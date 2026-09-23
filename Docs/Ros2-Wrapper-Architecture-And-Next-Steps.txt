@@ -1,0 +1,431 @@
+======================================================================
+How the ros2_wrapper works, end to end -- and what's next
+======================================================================
+UPDATE (full-copy rigorous bug-hunt pass): a real bug matching exactly
+the risk this doc's Part 6 already described in theory was found and
+fixed in the full CPM-Loader-ais/ working copy --
+LpsSaWeighApp::initialize() called
+LpsCalCmdScsReqstIn->addNewDataSlot(boost::bind(&LpsSaWeighApp::
+LpsSaWeighCalReqstCallback, this)) -- a method that only exists on the
+OLD SCS InputInterface<T>, not on ros2_wrapper::RosInputInterface<T>.
+Would not have compiled, and even if patched to compile, the callback
+would never have fired again (no push/notify mechanism exists in the
+new wrapper at all -- see Part 6). Fixed by removing the
+addNewDataSlot() registration and calling LpsSaWeighCalReqstCallback()
+directly once per tick from LpsSaWeighingScsRx(), since the function
+already did its own while(get()) drain loop internally. Swept the rest
+of both apps for addNewDataSlot()/removeNewDataSlot()/
+getNewDataCondition() -- this was the only live instance; the only
+other hits are the untouched original LpsSaWeighAppInf.hpp (correctly
+still using the old API, since AisJhm2RequestProcessor depends on it
+unmodified) and one already-dead commented-out line.
+
+Scope: explains the actual mechanism (not just design decisions) behind
+prod/common/ros2_wrapper/{RosInputInterface.h,RosOutputInterface.h} and
+DDSWeighAppInf.hpp, using verified content from the real files (quoted
+directly, not reconstructed from memory), then lays out the concrete
+work still pending. Written to be read start-to-finish by someone who
+has not seen the rest of this project's docs.
+
+======================================================================
+PART 1 -- The problem these wrappers solve
+======================================================================
+The original SCS (shared-memory) communication layer gave every channel
+two small template classes:
+  InputInterface<T>::get(T& data)   -- non-blocking poll, returns true/
+                                        fills data if a message is
+                                        waiting, false otherwise
+  OutputInterface<T>::publish(const T& data) -- fire-and-forget send,
+                                        returns bool success
+
+All business logic in both apps was written against exactly this
+2-method contract, called in tight poll loops:
+  while (someChannel->get(data)) { ...process data... }
+  someChannel->publish(result);
+
+The migration's guiding constraint (established early in this project):
+change the TRANSPORT, not the CALL SITES. So ros2_wrapper provides two
+classes with the exact same method names, same call syntax, same
+boolean-success contract -- but backed by real ROS2/DDS underneath.
+Only the member's DECLARED TYPE changes (SCS pointer type -> wrapper
+type); every `->get(x)` / `->publish(x)` call site in the business
+logic keeps compiling unchanged.
+
+======================================================================
+PART 2 -- RosOutputInterface<T> (the simpler of the two)
+======================================================================
+Full real file, prod/common/ros2_wrapper/RosOutputInterface.h:
+
+    template<typename T>
+    class RosOutputInterface
+    {
+    public:
+        RosOutputInterface(const rclcpp::Node::SharedPtr& node, const std::string& topicName, size_t qosDepth = 10)
+            : topicName_(topicName)
+        {
+            publisher_ = node->create_publisher<T>(topicName, qosDepth);
+        }
+
+        bool publish(const T& data)
+        {
+            try
+            {
+                publisher_->publish(data);
+                return true;
+            }
+            catch (const std::exception&)
+            {
+                return false;
+            }
+        }
+
+        const std::string& topicName() const { return topicName_; }
+
+    private:
+        typename rclcpp::Publisher<T>::SharedPtr publisher_;
+        std::string topicName_;
+    };
+
+Mechanics:
+  - Header-only template, same reason the original OutputInterface<T>
+    was header-only: it's instantiated once per real message type
+    (T = cpm_common_interfaces::msg::LpsSaWeighReqstChannel, etc.), so
+    there's no single .cpp to put a non-template implementation in.
+  - Construction takes the app's SHARED rclcpp::Node (one node per app,
+    not one per channel -- a deliberate resolved decision, see Part 5)
+    plus a topic name string, and immediately creates a real DDS
+    publisher on that node via node->create_publisher<T>().
+  - publish() is a direct, synchronous call into rclcpp::Publisher<T>
+    ::publish() -- DDS handles the actual wire send. The try/catch
+    exists purely to preserve the OLD contract: real SCS
+    OutputInterface<T>::publish() never threw, callers everywhere just
+    check the returned bool (e.g. LpsSaJobMgrScs.cpp's
+    `scsCmdRet = LpsSaJobMgrScsTxOut->publish(txOut);` followed by an
+    `if (!scsCmdRet)` check) -- so any exception from the DDS layer is
+    caught and turned into a `false` return instead of propagating and
+    crashing a caller that never expected to catch anything.
+  - No PIMPL (explicit, documented decision): a compiled-firewall
+    pattern doesn't transfer cleanly to a header-only template (there's
+    no single .cpp to hide an Impl class in), so <rclcpp/rclcpp.hpp> is
+    visible wherever this header is included. Kept as a fallback only
+    if this plain approach ever causes a real problem (e.g. build-time
+    bloat from rclcpp headers appearing in many translation units).
+
+======================================================================
+PART 3 -- RosInputInterface<T> (the one with real design content)
+======================================================================
+Full real file, prod/common/ros2_wrapper/RosInputInterface.h:
+
+    template<typename T>
+    class RosInputInterface
+    {
+    public:
+        RosInputInterface(const rclcpp::Node::SharedPtr& node, const std::string& topicName, size_t qosDepth = 10)
+            : topicName_(topicName)
+        {
+            subscription_ = node->create_subscription<T>(
+                topicName,
+                qosDepth,
+                [this](const typename T::SharedPtr msg)
+                {
+                    queue_.push(*msg);
+                });
+        }
+
+        bool get(T& data)
+        {
+            if (queue_.empty())
+            {
+                return false;
+            }
+            data = queue_.front();
+            queue_.pop();
+            return true;
+        }
+
+        const std::string& topicName() const { return topicName_; }
+
+    private:
+        typename rclcpp::Subscription<T>::SharedPtr subscription_;
+        std::queue<T> queue_;
+        std::string topicName_;
+    };
+
+Mechanics:
+  - Construction creates a real DDS subscription on the shared node,
+    with a LAMBDA CALLBACK that just pushes every arriving message onto
+    an internal std::queue<T> and returns immediately. That callback
+    does no other work -- no processing, no locking, nothing.
+  - get(T& data) is NOT a live DDS read. It pops the FRONT of the
+    internal queue (oldest-first) if non-empty, or returns false if the
+    queue is currently empty. This is a deliberate match to the real
+    SCS InputInterface<T>::get() contract, which the whole codebase
+    already assumes: business logic everywhere drains channels in
+    `while (channel->get(x)) { ... }` loops, expecting to see EVERY
+    message that arrived since the last poll, not just the newest one.
+    A cached-single-latest-value design (the "simple" alternative) would
+    silently drop messages whenever 2+ arrived between polls -- wrong
+    for this codebase's existing drain-loop pattern, so a real
+    std::queue<T> was used instead.
+  - No mutex, despite a callback (the lambda) and a poller (get())
+    touching the same queue_ from what LOOKS like two different
+    contexts. This is safe, not an oversight -- see Part 4.
+
+======================================================================
+PART 4 -- Why there's no mutex (the single-thread proof)
+======================================================================
+The callback that pushes onto queue_ never fires on its own thread.
+rclcpp callbacks only run when something actively pumps them -- in this
+design, that's rclcpp::executors::SingleThreadedExecutor::spin_some(),
+called explicitly, synchronously, by the app itself, once per
+executive() tick:
+
+    bool LpsSaJobMgrApp::executive()
+    {
+        rosChannels_.spinSome();   // <-- drains all pending DDS callbacks
+                                    //     for every RosInputInterface on
+                                    //     this node, right here, this call
+        ...
+        LpsSaJobMgrScsRx();         // <-- calls weighAppInf.waitForTxData(),
+                                    //     which calls the queue's get()
+        ...
+    }
+
+So the full sequence, every tick, on ONE thread:
+  1. spin_some() runs -> for every message DDS has delivered since the
+     last tick, the lambda callback fires and pushes it onto queue_.
+  2. spin_some() returns (no more pending callbacks).
+  3. Business logic calls get() on that same queue_, still same thread.
+
+There is no window where step 1 and step 3 can run concurrently --
+they're sequential calls on the same thread, never interleaved. A
+background-thread-spins-continuously design WOULD need a mutex (the
+callback could fire literally any time, including mid-get()); this
+poll-once-per-tick design structurally cannot race, so the mutex was
+correctly left out rather than added defensively.
+
+======================================================================
+PART 5 -- A composed wrapper: DDSWeighAppInf
+======================================================================
+The 2 primitives above are generic -- they know nothing about request/
+response semantics. DDSWeighAppInf.hpp is a hand-built class that
+composes 3 of them (one RosOutputInterface for requests, 2
+RosInputInterface for responses and tx data) into JobMgr's actual
+request/response/tx protocol with WeighApp. Verified real methods:
+
+  bool start(appName, requestOutput, responseInput, txInput)
+    Stores the 3 wrapper pointers, resets internal state
+    (nextTxTimePointNs_, lastRequestId_, lastCommand_).
+
+  bool sendRequest(cpm_common_interfaces::msg::LpsSaWeighReqstChannel& request)
+    Stamps request.app_name/app_request_id, publishes it via
+    requestOutput_->publish(request), and on success records
+    nextTxTimePointNs_ = now + 250ms (the same 250ms default the old
+    SCS code used) plus lastRequestId_/lastCommand_ -- this is the
+    "freshness gate" used by waitForTxData() below to know when a tx
+    update actually reflects this specific request's effect, not just
+    stale, already-in-flight data.
+
+  bool waitForTxData(cpm_common_interfaces::msg::LpsSaWeighTxChannel& txData, ...)
+    NOT a real blocking wait (see Part 6 for why). Drains
+    responseInput_ and txInput_ (both via their get() loops), checks
+    whether the latest tx data's timestamp is >= nextTxTimePointNs_
+    (meaning: new enough to reflect the last sent request), and returns
+    that as success/failure. Always fills txData with whatever the
+    latest data is, whether "fresh enough" or not -- matching the old
+    SCS contract's same behavior on timeout.
+
+======================================================================
+PART 6 -- Why waitForTxData() can't really "wait" (and why that's fine)
+======================================================================
+The original SCS LpsSaWeighAppInf used a std::condition_variable: when
+new data was too stale, the caller's thread would genuinely BLOCK,
+woken either by the callback thread signaling new data, or by a
+timeout. That's impossible to replicate here structurally:
+RosInputInterface<T> has no notification/callback hook exposed to
+DDSWeighAppInf at all -- new data just silently accumulates in queue_
+until someone calls get(). There is no background thread left to wake
+a blocking waiter, because (Part 4) there IS no background thread.
+
+So waitForTxData() is a single-shot, non-blocking poll of whatever
+spin_some() already delivered THIS tick -- "return false this tick, try
+again next tick" instead of "block until data arrives or 250ms
+elapses." This is judged SAFE (not just a compromise) because the real
+caller, LpsSaJobMgrScsRx(), itself runs every single executive() tick
+(confirmed via grep of LpsSaJobMgrApp.cpp) -- so a miss this tick is
+retried automatically next tick, at the app's normal cycle rate, likely
+FASTER in practice than the old 250ms blocking timeout ever was.
+
+======================================================================
+PART 7 -- App-level composition: the RosChannels pattern
+======================================================================
+Neither app talks to ros2_wrapper types directly in initialize()/
+executive()/cleanup() in the newer (stage1-rosChannels) layout -- that
+plumbing is pulled into one small class per app (see
+LpsSaJobMgrRosChannels.h / LpsSaWeighAppRosChannels.h) that owns:
+  - the shared rclcpp::Node for the whole app
+  - the rclcpp::executors::SingleThreadedExecutor
+  - every RosInputInterface<T>/RosOutputInterface<T> instance (or, for
+    JobMgr, the single DDSWeighAppInf that itself owns 3 of them)
+
+Three methods: init(nodeName) does the rclcpp::init() guard + node
+construction + every wrapper construction + executor_.add_node();
+spinSome() just forwards to executor_.spin_some(); shutdown() deletes
+things and calls rclcpp::shutdown(). The app's own initialize()/
+executive()/cleanup() shrink to one call each into this class. (In the
+original, non-rosChannels Stage 1 layout, this same code is inlined
+directly into the app's own initialize()/executive()/cleanup() instead
+-- functionally identical, just not factored out. See
+CPM-Loader-ais-stage1-rosChannels/README.txt for the full comparison.)
+
+======================================================================
+PART 8 -- Full request/response/tx cycle, traced end to end
+======================================================================
+Concrete example: JobMgr sends RESET_BEST_BUCKET_WEIGHT.
+
+  Tick N, JobMgr:
+    LpsSaJobMgrScsSendCmd(command) builds a
+    cpm_common_interfaces::msg::LpsSaWeighReqstChannel request,
+    sets request.command.value, calls weighAppInf.sendRequest(request).
+    -> requestOutput_->publish(request) sends it over DDS.
+    -> nextTxTimePointNs_ = now + 250ms recorded.
+
+  Some tick M >= N, WeighApp:
+    executor_.spin_some() delivers the request into
+    LpsSaWeighScsReqstIn's queue_.
+    LpsSaScsChkForReqst() drains it via get(), matches the command in
+    its switch, performs the actual reset, calls
+    LpsSaScsSendReqstResponse(request, true) -- which builds a
+    LpsSaWeighRespChannel and publishes it via LpsSaWeighScsRespOut.
+    Separately, LpsSaWeighingScsTx() (running every tick regardless)
+    builds and publishes a fresh LpsSaWeighTxChannel reflecting the
+    now-reset state, stamped with the current time.
+
+  Some tick P >= M, JobMgr:
+    spin_some() delivers both the response and the new tx data into
+    their respective queues.
+    waitForTxData()'s drainResponseInput() sees the response, confirms
+    it matches (app_name/app_request_id/command all match what was
+    sent), and advances nextTxTimePointNs_ to the response's own
+    timestamp -- tightening the freshness gate now that we know
+    WeighApp has actually processed the request.
+    drainTxInput() sees the new tx data; since its timestamp is now
+    >= nextTxTimePointNs_, waitForTxData() returns true with the
+    fresh data.
+
+This is why sendRequest() and waitForTxData() are 2 separate calls
+(not 1 combined "send and get result" call): the freshness gate
+spans potentially many ticks between them, and the app keeps doing
+other work (LpsSaJobMgrScsRx()'s other read functions, LpsSaJobMgrScsTx())
+on every one of those ticks in between -- there's no blocking, ever.
+
+======================================================================
+PART 9 -- What this wrapper layer explicitly does NOT do
+======================================================================
+  - It does not touch any channel still on raw SCS/InterfaceDb. Only
+    the channels actually converted (currently: legs 1-3, i.e. the
+    weighAppInf trio, in both Stage 1 folders; all ~40 channels across
+    both apps in the full CPM-Loader-ais/ working copy) go through
+    ros2_wrapper at all. Everything else still calls
+    task::InterfaceDb::fetch()/bind() exactly as before -- confirmed
+    directly against the reference tree earlier in this project.
+  - It does not provide any struct-to-struct field mapping beyond what
+    each hand-written call site does inline (see the earlier
+    field-by-field conversions in LpsSaWeighingScsTx(),
+    LpsSaWeighScsTxParamRead(), etc.). A "mapper class per channel"
+    alternative design was considered and explicitly rejected earlier
+    in this project (see the BizChat-advice review) because the direct,
+    inline approach was already built and working, and switching now
+    would mean reverting completed work for no functional gain.
+  - It does not provide QoS profiles beyond the fixed qosDepth=10
+    default on every publisher/subscription -- no reliability/
+    durability tuning has been done yet.
+
+======================================================================
+PART 10 -- What's next
+======================================================================
+In rough priority order, based on everything established across this
+project so far:
+
+1. REAL COMPILER/DOCKER VERIFICATION -- still the single biggest gap.
+   Neither Stage 1 folder, nor the full CPM-Loader-ais/ working copy,
+   has ever been confirmed to actually compile. All verification done
+   so far has been static (brace/paren balance, grep sweeps, manual
+   type-matching against the known-working full copy) -- real, but not
+   equivalent to a compiler pass. Docker was unavailable the times this
+   was attempted; retry via Dockerfile.stage1 / docker-compose once
+   Docker Desktop is running, or verify directly at site 2.
+
+2. THE 3 LATENT SHARED-WRAPPER-CLASS RISKS -- LpsSaJobMgrReqstChannel's
+   LpsSaJobMgrRequestHelper, AutonomyConditionDiagnostics's
+   RequestHelper, and LpsSaTotals's RequestHelper all have the exact
+   same shape that caused the original LpsSaWeighAppInf/
+   AisJhm2RequestProcessor bug (a shared class instantiated by both an
+   app and AisJhm2RequestProcessor). None are touched yet, so nothing
+   is broken today -- but the FIRST time any of them is converted, it
+   must get the same DDSWeighAppInf-style treatment (new sibling class,
+   original left byte-identical), not an in-place edit. See
+   Shared-Wrapper-Class-Audit.txt for full detail.
+
+3. THE 12 UNRESOLVED CHANNELS -- SwitchInputScs, OutputChannel,
+   ShmClock, DataLinkData, EventDiagnosticData, PwmInputChannels,
+   CalMgrCmdReqst, CalMgrCmdResp, PartNumbers, SystemHardwareHealth,
+   SystemHardwareHealthRequest, ReadyToFlashStatus have no matching
+   directory in this reference checkout at all -- 4 of them are
+   referenced by AisJhm2RequestProcessor.h's own includes, meaning they
+   genuinely exist somewhere (likely a sibling repo not present here).
+   Re-audit these for the same shared-wrapper-class risk once that
+   source is available, e.g. at site 2 -- they are unresolved, not
+   cleared.
+
+4. LEGS 4-5 (LpsSaJobMgrReqstChannel/LpsSaJobMgrTxChannel's direct
+   hybrid legs) -- not converted in either Stage 1 folder. Deliberately
+   excluded because their handler functions are tangled with unrelated
+   channels (leg 4's LpsSaJobMgrScsChkForReqst() also touches
+   SwitchInputScs/displayStateInput_). Already fully converted in the
+   full CPM-Loader-ais/ working copy, which can serve as the reference
+   pattern when/if a "Stage 2" cut is scoped out.
+
+5. rclcpp::init() TIMING ASSUMPTION -- the guarded rclcpp::init(0,
+   nullptr) added inside each app's initialize() (or RosChannels::init())
+   assumes it's safe to call there because each app is its own
+   standalone SConscript Program() target (one task per process). This
+   reasoning has not been checked against the real ais_task framework's
+   own internal initialization sequencing, which isn't visible from
+   this checkout -- confirm at site 2.
+
+6. WHETHER TO EXTEND THE RosChannels PATTERN TO THE FULL WORKING COPY --
+   already recommended earlier in this project: the RosChannels split
+   is roughly a wash at Stage 1's narrow scope (3 channels) but a real
+   readability win at the full copy's ~16-24-channel-per-app scale,
+   where initialize() is currently a long wall of repetitive
+   `new ros2_wrapper::Ros...Interface<...>(...)` calls. Not yet done in
+   CPM-Loader-ais/ itself -- only prototyped in the Stage 1 comparison
+   folder.
+
+7. WEIGHAPP'S FINAL ARCHITECTURE -- still explicitly undecided (full
+   port vs. permanent SCS<->DDS bridge), deferred until after JobMgr
+   ships, per earlier project decision. Worth re-raising when it comes
+   up: the risk calculus favors a full port more than originally
+   assessed, since LpsUpdt() and the calibration library stay untouched
+   under the transport-swap pattern -- only LpsSaScs.cpp changes, so a
+   full port carries much less Legal-For-Trade re-certification risk
+   than an earlier, more pessimistic framing assumed.
+
+8. AIS SDK / ROS2 ABI COMPATIBILITY ON THE REAL TARGET -- target
+   platform is A7H4 (confirmed Ubuntu 24.04/Noble, ROS2 Jazzy's actual
+   Tier-1 target: GCC 13, glibc 2.39, C++17) -- prebuilt ros-jazzy-*
+   packages should work directly, no need to build ROS2 core from
+   source. Still unverified: whether the AIS SDK's own A7H4 SCons
+   toolchain produces GCC-13/glibc-2.39-ABI-compatible object code --
+   matters specifically for whichever binary ends up linking both
+   rclcpp and the AIS SDK's task::Task/InterfaceDb in one process. Not
+   checkable from source inspection alone; needs `gcc --version`
+   against the real A7H4 toolchain at site 2.
+
+9. COPY STAGE 1 TO SITE 2 AND RUN IT FOR REAL -- once (1) passes, the
+   actual point of Stage 1's existence: copy its file set over the real
+   ssp-CPM_Loader-ais checkout at site 2, build with the real AIS SDK,
+   and do a real end-to-end DDS test between the two real apps --
+   something no amount of local Docker/adapter testing can substitute
+   for.

@@ -142,8 +142,15 @@ Add includes: <rclcpp/rclcpp.hpp>, <ros2_wrapper/RosInputInterface.h>,
 Add 2 new private members:
     rclcpp::Node::SharedPtr rosNode_;
     rclcpp::executors::SingleThreadedExecutor executor_;
-No existing channel member is retyped -- weighAppInf_'s own member
-declaration (`LpsSaWeighAppInf weighAppInf_;`) is unchanged.
+No existing channel member is retyped. weighAppInf_'s own member
+declaration DOES change type -- from `LpsSaWeighAppInf weighAppInf_;`
+to `DDSWeighAppInf weighAppInf_;` (a new, separate class -- see section
+5's LpsSaWeighReqstChannel/ entry below for why LpsSaWeighAppInf.hpp
+itself is NOT edited). The #include swaps accordingly. Corrected here
+after being caught mid-review: the original version of this plan said
+this declaration was "unchanged," which was wrong -- it's the class
+*definition* (LpsSaWeighAppInf.hpp) that must stay untouched, not the
+member's declared type.
 
 --- apps/LpsSaJobMgrApp/LpsSaJobMgrApp.cpp ---
 Constructor initializer list: add `rosNode_(nullptr), executor_(),`.
@@ -237,11 +244,24 @@ Only 3 functions change; everything else in this file is untouched:
 --- prod/common/ros2_wrapper/RosOutputInterface.h (new file) ---
 As specified in section 2.2.
 
+--- prod/common/interfaces/LpsSaWeighReqstChannel/DDSWeighAppInf.hpp (new file) ---
+This IS legs 1-3's implementation on JobMgr's side (the real class
+weighAppInf_ now wraps). Same public API as the original
+LpsSaWeighAppInf (start(), sendRequest(), waitForTxData()), but its
+own separate class -- see next entry for why.
+
 --- prod/common/interfaces/LpsSaWeighReqstChannel/LpsSaWeighAppInf.hpp ---
-New content -- this file IS legs 1-3's implementation on JobMgr's side
-(the real class weighAppInf_ wraps). Its public API (start(),
-sendRequest(), waitForTxData()) is unchanged; only its internals now
-hold the 3 ros2_wrapper objects instead of raw SCS pointers.
+NOT changed -- byte-for-byte identical to the original. This file is
+shared common/interfaces code: at least one other real component
+(AisJhm2RequestProcessor, part of the legacy UI infrastructure, still
+SCS-only, confirmed via grep of ssp-CPM_Loader-ais) holds its own
+instance and calls methods (sendRequestGetResponse(), waitForResponse(),
+etc.) that LpsSaJobMgrApp itself never uses. An earlier version of this
+work-in-progress edited this file in place -- dropping those unused-by-
+JobMgr methods and retyping requestOutput_/responseInput_/txInput_ to
+the new wrapper types -- which would have broken that unrelated caller
+the moment this tree gets copied back over the original repo. Caught
+and reverted; DDSWeighAppInf.hpp (above) is the corrected approach.
 
 ======================================================================
 6. BUILD PROCESS

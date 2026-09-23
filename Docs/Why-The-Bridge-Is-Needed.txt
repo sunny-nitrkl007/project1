@@ -1,0 +1,127 @@
+======================================================================
+Why the Bridge is needed (and why "just convert one channel at a
+time until everything is DDS" doesn't get rid of it)
+======================================================================
+
+THE SHORT ANSWER
+----------------------------------------------------------------------
+It depends on who is on the OTHER end of the channel.
+
+The 3 (really 5) channels that went direct DDS-to-DDS with no Bridge
+share one property: both real endpoints are JobMgr and WeighApp --
+the two apps actually being converted in this project. Once both
+sides speak DDS, the conversion for that channel is simply complete.
+There's nothing left to bridge.
+
+Every other channel has an endpoint that is NOT JobMgr or WeighApp --
+it's a separate, real component this project was never scoped to
+touch. That's the whole reason the Bridge exists, and it's a
+permanent architectural seam, not a temporary stepping stone.
+
+----------------------------------------------------------------------
+1. THE CHANNELS THAT DIDN'T NEED A BRIDGE, AND WHY
+----------------------------------------------------------------------
+LpsSaWeighReqstChannel, LpsSaWeighRespChannel, LpsSaWeighTxChannel,
+plus the 2 hybrid legs (LpsSaJobMgrReqstChannel's WeighApp leg,
+LpsSaJobMgrTxChannel's direct leg) -- all 5 are JobMgr<->WeighApp
+only. No third party ever reads or writes them. Converting both
+apps' code for these channels IS the whole job; there's no gap left
+for anything to fall into.
+
+This is why Stage 1 could pick exactly these channels for a minimal
+first slice: they're the only channels where "convert it and you're
+done" is actually true in isolation.
+
+----------------------------------------------------------------------
+2. THE CHANNELS THAT DO NEED A BRIDGE, AND WHY
+----------------------------------------------------------------------
+Every other real channel has a second party outside this project's
+scope:
+
+  - SwitchInputScs       -> the real switch/button hardware (or
+                             whatever driver actually reads it)
+  - OutputChannel         -> real GPIO output hardware (drives the
+                             horn, etc.)
+  - LpsSaJobMgrReqstChannel's OTHER leg -> the legacy UI app
+                             (AisJhm2RequestProcessor), explicitly
+                             still SCS-only, not part of this project
+  - DisplayState          -> published by a separate DisplayApp
+  - ShmClock              -> a separate system/hardware clock source
+  - EventDiagnosticData   -> hardware/ECM diagnostics, a separate
+                             source
+  - AutonomyConditionDiagnosticsTxChannel -> a separate autonomy
+                             component
+
+None of these are being converted here. Some of them plausibly
+CAN'T be -- a GPIO board or a switch driver almost certainly isn't
+something you put ROS2/DDS on. Converting JobMgr's side of
+SwitchInputScs to DDS doesn't make the physical switch start
+speaking DDS. The other end just... doesn't move.
+
+----------------------------------------------------------------------
+3. THE PART THAT MAKES "GRADUAL, NO BRIDGE" IMPOSSIBLE, NOT JUST
+   INCONVENIENT
+----------------------------------------------------------------------
+This isn't only a scope argument -- it's a protocol one. Once
+JobMgr's object for a channel is a DDS wrapper
+(ros2_wrapper::RosInputInterface<T>/RosOutputInterface<T>), it
+literally cannot talk to a real SCS InputInterface<T>/
+OutputInterface<T> anymore. Different transport, different wire
+format, not interoperable at any level.
+
+So the instant JobMgr's side of SwitchInputScs converts, the channel
+goes dead UNLESS something in the middle holds a real SCS handle on
+one side and a DDS wrapper on the other, and actively relays between
+them. That's not an optional nicety -- it's the only way the channel
+keeps working at all once one side has moved and the other hasn't.
+That "something in the middle" is the Bridge.
+
+----------------------------------------------------------------------
+4. HOW THE BRIDGE ACTUALLY WORKS, MECHANICALLY
+----------------------------------------------------------------------
+For each such channel-leg, the Bridge constructs BOTH a real SCS
+handle (task::InterfaceDb::fetch/bind -- the exact same mechanism
+the original, pre-migration JobMgr/WeighApp code used) and a DDS
+wrapper on the same topic name/type JobMgr or WeighApp already uses.
+Once per tick, it drains one side and republishes onto the other:
+
+  Publisher relay (JobMgr/WeighApp -> legacy peer):
+    read the DDS topic JobMgr/WeighApp already publishes to
+      -> write the real SCS output object
+
+  Subscriber relay (legacy peer -> JobMgr/WeighApp):
+    read the real SCS input object
+      -> republish onto the same DDS topic JobMgr/WeighApp already
+         subscribes to
+
+From JobMgr/WeighApp's point of view, nothing distinguishes a
+Bridge-relayed channel from a directly-wired one -- same topic name,
+same message type, same get()/publish() calls. The Bridge is
+invisible to them; it only matters to whatever's still SCS-only on
+the other side.
+
+----------------------------------------------------------------------
+5. IS IT PERMANENT, OR DOES IT GO AWAY EVENTUALLY?
+----------------------------------------------------------------------
+Per-leg, it's permanent for exactly as long as that leg's other
+party stays SCS-only -- which, given those parties are outside this
+project's scope, could be indefinitely, or could change if some
+separate future project converts the legacy UI or the hardware
+drivers too. If that ever happens, that specific leg's Bridge relay
+becomes removable (the two sides could go direct DDS-to-DDS, same as
+the 5 legs that never needed it) -- but that's a decision for
+whoever owns that other component, not something this migration
+controls or should assume will happen.
+
+----------------------------------------------------------------------
+6. WHY ONE SHARED BRIDGE PROCESS, NOT ONE PER CHANNEL OR ONE PER APP
+----------------------------------------------------------------------
+A per-app bridge (one JobMgr-facing relay process, one WeighApp-
+facing one) was considered and rejected in favor of a single shared
+process. Two reasons: it matches the "one boundary, one seam"
+framing -- there's conceptually one line between "migrated" and
+"not yet migrated," so one process modeling that line is cleaner
+than several -- and its channel list is a visible, incrementally-
+growable measure of how much of the system has actually been
+migrated so far. Every leg added to the Bridge is a leg that's been
+verified and wired; the list itself is a progress record.

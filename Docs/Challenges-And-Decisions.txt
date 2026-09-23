@@ -942,3 +942,38 @@ A push was rejected because someone uploaded ROS2_custom_Code.zip
 directly via GitHub's web UI while local work was in progress. Not an
 actual content conflict (different files entirely) -- resolved with a
 plain merge, no force-push, both sides' work preserved.
+
+======================================================================
+PART 8 -- RUNTIME CRASH: executor_ constructed before rclcpp::init()
+======================================================================
+
+8.1  Both apps aborting on every run -- executor_ was a value member,
+     not gated by rclcpp::init()
+----------------------------------------------------------------------
+cores.zip (8 core dumps, 4 per app, all SIGABRT) plus a captured
+console message gave the real cause:
+  terminate called after throwing an instance of
+  'rclcpp::exceptions::RCLInvalidArgument'
+  what():  failed to create guard condition: context argument is
+  null, at ./src/rcl/guard_condition.c:65
+Traced to: `rclcpp::executors::SingleThreadedExecutor executor_;` was
+declared as a plain value member (LpsSaJobMgrApp.h, LpsSaWeighApp.h),
+not a pointer like rosNode_. Its no-arg constructor immediately builds
+a guard condition against the global default rclcpp::Context, so it
+runs at LpsSaJobMgrApp/LpsSaWeighApp's own construction time (inside
+task::getTaskImplementation(), before initialize() -- and therefore
+before rclcpp::init() -- ever runs). Moving the rclcpp::init() call
+around inside initialize() could never fix this: executor_'s
+construction isn't gated by any function call, only by the enclosing
+object's constructor, which always completes before any method
+(including whichever one calls rclcpp::init()) can run.
+FIXED (stage1 only): executor_ changed to
+`std::unique_ptr<rclcpp::executors::SingleThreadedExecutor>`,
+default-constructed to nullptr in the member-init-list, and actually
+built with `std::make_unique<...>()` right after the existing
+`if (!rclcpp::ok()) { rclcpp::init(0, nullptr); }` guard in each app's
+init function -- same place rosNode_ already gets assigned. All
+`executor_.` call sites (add_node, spin_some) became `executor_->`.
+NOT YET DONE: CPM-Loader-ais, stage1-callback, and stage1-rosChannels
+have the identical `executor_` value-member pattern and were not
+touched -- same fix needed there before those variants can run.

@@ -1,0 +1,136 @@
+======================================================================
+cpm_common_interfaces -- Map
+======================================================================
+1. LpsSaWeighTxChannel.h
+   CPM-Loader-ais/prod/common/interfaces/LpsSaWeighTxChannel/
+======================================================================
+
+  Real type                          -> .msg file
+  ----------------------------------------------------------------
+  LpsSaWeighTxChannelStorage         -> LpsSaWeighTxChannel.msg
+    (nested) ToaAnchorStatus_t       -> LpsSaWeighTxChannel.msg (inlined section)
+    (nested) TestStatus_t            -> LpsSaWeighTxChannel.msg (inlined section)
+  LpsFloatIO_t                       -> FloatIO.msg
+  LpsSaLftSealStatus_t               -> LftSealStatus.msg
+  LpsSaLiftPosition_t                -> LiftPosition.msg
+  LpsSaTiltPosition_t                -> TiltPosition.msg
+  LpsSaPayload_t                     -> Payload.msg
+  LpsSaWeighRange_t                  -> WeighRange.msg
+  LinkSensorCalLim_t                 -> LinkSensorCalLim.msg
+  ProdMeasureSensorStatus_t          -> ProdMeasureSensorStatus.msg
+    (nested) TiltSensorConfig_t      -> ProdMeasureSensorStatus.msg (inlined section)
+  ACDEventPopUp::type                -> AcdEventPopUp.msg
+  ACDDiagPopUp::type                 -> AcdDiagPopUp.msg
+  ACDInfoPopUp::type                 -> AcdInfoPopUp.msg
+  WeighPidData_t                     -> WeighPidData.msg
+    (nested) ACDWeighStatus::type            -> WeighPidData.msg (inlined section)
+    (nested) PloadSysZeroStat_t              -> WeighPidData.msg (inlined section)
+    (nested) PloadSysCalWtEntryReqStat_t     -> WeighPidData.msg (inlined section)
+    (nested) BktPayloadData_t                -> WeighPidData.msg (inlined section)
+    (nested) AudibleAnnunciationPriority_t   -> WeighPidData.msg (inlined section)
+
+======================================================================
+2. LpsSaWeighReqstChannel.h
+   CPM-Loader-ais/prod/common/interfaces/LpsSaWeighReqstChannel/
+======================================================================
+  LpsSaWeighReqstChannelStorage          -> LpsSaWeighReqstChannel.msg
+    (nested) ::Command                   -> WeighReqstChannelCommand.msg
+  std::pair<float, float> (arg.map field)-> FloatPair.msg (raw std::pair,
+                                             not a named struct anywhere --
+                                             this is just where it's used)
+
+======================================================================
+3. LpsSaWeighRespChannel.h
+   CPM-Loader-ais/prod/common/interfaces/LpsSaWeighRespChannel/
+======================================================================
+  LpsSaWeighRespChannelStorage       -> LpsSaWeighRespChannel.msg
+  (reuses WeighReqstChannelCommand from source #2 for its own
+  Command field -- same real Command type, both channels share it)
+
+======================================================================
+4. LpsSaJobMgrTxChannel.h
+   CPM-Loader-ais/prod/common/interfaces/LpsSaJobMgrTxChannel/
+======================================================================
+Only these 3 nested enums promoted -- the channel struct itself
+(LpsSaJobMgrTxChannelStorage) stays in job_mgr_interfaces, since only
+these 3 (of ~100 fields) are genuinely read by WeighApp too 
+
+  LpsSaJobMgrStandbyState_t          -> StandbyState.msg
+  LpsSaJobMgrTipOffState_t           -> TipOffState.msg
+  LpsSaTipOffTriggerType_t           -> TipOffTriggerType.msg
+
+======================================================================
+5. LpsSaJobMgrReqstChannel.h
+   CPM-Loader-ais/prod/common/interfaces/LpsSaJobMgrReqstChannel/
+======================================================================
+
+  LpsSaJobMgrReqstChannelStorage         -> LpsSaJobMgrReqstChannel.msg
+    (nested) ::Command                   -> JobMgrReqstChannelCommand.msg
+    (nested) ::LpsSaJobMgrSubtotalInfo_t -> LpsSaJobMgrSubtotalInfo.msg
+  LpsSaJobMgrReqst / LpsSaJobMgrReqstCommand -> LpsSaJobMgrReqst.msg
+
+======================================================================
+6. AisJhm2TxChannel.h
+   CPM-Loader-ais/prod/common/interfaces/AisJhm2TxChannel/
+======================================================================
+  AisJhm2TxChannelStorage                        -> AisJhm2TxChannel.msg
+    (nested) ::simplecal_data_t                  -> SimpleCalDataT.msg
+    (nested) ::tipoff_weight_adjust_data_t        -> TipoffWeightAdjustData.msg
+
+======================================================================
+7. AutonomyConditionDiagnostics/TxInterface.hpp
+   CPM-Loader-ais/prod/common/interfaces/AutonomyConditionDiagnostics/
+======================================================================
+  AutonomyConditionDiagnosticsTxInterfaceStorage -> AutonomyConditionDiagnosticsTxChannel.msg
+  (its seaList field uses SEA, defined in source #8, not here)
+
+======================================================================
+8. SEAStatus.h
+   eta-ais/prod/machineCommon/content/prod/common/interfaces/SEAStatus/
+======================================================================
+  SEA                                 -> SEA.msg
+    (nested) SEAStatusCodes           -> SEA.msg (inlined section)
+
+======================================================================
+9. ShmClock.h
+   eta-ais/prod/machineCommon/content/prod/common/interfaces/ShmClock/
+======================================================================
+  ShmClockStorage                     -> ShmClockInput.msg
+
+======================================================================
+10. DisplayState.hpp
+    CPM-Loader-ais/prod/common/interfaces/LpsSaUI/
+======================================================================
+  LpsSaUIDisplayState                 -> LpsSaUIDisplayState.msg
+
+======================================================================
+11. DisplaySettings.hpp
+    CPM-Loader-ais/prod/common/interfaces/LpsSaUI/
+======================================================================
+  LpsSaUIDisplaySettings              -> LpsSaUIDisplaySettings.msg
+    (nested) LpsSaUIDisplaySettingsLanguage -> LpsSaUIDisplaySettings.msg (inlined)
+    (nested) Units                          -> LpsSaUIDisplaySettings.msg (inlined)
+    (nested) Time Format                    -> LpsSaUIDisplaySettings.msg (inlined)
+    (nested) Date Format                    -> LpsSaUIDisplaySettings.msg (inlined)
+    (nested) Keyboard Layout                -> LpsSaUIDisplaySettings.msg (inlined)
+
+======================================================================
+12. DisplayStateInterface.hpp
+    CPM-Loader-ais/prod/common/interfaces/LpsSaUI/
+======================================================================
+  LpsSaUIDisplayStateInterfaceStorage -> LpsSaUIDisplayStateInterface.msg
+  (its `state` field uses LpsSaUIDisplayState from source #10, and
+  LpsSaUIDisplayState's own `settings` field uses LpsSaUIDisplaySettings
+  from source #11 -- 3 separate real files feeding one channel struct)
+
+======================================================================
+- Sources #1, #2, #3: structurally forced. These 3 headers back the 4
+  channels that ARE the direct JobMgr<->WeighApp legs themselves
+   -- everything they need as a field
+  has nowhere else to live, since cpm_common_interfaces depends on
+  neither app-specific package.
+- Sources #4, #6, #7, #8, #9, #10, #11, #12: genuine cross-app business-
+  logic reuse `job_mgr_interfaces::msg::X` referenced directly in
+  both apps' own .cpp/.h -- 
+
+
