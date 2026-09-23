@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connectionmanager>
+   <vlan>
+      <!-- addressmode: 0=static, 1=DHCP Client, 2=LLA -->
+      <!--              addressmode is ignored if devicetype is present. -->
+      <!-- name:        Identifier name of A6N2 Ports-->
+      <!-- master:      0=NotApplicable,1=master,2=slave-->
+      <!-- devicetype:  1=CellAir, 2=SatAir -->
+      <!--              If devicetype is present, conn_mgr will only set up -->
+      <!--              port/vlan/interface and not the IP address. -->
+      <!-- ipaddr:      IP address to use in static addressmode -->
+      <!-- netmask:     netmask to use in static addressmode -->
+      <!--              dotted-decimal form, like "255.255.255.0" -->
+      <!-- metric:      20=WiredEthernet, 30=Wifi, 40=Cellular, -->
+      <!--              50=SatelliteSBD, 60=SatelliteCSC -->
+      <!-- dhcp_dns:    1=use DHCP-provided DNS -->
+      <!--              0=set up DHCP, but don't use gateway's DNS -->
+      <!-- gateway:     static configuration of default gateway, can be "" -->
+      <!--              for local only use -->
+      <!-- speed:       10, 100, *auto (default) -->
+      <!-- duplex:      full, half, *auto (default) -->
+      <device port="1" name="Triangle 34-35 (BR)" vlan="20" master="1" enable="1" /> <!-- Display -->
+      <device port="2" name="Triangle 18-19 (BR)" vlan="20" master="1" enable="1" /> <!-- Network Manager -->
+      <device port="3" name="Square 20-21 (BR)" vlan="20" master="1" enable="1" /> <!-- Machine ECM (14A/B) Remote Control Module (RCM) -->
+      <device port="4" name="Square 18-19 (BR)" vlan="20" master="2" enable="1" /> <!-- Machine ECM (14C) Remote Control Module (RCM) -->
+      <device port="5" name="Square 34-35 (BR)" vlan="20" master="1" enable="1" /> <!-- No Connection -->
+      <device port="6" name="Circle 20-21 (BR)" vlan="20" master="1" enable="1" /> <!-- Display (OLD) -->
+      <device port="7" name="Triangle 1-4 (BASE-T)" vlan="20" speed="auto" duplex="auto" enable="1" />
+      <device port="8" name="Triangle 36-39 (BASE-T)" vlan="20" speed="auto" duplex="auto" enable="1" />
+      <device port="9" name="Square 36-39 (BASE-T)" vlan="20" speed="auto" duplex="auto" enable="1" />
+      <device port="10" name="Square 41-44 (BASE-T)" vlan="20" speed="auto" duplex="auto" enable="1" />
+      <device port="11" name="Circle 39-42 (BASE-T)" vlan="20" speed="auto" duplex="auto" addressmode="0" ipaddr="165.26.79.19" netmask="255.255.254.0" enable="1" />
+   </vlan>
+   <systemconfig>
+      <!-- static systemconfig will only take effect if dhcp_dns="1" is not -->
+      <!-- specified above or if DHCP fails -->
+      <dns primary="8.8.8.8" secondary="8.8.4.4" />
+   </systemconfig>
+</connectionmanager>

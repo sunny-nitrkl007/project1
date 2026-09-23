@@ -1,0 +1,51 @@
+{
+
+"CDL_PID":
+{
+    "Hydraulic Oil Temp": {
+        "CDL PID"              : "0x45",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x27",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "3",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "596"
+    },
+
+    "Product Link Module GPS Position Status": {
+        "CDL PID"              : "0xF84D",
+        "Data Size(bytes)"     : "15",
+        "Source J1939 Address" : "0x25",
+        "Request Rate(ms)"     : "1000",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "5000",
+        "Attributes"           : "",
+        "RequestType"          : "3",
+        "VarLengthDataType"    : "1",
+        "ParameterType"        : "12",
+        "Cid"                  : "1273"
+    }
+
+},
+
+"PGN":
+{
+    "PROPRIETARY A (PROPA)": {
+        "PGN"               : "61184",
+        "Source Address"    : "255",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "1"
+    }
+
+}
+}

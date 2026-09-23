@@ -1,0 +1,11 @@
+// For a list of possible errors
+//  cppcheck --errorlist > cppcheck_errorlist.xml
+
+// cppcheck doesn't understand enum class
+variableHidingEnum:prod/common/interfaces/LpsSaTotals/PrinterCnfg.hpp:12
+variableHidingEnum:prod/common/interfaces/LpsSaTotals/PrinterCnfg.hpp:13
+variableHidingEnum:prod/common/interfaces/LpsSaUI/DisplaySettings.hpp:96
+variableHidingEnum:prod/common/interfaces/LpsSaUI/DisplaySettings.hpp:97
+
+// cppcheck doesn't understand brace initializers
+constStatement:apps/WorkOrderAssist/Data.h

@@ -1,0 +1,32 @@
+#!/usr/bin/python
+Import('testEnv')
+myEnv = testEnv.Clone();
+
+# Need to compile against the c99 standard
+myEnv.Append(CFLAGS = [
+    '-std=gnu99',
+    '-Wno-unused-variable',
+    '-Wno-unused-parameter',
+    '-Wno-unused-function'
+])
+
+myEnv.Append(CPPPATH = [
+    '.'
+])
+
+source_files = [
+    'apriltag.c',
+    'apriltag_pose.c',
+    'apriltag_quad_thresh.c',
+    'tag36h11.c',
+    'tagStandard41h12.c',
+    Glob('common/*.c')
+]
+
+april_tag_lib = myEnv.SharedLibrary(
+    target = 'apriltag',
+    source = source_files
+)
+
+myEnv.InstallLibrary(april_tag_lib)
+

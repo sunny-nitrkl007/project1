@@ -1,0 +1,371 @@
+{
+  "config": {
+    "950 S5": [
+      { "linkage": 52, "internalMsn": "50700" },
+      { "linkage": 137, "internalMsn": "50701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "50702" },
+      { "linkage": 367, "internalMsn": "50702" },
+      { "internalMsn": "50700" }
+    ],
+    "950 S5 (z)": [
+      { "linkage": 52, "internalMsn": "50708" },
+      { "linkage": 137, "internalMsn": "50709" },
+      { "linkage": 367, "tool": 371, "internalMsn": "50710" },
+      { "linkage": 367, "internalMsn": "50710" },
+      { "internalMsn": "50708" }
+    ],
+    "950 T3": [
+      { "linkage": 52, "internalMsn": "50700" },
+      { "linkage": 137, "internalMsn": "50701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "50702" },
+      { "linkage": 367, "internalMsn": "50702" },
+      { "internalMsn": "50700" }
+    ],
+    "950 T3 (z)": [
+      { "linkage": 52, "internalMsn": "50708" },
+      { "linkage": 137, "internalMsn": "50709" },
+      { "linkage": 367, "tool": 371, "internalMsn": "50710" },
+      { "linkage": 367, "internalMsn": "50710" },
+      { "internalMsn": "50708" }
+    ],
+
+    "962 S5": [
+      { "linkage": 52, "internalMsn": "62700" },
+      { "linkage": 137, "internalMsn": "62701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "62702" },
+      { "linkage": 367, "internalMsn": "62702" },
+      { "internalMsn": "62700" }
+    ],
+    "962 S5 (z)": [
+      { "linkage": 52, "internalMsn": "62708" },
+      { "linkage": 137, "internalMsn": "62709" },
+      { "linkage": 138, "internalMsn": "62711" },
+      { "linkage": 448, "internalMsn": "62711" },
+      { "internalMsn": "62708" }
+    ],
+    "962 T3": [
+      { "linkage": 52, "internalMsn": "62700" },
+      { "linkage": 137, "internalMsn": "62701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "62702" },
+      { "linkage": 367, "internalMsn": "62702" },
+      { "internalMsn": "62700" }
+    ],
+    "962 T3 (z)": [
+      { "linkage": 52, "internalMsn": "62708" },
+      { "linkage": 137, "internalMsn": "62709" },
+      { "linkage": 138, "internalMsn": "62711" },
+      { "linkage": 448, "internalMsn": "62711" },
+      { "internalMsn": "62708" }
+    ],
+
+    "966 S5": [
+      { "linkage": 52, "internalMsn": "66700" },
+      { "linkage": 137, "internalMsn": "66701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "66702" },
+      { "linkage": 367, "internalMsn": "66702" },
+      { "internalMsn": "66700" }
+    ],
+    "966 T3": [
+      { "linkage": 52, "internalMsn": "66700" },
+      { "linkage": 137, "internalMsn": "66701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "66702" },
+      { "linkage": 367, "internalMsn": "66702" },
+      { "internalMsn": "66700" }
+    ],
+    "966 XE S5": [
+      { "linkage": 52, "internalMsn": "66700" },
+      { "linkage": 137, "internalMsn": "66701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "66702" },
+      { "linkage": 367, "internalMsn": "66702" },
+      { "internalMsn": "66700" }
+    ],
+
+    "972 S5": [
+      { "linkage": 52, "internalMsn": "72700" },
+      { "linkage": 136, "internalMsn": "72700" },
+      { "linkage": 137, "internalMsn": "72701" },
+      { "linkage": 1255, "internalMsn": "72701" },
+      { "linkage": 138, "internalMsn": "72703" },
+      { "linkage": 448, "internalMsn": "72703" },
+      { "internalMsn": "72700" }
+    ],
+    "972 T3": [
+      { "linkage": 52, "internalMsn": "72700" },
+      { "linkage": 136, "internalMsn": "72700" },
+      { "linkage": 137, "internalMsn": "72701" },
+      { "linkage": 1255, "internalMsn": "72701" },
+      { "linkage": 138, "internalMsn": "72703" },
+      { "linkage": 448, "internalMsn": "72703" },
+      { "internalMsn": "72700" }
+    ],
+    "972 XE S5": [
+      { "linkage": 52, "internalMsn": "72700" },
+      { "linkage": 136, "internalMsn": "72700" },
+      { "linkage": 137, "internalMsn": "72701" },
+      { "linkage": 1255, "internalMsn": "72701" },
+      { "linkage": 138, "internalMsn": "72703" },
+      { "linkage": 448, "internalMsn": "72703" },
+      { "internalMsn": "72700" }
+    ],
+    
+    "980 S5": [
+      { "linkage": 52, "internalMsn": "80700" },
+      { "linkage": 137, "internalMsn": "80701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "80702" },
+      { "linkage": 367, "internalMsn": "80702" },
+      { "linkage": 369, "internalMsn": "80705" },
+      { "linkage": 136, "internalMsn": "80706" },
+      { "internalMsn": "80700" }
+    ],
+    "980 T3": [
+      { "linkage": 52, "internalMsn": "80700" },
+      { "linkage": 137, "internalMsn": "80701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "80702" },
+      { "linkage": 367, "internalMsn": "80702" },
+      { "linkage": 369, "internalMsn": "80705" },
+      { "linkage": 136, "internalMsn": "80706" },
+      { "internalMsn": "80700" }
+    ],
+    "980 XE S5": [
+      { "linkage": 52, "internalMsn": "80700" },
+      { "linkage": 137, "internalMsn": "80701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "80702" },
+      { "linkage": 367, "internalMsn": "80702" },
+      { "linkage": 369, "internalMsn": "80705" },
+      { "linkage": 136, "internalMsn": "80706" },
+      { "internalMsn": "80700" }
+    ],
+
+    "982 S5": [
+      { "linkage": 52, "internalMsn": "82700" },
+      { "linkage": 137, "internalMsn": "82701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "82702" },
+      { "linkage": 367, "internalMsn": "82702" },
+      { "internalMsn": "82700" }
+    ],
+    "982 T3": [
+      { "linkage": 52, "internalMsn": "82700" },
+      { "linkage": 137, "internalMsn": "82701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "82702" },
+      { "linkage": 367, "internalMsn": "82702" },
+      { "internalMsn": "82700" }
+    ],
+    "982 T4": [
+      { "linkage": 52, "internalMsn": "82700" },
+      { "linkage": 137, "internalMsn": "82701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "82702" },
+      { "linkage": 367, "internalMsn": "82702" },
+      { "internalMsn": "82700" }
+    ],
+    "982 XE S5": [
+      { "linkage": 52, "internalMsn": "82700" },
+      { "linkage": 137, "internalMsn": "82701" },
+      { "linkage": 367, "tool": 371, "internalMsn": "82702" },
+      { "linkage": 367, "internalMsn": "82702" },
+      { "internalMsn": "82700" }
+    ]
+  },
+  
+  "msn": {
+    "WL7": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 S5", "factory": "NLR" }
+    ],
+    "M38": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 S5", "factory": "GREN" }
+    ],
+    "TN2": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 S5", "factory": "CBL" }
+    ],
+    "WF8": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 S5", "factory": "CSCL" }
+    ],
+
+    "WL9": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 S5", "factory": "NLR" }
+    ],
+    "FRD": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 S5", "factory": "GREN" }
+    ],
+    "MT2": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 S5", "factory": "CBL" }
+    ],
+    "ZD8": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 S5", "factory": "CSCL" }
+    ],
+  
+    "WL8": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 S5 (z)", "factory": "CSCL" }
+    ],
+
+    "WLX": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 S5 (z)", "factory": "CSCL" }
+    ],
+
+    "CE7": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 T3", "factory": "CBL" }
+    ],
+    "WL6": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 T3", "factory": "CSCL" }
+    ],
+
+    "WLJ": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 T3", "factory": "NLR" }
+    ],
+    "FC3": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 T3", "factory": "CBL" }
+    ],
+    "WLZ": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 T3", "factory": "CSCL" }
+    ],
+
+    "RM7": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 T3 (z)", "factory": "CBL" }
+    ],
+    "CM2": [
+      { "firstSn": 0, "lastSn": 99999, "config": "950 T3 (z)", "factory": "CSCL" }
+    ],
+
+    "LN6": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 T3 (z)", "factory": "CBL" }
+    ],
+    "WLY": [
+      { "firstSn": 0, "lastSn": 99999, "config": "962 T3 (z)", "factory": "CSCL" }
+    ],
+    
+    "WLW": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 S5", "factory": "NLR" }
+    ],
+    "RD6": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 S5", "factory": "GREN" }
+    ],
+    "M7R": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 S5", "factory": "CBL" }
+    ],
+    "AH8": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 S5", "factory": "CSCL" }
+    ],
+
+    "SM2": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 S5", "factory": "NLR" }
+    ],
+    "FGD": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 S5", "factory": "GREN" }
+    ],
+    "FFB": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 S5", "factory": "CBL" }
+    ],
+    "WF9": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 S5", "factory": "CSCL" }
+    ],
+
+    "J8R": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 T3", "factory": "CBL" }
+    ],
+    "EL9": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 T3", "factory": "CSCL" }
+    ],
+
+    "M7P": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 T3", "factory": "CBL" }
+    ],
+    "W99": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 T3", "factory": "CSCL" }
+    ],
+
+    "EL8": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 XE S5", "factory": "NLR" }
+    ],
+    "MZN": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 XE S5", "factory": "GREN" }
+    ],
+    "XSM": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 XE S5", "factory": "CSCL" }
+    ],
+    "HNP": [
+      { "firstSn": 0, "lastSn": 99999, "config": "966 XE S5", "factory": "CBL" }
+    ],
+
+    "MBY": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 XE S5", "factory": "NLR" }
+    ],
+    "TZ2": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 XE S5", "factory": "GREN" }
+    ],
+    "SLS": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 XE S5", "factory": "CSCL" }
+    ],
+    "E5F": [
+      { "firstSn": 0, "lastSn": 99999, "config": "972 XE S5", "factory": "CBL" }
+    ],
+
+    "MK7": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 S5", "factory": "NLR" }
+    ],
+    "GYL": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 S5", "factory": "GREN" }
+    ],
+    "WFX": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 S5", "factory": "CSCL" }
+    ],
+    "CF8": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 S5", "factory": "CBL" }
+    ],
+    
+    "MK8": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 S5", "factory": "NLR" }
+    ],
+    "L84": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 S5", "factory": "GREN" }
+    ],
+    "WFY": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 S5", "factory": "CSCL" }
+    ],
+    "T4M": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 S5", "factory": "CBL" }
+    ],
+
+    "MK9": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 T3", "factory": "CSCL" }
+    ],
+    "CXS": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 T3", "factory": "CBL" }
+    ],
+
+    "W82": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 T3", "factory": "CSCL" }
+    ],
+    "FS2": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 T3", "factory": "CBL" }
+    ],
+    
+    "WHB": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 T4", "factory": "CBL" }
+    ],
+    
+    "XE3": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 XE S5", "factory": "NLR" }
+    ],
+    "XMA": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 XE S5", "factory": "GREN" }
+    ],
+    "Z8L": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 XE S5", "factory": "CSCL" }
+    ],
+    "EZR": [
+      { "firstSn": 0, "lastSn": 99999, "config": "980 XE S5", "factory": "CBL" }
+    ],
+
+    "XE4": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 XE S5", "factory": "NLR" }
+    ],
+    "YWC": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 XE S5", "factory": "GREN" }
+    ],
+    "YBY": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 XE S5", "factory": "CSCL" }
+    ],
+    "FL6": [
+      { "firstSn": 0, "lastSn": 99999, "config": "982 XE S5", "factory": "CBL" }
+    ]
+  }
+}

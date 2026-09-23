@@ -19,6 +19,10 @@ DESCRIPTION:
 #include <scl_prmsw.h>
 #include <lps_sea_defs.h>
 
+#include <interfaces/LpsSaWeighReqstChannel/InterfaceTypes.h>
+#include <interfaces/LpsSaWeighRespChannel/InterfaceTypes.h>
+#include <interfaces/LpsSaWeighTxChannel/InterfaceTypes.h>
+
 #include "LpsSaJobMgrApp.h"
 
 namespace fs = boost::filesystem;
@@ -53,6 +57,8 @@ RETURN VALUE:
 *******************************************************************************/
 AbstractTaskCore* task::getTaskImplementation(void)
 {
+    rclcpp::init(0, nullptr);
+    std::cout<<"[ROS2][Initialized][JOB_MANAGER]";
     static LpsSaJobMgrApp thisTask("LpsSaJobMgrApp");
     return dynamic_cast<Task *>(&thisTask);
 }
@@ -65,15 +71,16 @@ RETURN VALUE:
 *******************************************************************************/
 LpsSaJobMgrApp::LpsSaJobMgrApp(const std::string& taskName):
     Task(taskName), LpsJobMgrJobTrackerInfoTbl(),
+    LpsSaJobMgrTxRosOut_(nullptr), LpsSaJobMgrReqstIn(nullptr), LpsSaJobMgrDebugRosOut_(nullptr), LpsSaJobMgrRespChannelOutput_(nullptr),
+    weighAppTxDataReceived_(false), weighAppInf_(),
     rosNode_(nullptr), executor_(),
-    LpsSaJobMgrScsTxOut(nullptr), LpsSaJobMgrScsReqstIn(nullptr), LpsSaJobMgrScsDebugOut(nullptr), LpsSaJobMgrRespChannelOutput_(nullptr), weighAppTxDataReceived_(false), weighAppInf_(),
-    LpsSaSwitchInput(nullptr), LpsSaOutputChannelOut(nullptr), AisJhm2TxInputScs(nullptr), displayStateInput_(nullptr),
-    ShmClockInputScs(nullptr), dataLinkDataInput_(nullptr), loadRecordOutputChannel_(nullptr),
+    LpsSaSwitchInput(nullptr), LpsSaOutputChannelRosOut_(nullptr), AisJhm2TxInput(nullptr), displayStateInputRos_(nullptr),
+    ShmClockInputRos(nullptr), dataLinkDataInputRos_(nullptr), loadRecordOutputChannel_(nullptr),
     tasks_(), config_(), stats_(), simpleCal_(), storageRoot_(DEFAULT_STORAGE_ROOT), defaultTargetWeight_(0.0),
     machineMSN(), storeRejectedExpireTime(std::chrono::steady_clock::time_point::min()),
-    autonomyConditionDiagnosticsTxInputChannel_(nullptr),
+    autonomyConditionDiagnosticsTxInputRos_(nullptr),
     SEALevel1EssentialsInstalled_(true), SEALevel2ProInstalled_(true), SEALegalForTradeInstalled_(false),
-    eddtInputChannel_(nullptr), totalWeightAccuracy_(LPS_WEIGH_BUCKET_WEIGHT_ACCURACY_NONE)
+    eddtInputRos_(nullptr), totalWeightAccuracy_(LPS_WEIGH_BUCKET_WEIGHT_ACCURACY_NONE)
 {
 }
 /******************************************************************************
@@ -84,7 +91,39 @@ RETURN VALUE:
 *******************************************************************************/
 LpsSaJobMgrApp::~LpsSaJobMgrApp( )
 {
+    cleanupRosInterfaces();
+}
 
+void LpsSaJobMgrApp::cleanupRosInterfaces()
+{
+    weighAppInf_.stop();
+
+    delete LpsSaJobMgrTxRosOut_;
+    LpsSaJobMgrTxRosOut_ = nullptr;
+    delete LpsSaJobMgrReqstIn;
+    LpsSaJobMgrReqstIn = nullptr;
+    delete LpsSaJobMgrDebugRosOut_;
+    LpsSaJobMgrDebugRosOut_ = nullptr;
+    delete LpsSaJobMgrRespChannelOutput_;
+    LpsSaJobMgrRespChannelOutput_ = nullptr;
+    delete LpsSaSwitchInput;
+    LpsSaSwitchInput = nullptr;
+    delete LpsSaOutputChannelRosOut_;
+    LpsSaOutputChannelRosOut_ = nullptr;
+    delete AisJhm2TxInput;
+    AisJhm2TxInput = nullptr;
+    delete displayStateInputRos_;
+    displayStateInputRos_ = nullptr;
+    delete ShmClockInputRos;
+    ShmClockInputRos = nullptr;
+    delete dataLinkDataInputRos_;
+    dataLinkDataInputRos_ = nullptr;
+    delete loadRecordOutputChannel_;
+    loadRecordOutputChannel_ = nullptr;
+    delete autonomyConditionDiagnosticsTxInputRos_;
+    autonomyConditionDiagnosticsTxInputRos_ = nullptr;
+    delete eddtInputRos_;
+    eddtInputRos_ = nullptr;
 }
 /******************************************************************************
 FUNCTION NAME:LpsSaJobMgrApp::initialize
@@ -187,67 +226,48 @@ bool LpsSaJobMgrApp::initialize( )
     tzInfo_.offset = 0;
     tzInfo_.index = -1;
 
-    /* ROS2/DDS wrapper construction (Development-Plan.txt Step 4.1) --
-       replaces InterfaceDb::bind/fetch. One shared node for the whole app;
-       every wrapper below just creates its own publisher/subscription on it.
-       Topic names are the original SCS channel name in snake_case, minus
-       the redundant Input/Output suffix (direction is already implied by
-       which wrapper type is used). */
-    // rclcpp::init() must run once, before any Node is constructed -- this
-    // app builds as its own standalone process (SConscript Program()
-    // target, one task per process), so there's no risk of double-init
-    // from another task sharing this process.
-    if (!rclcpp::ok()) {
-        rclcpp::init(0, nullptr);
-    }
     rosNode_ = std::make_shared<rclcpp::Node>("job_mgr_node");
     executor_.add_node(rosNode_);
 
-    LpsSaJobMgrScsTxOut  = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(rosNode_, "lps_sa_job_mgr_tx_channel");
-    LpsSaJobMgrScsReqstIn  = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(rosNode_, "lps_sa_job_mgr_reqst_channel");
-    LpsSaJobMgrScsDebugOut = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrDebugChannel>(rosNode_, "lps_sa_job_mgr_debug_channel");
+    /* Initialsing SCS interface*/
+    LpsSaJobMgrTxRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(rosNode_, "lps_sa_job_mgr_tx_channel");
+    LpsSaJobMgrReqstIn = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(rosNode_, "lps_sa_job_mgr_reqst_channel");
+    LpsSaJobMgrDebugRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrDebugChannel>(rosNode_, "lps_sa_job_mgr_debug_channel");
     LpsSaJobMgrRespChannelOutput_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrRespChannel>(rosNode_, "lps_sa_job_mgr_resp_channel");
     LpsSaSwitchInput = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>(rosNode_, "switch_input_scs");
-    LpsSaOutputChannelOut = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>(rosNode_, "output_channel");
-    AisJhm2TxInputScs  = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode_, "ais_jhm2_tx_channel");
+    LpsSaOutputChannelRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>(rosNode_, "output_channel");
+    AisJhm2TxInput = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode_, "ais_jhm2_tx_channel");
 
-    displayStateInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(rosNode_, "display_state");
-    if (!displayStateInput_) {
-        AIS_LOG_ERROR("No DisplayStateInput input channel defined.");
-        everythingOk = false;
-    }
+    displayStateInputRos_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(
+            rosNode_, "lps_sa_ui_display_state_interface");
 
-    ShmClockInputScs = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(rosNode_, "shm_clock");
-    autonomyConditionDiagnosticsTxInputChannel_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(rosNode_, "autonomy_condition_diagnostics_tx_channel");
+    ShmClockInputRos = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(rosNode_, "shm_clock_input");
+    dataLinkDataInputRos_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::DataLinkData>(rosNode_, "data_link_data");
+    autonomyConditionDiagnosticsTxInputRos_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(
+            rosNode_, "autonomy_condition_diagnostics_tx_channel");
+    eddtInputRos_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>(rosNode_, "event_diagnostic_data");
 
-    dataLinkDataInput_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::DataLinkData>(rosNode_, "data_link_data");
-    if (!dataLinkDataInput_) {
-        AIS_LOG_ERROR("DataLinkDataInput Interface not configured.");
-        everythingOk = false;
-    }
-
-    if ( !ShmClockInputScs )
+    if ( !ShmClockInputRos )
     {
-        AIS_LOG_ERROR( "\n  ShmClockInputScs Interface  not configured." );
+        AIS_LOG_ERROR( "\n  ShmClockInput ROS2 interface not configured." );
     }
 
-    if ( !LpsSaJobMgrScsTxOut )
+    if ( !LpsSaJobMgrTxRosOut_ )
     {
-        AIS_LOG_ERROR( "\n  LpsSaJobMgrScsTxOut Interface  not configured." );
+        AIS_LOG_ERROR( "\n  LpsSaJobMgrTx ROS2 interface not configured." );
     }
 
-    if ( !LpsSaJobMgrScsDebugOut )
+    if ( !LpsSaJobMgrDebugRosOut_ )
     {
-        AIS_LOG_ERROR( "\n  LpsSaJobMgrScsDebugOut Interface  not configured." );
+        AIS_LOG_ERROR( "\n  LpsSaJobMgrDebug ROS2 interface not configured." );
     }
 
     if (!LpsSaJobMgrRespChannelOutput_) {
-        AIS_LOG_ERROR("LpsSaJobMgrRespChannelOutput Interface not configured");
+        AIS_LOG_ERROR("LpsSaJobMgrRespChannel ROS2 output not initialized");
     }
 
-    if ( !LpsSaJobMgrScsReqstIn )
-    {
-        AIS_LOG_ERROR( "t\n  LpsSaJobMgrScsReqstIn Interface  not configured." );
+    if (!LpsSaJobMgrReqstIn) {
+        AIS_LOG_ERROR("LpsSaJobMgrReqstChannel ROS2 input not initialized");
     }
 
     if ( !LpsSaSwitchInput )
@@ -255,25 +275,31 @@ bool LpsSaJobMgrApp::initialize( )
         AIS_LOG_ERROR( "\n LpsSaSwitchInput Interface  not configured." );
     }
 
-    if ( !LpsSaOutputChannelOut )
+    if ( !LpsSaOutputChannelRosOut_ )
     {
-        AIS_LOG_ERROR( "\n LpsSaOutputChannelOut Interface  not configured." );
+        AIS_LOG_ERROR( "\n OutputChannel ROS2 interface not configured." );
     }
 
-    if ( !AisJhm2TxInputScs )
-    {
-        AIS_LOG_ERROR( "\n AisJhm2TxInputScs Interface  not configured." );
+    if (!AisJhm2TxInput) {
+        AIS_LOG_ERROR("AisJhm2TxChannel ROS2 input not initialized");
     }
 
-    if (nullptr == autonomyConditionDiagnosticsTxInputChannel_) {
-        AIS_LOG_ERROR("autonomyConditionDiagnosticsTxInputChannel_ Interface not configured.");
+    if (!displayStateInputRos_) {
+        AIS_LOG_ERROR("DisplayStateInput ROS2 input not initialized");
         everythingOk = false;
     }
 
-    { // Initialize the WeighApp interface -- pure direct DDS, no Bridge
-      // (Development-Plan.txt Step 6.1.1/6.1.2/6.1.3). Topic names must
-      // match WeighApp's own construction of these 3 wrappers exactly
-      // (LpsSaWeighApp.cpp:567,573,594).
+    if (nullptr == dataLinkDataInputRos_) {
+        AIS_LOG_ERROR("DataLinkData ROS2 input not initialized.");
+        everythingOk = false;
+    }
+
+    if (nullptr == autonomyConditionDiagnosticsTxInputRos_) {
+        AIS_LOG_ERROR("AutonomyConditionDiagnosticsTx ROS2 input not initialized.");
+        everythingOk = false;
+    }
+
+    { // Initialize the WeighApp interface
         ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>* requestOutput =
                 new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>(rosNode_, "lps_sa_weigh_reqst_channel");
         ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* responseInput =
@@ -289,16 +315,15 @@ bool LpsSaJobMgrApp::initialize( )
         weighAppTxDataReceived_ = false;
     }
 
-    // Get the load record output channel
-    loadRecordOutputChannel_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaLoadRecordChannel>(rosNode_, "load_record");
+    // Get the load record output channel (now ROS2-only, bridge forwards to AIS SCS consumers)
+    loadRecordOutputChannel_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaLoadRecordChannel>(rosNode_, "lps_sa_load_record_channel");
     if (nullptr == loadRecordOutputChannel_) {
-        AIS_LOG_ERROR("\n Load record output channel not configured.");
+        AIS_LOG_ERROR("\n Load record ROS2 output channel not initialized.");
         everythingOk = false;
     }
 
-    eddtInputChannel_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>(rosNode_, "event_diagnostic_data");
-    if (!eddtInputChannel_) {
-        AIS_LOG_ERROR("\n EventDiagnosticDataInput channel not configured.");
+    if (nullptr == eddtInputRos_) {
+        AIS_LOG_ERROR("EventDiagnosticData ROS2 input not initialized.");
         everythingOk = false;
     }
 
@@ -418,14 +443,12 @@ bool LpsSaJobMgrApp::executive( )
 {
     getLogger().log_debug( "Executing JobManager Task" );
 
-    // Drain pending DDS messages into every wrapper's queue for this cycle.
-    // Must run before any wrapper's get() below -- same thread, synchronous,
-    // no mutex needed (Development-Plan.txt "RESOLVED DECISIONS" #3).
+    // ROS2/DDS: drain pending callbacks for weighAppInf_'s 3 channels
     executor_.spin_some();
 
-    if (nullptr != autonomyConditionDiagnosticsTxInputChannel_) {
+    if (nullptr != autonomyConditionDiagnosticsTxInputRos_) {
         cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel txData;
-        while (autonomyConditionDiagnosticsTxInputChannel_->get(txData)) {
+        while (autonomyConditionDiagnosticsTxInputRos_->get(txData)) {
             for (const auto & element : txData.sea_list) {
                 if (element.reason_code == LPS_SEA_REASON_CODE_149) {
                     SEALevel1EssentialsInstalled_ = AutonomyConditionDiagnosticsTxInterfaceStorage::checkSEAEnableStatus(element.status);
@@ -469,11 +492,11 @@ bool LpsSaJobMgrApp::executive( )
         return FAIL;
     }
 
-    if (nullptr != LpsSaJobMgrScsDebugOut) {
+    if (nullptr != LpsSaJobMgrDebugRosOut_) {
         job_mgr_interfaces::msg::LpsSaJobMgrDebugChannel txOut;
         txOut.current_state = LpsSaJobMgrWmOutput.pt_current_state;
         txOut.tipoff_assist_activation_count = stats_.tipoffAssistActivationCount;
-        LpsSaJobMgrScsDebugOut->publish(txOut);
+        LpsSaJobMgrDebugRosOut_->publish(txOut);
     }
 
     // Save statistics if needed
@@ -502,6 +525,7 @@ RETURN VALUE:
 *******************************************************************************/
 void LpsSaJobMgrApp::cleanup( ) {
     AIS_LOG_INFO("LpsSaJobMgrApp::cleanup");
+    cleanupRosInterfaces();
     if (rclcpp::ok()) {
         rclcpp::shutdown();
     }

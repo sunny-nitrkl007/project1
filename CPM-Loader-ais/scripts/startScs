@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Get super project path from first argument, else default
+ssp=${1:-~/git/a6n2/ssp-CPM_Loader-ais}
+
+# Remove trailing slash
+ssp=$(echo "$ssp"|sed 's/\/$//g')
+
+cd ${ssp}/eta-ais
+pwd
+. changeCatEnvToHere.sh
+./bin/scs
+
+sleep 5s

@@ -1,0 +1,58 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the test/ directory.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+#!/usr/bin/python
+import os
+
+
+Import( 'baseEnv' )
+baseEnv['TES_COMMON_DIR'] = os.environ['TES_COMMON_DIR']
+baseEnv['SSP_DIR'] = os.environ['SSP_DIR']
+Export( 'baseEnv' )
+
+appEnv = baseEnv.Clone()
+Export( 'appEnv' )
+
+### cpm_loader_ais ###
+
+# Needed for cpm_load_ais compatibility
+testEnv = baseEnv.Clone();
+Export( 'testEnv' )
+
+testEnv.buildit( 'LpsSaWeighApp', ['suse'] )
+testEnv.buildit( 'CycleSeg', ['suse'] )
+testEnv.buildit( 'LpsSaJobMgrApp', ['suse'] )
+testEnv.buildit( 'ScsToRos2Bridge', ['suse'] )
+testEnv.buildit( 'LpsSaListMgrApp', ['suse'] )
+testEnv.buildit( 'LpsSaTotalsApp', ['suse'] )
+testEnv.buildit( 'WorkOrderAssist', ['suse'] )
+testEnv.buildit( 'WidgetApp', ['suse'] )
+testEnv.buildit( 'DemoApp', ['suse'] )
+#testEnv.buildit( 'AprilTagReader', ['suse'] )
+
+if (testEnv[ 'PLATFORM' ] != 'x86_64-linux-gnu'):
+    #if testEnv[ 'PLATFORM' ] not in ['A7H4']:
+#        testEnv.buildit( 'CycleSeg', ['suse'] )  ## _gps lib not available for A7H4
+#        testEnv.buildit( 'LpsSaWeighApp', ['suse'] )
+    testEnv.buildit( 'ServiceDashboard', ['suse'] )
+    testEnv.buildit( 'AppLogCapture', ['suse'] )
+
+#XCP
+testEnv.buildit( 'aisXcpServer', ['suse'] )
+
+
+#Comment this out if you do not need Datalink Monitor App
+testEnv.buildit('DatalinkMonApp', ['suse'])
+
+#hornOnStoreTest
+#testEnv.buildit( 'hornOnStoreTest', ['suse'] )
+#testEnv.buildit( 'CANTestApp', ['suse'] )

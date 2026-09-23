@@ -1,0 +1,81 @@
+{
+
+"CDL_PID":
+{
+    "Product ID": {
+        "CDL PID"              : "0xF82D",
+        "Data Size(bytes)"     : "9",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "10000",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "5000",
+        "Attributes"           : "",
+        "RequestType"          : "3",
+        "VarLengthDataType"    : "4",
+        "ParameterType"        : "12",
+        "Cid"                  : "596"
+    }
+
+},
+
+"PGN":
+{
+    "PROPRIETARY A (PROPA)": {
+        "PGN"               : "61184",
+        "Source Address"    : "255",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "1",
+        "Cid"               : "200",
+        "SPN List"          : "2550"
+    },
+
+    "IMU Rate": {
+        "PGN"               : "61482",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "2000",
+        "Priority"          : "6",
+        "Control Bitfield"  : "3",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "4983,4984,4985,4986,4987,4988,4989"
+    },
+
+    "IMU Accel": {
+        "PGN"               : "61485",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "2000",
+        "Priority"          : "6",
+        "Control Bitfield"  : "3",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "5347,5348,5349,5350,5351,5352,5353"
+    },
+
+    "IMU Identification": {
+        "PGN"               : "64965",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "2901,2902,2903,2904,4304,6714"
+    },
+
+    "IMU Software Identification": {
+        "PGN"               : "65242",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "965,234"
+    }
+
+}
+}

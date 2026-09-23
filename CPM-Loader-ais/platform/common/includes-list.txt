@@ -1,0 +1,53 @@
+#apps/include
+#apps/lib
+#prod/common
+
+## Add eta-ais coretech includes directly
+## (The TES _COMMON/includes-list.txt chain includes these via ${AIS_TLD}/platform
+## but the nested relative 'include' directives break from CPM build context,
+## so we list them explicitly here for A7H4 cross-compile support.)
+${AIS_CT_CONTENT}/
+${AIS_CT_CONTENT}/ais_apps
+${AIS_CT_CONTENT}/ais_apps/ais
+${AIS_CT_CONTENT}/ais_autonomyTask
+${AIS_CT_CONTENT}/ais_autonomyTask/ais
+${AIS_CT_CONTENT}/ais_config
+${AIS_CT_CONTENT}/ais_crypto
+${AIS_CT_CONTENT}/ais_factory
+${AIS_CT_CONTENT}/ais_interfaces
+${AIS_CT_CONTENT}/ais_log
+${AIS_CT_CONTENT}/ais_logger
+${AIS_CT_CONTENT}/ais_monitor
+${AIS_CT_CONTENT}/ais_pcm
+${AIS_CT_CONTENT}/ais_scs
+${AIS_CT_CONTENT}/ais_serialization
+${AIS_CT_CONTENT}/ais_task
+${AIS_CT_CONTENT}/ais_time
+${AIS_CT_CONTENT}/ais_util
+${AIS_CT_CONTENT}/coretechExtensions
+${AIS_CT_CONTENT}/ext
+${AIS_CT_CONTENT}/generated
+${AIS_CT_CONTENT}/hub
+${AIS_CT_CONTENT}/hub/lib_module
+${AIS_CT_CONTENT}/include
+${AIS_CT_CONTENT}/ext/nlohmann_json/include
+${AIS_PC_CONTENT}/include/lib_oel
+
+${AIS_MC_CONTENT}/prod/common/prodDataInterface/
+${SSP_DIR}/lps_common/include
+${SSP_DIR}/lps_app_common/include
+${SSP_DIR}/lps_pass_tracker/include
+${SSP_DIR}/lps_weighing/include
+${SSP_DIR}/lps_weighing/src
+${SSP_DIR}/payload00-b/include
+${SSP_DIR}/payload00-b/src
+${SSP_DIR}/payload00_inf/include
+${SSP_DIR}/payload00_inf/src
+${SSP_DIR}/lib_autocode_release/lib_simulink/include
+${SSP_DIR}/lib_autocode_release/lib_simulink/include_PostR2014a
+${TES_COMMON_DIR}/apps/
+${TES_COMMON_DIR}/prod/common/
+${TES_COMMON_DIR}/prod/infrastructure/
+
+# Needed for scsIOContainer
+${AIS_MC_CONTENT}/legacy/common

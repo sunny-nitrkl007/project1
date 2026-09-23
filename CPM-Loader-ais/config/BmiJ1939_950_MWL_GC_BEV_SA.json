@@ -1,0 +1,99 @@
+{
+
+"CDL_PID":
+{
+    "Hydraulic Oil Temp": {
+        "CDL PID"              : "0x45",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "3",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "596"
+    },
+
+    "Ground Speed": {
+        "CDL PID"              : "0xF4FD",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.0036",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "296"
+    },
+
+    "Actual Gear": {
+        "CDL PID"              : "0xF5D9",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "296"
+    },
+
+    "Product Link Module GPS Position Status": {
+        "CDL PID"              : "0xF84D",
+        "Data Size(bytes)"     : "15",
+        "Source J1939 Address" : "0x25",
+        "Request Rate(ms)"     : "1000",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "5000",
+        "Attributes"           : "",
+        "RequestType"          : "3",
+        "VarLengthDataType"    : "1",
+        "ParameterType"        : "12",
+        "Cid"                  : "1273"
+    },
+
+    "Backlight Percent": {
+        "CDL PID"              : "0xD0022B",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x28",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "2448"
+    }
+
+},
+
+"PGN":
+{
+    "PROPRIETARY A (PROPA)": {
+        "PGN"               : "61184",
+        "Source Address"    : "255",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "1"
+    }
+
+}
+}

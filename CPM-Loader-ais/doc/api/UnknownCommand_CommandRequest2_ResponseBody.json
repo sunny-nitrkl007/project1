@@ -1,0 +1,8 @@
+{
+    "CommandStatus": {
+        "value": "CannotExecute"
+    },
+    "CommandFailDetails": {
+        "value": "Unknown Command"
+    }
+}

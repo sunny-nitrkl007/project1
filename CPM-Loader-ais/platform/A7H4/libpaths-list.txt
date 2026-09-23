@@ -1,0 +1,13 @@
+include ${TES_COMMON_DIR}/platform/_COMMON/libpaths-list.txt
+include platform/common/libpaths-list.txt
+
+# A7H4 ssp-linux-is7 prebuilt library paths
+${AIS_PC_TARGET_CONTENT}/lib_a4/scl
+${AIS_PC_TARGET_CONTENT}/lib_a4/hal
+${AIS_PC_TARGET_CONTENT}/lib_a4/hal_common
+${AIS_PC_TARGET_CONTENT}/lib_csf
+${AIS_PC_TARGET_CONTENT}/lib_oel/oel
+${AIS_PC_TARGET_CONTENT}/lib_scl_info
+${AIS_PC_TARGET_CONTENT}/scl_crypto-a
+${AIS_PC_TARGET_CONTENT}/core_telematics/ipc
+${AIS_PC_TARGET_CONTENT}/lib_sys/osa

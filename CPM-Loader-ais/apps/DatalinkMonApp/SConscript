@@ -1,0 +1,48 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+#Change testEnv something meaningful for AppSegApp.
+Import( 'testEnv' )
+
+cycleSegAppEnv = testEnv.Clone();
+
+cycleSegAppEnv.Append( CPPPATH = ['.',
+                                 ] )
+
+cycleSegAppEnv.Append( LIBPATH = [ '#/../eta-ais/prod/platformCommon/content/tgt_gcc_5.1.0_a6n2/lib_oel/oel',
+                                   '#/prod/platformCommon/content/tgt_gcc_5.1.0_a6n2/lib_a4/scl',
+                                   '#/../ss/mach_prod_gps-a/tgt_gcc_5.1.0_a6n2/',
+                                 ] )
+
+
+sourceFiles = [
+    # App
+    'MTPCycleSegExe.cpp',
+]
+
+DatalinkMonApp = cycleSegAppEnv.ProgramWrapper(
+        target = 'DatalinkMonApp',
+        source = sourceFiles,
+        LIBS = [ 'ais_task',
+                 'ais_config',
+                 'ais_log',
+         ]
+    )
+
+cycleSegAppEnv.InstallBinary( DatalinkMonApp )
+
+
+cycleSegAppEnv.Alias("DatalinkMonApp", "#bin/DatalinkMonApp")
+
+

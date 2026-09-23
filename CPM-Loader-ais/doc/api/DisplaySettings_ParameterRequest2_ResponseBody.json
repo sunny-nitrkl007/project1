@@ -1,0 +1,28 @@
+{
+    "DisplaySettings": {
+        "units": {
+            "value": "1"
+        },
+        "language": {
+            "value": "1"
+        },
+        "brightness": {
+            "value": "90"
+        },
+        "timeFormat": {
+            "value": "0"
+        },
+        "dateFormat": {
+            "value": "0"
+        },
+        "weightUnits": {
+            "value": "990"
+        },
+        "weightResolution": {
+            "value": "1"
+        },
+        "payloadSystemDisplayMode": {
+            "value": "1645"
+        }
+    }
+}

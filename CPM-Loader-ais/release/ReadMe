@@ -1,0 +1,16 @@
+To make a release the following need to be updated in sa/adv directory depending on the release:
+
+version_a6n2.cpp
+1) SW_PART_NUMBER
+2) SW_CHANGE_LEVEL
+3) SW_REL_DATE
+4) Uncomment appropriate build type, for example #define SW_BUILD "T01" for Test release
+5) Define the appropriate FlashComponentIdentifier. Wheel Loader vs Track Type Loader
+
+appVeritySettings.sh
+1) Set the BUILD_ID accordingly
+      Test Release: "T0x"
+      Dev Release:  "D0x"
+      Concept/Production Release: "0"
+2) Set the SOFTWARE_PNUM
+3) Set the CHANGE_LEVEL

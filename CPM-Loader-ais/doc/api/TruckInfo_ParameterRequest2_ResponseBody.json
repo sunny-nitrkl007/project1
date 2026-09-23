@@ -1,0 +1,13 @@
+{
+    "TruckInfo": {
+        "id": {
+            "value": "2"
+        },
+        "name": {
+            "value": "Truck Two"
+        },
+        "targetWeight": {
+            "value": "22.200"
+        }
+    }
+}

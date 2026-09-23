@@ -2,11 +2,14 @@
 #define _TIPOFFASSSIST_H_
 
 #include <chrono>
-#include <interfaces/TipoffModelTestPoints/InterfaceTypes.h>
+#include <memory>
 #include "../LpsSaIncludes.h"
-#include <rclcpp/rclcpp.hpp>
-#include <ros2_wrapper/RosOutputInterface.h>
-#include <weigh_app_interfaces/msg/tipoff_model_test_points.hpp>
+
+namespace rclcpp {
+class Node;
+}
+
+class TipoffModelTestPointsPublisher;
 
 /* Tipoff Assist Inputs */
 struct TipoffAssistInputs {
@@ -91,18 +94,17 @@ class TipoffAssist {
 
 public:
     TipoffAssist();
+    ~TipoffAssist();
 
-    bool initialize(LpsSaMachineProperties_t const& machine_properties);
+    bool initialize(LpsSaMachineProperties_t const& machine_properties, std::shared_ptr<rclcpp::Node> rosNode);
     TipoffAssistOutputs* update(TipoffAssistInputs& tipoff_inputs);
 
     TipoffAssistOutputs TipoffAssistOut;
 
     /* Tipoff Assist  Model Test Points */
-    weigh_app_interfaces::msg::TipoffModelTestPoints    TipoffModelTestPointsData;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::TipoffModelTestPoints> *TipoffModelTestPointsOut;
+    TipoffModelTestPointsPublisher* TipoffModelTestPointsRosOut_;
 
 private:
-    rclcpp::Node::SharedPtr node_;
 
 };
 

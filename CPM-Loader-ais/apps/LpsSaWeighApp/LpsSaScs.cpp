@@ -52,8 +52,8 @@ void LpsSaWeighApp::LpsSaScsChkForReqst()
         case (cpm_common_interfaces::msg::WeighReqstChannelCommand::RESET_BEST_BUCKET_WEIGHT):
         case (cpm_common_interfaces::msg::WeighReqstChannelCommand::CAPTURE_CYLINDER_EXTENSION_REFERENCE):
         case (cpm_common_interfaces::msg::WeighReqstChannelCommand::CLEAR_REWEIGH_WARNING): {
-            // These commands are handled later. request_ stays on its real
-            // old type (needs .reInit()), so convert field-by-field.
+            // These commands are handled later.
+            // old type so convert field-by-field.
             request_.command = static_cast<LpsSaWeighReqstChannel::Command>(request.command.value);
             request_.appName = request.app_name;
             request_.appRequestId = request.app_request_id;
@@ -400,7 +400,13 @@ bool LpsSaWeighApp::LpsSaScsSendReqstResponse(LpsSaWeighReqstChannel::Command co
         return false;
     }
 
-    bool rVal = LpsSaScsSendReqstResponse(request_, success);
+    // request_ is the old raw SCS type
+    cpm_common_interfaces::msg::LpsSaWeighReqstChannel newRequest;
+    newRequest.app_name = request_.appName;
+    newRequest.app_request_id = request_.appRequestId;
+    newRequest.command.value = static_cast<uint8_t>(request_.command);
+
+    bool rVal = LpsSaScsSendReqstResponse(newRequest, success);
 
     // Clear out the request since it has been handled.
     request_.reInit();
@@ -408,45 +414,25 @@ bool LpsSaWeighApp::LpsSaScsSendReqstResponse(LpsSaWeighReqstChannel::Command co
     return rVal;
 }
 
-bool LpsSaWeighApp::LpsSaScsSendReqstResponse(const LpsSaWeighReqstChannelStorage& request, bool success, const std::string& arg1) {
-    // Build the response
-    cpm_common_interfaces::msg::LpsSaWeighRespChannel response;
-    response.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::steady_clock::now().time_since_epoch()).count();
-    response.app_name = request.appName;
-    response.app_request_id = request.appRequestId;
-    response.command.value = static_cast<uint8_t>(request.command);
-    response.success = success;
-    response.arg1 = arg1;
-
-    /* send response SCS channel */
-    if (LpsSaWeighScsRespOut) {
-        if (LpsSaWeighScsRespOut->publish(response)) {
-            AIS_LOG_INFO("Published response, command=%d, success=%d", response.command.value , success);
-            return true;
-        }
-    }
-
-    AIS_LOG_ERROR("Failed to publish response, command=%d, success=%d", response.command.value , success);
-    return false;
-}
-
 bool LpsSaWeighApp::LpsSaScsSendReqstResponse(const cpm_common_interfaces::msg::LpsSaWeighReqstChannel& request, bool success, const std::string& arg1) {
     // Build the response
-    cpm_common_interfaces::msg::LpsSaWeighRespChannel response;
-    response.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::steady_clock::now().time_since_epoch()).count();
+    cpm_common_interfaces::msg::LpsSaWeighRespChannel response; // Default timepoint is now
     response.app_name = request.app_name;
     response.app_request_id = request.app_request_id;
     response.command = request.command;
     response.success = success;
     response.arg1 = arg1;
 
-    /* send response SCS channel */
-    if (LpsSaWeighScsRespOut) {
-        if (LpsSaWeighScsRespOut->publish(response)) {
-            AIS_LOG_INFO("Published response, command=%d, success=%d", response.command.value , success);
+    response.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+
+     /* send response ROS2 topic */
+    if (LpsSaWeighScsRespOut_ROS2) {
+        if (LpsSaWeighScsRespOut_ROS2->publish(response)) {
+            AIS_LOG_ERROR("[ROS2] Published response, command=%d, success=%d", response.command.value, success);
             return true;
+        } else {
+            AIS_LOG_ERROR("[ROS2] Failed to publish response, command=%d, success=%d", response.command.value, success);
         }
     }
 
@@ -462,8 +448,9 @@ RETURN VALUE:
 *******************************************************************************/
 void LpsSaWeighApp::AisJhmDataServerTxRead()
 {
-    cpm_common_interfaces::msg::AisJhm2TxChannel AisJhm2TxIn;
-    while (AisJhm2TxInputScs->get(AisJhm2TxIn)) {
+
+ cpm_common_interfaces::msg::AisJhm2TxChannel AisJhm2TxIn;
+    while (AisJhm2TxRosIn_->get(AisJhm2TxIn)) {
         if (AisJhm2TxIn.simplecal_data.new_data_flag) {
             AIS_LOG_DEBUG("### AIS Adj wt = %f", AisJhm2TxIn.simplecal_data.adjtruckweight);
             AIS_LOG_DEBUG("### AIS Zeroed wt = %f", AisJhm2TxIn.simplecal_data.zeroed_truck_wt);
@@ -571,7 +558,7 @@ void LpsSaWeighApp::AisJhmDataServerTxRead()
 }
 
 /******************************************************************************
-FUNCTION NAME: AisJhmDataServerTxRead
+FUNCTION NAME: LpsSaSEAStatus
 DESCRIPTION:
 PARAMETER DESCRIPTION:
 RETURN VALUE:
@@ -581,8 +568,9 @@ void LpsSaWeighApp::LpsSaSEAStatus( )
     /*TODO: We are initializing the status of the SEA to installed/enabled,
      * we should probably disable the SEA if we do not receive a SEA object
      * in the first x minutes */
+
     cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel txData;
-    while (AutonomyConditionDiagnosticsTxInputChannel->get(txData)) {
+    while (AutonomyConditionDiagnosticsTxRosIn_->get(txData)) {
         for (const auto & element : txData.sea_list) {
             if (element.reason_code == LPS_SEA_REASON_CODE_149) {
                 LpsSaWeighInfoTbl.SEALevel1EssentialsInstalled = AutonomyConditionDiagnosticsTxInterfaceStorage::checkSEAEnableStatus(element.status);
@@ -620,10 +608,13 @@ void LpsSaWeighApp::LpsSaSEAStatus( )
 void LpsSaWeighApp::LpsSaBattVoltageRead( )
 {
     /* send a request for SystemHardwareHealth at configured period */
-    SystemHardwareHealthRequestOutput_->publish(weigh_app_interfaces::msg::SystemHardwareHealthRequest());
+    if (SystemHardwareHealthRequestRosOut_) {
+        weigh_app_interfaces::msg::SystemHardwareHealthRequest request;
+        SystemHardwareHealthRequestRosOut_->publish(request);
+    }
 
     weigh_app_interfaces::msg::SystemHardwareHealthStorage rxData;
-    while (SystemHardwareHealthInput_->get(rxData)) {
+    while (SystemHardwareHealthRosIn_ && SystemHardwareHealthRosIn_->get(rxData)) {
         auto voltage = rxData.battery_voltage;
 
         // Battery Low condition
@@ -697,19 +688,23 @@ void LpsSaWeighApp::LpsSaWeighingScsRx( )
 
     // Report ticket retention period to seal tracker.
     if (nullptr != printerCnfgInput_) {
-        weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfgInterfaceStorage printerCnfg;
+        weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg printerCnfg;
         while (printerCnfgInput_->get(printerCnfg)) {
-            sealTracker_.reportTicketRetentionPeriod(printerCnfg.config.truck_ticket.retention_period);
+            sealTracker_.reportTicketRetentionPeriod(printerCnfg.truck_ticket.retention_period);
         }
     }
 
     /* Receive local time offset and override the local time offset in chrono/print.hpp */
     if (nullptr != shmClockInput_) {
-        cpm_common_interfaces::msg::ShmClockInput shmClock;
-        while (shmClockInput_->get(shmClock)) {
-            int32_t offset = shmClock.utc_offset_min;
+        cpm_common_interfaces::msg::ShmClockInput shmClockRos;
+        while (shmClockInput_->get(shmClockRos)) {
+            ShmClock shmClock;
+            shmClock.set_SHM(shmClockRos.shm_sec);
+            shmClock.set_UTC_offset(shmClockRos.utc_offset_min);
+            shmClock.set_TZ(shmClockRos.tzone_info.data(), shmClockRos.tzone_info.size());
+            int32_t offset = shmClock.get_UTC_offset();
             tzone_tx_comm_struct tzone;
-            if (tes_common_ais::get_tz_struct(shmClock.tzone_info.data(), shmClock.tzone_info.size(), tzone)) {
+            if (tes_common_ais::get_tz_struct(tzone, shmClock)) {
                 if ((tzInfo_.offset != offset) || (tzInfo_.index != tzone.tzone_id)) {
                     std::string tzStr = tes_common_ais::makeTZString(tzone);
                     if (tes_common_ais::setTZString(tzStr)) {
@@ -728,7 +723,7 @@ void LpsSaWeighApp::LpsSaWeighingScsRx( )
                 AIS_LOG_ERROR("Could not get tzone_tx_comm_struct");
             }
 
-            serviceHourMeter_ = shmClock.shm_sec;
+            serviceHourMeter_ = shmClockRos.shm_sec;
         }
     }
 }
@@ -743,10 +738,10 @@ void LpsSaWeighApp::LpsSaScsSendZeroRqst()
 {
     bool scsReqstRet=false;
 
-    if (LpsSaJobMgrScsReqstOut) {
+    if (LpsSaJobMgrReqstRosOut_) {
         cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel req;
         req.command.value = cpm_common_interfaces::msg::JobMgrReqstChannelCommand::ZERO;
-        scsReqstRet = LpsSaJobMgrScsReqstOut->publish(req);
+        scsReqstRet = LpsSaJobMgrReqstRosOut_->publish(req);
     }
 
     if (!scsReqstRet) {
@@ -762,26 +757,14 @@ RETURN VALUE: true if successful, else false
 bool LpsSaWeighApp::LpsSaWeighingScsTx()
 {
     bool scsCmdRet = false;
-
-    if (nullptr != LpsSaWeighScsTxOut) {
+    if (nullptr != LpsSaWeighScsTxOut_ROS2) {
         cpm_common_interfaces::msg::LpsSaWeighTxChannel txOut;
 
+        txOut.dig_stat = LpsSaWeighInfoTbl.DigStat;
         txOut.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
                 std::chrono::steady_clock::now().time_since_epoch()).count();
 
-        // EventState/DiagState/InfoState/ProdMeasureWeighStatus are real
-        // std::bitset<N> in the original code (confirmed via
-        // LpsSaWeighTxChannel.h's ACDEventPopUp/ACDDiagPopUp/ACDInfoPopUp/
-        // ACDWeighStatus namespaces), used here with real bitset operations
-        // (.none()/.reset()/operator[]) -- kept as real bitset locals for
-        // that logic, converted to the new message's raw bit fields only
-        // at the very end, right before publish.
-        auto eventStateBits = LpsSaWeighInfoTbl.EventState;
-        auto diagStateBits = LpsSaWeighInfoTbl.DiagState;
-        auto infoStateBits = LpsSaWeighInfoTbl.InfoState;
         ACDWeighStatus::type prodMeasureWeighStatusBits;
-
-        txOut.dig_stat = LpsSaWeighInfoTbl.DigStat;
 
         if (GetPayloadMonSysCalStatus()) {
             txOut.cal_stat = LPS_WEIGH_SYSTEM_CALIBRATED;
@@ -888,18 +871,18 @@ bool LpsSaWeighApp::LpsSaWeighingScsTx()
         txOut.pid_data.hyd_oil_temp_enabled = cnfg_.hydOilTempEnabled;
         txOut.pid_data.audible_weight_enabled = cnfg_.audibleWeightEnabled;
 
-        prodMeasureWeighStatusBits[ACDWeighStatus::LOWER_STALL] = infoStateBits[ACDInfoPopUp::PAYLOAD_LOWER_STALL];
-        prodMeasureWeighStatusBits[ACDWeighStatus::RAISE_STALL] = infoStateBits[ACDInfoPopUp::PAYLOAD_RAISE_STALL];
+        prodMeasureWeighStatusBits[ACDWeighStatus::LOWER_STALL] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_LOWER_STALL];
+        prodMeasureWeighStatusBits[ACDWeighStatus::RAISE_STALL] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_RAISE_STALL];
         prodMeasureWeighStatusBits[ACDWeighStatus::INSUFFICIENT_DATA] = false;
-        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_PRESSURE_CHANGING] = infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_PRESSURE_CHANGING];
-        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_INCONSISTENT] = infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_INCONSISTENT];
-        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_SPEED_CHANGING] = infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_SPEED_CHANGING];
+        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_PRESSURE_CHANGING] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_PRESSURE_CHANGING];
+        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_INCONSISTENT] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_INCONSISTENT];
+        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_SPEED_CHANGING] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_SPEED_CHANGING];
         prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_NOT_RACKED_EXCESSIVE_PITCH] =
-                infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_NOT_RACKED] ||
-                infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_EXCESSIVE_PITCH];
-        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_STOPPED_IN_RANGE] = infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_STOPPED_IN_RANGE];
-        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_LIFT_TOO_SLOW] = infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_LIFT_TOO_SLOW];
-        prodMeasureWeighStatusBits[ACDWeighStatus::INSUFFICIENT_DATA] = infoStateBits[ACDInfoPopUp::PAYLOAD_REWEIGH_WARMUP_LIFT];
+                LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_NOT_RACKED] ||
+                LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_EXCESSIVE_PITCH];
+        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_STOPPED_IN_RANGE] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_STOPPED_IN_RANGE];
+        prodMeasureWeighStatusBits[ACDWeighStatus::REWEIGH_LIFT_TOO_SLOW] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_LIFT_TOO_SLOW];
+        prodMeasureWeighStatusBits[ACDWeighStatus::INSUFFICIENT_DATA] = LpsSaWeighInfoTbl.InfoState[ACDInfoPopUp::PAYLOAD_REWEIGH_WARMUP_LIFT];
         /* send audible tone command */
         txOut.pid_data.audible_weight_command = getAudibleCommand();
 
@@ -922,6 +905,11 @@ bool LpsSaWeighApp::LpsSaWeighingScsTx()
         txOut.zero_weight = payloadCalNvmTbl_.data.ZeroWeight;
         txOut.simple_cal_adjust = payloadCalNvmTbl_.data.CalAdjust;
 
+        // EventState/DiagState/InfoState/ProdMeasureWeighStatus are std::bitset<N>
+        auto eventStateBits = LpsSaWeighInfoTbl.EventState;
+        auto diagStateBits = LpsSaWeighInfoTbl.DiagState;
+        auto infoStateBits = LpsSaWeighInfoTbl.InfoState;
+
         if (diagStateBits.none()) {
             // No diagnostics, check battery voltage events and imu w/lft
             if (STATUS_GOOD != LpsChkInputStat()) {
@@ -929,6 +917,7 @@ bool LpsSaWeighApp::LpsSaWeighingScsTx()
                 txOut.show_exclamation_point = true;
                 txOut.bucket_fully_racked = true;
                 txOut.excessive_pitch = false;
+                AIS_LOG_ERROR("Input status not good, suppressing payload availability.");
             }
             else {
                 txOut.show_exclamation_point = false;
@@ -939,6 +928,59 @@ bool LpsSaWeighApp::LpsSaWeighingScsTx()
         }
         else {
             // We have at least one diagnostic.
+            AIS_LOG_ERROR("Diagnostics present, suppressing payload availability. DiagState: %d", diagStateBits);
+            if (diagStateBits[ACDDiagPopUp::HYDRAULIC_OIL_TEMP_BAD]) {
+                AIS_LOG_ERROR("Diagnostic: HYDRAULIC_OIL_TEMP_BAD");
+            }
+            if (diagStateBits[ACDDiagPopUp::LIFT_HE_FREQ_ABNORMAL] ||
+                diagStateBits[ACDDiagPopUp::LIFT_HE_VOLTAGE_ABOVE_NORMAL] ||
+                diagStateBits[ACDDiagPopUp::LIFT_HE_VOLTAGE_BELOW_NORMAL]) {
+                AIS_LOG_ERROR("Diagnostic: LIFT_HE_BAD");
+            }
+            if (diagStateBits[ACDDiagPopUp::LIFT_RE_FREQ_ABNORMAL] ||
+                diagStateBits[ACDDiagPopUp::LIFT_RE_VOLTAGE_ABOVE_NORMAL] ||
+                diagStateBits[ACDDiagPopUp::LIFT_RE_VOLTAGE_BELOW_NORMAL]) {
+                AIS_LOG_ERROR("Diagnostic: LIFT_RE_BAD");
+            }
+            if (diagStateBits[ACDDiagPopUp::TILT_HE_FREQ_ABNORMAL] ||
+                diagStateBits[ACDDiagPopUp::TILT_HE_VOLTAGE_ABOVE_NORMAL] ||
+                diagStateBits[ACDDiagPopUp::TILT_HE_VOLTAGE_BELOW_NORMAL]) {
+                AIS_LOG_ERROR("Diagnostic: TILT_HE_BAD");
+            }
+            if (diagStateBits[ACDDiagPopUp::TILT_RE_FREQ_ABNORMAL] ||
+                diagStateBits[ACDDiagPopUp::TILT_RE_VOLTAGE_ABOVE_NORMAL] ||
+                diagStateBits[ACDDiagPopUp::TILT_RE_VOLTAGE_BELOW_NORMAL]) {
+                AIS_LOG_ERROR("Diagnostic: TILT_RE_BAD");
+            }
+            if (diagStateBits[ACDDiagPopUp::MACHINE_MODEL_NOT_SET]) {
+                AIS_LOG_ERROR("Diagnostic: MACHINE_MODEL_NOT_SET");
+            }
+            if (diagStateBits[ACDDiagPopUp::PAYLOAD_SYSTEM_NOT_INSTALLED]) {
+                AIS_LOG_ERROR("Diagnostic: PAYLOAD_SYSTEM_NOT_INSTALLED");
+            }
+            if (diagStateBits[ACDDiagPopUp::PAYLOAD_SYSTEM_OUT_OF_CAL]) {
+                AIS_LOG_ERROR("Diagnostic: PAYLOAD_SYSTEM_OUT_OF_CAL");
+            }
+            if (diagStateBits[ACDDiagPopUp::PAYLOAD_SYSTEM_OUT_OF_CAL]) {
+                AIS_LOG_ERROR("Diagnostic: PAYLOAD_SYSTEM_OUT_OF_CAL");
+            }
+            if (diagStateBits[ACDDiagPopUp::LIFT_LINK_OUT_OF_CAL]) {
+                AIS_LOG_ERROR("Diagnostic: LIFT_LINK_OUT_OF_CAL");
+            }
+            if (diagStateBits[ACDDiagPopUp::TILT_LINK_OUT_OF_CAL]) {
+                AIS_LOG_ERROR("Diagnostic: TILT_LINK_OUT_OF_CAL");
+            }
+            if (diagStateBits[ACDDiagPopUp::LIFT_LINK_FREQ_ABNORMAL] ||
+                diagStateBits[ACDDiagPopUp::LIFT_LINK_VOLTAGE_ABOVE_NORMAL] ||
+                diagStateBits[ACDDiagPopUp::LIFT_LINK_VOLTAGE_BELOW_NORMAL]) {
+                AIS_LOG_ERROR("Diagnostic: LIFT_LINK_BAD");
+            }
+            if (diagStateBits[ACDDiagPopUp::TILT_LINK_FREQ_ABNORMAL] ||
+                diagStateBits[ACDDiagPopUp::TILT_LINK_VOLTAGE_ABOVE_NORMAL] ||
+                diagStateBits[ACDDiagPopUp::TILT_LINK_VOLTAGE_BELOW_NORMAL]) {
+                AIS_LOG_ERROR("Diagnostic: TILT_LINK_BAD");
+            }
+
             txOut.show_exclamation_point = true;
             txOut.bucket_fully_racked = true;
             txOut.excessive_pitch = false;
@@ -1030,14 +1072,17 @@ bool LpsSaWeighApp::LpsSaWeighingScsTx()
 
         txOut.test_status = static_cast<uint8_t>(testFixture_.getTestStatus());
 
-        // Resolve the real bitset locals into the new message's raw bit fields.
+        // Resolve the bitset locals into the new message's raw bit fields.
         txOut.event_state.bits = static_cast<uint32_t>(eventStateBits.to_ulong());
         txOut.diag_state.bits = static_cast<uint32_t>(diagStateBits.to_ulong());
         txOut.info_state.bits = static_cast<uint32_t>(infoStateBits.to_ulong());
         txOut.pid_data.prod_measure_weigh_status = static_cast<uint16_t>(prodMeasureWeighStatusBits.to_ulong());
 
-        /* Broadcasting Weighing App elements */
-        scsCmdRet = LpsSaWeighScsTxOut->publish(txOut);
+        /* Broadcasting Weighing App elements to ROS2 */
+        bool scsCmdRet_ROS2 = LpsSaWeighScsTxOut_ROS2->publish(txOut);
+        if (!scsCmdRet_ROS2) {
+            AIS_LOG_ERROR("[ROS2] Failed to publish LpsSaWeighTxChannel");
+        }
     }
 
     if (!scsCmdRet) {
@@ -1055,23 +1100,19 @@ RETURN VALUE:
 *******************************************************************************/
 void LpsSaWeighApp::LpsSaWeighScsInitDebugTx()
 {
-    weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel txOut;
-    if (LpsSaWeighScsInitDebugOut )
+    if (LpsSaWeighInitDebugRosOut_ )
     {
-        /* Fill in the data to publish -- scoped to the 8 fields serialize()
-           actually archives (see WEIGH_CHANNEL_MAPPING.md channel 6), not
-           the full LpsInitTbl_t. */
-        txOut.exec_rate = LpsWrk.InitTbl.ExecRate;
-        txOut.cal_weight = LpsWrk.InitTbl.MachSpecificCfg.CalibTbl.CalWeight;
-        txOut.cal_status = LpsWrk.InitTbl.MachSpecificCfg.CalibTbl.CalStatus;
-        txOut.cal_adjust = LpsWrk.InitTbl.MachSpecificCfg.CalibTbl.CalAdjust;
-        txOut.zero_weight = LpsWrk.InitTbl.MachSpecificCfg.CalibTbl.ZeroWeight;
-        txOut.dig_target_wt = LpsWrk.InitTbl.MachSpecificCfg.DigConfig.DigTargetWt;
-        txOut.start_of_weigh = LpsWrk.InitTbl.MachSpecificCfg.StartOfWeigh;
-        txOut.tilt_comp_gain_scalar = LpsWrk.InitTbl.MachSpecificCfg.TiltComp.TiltCompGainScalar;
-
-        /* Broadcasting Weighing App elements */
-        LpsSaWeighScsInitDebugOut->publish( txOut );
+        weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel txOut;
+        const LpsInitTbl_t& init = LpsWrk.InitTbl;
+        txOut.exec_rate = init.ExecRate;
+        txOut.cal_weight = init.MachSpecificCfg.CalibTbl.CalWeight;
+        txOut.cal_status = init.MachSpecificCfg.CalibTbl.CalStatus;
+        txOut.cal_adjust = init.MachSpecificCfg.CalibTbl.CalAdjust;
+        txOut.zero_weight = init.MachSpecificCfg.CalibTbl.ZeroWeight;
+        txOut.dig_target_wt = init.MachSpecificCfg.DigConfig.DigTargetWt;
+        txOut.start_of_weigh = init.MachSpecificCfg.StartOfWeigh;
+        txOut.tilt_comp_gain_scalar = init.MachSpecificCfg.TiltComp.TiltCompGainScalar;
+        LpsSaWeighInitDebugRosOut_->publish(txOut);
     }
     else
     {
@@ -1087,317 +1128,219 @@ RETURN VALUE:
  *******************************************************************************/
 void LpsSaWeighApp::LpsSaWeighScsDebugTx()
 {
-    if (LpsSaWeighScsDebugOut) {
-        // Check for a new weigh range weight and make a log entry.
-        if (LPS_WEIGH_WRW_STATUS_VALID == LpsWrk.WrwTbl.OpTbl.Status) {
-            bool newWeighRangeWeighResults = false;
+    if (!LpsSaWeighDebugRosOut_) { return; }
 
-            if (LPS_WEIGH_WRW_STATUS_VALID != DebugLpsSaXCPChannels.m_LpsWrk.WrwTbl.OpTbl.Status) {
-                // It previously was not valid, must be new
-                newWeighRangeWeighResults = true;
-            }
-            else if ((LPS_IN_WEIGH_RANGE_WEIGHING == DebugLpsSaXCPChannels.m_LpsWrk.WrwTbl.OpTbl.Indicator) &&
-                    (LPS_ABOVE_WEIGH_RANGE == LpsWrk.WrwTbl.OpTbl.Indicator)) {
-                // We were in the weigh range weighing, now we are above the weigh range.
-                newWeighRangeWeighResults = true;
-            }
+    // Check for a new weigh range weight and make a log entry.
+    // DebugLpsSaXCPChannels.m_LpsWrk retains the previous cycle's values for WRW transition comparison.
+    if (LPS_WEIGH_WRW_STATUS_VALID == LpsWrk.WrwTbl.OpTbl.Status) {
+        bool newWeighRangeWeighResults = false;
 
-            if (newWeighRangeWeighResults) {
-                // We have a new weigh range weigh available.
-                logWeighRangeWeighUpdate();
-            }
+        if (LPS_WEIGH_WRW_STATUS_VALID != DebugLpsSaXCPChannels.m_LpsWrk.WrwTbl.OpTbl.Status) {
+            newWeighRangeWeighResults = true;
+        }
+        else if ((LPS_IN_WEIGH_RANGE_WEIGHING == DebugLpsSaXCPChannels.m_LpsWrk.WrwTbl.OpTbl.Indicator) &&
+                (LPS_ABOVE_WEIGH_RANGE == LpsWrk.WrwTbl.OpTbl.Indicator)) {
+            newWeighRangeWeighResults = true;
         }
 
-        // Fill in the data to publish
-        DebugLpsSaXCPChannels.m_LpsWrk = LpsWrk;
-
-        DebugLpsSaXCPChannels.DebugLiftCylHePress = weighUpdtTbl.LiftCylHePres.Val;
-        DebugLpsSaXCPChannels.DebugLiftCylHePressStatus = weighUpdtTbl.LiftCylHePres.Stat;
-        DebugLpsSaXCPChannels.DebugLiftCylRePress = weighUpdtTbl.LiftCylRePres.Val;
-        DebugLpsSaXCPChannels.DebugLiftCylRePressStatus = weighUpdtTbl.LiftCylRePres.Stat;
-
-        DebugLpsSaXCPChannels.DebugTiltCylHePress = LpsSaWeighInfoTbl.TiltCylHePres.Val;
-        DebugLpsSaXCPChannels.DebugTiltCylHePressStatus = LpsSaWeighInfoTbl.TiltCylHePres.Stat;
-        DebugLpsSaXCPChannels.DebugTiltCylRePress = LpsSaWeighInfoTbl.TiltCylRePres.Val;
-        DebugLpsSaXCPChannels.DebugTiltCylRePressStatus = LpsSaWeighInfoTbl.TiltCylRePres.Stat;
-
-        DebugLpsSaXCPChannels.DebugLiftCylRawExt  = LpsSaWeighInfoTbl.LiftPosition.cylinderLength;
-        DebugLpsSaXCPChannels.DebugLiftCylFiltExt = LpsSaWeighInfoTbl.LiftPosition.cylinderLength;
-        DebugLpsSaXCPChannels.DebugLiftCylNormLen = LpsSaWeighInfoTbl.LiftPosition.percentCylinderLength;
-        DebugLpsSaXCPChannels.DebugLiftCylVel = LpsSaWeighInfoTbl.LiftCylVel.Val;
-        DebugLpsSaXCPChannels.DebugLiftAngle = LpsSaWeighInfoTbl.LiftPosition.angle;
-        DebugLpsSaXCPChannels.DebugLiftAngVel = LpsSaWeighInfoTbl.LiftAngVel.Val;
-        DebugLpsSaXCPChannels.DebugLiftPositionStatus = LpsSaWeighInfoTbl.LiftPosition.status;
-
-        DebugLpsSaXCPChannels.DebugTiltCylRawLen = LpsSaWeighInfoTbl.TiltPosition.cylinderLength;
-        DebugLpsSaXCPChannels.DebugTiltCylNormLen = LpsSaWeighInfoTbl.TiltPosition.percentCylinderLength;
-        DebugLpsSaXCPChannels.DebugTiltCylVel = LpsSaWeighInfoTbl.TiltCylVel.Val;
-        DebugLpsSaXCPChannels.DebugTiltAngle = LpsSaWeighInfoTbl.TiltPosition.angle;
-        DebugLpsSaXCPChannels.DebugTiltAngleABC = LpsSaWeighInfoTbl.TiltPosition.percentAngle;
-        DebugLpsSaXCPChannels.DebugTiltPositionStatus = LpsSaWeighInfoTbl.TiltPosition.status;
-
-        DebugLpsSaXCPChannels.DebugBucketAngle = weighUpdtTbl.BktAngle.Val;
-        DebugLpsSaXCPChannels.DebugBucketAngleStatus = weighUpdtTbl.BktAngle.Stat;
-        DebugLpsSaXCPChannels.DebugHydOilTemp = weighUpdtTbl.HydOilTemp.Val;
-        DebugLpsSaXCPChannels.DebugHydOilTempStatus = weighUpdtTbl.HydOilTemp.Stat;
-        DebugLpsSaXCPChannels.DebugRequestedGear = weighUpdtTbl.RequestedGear.Val;
-        DebugLpsSaXCPChannels.DebugRequestedGearStatus = weighUpdtTbl.RequestedGear.Stat;
-        DebugLpsSaXCPChannels.DebugWeighUpdtLoaderBktPayldTrgtWt = weighUpdtTbl.LoaderBktPayldTrgtWt;
-        DebugLpsSaXCPChannels.DebugWeighUpdtClockKeyonSec = weighUpdtTbl.ClockKeyonSec;
-        DebugLpsSaXCPChannels.DebugWeighUpdtPassCount = weighUpdtTbl.PassCount;
-
-        { // Get gravity vector
-            auto gravityVector = chassisImu_.imu.gravityVector();
-            DebugLpsSaXCPChannels.chassisImuGravityX = gravityVector.x();
-            DebugLpsSaXCPChannels.chassisImuGravityY = gravityVector.y();
-            DebugLpsSaXCPChannels.chassisImuGravityZ = gravityVector.z();
+        if (newWeighRangeWeighResults) {
+            logWeighRangeWeighUpdate();
         }
-
-        { // Get estimated velocity
-            auto estimatedLinVelVector = chassisImu_.imu.estimatedLinVelVector();
-            DebugLpsSaXCPChannels.chassisImuVelocityX = estimatedLinVelVector.x();
-            DebugLpsSaXCPChannels.chassisImuVelocityY = estimatedLinVelVector.y();
-            DebugLpsSaXCPChannels.chassisImuVelocityZ = estimatedLinVelVector.z();
-        }
-
-        { // Get IMU testpoints - Bias Correction
-            DebugLpsSaXCPChannels.chassisImuBiasMagJerk = chassisImu_.imu.magJerk_;
-            DebugLpsSaXCPChannels.chassisImuBiasMagAngAccel = chassisImu_.imu.magAngAccel_;
-            DebugLpsSaXCPChannels.chassisImuBiasMaxAngVel = chassisImu_.imu.maxAngVel_;
-
-            auto biasAngVel = chassisImu_.imu.biasAngVelVector();
-            DebugLpsSaXCPChannels.chassisImuBiasAngVelX = biasAngVel.x();
-            DebugLpsSaXCPChannels.chassisImuBiasAngVelY = biasAngVel.y();
-            DebugLpsSaXCPChannels.chassisImuBiasAngVelZ = biasAngVel.z();
-        }
-
-        { // Get IMU testpoints - Sensor Linear Acceleration
-            auto sensorLinAcc = chassisImu_.sensorLinAcc;
-            DebugLpsSaXCPChannels.chassisImuLinAccX = sensorLinAcc.x();
-            DebugLpsSaXCPChannels.chassisImuLinAccY = sensorLinAcc.y();
-            DebugLpsSaXCPChannels.chassisImuLinAccZ = sensorLinAcc.z();
-        }
-
-        { // Get IMU testpoints - Sensor Angular Velocity
-            auto sensorAngVel = chassisImu_.sensorAngVel;
-            DebugLpsSaXCPChannels.chassisImuAngVelX = sensorAngVel.x();
-            DebugLpsSaXCPChannels.chassisImuAngVelY = sensorAngVel.y();
-            DebugLpsSaXCPChannels.chassisImuAngVelZ = sensorAngVel.z();
-        }
-
-        // Get IMU pitch and roll
-        DebugLpsSaXCPChannels.chassisImuPitch = chassisImu_.imu.pitchDegrees();
-        DebugLpsSaXCPChannels.chassisImuRoll = chassisImu_.imu.rollDegrees();
-
-        // Get raw IMU sensor status
-        DebugLpsSaXCPChannels.chassisImuSensorLinAccStatus = chassisImu_.sensorLinAccStatus;
-        DebugLpsSaXCPChannels.chassisImuSensorAngVelStatus = chassisImu_.sensorAngVelStatus;
-
-        // DebugLpsSaXCPChannels stays on its real old type (see
-        // LpsSaWeighApp.h) -- its previous-tick m_LpsWrk value is read
-        // above (line ~1091) before being overwritten this tick, so it
-        // can't be a plain-data message. Convert to the new message here,
-        // at the publish boundary, reading the now-fully-populated member.
-        weigh_app_interfaces::msg::LpsSaWeighDebugChannel txOut;
-
-        memcpy(&txOut.reweigh_warn, &DebugLpsSaXCPChannels.m_LpsWrk.WrwTbl.ReweighWarn, sizeof(txOut.reweigh_warn));
-
-        txOut.debug_lift_cyl_he_period = DebugLpsSaXCPChannels.DebugLiftCylHePeriod;
-        txOut.debug_lift_cyl_he_width = DebugLpsSaXCPChannels.DebugLiftCylHeWidth;
-        txOut.debug_lift_cyl_he_dc = DebugLpsSaXCPChannels.DebugLiftCylHeDc;
-        txOut.debug_lift_cyl_he_press = DebugLpsSaXCPChannels.DebugLiftCylHePress;
-        txOut.debug_lift_cyl_he_press_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugLiftCylHePressStatus);
-
-        txOut.debug_lift_cyl_re_period = DebugLpsSaXCPChannels.DebugLiftCylRePeriod;
-        txOut.debug_lift_cyl_re_width = DebugLpsSaXCPChannels.DebugLiftCylReWidth;
-        txOut.debug_lift_cyl_re_dc = DebugLpsSaXCPChannels.DebugLiftCylReDc;
-        txOut.debug_lift_cyl_re_press = DebugLpsSaXCPChannels.DebugLiftCylRePress;
-        txOut.debug_lift_cyl_re_press_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugLiftCylRePressStatus);
-
-        txOut.debug_tilt_cyl_he_period = DebugLpsSaXCPChannels.DebugTiltCylHePeriod;
-        txOut.debug_tilt_cyl_he_width = DebugLpsSaXCPChannels.DebugTiltCylHeWidth;
-        txOut.debug_tilt_cyl_he_dc = DebugLpsSaXCPChannels.DebugTiltCylHeDc;
-        txOut.debug_tilt_cyl_he_press = DebugLpsSaXCPChannels.DebugTiltCylHePress;
-        txOut.debug_tilt_cyl_he_press_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugTiltCylHePressStatus);
-
-        txOut.debug_tilt_cyl_re_period = DebugLpsSaXCPChannels.DebugTiltCylRePeriod;
-        txOut.debug_tilt_cyl_re_width = DebugLpsSaXCPChannels.DebugTiltCylReWidth;
-        txOut.debug_tilt_cyl_re_dc = DebugLpsSaXCPChannels.DebugTiltCylReDc;
-        txOut.debug_tilt_cyl_re_press = DebugLpsSaXCPChannels.DebugTiltCylRePress;
-        txOut.debug_tilt_cyl_re_press_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugTiltCylRePressStatus);
-
-        txOut.debug_lift_cyl_period = DebugLpsSaXCPChannels.DebugLiftCylPeriod;
-        txOut.debug_lift_cyl_width = DebugLpsSaXCPChannels.DebugLiftCylWidth;
-        txOut.debug_lift_cyl_dc = DebugLpsSaXCPChannels.DebugLiftCylDc;
-        txOut.debug_lift_cyl_raw_ext = DebugLpsSaXCPChannels.DebugLiftCylRawExt;
-        txOut.debug_lift_cyl_filt_ext = DebugLpsSaXCPChannels.DebugLiftCylFiltExt;
-        txOut.debug_lift_cyl_norm_len = DebugLpsSaXCPChannels.DebugLiftCylNormLen;
-        txOut.debug_lift_cyl_vel = DebugLpsSaXCPChannels.DebugLiftCylVel;
-        txOut.debug_lift_angle = DebugLpsSaXCPChannels.DebugLiftAngle;
-        txOut.debug_lift_ang_vel = DebugLpsSaXCPChannels.DebugLiftAngVel;
-        txOut.debug_lift_position_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugLiftPositionStatus);
-
-        txOut.debug_tilt_cyl_period = DebugLpsSaXCPChannels.DebugTiltCylPeriod;
-        txOut.debug_tilt_cyl_width = DebugLpsSaXCPChannels.DebugTiltCylWidth;
-        txOut.debug_tilt_cyl_dc = DebugLpsSaXCPChannels.DebugTiltCylDc;
-        txOut.debug_tilt_cyl_raw_len = DebugLpsSaXCPChannels.DebugTiltCylRawLen;
-        txOut.debug_tilt_cyl_norm_len = DebugLpsSaXCPChannels.DebugTiltCylNormLen;
-        txOut.debug_tilt_cyl_vel = DebugLpsSaXCPChannels.DebugTiltCylVel;
-        txOut.debug_tilt_angle = DebugLpsSaXCPChannels.DebugTiltAngle;
-        txOut.debug_tilt_angle_abc = DebugLpsSaXCPChannels.DebugTiltAngleABC;
-        txOut.debug_tilt_position_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugTiltPositionStatus);
-
-        txOut.debug_bucket_angle = DebugLpsSaXCPChannels.DebugBucketAngle;
-        txOut.debug_bucket_angle_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugBucketAngleStatus);
-        txOut.debug_hyd_oil_temp = DebugLpsSaXCPChannels.DebugHydOilTemp;
-        txOut.debug_hyd_oil_temp_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugHydOilTempStatus);
-        txOut.debug_requested_gear = DebugLpsSaXCPChannels.DebugRequestedGear;
-        txOut.debug_requested_gear_status = static_cast<int32_t>(DebugLpsSaXCPChannels.DebugRequestedGearStatus);
-        txOut.debug_weigh_updt_loader_bkt_payld_trgt_wt = DebugLpsSaXCPChannels.DebugWeighUpdtLoaderBktPayldTrgtWt;
-        txOut.debug_weigh_updt_clock_keyon_sec = DebugLpsSaXCPChannels.DebugWeighUpdtClockKeyonSec;
-        txOut.debug_weigh_updt_pass_count = DebugLpsSaXCPChannels.DebugWeighUpdtPassCount;
-
-        {
-            const auto& w = DebugLpsSaXCPChannels.m_LpsWrk;
-            txOut.best_bkt_wt_payload_calc_meth = w.BestBktWt.PayloadCalcMeth;
-            txOut.best_bkt_wt_wt = w.BestBktWt.Wt;
-            txOut.best_bkt_wt_tipoff_live_weight_in_use = w.BestBktWt.TipoffLiveWeightInUse;
-            txOut.cyl_flow_const_lift_he_flow_const = w.CylFlowConst.LiftHeFlowConst;
-            txOut.cyl_flow_const_lift_re_to_he_flow_ratio = w.CylFlowConst.LiftReToHeFlowRatio;
-            txOut.dig_detect_data_dig_detected = w.DigDetectData.DigDetected;
-            txOut.dig_detect_data_dig_duration = w.DigDetectData.DigDuration;
-            txOut.dig_detect_data_dig_started = w.DigDetectData.DigStarted;
-            txOut.dig_detect_data_dig_state = static_cast<uint8_t>(w.DigDetectData.DigState);
-            txOut.dig_detect_data_wt_stabilized = w.DigDetectData.WtStabilized;
-            txOut.dump_wt_change_data_dump_cumulative_wt_change = w.DumpWtChangeData.DumpCumulativeWtChange;
-            txOut.inst_wt_der = w.InstWtDer;
-            txOut.inst_wt_filt = w.InstWtFilt;
-            txOut.inst_wt_llw_filt = w.InstWtLlwFilt;
-            txOut.inst_wt_raw.stat = static_cast<int32_t>(w.InstWtRaw.Stat);
-            txOut.inst_wt_raw.val = w.InstWtRaw.Val;
-            txOut.inst_wt_raw_pre_tilt_comp = w.InstWtRawPreTiltComp;
-            txOut.inst_wt_raw_post_tilt_comp = w.InstWtRawPostTiltComp;
-            txOut.lift_cyl_pressure = w.LiftCylPressure;
-            txOut.lift_cyl_pressure_v0 = w.LiftCylPressureV0;
-            txOut.lift_cyl_pressure_imu_adjusted = w.LiftCylPressureIMUAdjusted;
-            txOut.live_weigh_tbl_stat = static_cast<uint8_t>(w.LiveWeighTbl.Stat);
-            txOut.live_weigh_tbl_wt = w.LiveWeighTbl.Wt;
-            txOut.live_weigh_tbl_use_fast_filter = w.LiveWeighTbl.UseFastFilter;
-            txOut.low_lift_wt_wt = w.LowLiftWt.Wt;
-            txOut.low_lift_wt_confidence = w.LowLiftWt.Confidence;
-            txOut.low_lift_wt_confidence_est = w.LowLiftWt.ConfidenceEst;
-            txOut.low_lift_wt_confidence_timer = w.LowLiftWt.ConfidenceTimer;
-            txOut.low_lift_wt_last_input = w.LowLiftWt.LastInput;
-            txOut.low_lift_wt_mean_est = w.LowLiftWt.MeanEst;
-            txOut.low_lift_wt_mean_est_comp = w.LowLiftWt.MeanEstComp;
-            txOut.low_lift_wt_stat = static_cast<uint8_t>(w.LowLiftWt.Stat);
-            txOut.low_lift_wt_stdev_est = w.LowLiftWt.StdevEst;
-            txOut.low_lift_wt_variance_est = w.LowLiftWt.VarianceEst;
-            txOut.dump_state_status = static_cast<uint8_t>(w.DumpStateStatus);
-            txOut.lps_stall_detect_lift_stalled = w.LpsStallDetect.liftStalled;
-            txOut.linkage_movement_lift = w.LinkageMovement.lift;
-            txOut.linkage_movement_tilt = w.LinkageMovement.tilt;
-            txOut.wrw_tbl_wk_tbl_result_weight_ave_raw = w.WrwTbl.WkTbl.result.weightAveRaw;
-            txOut.wrw_tbl_wk_tbl_result_weight_ave = w.WrwTbl.WkTbl.result.weightAve;
-            txOut.wrw_tbl_op_tbl_wt = w.WrwTbl.OpTbl.Wt;
-            txOut.wrw_tbl_op_tbl_warning = w.WrwTbl.OpTbl.Warning;
-            txOut.wrw_tbl_op_tbl_indicator = static_cast<int32_t>(w.WrwTbl.OpTbl.Indicator);
-            txOut.wrw_tbl_op_tbl_status = static_cast<uint8_t>(w.WrwTbl.OpTbl.Status);
-            txOut.wrw_tbl_wk_tbl_result_weight_ave_raw_imu_comp = w.WrwTbl.WkTbl.result.weightAveRawIMUComp;
-            txOut.wrw_tbl_wk_tbl_been_below_range = w.WrwTbl.WkTbl.BeenBelowRange;
-            txOut.zero_adj_tbl_zero_adj_status = static_cast<uint8_t>(w.ZeroAdjTbl.ZeroAdjStatus);
-            txOut.overload_warn_tbl_bucket_load_factor = w.OverloadWarnTbl.BucketLoadFactor;
-            txOut.overload_warn_tbl_dig_reverse_flag = w.OverloadWarnTbl.DigReverseFlag;
-            txOut.overload_warn_tbl_in_overload_range = w.OverloadWarnTbl.InOverloadRange;
-            txOut.overload_warn_tbl_level = static_cast<uint8_t>(w.OverloadWarnTbl.Level);
-            txOut.overload_warn_tbl_prev_dig_state = static_cast<uint8_t>(w.OverloadWarnTbl.PrevDigState);
-            txOut.lift_position_filt_length = w.LiftPositionFilt.length;
-            txOut.lift_position_filt_velocity = w.LiftPositionFilt.velocity;
-            txOut.lift_position_filt_angle = w.LiftPositionFilt.angle;
-        }
-
-        {
-            const auto& ti = DebugLpsSaXCPChannels.m_TipoffInputs;
-            txOut.tipoff_inputs.input_status = ti.input_status.data;
-            txOut.tipoff_inputs.invalidate_outputs = ti.invalidate_outputs;
-            txOut.tipoff_inputs.lift_valve_cmd = ti.lift_valve_cmd;
-            txOut.tipoff_inputs.tilt_valve_cmd = ti.tilt_valve_cmd;
-            txOut.tipoff_inputs.tilt_extension = ti.tilt_extension;
-            txOut.tipoff_inputs.lift_angle = ti.lift_angle;
-            txOut.tipoff_inputs.lift_he_pressure = ti.lift_he_pressure;
-            txOut.tipoff_inputs.lift_re_pressure = ti.lift_re_pressure;
-            txOut.tipoff_inputs.tilt_he_pressure = ti.tilt_he_pressure;
-            txOut.tipoff_inputs.tilt_re_pressure = ti.tilt_re_pressure;
-            txOut.tipoff_inputs.eef_imu_accel_x = ti.eef_imu_accelX;
-            txOut.tipoff_inputs.eef_imu_accel_y = ti.eef_imu_accelY;
-            txOut.tipoff_inputs.eef_imu_accel_z = ti.eef_imu_accelZ;
-            txOut.tipoff_inputs.steering_angle = ti.steering_angle;
-            txOut.tipoff_inputs.tool_mass = ti.tool_mass;
-            txOut.tipoff_inputs.truck_target_wt = ti.truck_target_wt;
-            txOut.tipoff_inputs.truck_start_weight = ti.truck_start_weight;
-            txOut.tipoff_inputs.bucket_current_weight_accuracy = ti.bucket_current_weight_accuracy;
-            txOut.tipoff_inputs.bucket_current_weight = ti.bucket_current_weight;
-            txOut.tipoff_inputs.tipoff_mode = ti.tipoff_mode;
-            txOut.tipoff_inputs.zero_offset = ti.zero_offset;
-            txOut.tipoff_inputs.simple_cal_factor = ti.simple_cal_factor;
-            txOut.tipoff_inputs.mach_pitch_cal_offset = ti.mach_pitch_cal_offset;
-            txOut.tipoff_inputs.unlatch_trigger = ti.unlatch_trigger;
-            txOut.tipoff_inputs.bucket_angle = ti.bucket_angle;
-            txOut.tipoff_inputs.anchor_zero_offset = ti.anchor_zero_offset;
-            txOut.tipoff_inputs.anchor_factor = ti.anchor_factor;
-            txOut.tipoff_inputs.pass_count = ti.pass_count;
-            txOut.tipoff_inputs.lift_norm_angle = ti.lift_norm_angle;
-            txOut.tipoff_inputs.lift_norm_length = ti.lift_norm_length;
-            txOut.tipoff_inputs.tilt_norm_angle = ti.tilt_norm_angle;
-            txOut.tipoff_inputs.tilt_norm_length = ti.tilt_norm_length;
-            txOut.tipoff_inputs.friction_mu = ti.friction_mu;
-            txOut.tipoff_inputs.friction_offset = ti.friction_offset;
-
-            const auto& to = DebugLpsSaXCPChannels.m_TipoffOutputs;
-            txOut.tipoff_outputs.arbitrated_payload_norm_error_out = to.arbitrated_payload_norm_error_out;
-            txOut.tipoff_outputs.current_weight_norm_error_out = to.current_weight_norm_error_out;
-            txOut.tipoff_outputs.error_code_out = to.error_code_out;
-            txOut.tipoff_outputs.payload_norm_stdev_out = to.payload_norm_stdev_out;
-            txOut.tipoff_outputs.payload_send_to_cpm = to.payload_send_to_CPM;
-            txOut.tipoff_outputs.payload_status_send_to_cpm = to.payload_status_send_to_CPM;
-            txOut.tipoff_outputs.pcs_weight_accuracy_out = to.pcs_weight_accuracy_out;
-            txOut.tipoff_outputs.spill_rate_out = to.spill_rate_out;
-            txOut.tipoff_outputs.tilt_pressure_out = to.tilt_pressure_out;
-            txOut.tipoff_outputs.tilt_sensitivity_out = to.tilt_sensitivity_out;
-            txOut.tipoff_outputs.weigh_status_out = to.weigh_status_out;
-            txOut.tipoff_outputs.bucket_payload_target = to.bucket_payload_target;
-            txOut.tipoff_outputs.unsecured_pfw_status = to.unsecured_PFW_status;
-            txOut.tipoff_outputs.unsecured_payload_lower_bound_norm = to.unsecured_payload_lower_bound_norm;
-            txOut.tipoff_outputs.unsecured_payload_upper_bound_norm = to.unsecured_payload_upper_bound_norm;
-            txOut.tipoff_outputs.min_secure_bucket_angle = to.min_secure_bucket_angle;
-        }
-
-        txOut.chassis_imu_gravity_x = DebugLpsSaXCPChannels.chassisImuGravityX;
-        txOut.chassis_imu_gravity_y = DebugLpsSaXCPChannels.chassisImuGravityY;
-        txOut.chassis_imu_gravity_z = DebugLpsSaXCPChannels.chassisImuGravityZ;
-        txOut.chassis_imu_velocity_x = DebugLpsSaXCPChannels.chassisImuVelocityX;
-        txOut.chassis_imu_velocity_y = DebugLpsSaXCPChannels.chassisImuVelocityY;
-        txOut.chassis_imu_velocity_z = DebugLpsSaXCPChannels.chassisImuVelocityZ;
-        txOut.chassis_imu_bias_mag_jerk = DebugLpsSaXCPChannels.chassisImuBiasMagJerk;
-        txOut.chassis_imu_bias_mag_ang_accel = DebugLpsSaXCPChannels.chassisImuBiasMagAngAccel;
-        txOut.chassis_imu_bias_max_ang_vel = DebugLpsSaXCPChannels.chassisImuBiasMaxAngVel;
-        txOut.chassis_imu_bias_ang_vel_x = DebugLpsSaXCPChannels.chassisImuBiasAngVelX;
-        txOut.chassis_imu_bias_ang_vel_y = DebugLpsSaXCPChannels.chassisImuBiasAngVelY;
-        txOut.chassis_imu_bias_ang_vel_z = DebugLpsSaXCPChannels.chassisImuBiasAngVelZ;
-        txOut.chassis_imu_pitch = DebugLpsSaXCPChannels.chassisImuPitch;
-        txOut.chassis_imu_roll = DebugLpsSaXCPChannels.chassisImuRoll;
-        txOut.chassis_imu_sensor_lin_acc_status = DebugLpsSaXCPChannels.chassisImuSensorLinAccStatus;
-        txOut.chassis_imu_sensor_ang_vel_status = DebugLpsSaXCPChannels.chassisImuSensorAngVelStatus;
-        txOut.chassis_imu_lin_acc_x = DebugLpsSaXCPChannels.chassisImuLinAccX;
-        txOut.chassis_imu_lin_acc_y = DebugLpsSaXCPChannels.chassisImuLinAccY;
-        txOut.chassis_imu_lin_acc_z = DebugLpsSaXCPChannels.chassisImuLinAccZ;
-        txOut.chassis_imu_ang_vel_x = DebugLpsSaXCPChannels.chassisImuAngVelX;
-        txOut.chassis_imu_ang_vel_y = DebugLpsSaXCPChannels.chassisImuAngVelY;
-        txOut.chassis_imu_ang_vel_z = DebugLpsSaXCPChannels.chassisImuAngVelZ;
-
-        // Broadcasting Weighing App elements
-        LpsSaWeighScsDebugOut->publish(txOut);
     }
+
+    // Update staging struct (previous-cycle snapshot + debug fields set across the codebase)
+    DebugLpsSaXCPChannels.m_LpsWrk = LpsWrk;
+
+    // Build ROS2 message -- field-for-field mapping from AIS struct to snake_case ROS2 fields.
+    // Field ordering follows serialize() in LpsSaWeighDebugChannel.h; types from generated struct.hpp.
+    weigh_app_interfaces::msg::LpsSaWeighDebugChannel txOut;
+
+    memcpy(&txOut.reweigh_warn, &LpsWrk.WrwTbl.ReweighWarn, sizeof(txOut.reweigh_warn));
+
+    txOut.debug_lift_cyl_he_press        = weighUpdtTbl.LiftCylHePres.Val;
+    txOut.debug_lift_cyl_he_press_status = static_cast<int32_t>(weighUpdtTbl.LiftCylHePres.Stat);
+    txOut.debug_lift_cyl_re_press        = weighUpdtTbl.LiftCylRePres.Val;
+    txOut.debug_lift_cyl_re_press_status = static_cast<int32_t>(weighUpdtTbl.LiftCylRePres.Stat);
+
+    txOut.debug_tilt_cyl_he_press        = LpsSaWeighInfoTbl.TiltCylHePres.Val;
+    txOut.debug_tilt_cyl_he_press_status = static_cast<int32_t>(LpsSaWeighInfoTbl.TiltCylHePres.Stat);
+    txOut.debug_tilt_cyl_re_press        = LpsSaWeighInfoTbl.TiltCylRePres.Val;
+    txOut.debug_tilt_cyl_re_press_status = static_cast<int32_t>(LpsSaWeighInfoTbl.TiltCylRePres.Stat);
+
+    txOut.debug_lift_cyl_raw_ext         = LpsSaWeighInfoTbl.LiftPosition.cylinderLength;
+    txOut.debug_lift_cyl_filt_ext        = LpsSaWeighInfoTbl.LiftPosition.cylinderLength;
+    txOut.debug_lift_cyl_norm_len        = LpsSaWeighInfoTbl.LiftPosition.percentCylinderLength;
+    txOut.debug_lift_cyl_vel             = LpsSaWeighInfoTbl.LiftCylVel.Val;
+    txOut.debug_lift_angle               = LpsSaWeighInfoTbl.LiftPosition.angle;
+    txOut.debug_lift_ang_vel             = LpsSaWeighInfoTbl.LiftAngVel.Val;
+    txOut.debug_lift_position_status     = static_cast<int32_t>(LpsSaWeighInfoTbl.LiftPosition.status);
+
+    txOut.debug_tilt_cyl_raw_len         = LpsSaWeighInfoTbl.TiltPosition.cylinderLength;
+    txOut.debug_tilt_cyl_norm_len        = LpsSaWeighInfoTbl.TiltPosition.percentCylinderLength;
+    txOut.debug_tilt_cyl_vel             = LpsSaWeighInfoTbl.TiltCylVel.Val;
+    txOut.debug_tilt_angle               = LpsSaWeighInfoTbl.TiltPosition.angle;
+    txOut.debug_tilt_angle_abc           = LpsSaWeighInfoTbl.TiltPosition.percentAngle;
+    txOut.debug_tilt_position_status     = static_cast<int32_t>(LpsSaWeighInfoTbl.TiltPosition.status);
+
+    txOut.debug_bucket_angle             = weighUpdtTbl.BktAngle.Val;
+    txOut.debug_bucket_angle_status      = static_cast<int32_t>(weighUpdtTbl.BktAngle.Stat);
+    txOut.debug_hyd_oil_temp             = weighUpdtTbl.HydOilTemp.Val;
+    txOut.debug_hyd_oil_temp_status      = static_cast<int32_t>(weighUpdtTbl.HydOilTemp.Stat);
+    txOut.debug_requested_gear           = weighUpdtTbl.RequestedGear.Val;
+    txOut.debug_requested_gear_status    = static_cast<int32_t>(weighUpdtTbl.RequestedGear.Stat);
+    txOut.debug_weigh_updt_loader_bkt_payld_trgt_wt = weighUpdtTbl.LoaderBktPayldTrgtWt;
+    txOut.debug_weigh_updt_clock_keyon_sec           = weighUpdtTbl.ClockKeyonSec;
+    txOut.debug_weigh_updt_pass_count                = weighUpdtTbl.PassCount;
+
+    // LpsWrkTbl_t m_LpsWrk fields (flattened)
+    txOut.best_bkt_wt_payload_calc_meth              = LpsWrk.BestBktWt.PayloadCalcMeth;
+    txOut.best_bkt_wt_wt                             = LpsWrk.BestBktWt.Wt;
+    txOut.best_bkt_wt_tipoff_live_weight_in_use      = LpsWrk.BestBktWt.TipoffLiveWeightInUse;
+    txOut.cyl_flow_const_lift_he_flow_const          = LpsWrk.CylFlowConst.LiftHeFlowConst;
+    txOut.cyl_flow_const_lift_re_to_he_flow_ratio    = LpsWrk.CylFlowConst.LiftReToHeFlowRatio;
+    txOut.dig_detect_data_dig_detected               = LpsWrk.DigDetectData.DigDetected;
+    txOut.dig_detect_data_dig_duration               = LpsWrk.DigDetectData.DigDuration;
+    txOut.dig_detect_data_dig_started                = LpsWrk.DigDetectData.DigStarted;
+    txOut.dig_detect_data_dig_state                  = static_cast<uint8_t>(LpsWrk.DigDetectData.DigState);
+    txOut.dig_detect_data_wt_stabilized              = LpsWrk.DigDetectData.WtStabilized;
+    txOut.dump_wt_change_data_dump_cumulative_wt_change = LpsWrk.DumpWtChangeData.DumpCumulativeWtChange;
+    txOut.inst_wt_der                                = LpsWrk.InstWtDer;
+    txOut.inst_wt_filt                               = LpsWrk.InstWtFilt;
+    txOut.inst_wt_llw_filt                           = LpsWrk.InstWtLlwFilt;
+    txOut.inst_wt_raw.stat                           = static_cast<int32_t>(LpsWrk.InstWtRaw.Stat);
+    txOut.inst_wt_raw.val                            = LpsWrk.InstWtRaw.Val;
+    txOut.inst_wt_raw_pre_tilt_comp                  = LpsWrk.InstWtRawPreTiltComp;
+    txOut.inst_wt_raw_post_tilt_comp                 = LpsWrk.InstWtRawPostTiltComp;
+    txOut.lift_cyl_pressure                          = LpsWrk.LiftCylPressure;
+    txOut.lift_cyl_pressure_v0                       = LpsWrk.LiftCylPressureV0;
+    txOut.lift_cyl_pressure_imu_adjusted             = LpsWrk.LiftCylPressureIMUAdjusted;
+    txOut.live_weigh_tbl_stat                        = static_cast<uint8_t>(LpsWrk.LiveWeighTbl.Stat);
+    txOut.live_weigh_tbl_wt                          = LpsWrk.LiveWeighTbl.Wt;
+    txOut.live_weigh_tbl_use_fast_filter             = LpsWrk.LiveWeighTbl.UseFastFilter;
+    txOut.low_lift_wt_wt                             = LpsWrk.LowLiftWt.Wt;
+    txOut.low_lift_wt_confidence                     = LpsWrk.LowLiftWt.Confidence;
+    txOut.low_lift_wt_confidence_est                 = LpsWrk.LowLiftWt.ConfidenceEst;
+    txOut.low_lift_wt_confidence_timer               = LpsWrk.LowLiftWt.ConfidenceTimer;
+    txOut.low_lift_wt_last_input                     = LpsWrk.LowLiftWt.LastInput;
+    txOut.low_lift_wt_mean_est                       = LpsWrk.LowLiftWt.MeanEst;
+    txOut.low_lift_wt_mean_est_comp                  = LpsWrk.LowLiftWt.MeanEstComp;
+    txOut.low_lift_wt_stat                           = static_cast<uint8_t>(LpsWrk.LowLiftWt.Stat);
+    txOut.low_lift_wt_stdev_est                      = LpsWrk.LowLiftWt.StdevEst;
+    txOut.low_lift_wt_variance_est                   = LpsWrk.LowLiftWt.VarianceEst;
+    txOut.dump_state_status                          = static_cast<uint8_t>(LpsWrk.DumpStateStatus);
+    txOut.lps_stall_detect_lift_stalled              = LpsWrk.LpsStallDetect.liftStalled;
+    txOut.linkage_movement_lift                      = static_cast<float>(LpsWrk.LinkageMovement.lift);
+    txOut.linkage_movement_tilt                      = static_cast<float>(LpsWrk.LinkageMovement.tilt);
+    txOut.wrw_tbl_wk_tbl_result_weight_ave_raw       = LpsWrk.WrwTbl.WkTbl.result.weightAveRaw;
+    txOut.wrw_tbl_wk_tbl_result_weight_ave           = LpsWrk.WrwTbl.WkTbl.result.weightAve;
+    txOut.wrw_tbl_op_tbl_wt                          = LpsWrk.WrwTbl.OpTbl.Wt;
+    txOut.wrw_tbl_op_tbl_warning                     = LpsWrk.WrwTbl.OpTbl.Warning;
+    txOut.wrw_tbl_op_tbl_indicator                   = static_cast<int32_t>(LpsWrk.WrwTbl.OpTbl.Indicator);
+    txOut.wrw_tbl_op_tbl_status                      = static_cast<uint8_t>(LpsWrk.WrwTbl.OpTbl.Status);
+    txOut.wrw_tbl_wk_tbl_result_weight_ave_raw_imu_comp = LpsWrk.WrwTbl.WkTbl.result.weightAveRawIMUComp;
+    txOut.wrw_tbl_wk_tbl_been_below_range            = LpsWrk.WrwTbl.WkTbl.BeenBelowRange;
+    txOut.zero_adj_tbl_zero_adj_status               = static_cast<uint8_t>(LpsWrk.ZeroAdjTbl.ZeroAdjStatus);
+    txOut.overload_warn_tbl_bucket_load_factor        = LpsWrk.OverloadWarnTbl.BucketLoadFactor;
+    txOut.overload_warn_tbl_dig_reverse_flag          = LpsWrk.OverloadWarnTbl.DigReverseFlag;
+    txOut.overload_warn_tbl_in_overload_range         = LpsWrk.OverloadWarnTbl.InOverloadRange;
+    txOut.overload_warn_tbl_level                     = static_cast<uint8_t>(LpsWrk.OverloadWarnTbl.Level);
+    txOut.overload_warn_tbl_prev_dig_state            = static_cast<uint8_t>(LpsWrk.OverloadWarnTbl.PrevDigState);
+    txOut.lift_position_filt_length                   = LpsWrk.LiftPositionFilt.length;
+    txOut.lift_position_filt_velocity                 = LpsWrk.LiftPositionFilt.velocity;
+    txOut.lift_position_filt_angle                    = LpsWrk.LiftPositionFilt.angle;
+
+    // TipoffAssist inputs/outputs — sourced from LpsSaWeighInfoTbl (live cycle data)
+    txOut.tipoff_inputs.input_status                  = LpsSaWeighInfoTbl.TipoffInputs.input_status.data;
+    txOut.tipoff_inputs.invalidate_outputs            = LpsSaWeighInfoTbl.TipoffInputs.invalidate_outputs;
+    txOut.tipoff_inputs.lift_valve_cmd                = LpsSaWeighInfoTbl.TipoffInputs.lift_valve_cmd;
+    txOut.tipoff_inputs.tilt_valve_cmd                = LpsSaWeighInfoTbl.TipoffInputs.tilt_valve_cmd;
+    txOut.tipoff_inputs.tilt_extension                = LpsSaWeighInfoTbl.TipoffInputs.tilt_extension;
+    txOut.tipoff_inputs.lift_angle                    = LpsSaWeighInfoTbl.TipoffInputs.lift_angle;
+    txOut.tipoff_inputs.lift_he_pressure              = LpsSaWeighInfoTbl.TipoffInputs.lift_he_pressure;
+    txOut.tipoff_inputs.lift_re_pressure              = LpsSaWeighInfoTbl.TipoffInputs.lift_re_pressure;
+    txOut.tipoff_inputs.tilt_he_pressure              = LpsSaWeighInfoTbl.TipoffInputs.tilt_he_pressure;
+    txOut.tipoff_inputs.tilt_re_pressure              = LpsSaWeighInfoTbl.TipoffInputs.tilt_re_pressure;
+    txOut.tipoff_inputs.eef_imu_accel_x               = LpsSaWeighInfoTbl.TipoffInputs.eef_imu_accelX;
+    txOut.tipoff_inputs.eef_imu_accel_y               = LpsSaWeighInfoTbl.TipoffInputs.eef_imu_accelY;
+    txOut.tipoff_inputs.eef_imu_accel_z               = LpsSaWeighInfoTbl.TipoffInputs.eef_imu_accelZ;
+    txOut.tipoff_inputs.steering_angle                = LpsSaWeighInfoTbl.TipoffInputs.steering_angle;
+    txOut.tipoff_inputs.tool_mass                     = LpsSaWeighInfoTbl.TipoffInputs.tool_mass;
+    txOut.tipoff_inputs.truck_target_wt               = LpsSaWeighInfoTbl.TipoffInputs.truck_target_wt;
+    txOut.tipoff_inputs.truck_start_weight            = LpsSaWeighInfoTbl.TipoffInputs.truck_start_weight;
+    txOut.tipoff_inputs.bucket_current_weight_accuracy = LpsSaWeighInfoTbl.TipoffInputs.bucket_current_weight_accuracy;
+    txOut.tipoff_inputs.bucket_current_weight         = LpsSaWeighInfoTbl.TipoffInputs.bucket_current_weight;
+    txOut.tipoff_inputs.tipoff_mode                   = LpsSaWeighInfoTbl.TipoffInputs.tipoff_mode;
+    txOut.tipoff_inputs.zero_offset                   = LpsSaWeighInfoTbl.TipoffInputs.zero_offset;
+    txOut.tipoff_inputs.simple_cal_factor             = LpsSaWeighInfoTbl.TipoffInputs.simple_cal_factor;
+    txOut.tipoff_inputs.unlatch_trigger               = LpsSaWeighInfoTbl.TipoffInputs.unlatch_trigger;
+    txOut.tipoff_inputs.bucket_angle                  = LpsSaWeighInfoTbl.TipoffInputs.bucket_angle;
+    txOut.tipoff_inputs.anchor_zero_offset            = LpsSaWeighInfoTbl.TipoffInputs.anchor_zero_offset;
+    txOut.tipoff_inputs.anchor_factor                 = LpsSaWeighInfoTbl.TipoffInputs.anchor_factor;
+    txOut.tipoff_inputs.pass_count                    = LpsSaWeighInfoTbl.TipoffInputs.pass_count;
+    txOut.tipoff_inputs.lift_norm_angle               = LpsSaWeighInfoTbl.TipoffInputs.lift_norm_angle;
+    txOut.tipoff_inputs.lift_norm_length              = LpsSaWeighInfoTbl.TipoffInputs.lift_norm_length;
+    txOut.tipoff_inputs.tilt_norm_angle               = LpsSaWeighInfoTbl.TipoffInputs.tilt_norm_angle;
+    txOut.tipoff_inputs.tilt_norm_length              = LpsSaWeighInfoTbl.TipoffInputs.tilt_norm_length;
+    txOut.tipoff_inputs.friction_mu                   = LpsSaWeighInfoTbl.TipoffInputs.friction_mu;
+    txOut.tipoff_inputs.friction_offset               = LpsSaWeighInfoTbl.TipoffInputs.friction_offset;
+
+    if (nullptr != LpsSaWeighInfoTbl.TipoffOutputsPtr) {
+        const TipoffAssistOutputs& tipOut = *LpsSaWeighInfoTbl.TipoffOutputsPtr;
+        txOut.tipoff_outputs.tilt_sensitivity_out                  = tipOut.tilt_sensitivity_out;
+        txOut.tipoff_outputs.tilt_pressure_out                     = tipOut.tilt_pressure_out;
+        txOut.tipoff_outputs.arbitrated_payload_norm_error_out     = tipOut.arbitrated_payload_norm_error_out;
+        txOut.tipoff_outputs.weigh_status_out                      = tipOut.weigh_status_out;
+        txOut.tipoff_outputs.payload_norm_stdev_out                = tipOut.payload_norm_stdev_out;
+        txOut.tipoff_outputs.pcs_weight_accuracy_out               = tipOut.pcs_weight_accuracy_out;
+        txOut.tipoff_outputs.current_weight_norm_error_out         = tipOut.current_weight_norm_error_out;
+        txOut.tipoff_outputs.error_code_out                        = tipOut.error_code_out;
+        txOut.tipoff_outputs.spill_rate_out                        = tipOut.spill_rate_out;
+        txOut.tipoff_outputs.payload_send_to_cpm                   = tipOut.payload_send_to_CPM;
+        txOut.tipoff_outputs.payload_status_send_to_cpm            = tipOut.payload_status_send_to_CPM;
+        txOut.tipoff_outputs.bucket_payload_target                 = tipOut.bucket_payload_target;
+        txOut.tipoff_outputs.unsecured_payload_upper_bound_norm    = tipOut.unsecured_payload_upper_bound_norm;
+        txOut.tipoff_outputs.unsecured_payload_lower_bound_norm    = tipOut.unsecured_payload_lower_bound_norm;
+        txOut.tipoff_outputs.unsecured_pfw_status                  = tipOut.unsecured_PFW_status;
+        txOut.tipoff_outputs.min_secure_bucket_angle               = tipOut.min_secure_bucket_angle;
+    }
+
+    // Chassis IMU
+    { auto gravityVector = chassisImu_.imu.gravityVector();
+      txOut.chassis_imu_gravity_x = gravityVector.x();
+      txOut.chassis_imu_gravity_y = gravityVector.y();
+      txOut.chassis_imu_gravity_z = gravityVector.z(); }
+
+    { auto vel = chassisImu_.imu.estimatedLinVelVector();
+      txOut.chassis_imu_velocity_x = vel.x();
+      txOut.chassis_imu_velocity_y = vel.y();
+      txOut.chassis_imu_velocity_z = vel.z(); }
+
+    txOut.chassis_imu_bias_mag_jerk     = chassisImu_.imu.magJerk_;
+    txOut.chassis_imu_bias_mag_ang_accel = chassisImu_.imu.magAngAccel_;
+    txOut.chassis_imu_bias_max_ang_vel  = chassisImu_.imu.maxAngVel_;
+
+    { auto biasAngVel = chassisImu_.imu.biasAngVelVector();
+      txOut.chassis_imu_bias_ang_vel_x = biasAngVel.x();
+      txOut.chassis_imu_bias_ang_vel_y = biasAngVel.y();
+      txOut.chassis_imu_bias_ang_vel_z = biasAngVel.z(); }
+
+    { auto linAcc = chassisImu_.sensorLinAcc;
+      txOut.chassis_imu_lin_acc_x = linAcc.x();
+      txOut.chassis_imu_lin_acc_y = linAcc.y();
+      txOut.chassis_imu_lin_acc_z = linAcc.z(); }
+
+    { auto angVel = chassisImu_.sensorAngVel;
+      txOut.chassis_imu_ang_vel_x = angVel.x();
+      txOut.chassis_imu_ang_vel_y = angVel.y();
+      txOut.chassis_imu_ang_vel_z = angVel.z(); }
+
+    txOut.chassis_imu_pitch                  = chassisImu_.imu.pitchDegrees();
+    txOut.chassis_imu_roll                   = chassisImu_.imu.rollDegrees();
+    txOut.chassis_imu_sensor_lin_acc_status  = chassisImu_.sensorLinAccStatus;
+    txOut.chassis_imu_sensor_ang_vel_status  = chassisImu_.sensorAngVelStatus;
+
+    // Publish to ROS2 (AIS SCS leg forwarded by ScsToRos2Bridge)
+    LpsSaWeighDebugRosOut_->publish(txOut);
 }
 
 /******************************************************************************
@@ -1408,83 +1351,81 @@ RETURN VALUE: None
 *******************************************************************************/
 void LpsSaWeighApp::PublishCalFromNvmPayload( void )
 {
-   weigh_app_interfaces::msg::LpsSaNvmCalDataChannel scsPayload; // Default constructor clears the initial container
-   AIS_LOG_INFO("Populating SCS object with key-on NVM calibration data");
+   if (!LpsNvmCalRosOut_) { return; }
 
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_empty_lift_heights.data(),
-           payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftHt,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_empty_lift_heights));
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_empty_pressures.data(),
-           payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftPres,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_empty_pressures));
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_empty_lift_heights.data(),
-           payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftHt,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_empty_lift_heights));
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_empty_pressures.data(),
-           payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftPres,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_empty_pressures));
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_full_lift_heights.data(),
-           payloadCalNvmTbl_.data.SlowRaiseFullBktLiftHt,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_full_lift_heights));
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_full_pressures.data(),
-           payloadCalNvmTbl_.data.SlowRaiseFullBktLiftPres,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.raise_slow_full_pressures));
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_full_lift_heights.data(),
-           payloadCalNvmTbl_.data.SlowLowerFullBktLiftHt,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_full_lift_heights));
-   memcpy(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_full_pressures.data(),
-           payloadCalNvmTbl_.data.SlowLowerFullBktLiftPres,
-           sizeof(scsPayload.lps_sa_nvm_calibration_data_main.lower_slow_full_pressures));
+   AIS_LOG_INFO("Populating ROS2 msg with key-on NVM calibration data");
+   weigh_app_interfaces::msg::LpsSaNvmCalDataChannel rosPayload;
+   auto& main  = rosPayload.lps_sa_nvm_calibration_data_main;
+   auto& debug = rosPayload.lps_sa_nvm_calibration_data_debug;
 
-   scsPayload.lps_sa_nvm_calibration_data_main.raise_speed_empty_slow = payloadCalNvmTbl_.data.EmptyBktSlowRaiseSpd;
-   scsPayload.lps_sa_nvm_calibration_data_main.raise_speed_empty_fast = payloadCalNvmTbl_.data.EmptyBktFastRaiseSpd;
-   scsPayload.lps_sa_nvm_calibration_data_main.raise_fast_delta_p_empty = payloadCalNvmTbl_.data.FastRaiseEmptyBktDeltaPres;
-   scsPayload.lps_sa_nvm_calibration_data_main.raise_speed_full_slow = payloadCalNvmTbl_.data.FullBktSlowRaiseSpd;
-   scsPayload.lps_sa_nvm_calibration_data_main.raise_speed_full_fast = payloadCalNvmTbl_.data.FullBktFastRaiseSpd;
-   scsPayload.lps_sa_nvm_calibration_data_main.raise_fast_delta_p_full = payloadCalNvmTbl_.data.FastRaiseFullBktDeltaPres;
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftHt),
+             std::end(payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftHt),
+             main.raise_slow_empty_lift_heights.begin());
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftPres),
+             std::end(payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftPres),
+             main.raise_slow_empty_pressures.begin());
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftHt),
+             std::end(payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftHt),
+             main.lower_slow_empty_lift_heights.begin());
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftPres),
+             std::end(payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftPres),
+             main.lower_slow_empty_pressures.begin());
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowRaiseFullBktLiftHt),
+             std::end(payloadCalNvmTbl_.data.SlowRaiseFullBktLiftHt),
+             main.raise_slow_full_lift_heights.begin());
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowRaiseFullBktLiftPres),
+             std::end(payloadCalNvmTbl_.data.SlowRaiseFullBktLiftPres),
+             main.raise_slow_full_pressures.begin());
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowLowerFullBktLiftHt),
+             std::end(payloadCalNvmTbl_.data.SlowLowerFullBktLiftHt),
+             main.lower_slow_full_lift_heights.begin());
+   std::copy(std::begin(payloadCalNvmTbl_.data.SlowLowerFullBktLiftPres),
+             std::end(payloadCalNvmTbl_.data.SlowLowerFullBktLiftPres),
+             main.lower_slow_full_pressures.begin());
 
-   scsPayload.lps_sa_nvm_calibration_data_debug.lift_full_lower_dc_inf_value = static_cast<int_32>(liftCalNvmTbl_.lift_full_lower_dc);
-   scsPayload.lps_sa_nvm_calibration_data_debug.lift_full_raise_dc_inf_value = static_cast<int_32>(liftCalNvmTbl_.lift_full_raise_dc);
-   scsPayload.lps_sa_nvm_calibration_data_debug.tilt_full_dump_dc_inf_value = static_cast<int_32>(tiltCalNvmTbl_.tilt_full_dump_dc);
-   scsPayload.lps_sa_nvm_calibration_data_debug.tilt_full_rack_dc_inf_value = static_cast<int_32>(tiltCalNvmTbl_.tilt_full_rack_dc);
-   scsPayload.lps_sa_nvm_calibration_data_debug.tilt_dump_stop_angle_inf_value = static_cast<int_32>(tiltCalNvmTbl_.tilt_full_dump_stop_angle);
-   scsPayload.lps_sa_nvm_calibration_data_debug.tilt_rack_stop_angle_inf_value = static_cast<int_32>(tiltCalNvmTbl_.tilt_full_rack_stop_angle);
+   main.raise_speed_empty_slow  = payloadCalNvmTbl_.data.EmptyBktSlowRaiseSpd;
+   main.raise_speed_empty_fast  = payloadCalNvmTbl_.data.EmptyBktFastRaiseSpd;
+   main.raise_fast_delta_p_empty = payloadCalNvmTbl_.data.FastRaiseEmptyBktDeltaPres;
+   main.raise_speed_full_slow   = payloadCalNvmTbl_.data.FullBktSlowRaiseSpd;
+   main.raise_speed_full_fast   = payloadCalNvmTbl_.data.FullBktFastRaiseSpd;
+   main.raise_fast_delta_p_full  = payloadCalNvmTbl_.data.FastRaiseFullBktDeltaPres;
 
-   scsPayload.lps_sa_nvm_calibration_data_debug.pcs_cal_weight = payloadCalNvmTbl_.data.CalWeight;
-   scsPayload.lps_sa_nvm_calibration_data_debug.zero_weight = payloadCalNvmTbl_.data.ZeroWeight;
-   scsPayload.lps_sa_nvm_calibration_data_debug.cal_adjust = payloadCalNvmTbl_.data.CalAdjust;
-   scsPayload.lps_sa_nvm_calibration_data_debug.empty_temp = payloadCalNvmTbl_.data.EmptyTemp;
-   scsPayload.lps_sa_nvm_calibration_data_debug.full_temp = payloadCalNvmTbl_.data.FullTemp;
-   scsPayload.lps_sa_nvm_calibration_data_debug.empty_bucket_weight_est = payloadCalNvmTbl_.data.EmptyBucketWeightEst;
+   debug.lift_full_lower_dc_inf_value    = static_cast<int32_t>(liftCalNvmTbl_.lift_full_lower_dc);
+   debug.lift_full_raise_dc_inf_value    = static_cast<int32_t>(liftCalNvmTbl_.lift_full_raise_dc);
+   debug.tilt_full_dump_dc_inf_value     = static_cast<int32_t>(tiltCalNvmTbl_.tilt_full_dump_dc);
+   debug.tilt_full_rack_dc_inf_value     = static_cast<int32_t>(tiltCalNvmTbl_.tilt_full_rack_dc);
+   debug.tilt_dump_stop_angle_inf_value  = static_cast<int32_t>(tiltCalNvmTbl_.tilt_full_dump_stop_angle);
+   debug.tilt_rack_stop_angle_inf_value  = static_cast<int32_t>(tiltCalNvmTbl_.tilt_full_rack_stop_angle);
+   debug.pcs_cal_weight                  = payloadCalNvmTbl_.data.CalWeight;
+   debug.zero_weight                     = payloadCalNvmTbl_.data.ZeroWeight;
+   debug.cal_adjust                      = payloadCalNvmTbl_.data.CalAdjust;
+   debug.empty_temp                      = payloadCalNvmTbl_.data.EmptyTemp;
+   debug.full_temp                       = payloadCalNvmTbl_.data.FullTemp;
+   debug.empty_bucket_weight_est         = payloadCalNvmTbl_.data.EmptyBucketWeightEst;
+   debug.hyd_oil_type_index              = static_cast<int32_t>(LpsSaInitTbl.WeighInitTbl.MachSpecificCfg.HydOilType);
+   /* pcs_vel_slope, temp_slope, cal_adjust_temp not yet populated (same as original) */
 
-   scsPayload.lps_sa_nvm_calibration_data_debug.hyd_oil_type_index = static_cast<int_32>(LpsSaInitTbl.WeighInitTbl.MachSpecificCfg.HydOilType);
+   LpsCalIMUResults_t imu = {};
+   readIMUCalResultsFromFile(imu);
+   rosPayload.imu_cal_results.full_slow_imu_offset_temp1      = imu.FullSlowImuOffsetTemp1;
+   rosPayload.imu_cal_results.full_slow_imu_offset_temp2      = imu.FullSlowImuOffsetTemp2;
+   rosPayload.imu_cal_results.full_slow_imu_offset_temp3      = imu.FullSlowImuOffsetTemp3;
+   rosPayload.imu_cal_results.full_slow_lumped_weight_temp1   = imu.FullSlowLumpedWeightTemp1;
+   rosPayload.imu_cal_results.full_slow_lumped_weight_temp2   = imu.FullSlowLumpedWeightTemp2;
+   rosPayload.imu_cal_results.full_slow_lumped_weight_temp3   = imu.FullSlowLumpedWeightTemp3;
+   rosPayload.imu_cal_results.empty_slow_imu_offset_temp1     = imu.EmptySlowImuOffsetTemp1;
+   rosPayload.imu_cal_results.empty_slow_imu_offset_temp2     = imu.EmptySlowImuOffsetTemp2;
+   rosPayload.imu_cal_results.empty_slow_imu_offset_temp3     = imu.EmptySlowImuOffsetTemp3;
+   rosPayload.imu_cal_results.empty_slow_lumped_weight_temp1  = imu.EmptySlowLumpedWeightTemp1;
+   rosPayload.imu_cal_results.empty_slow_lumped_weight_temp2  = imu.EmptySlowLumpedWeightTemp2;
+   rosPayload.imu_cal_results.empty_slow_lumped_weight_temp3  = imu.EmptySlowLumpedWeightTemp3;
+   rosPayload.imu_cal_results.full_slow_imu_offset_final      = imu.FullSlowImuOffsetFinal;
+   rosPayload.imu_cal_results.empty_slow_imu_offset_final     = imu.EmptySlowImuOffsetFinal;
+   rosPayload.imu_cal_results.full_slow_lumped_weight_final   = imu.FullSlowLumpedWeightFinal;
+   rosPayload.imu_cal_results.empty_slow_lumped_weight_final  = imu.EmptySlowLumpedWeightFinal;
 
-   // Read IMU Cal Results from file
-   LpsCalIMUResults_t imu_cal_results = {};
-   readIMUCalResultsFromFile(imu_cal_results);
-   scsPayload.imu_cal_results.full_slow_imu_offset_temp1 = imu_cal_results.FullSlowImuOffsetTemp1;
-   scsPayload.imu_cal_results.full_slow_imu_offset_temp2 = imu_cal_results.FullSlowImuOffsetTemp2;
-   scsPayload.imu_cal_results.full_slow_imu_offset_temp3 = imu_cal_results.FullSlowImuOffsetTemp3;
-   scsPayload.imu_cal_results.full_slow_lumped_weight_temp1 = imu_cal_results.FullSlowLumpedWeightTemp1;
-   scsPayload.imu_cal_results.full_slow_lumped_weight_temp2 = imu_cal_results.FullSlowLumpedWeightTemp2;
-   scsPayload.imu_cal_results.full_slow_lumped_weight_temp3 = imu_cal_results.FullSlowLumpedWeightTemp3;
-   scsPayload.imu_cal_results.empty_slow_imu_offset_temp1 = imu_cal_results.EmptySlowImuOffsetTemp1;
-   scsPayload.imu_cal_results.empty_slow_imu_offset_temp2 = imu_cal_results.EmptySlowImuOffsetTemp2;
-   scsPayload.imu_cal_results.empty_slow_imu_offset_temp3 = imu_cal_results.EmptySlowImuOffsetTemp3;
-   scsPayload.imu_cal_results.empty_slow_lumped_weight_temp1 = imu_cal_results.EmptySlowLumpedWeightTemp1;
-   scsPayload.imu_cal_results.empty_slow_lumped_weight_temp2 = imu_cal_results.EmptySlowLumpedWeightTemp2;
-   scsPayload.imu_cal_results.empty_slow_lumped_weight_temp3 = imu_cal_results.EmptySlowLumpedWeightTemp3;
-   scsPayload.imu_cal_results.full_slow_imu_offset_final = imu_cal_results.FullSlowImuOffsetFinal;
-   scsPayload.imu_cal_results.empty_slow_imu_offset_final = imu_cal_results.EmptySlowImuOffsetFinal;
-   scsPayload.imu_cal_results.full_slow_lumped_weight_final = imu_cal_results.FullSlowLumpedWeightFinal;
-   scsPayload.imu_cal_results.empty_slow_lumped_weight_final = imu_cal_results.EmptySlowLumpedWeightFinal;
-
-   /* The following fields are not yet populated:
-    * lps_sa_nvm_calibration_data_debug.pcs_vel_slope
-    * lps_sa_nvm_calibration_data_debug.temp_slope
-    * lps_sa_nvm_calibration_data_debug.cal_adjust_temp
-    */
-
-   LpsNvmDumpChanOut->publish(scsPayload);
+   LpsNvmCalRosOut_->publish(rosPayload);
 }
+
+
 

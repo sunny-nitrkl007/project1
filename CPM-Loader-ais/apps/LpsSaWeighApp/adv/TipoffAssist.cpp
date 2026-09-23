@@ -4,9 +4,12 @@
 #include <oel_pack.h>
 #include <catdllib_fid_def.h>
 
-#include <ais/task/InterfaceDb.h>
 #include <ais/task/Task.h>
 #include <ais/log/Logger.h>
+
+#include "rclcpp/rclcpp.hpp"
+#include "ros2wrapper/RosOutputInterface.h"
+#include <weigh_app_interfaces/msg/tipoff_model_test_points.hpp>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,12 +34,28 @@ static void readCSV(TipoffAssistInputs& tipoff_inputs);
 
 extern toa_wl00_catParameters_si_RAM_t toa_wl00_catParameters_si_RAM;
 
+class TipoffModelTestPointsPublisher {
+public:
+    TipoffModelTestPointsPublisher(std::shared_ptr<rclcpp::Node> rosNode, const char* topic) :
+            rosOut_(rosNode, topic) {}
+
+    void publish(weigh_app_interfaces::msg::TipoffModelTestPoints const& txOut) {
+        rosOut_.publish(txOut);
+    }
+
+private:
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::TipoffModelTestPoints> rosOut_;
+};
+
 TipoffAssist::TipoffAssist():
         TipoffAssistOut(),
-        TipoffModelTestPointsOut(nullptr),
-        node_(nullptr) {}
+        TipoffModelTestPointsRosOut_(nullptr) {}
 
-bool TipoffAssist::initialize(LpsSaMachineProperties_t const& machine_properties) {
+TipoffAssist::~TipoffAssist() {
+    delete TipoffModelTestPointsRosOut_;
+}
+
+bool TipoffAssist::initialize(LpsSaMachineProperties_t const& machine_properties, std::shared_ptr<rclcpp::Node> rosNode) {
     uint32_t appNumber = machine_properties.internalMsn;
     AIS_LOG_INFO("TipoffAssist::initialize");
 
@@ -45,9 +64,11 @@ bool TipoffAssist::initialize(LpsSaMachineProperties_t const& machine_properties
         AIS_LOG_WARN("Tip-off Assist not supported for this machine configuration.");
     }
 
-    // Initialize Test Output SCS Channel
-    node_ = std::make_shared<rclcpp::Node>("tipoff_assist_node");
-    TipoffModelTestPointsOut = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::TipoffModelTestPoints>(node_, "tipoff_model_test_points");
+    TipoffModelTestPointsRosOut_ = new TipoffModelTestPointsPublisher(
+            rosNode, "tipoff_model_test_points");
+    if (!TipoffModelTestPointsRosOut_) {
+        AIS_LOG_WARN("TipoffModelTestPointsRosOut_ failed to initialize.");
+    }
 
     initTipoffAssistModelData(machine_properties);
 
@@ -123,95 +144,91 @@ TipoffAssistOutputs* TipoffAssist::update(TipoffAssistInputs& tipoff_inputs) {
     TipoffAssistOut.min_secure_bucket_angle = TOA_min_secure_bucket_angle;
     TipoffAssistOut.unsecured_PFW_status = TOA_unsecured_PFW_status;
 
-    /* Update Model TestPoints Outputs */
-    TipoffModelTestPointsData.toa_pfw_sec_latch = toa_wl00_work.BlockIO.toa_pfwSecLatch;
-    TipoffModelTestPointsData.toa_pfw_sec_payload = toa_wl00_work.BlockIO.toa_pfwSecPayload;
-    TipoffModelTestPointsData.toa_pfw_sec_status = toa_wl00_work.BlockIO.toa_pfwSecStatus;
-    TipoffModelTestPointsData.toa_pfw_sec_st_dev = toa_wl00_work.BlockIO.toa_pfwSecStDev;
-    TipoffModelTestPointsData.toa_target_payload_final = toa_wl00_work.BlockIO.toa_targetPayloadFinal;
-    TipoffModelTestPointsData.toa_target_payload_status = toa_wl00_work.BlockIO.toa_targetPayloadStatus;
-    TipoffModelTestPointsData.toa_pfw_nl_notch_mean_est = toa_wl00_work.BlockIO.toa_pfwNlNotchMeanEst;
-    TipoffModelTestPointsData.toa_pfw_nl_notch_st_dev_est = toa_wl00_work.BlockIO.toa_pfwNlNotchStDevEst;
-    TipoffModelTestPointsData.toa_lw_lpf_post = toa_wl00_work.BlockIO.toa_lwLpfPost;
-    TipoffModelTestPointsData.toa_payload_adjusted = toa_wl00_work.BlockIO.toa_payloadAdjusted;
-    TipoffModelTestPointsData.toa_send_payload_arb = toa_wl00_work.BlockIO.toa_sendPayloadArb;
-    TipoffModelTestPointsData.toa_sfunc_in_grav_x = toa_wl00_work.BlockIO.toa_sfuncInGravX;
-    TipoffModelTestPointsData.toa_sfunc_in_grav_y = toa_wl00_work.BlockIO.toa_sfuncInGravY;
-    TipoffModelTestPointsData.toa_sfunc_in_lift_force = toa_wl00_work.BlockIO.toa_sfuncInLiftForce;
-    TipoffModelTestPointsData.toa_sfunc_in_tilt_force = toa_wl00_work.BlockIO.toa_sfuncInTiltForce;
-    TipoffModelTestPointsData.toa_sfunc_out_raw_mass_tonne = toa_wl00_work.BlockIO.toa_sfuncOutRawMassTonne;
-
-    TipoffModelTestPointsData.toa_app_number = toa_wl00_catParameters_si_RAM.toa_appNumber;
-    TipoffModelTestPointsData.toa_lift_bore_dia = toa_wl00_catParameters_si_RAM.toa_liftBoreDia;
-    TipoffModelTestPointsData.toa_lift_rod_dia = toa_wl00_catParameters_si_RAM.toa_liftRodDia;
-    TipoffModelTestPointsData.toa_rated_payload = toa_wl00_catParameters_si_RAM.toa_ratedPayload;
-    TipoffModelTestPointsData.toa_tilt_bore_dia = toa_wl00_catParameters_si_RAM.toa_tiltBoreDia;
-    TipoffModelTestPointsData.toa_tilt_num_cyl = toa_wl00_catParameters_si_RAM.toa_tiltNumCyl;
-    TipoffModelTestPointsData.toa_tilt_rod_dia = toa_wl00_catParameters_si_RAM.toa_tiltRodDia;
-    TipoffModelTestPointsData.toa_tool_bc_length = toa_wl00_catParameters_si_RAM.toa_toolBcLength;
-    TipoffModelTestPointsData.toa_tool_bc_angle = toa_wl00_catParameters_si_RAM.toa_toolBcAngle;
-
-    TipoffModelTestPointsData.toa_payload_anc_adjusted = toa_wl00_work.BlockIO.toa_payloadAncAdjusted;
-    TipoffModelTestPointsData.toa_payload_anc_zeroed = toa_wl00_work.BlockIO.toa_payloadAncZeroed;
-    TipoffModelTestPointsData.toa_imu_cal_pitch_angle = TOA_imu_pitch_cal;
-    TipoffModelTestPointsData.toa_pfw_unsec_status = toa_wl00_work.BlockIO.toa_pfwUnsecStatus;
-    TipoffModelTestPointsData.toa_pfw_unsec_bound_lower = toa_wl00_work.BlockIO.toa_pfwUnsecBoundLower;
-    TipoffModelTestPointsData.toa_pfw_unsec_bound_upper = toa_wl00_work.BlockIO.toa_pfwUnsecBoundUpper;
-    TipoffModelTestPointsData.toa_lw_spill_rate = toa_wl00_work.BlockIO.toa_lwSpillRate;
-    TipoffModelTestPointsData.toa_lw_status = toa_wl00_work.BlockIO.toa_lwStatus;
-    TipoffModelTestPointsData.toa_raw_dist = toa_wl00_work.BlockIO.toa_rawDist;
-    TipoffModelTestPointsData.toa_raw_payload = toa_wl00_work.BlockIO.toa_rawPayload;
-    TipoffModelTestPointsData.toa_payload_zeroed = toa_wl00_work.BlockIO.toa_payloadZeroed;
-    TipoffModelTestPointsData.toa_pfw_is_warm = toa_wl00_work.BlockIO.toa_pfwIsWarm;
-    TipoffModelTestPointsData.toa_pfw_sec_is_secure = toa_wl00_work.BlockIO.toa_pfwSecIsSecure;
-    TipoffModelTestPointsData.toa_pfw_sec_is_no_sliding = toa_wl00_work.BlockIO.toa_pfwSecIsNoSliding;
-    TipoffModelTestPointsData.toa_pfw_sec_is_no_collapsing = toa_wl00_work.BlockIO.toa_pfwSecIsNoCollapsing;
-    TipoffModelTestPointsData.toa_pfw_sec_is_racked = toa_wl00_work.BlockIO.toa_pfwSecIsRacked;
-    TipoffModelTestPointsData.toa_pfw_sec_min_bucket_ang = toa_wl00_work.BlockIO.toa_pfwSecMinBucketAng;
-    TipoffModelTestPointsData.toa_pfw_mc_ok = toa_wl00_work.BlockIO.toa_pfwMcOk;
-    TipoffModelTestPointsData.toa_pfw_mc_maybe_stalled = toa_wl00_work.BlockIO.toa_pfwMcMaybeStalled;
-    TipoffModelTestPointsData.toa_pfw_mc_maybe_rack_stall = toa_wl00_work.BlockIO.toa_pfwMcMaybeRackStall;
-    TipoffModelTestPointsData.toa_pfw_mc_maybe_grounded = toa_wl00_work.BlockIO.toa_pfwMcMaybeGrounded;
-    TipoffModelTestPointsData.toa_stat_payload_nl_notch_one_up = toa_wl00_work.BlockIO.toa_statPayloadNlNotchOneUp;
-    TipoffModelTestPointsData.toa_stat_payload_nl_notch_one_low = toa_wl00_work.BlockIO.toa_statPayloadNlNotchOneLow;
-    TipoffModelTestPointsData.toa_stat_payload_nl_notch_one_size = toa_wl00_work.BlockIO.toa_statPayloadNlNotchOneSize;
-    TipoffModelTestPointsData.toa_stat_payload_nl_notch_two_up = toa_wl00_work.BlockIO.toa_statPayloadNlNotchTwoUp;
-    TipoffModelTestPointsData.toa_stat_payload_nl_notch_two_low = toa_wl00_work.BlockIO.toa_statPayloadNlNotchTwoLow;
-    TipoffModelTestPointsData.toa_stat_payload_nl_notch_two_size = toa_wl00_work.BlockIO.toa_statPayloadNlNotchTwoSize;
-    TipoffModelTestPointsData.toa_stat_payload_nl_one_up = toa_wl00_work.BlockIO.toa_statPayloadNlOneUp;
-    TipoffModelTestPointsData.toa_stat_payload_nl_one_low = toa_wl00_work.BlockIO.toa_statPayloadNlOneLow;
-    TipoffModelTestPointsData.toa_stat_payload_nl_one_size = toa_wl00_work.BlockIO.toa_statPayloadNlOneSize;
-    TipoffModelTestPointsData.toa_stat_payload_nl_two_up = toa_wl00_work.BlockIO.toa_statPayloadNlTwoUp;
-    TipoffModelTestPointsData.toa_stat_payload_nl_two_low = toa_wl00_work.BlockIO.toa_statPayloadNlTwoLow;
-    TipoffModelTestPointsData.toa_stat_payload_nl_two_size = toa_wl00_work.BlockIO.toa_statPayloadNlTwoSize;
-    TipoffModelTestPointsData.toa_pfw_nl_st_dev_est = toa_wl00_work.BlockIO.toa_pfwNlStDevEst;
-    TipoffModelTestPointsData.toa_pfw_nl_mean_est = toa_wl00_work.BlockIO.toa_pfwNlMeanEst;
-    TipoffModelTestPointsData.toa_pfw_payload_filt_final = toa_wl00_work.BlockIO.toa_pfwPayloadFiltFinal;
-    TipoffModelTestPointsData.toa_pfw_payload_notch_filt_final = toa_wl00_work.BlockIO.toa_pfwPayloadNotchFiltFinal;
-    TipoffModelTestPointsData.toa_pfw_payload_notch_post = toa_wl00_work.BlockIO.toa_pfwPayloadNotchPost;
-    TipoffModelTestPointsData.toa_pfw_latch_invalidate = toa_wl00_work.BlockIO.toa_pfwLatchInvalidate;
-    TipoffModelTestPointsData.toa_imu_raw_eef_accl_x = toa_wl00_work.BlockIO.toa_imuRawEefAcclX;
-    TipoffModelTestPointsData.toa_imu_raw_eef_accl_y = toa_wl00_work.BlockIO.toa_imuRawEefAcclY;
-    TipoffModelTestPointsData.toa_imu_raw_eef_accl_z = toa_wl00_work.BlockIO.toa_imuRawEefAcclZ;
-    TipoffModelTestPointsData.toa_imu_neef_grav_x = toa_wl00_work.BlockIO.toa_imuNeefGravX;
-    TipoffModelTestPointsData.toa_imu_neef_grav_y = toa_wl00_work.BlockIO.toa_imuNeefGravY;
-    TipoffModelTestPointsData.toa_imu_neef_grav_z = toa_wl00_work.BlockIO.toa_imuNeefGravZ;
-    TipoffModelTestPointsData.toa_imu_neef_pitch = toa_wl00_work.BlockIO.toa_imuNeefPitch;
-    TipoffModelTestPointsData.toa_target_comp_margin = toa_wl00_work.BlockIO.toa_targetCompMargin;
-    TipoffModelTestPointsData.toa_target_payload_post_comp = toa_wl00_work.BlockIO.toa_targetPayloadPostComp;
-    TipoffModelTestPointsData.toa_target_payload_pre_comp = toa_wl00_work.BlockIO.toa_targetPayloadPreComp;
-    TipoffModelTestPointsData.toa_stat_payload_secure_two_size = toa_wl00_work.BlockIO.toa_statPayloadSecureTwoSize;
-    TipoffModelTestPointsData.toa_stat_payload_secure_one_upper = toa_wl00_work.BlockIO.toa_statPayloadSecureOneUpper;
-    TipoffModelTestPointsData.toa_stat_payload_secure_one_lower = toa_wl00_work.BlockIO.toa_statPayloadSecureOneLower;
-    TipoffModelTestPointsData.toa_stat_payload_secure_one_size = toa_wl00_work.BlockIO.toa_statPayloadSecureOneSize;
-    TipoffModelTestPointsData.toa_stat_payload_secure_two_upper = toa_wl00_work.BlockIO.toa_statPayloadSecureTwoUpper;
-    TipoffModelTestPointsData.toa_stat_payload_secure_two_lower = toa_wl00_work.BlockIO.toa_statPayloadSecureTwoLower;
-    TipoffModelTestPointsData.toa_send_cpm_live_payload = toa_wl00_work.BlockIO.toa_sendCpmLivePayload;
-
-    /* Publish Tipoff Model Test Points */
-    if (TipoffModelTestPointsOut != nullptr)
-    {
-        TipoffModelTestPointsOut->publish(TipoffModelTestPointsData);
+    /* Publish Tipoff Model Test Points via ROS2 */
+    if (TipoffModelTestPointsRosOut_ != nullptr) {
+        weigh_app_interfaces::msg::TipoffModelTestPoints txOut;
+        txOut.toa_pfw_sec_latch                   = toa_wl00_work.BlockIO.toa_pfwSecLatch;
+        txOut.toa_pfw_sec_payload                 = toa_wl00_work.BlockIO.toa_pfwSecPayload;
+        txOut.toa_pfw_sec_status                  = toa_wl00_work.BlockIO.toa_pfwSecStatus;
+        txOut.toa_pfw_sec_st_dev                  = toa_wl00_work.BlockIO.toa_pfwSecStDev;
+        txOut.toa_target_payload_final             = toa_wl00_work.BlockIO.toa_targetPayloadFinal;
+        txOut.toa_target_payload_status            = toa_wl00_work.BlockIO.toa_targetPayloadStatus;
+        txOut.toa_pfw_nl_notch_mean_est            = toa_wl00_work.BlockIO.toa_pfwNlNotchMeanEst;
+        txOut.toa_pfw_nl_notch_st_dev_est          = toa_wl00_work.BlockIO.toa_pfwNlNotchStDevEst;
+        txOut.toa_lw_lpf_post                      = toa_wl00_work.BlockIO.toa_lwLpfPost;
+        txOut.toa_payload_adjusted                 = toa_wl00_work.BlockIO.toa_payloadAdjusted;
+        txOut.toa_send_payload_arb                 = toa_wl00_work.BlockIO.toa_sendPayloadArb;
+        txOut.toa_sfunc_in_grav_x                  = toa_wl00_work.BlockIO.toa_sfuncInGravX;
+        txOut.toa_sfunc_in_grav_y                  = toa_wl00_work.BlockIO.toa_sfuncInGravY;
+        txOut.toa_sfunc_in_lift_force              = toa_wl00_work.BlockIO.toa_sfuncInLiftForce;
+        txOut.toa_sfunc_in_tilt_force              = toa_wl00_work.BlockIO.toa_sfuncInTiltForce;
+        txOut.toa_sfunc_out_raw_mass_tonne         = toa_wl00_work.BlockIO.toa_sfuncOutRawMassTonne;
+        txOut.toa_app_number                       = toa_wl00_catParameters_si_RAM.toa_appNumber;
+        txOut.toa_lift_bore_dia                    = toa_wl00_catParameters_si_RAM.toa_liftBoreDia;
+        txOut.toa_lift_rod_dia                     = toa_wl00_catParameters_si_RAM.toa_liftRodDia;
+        txOut.toa_rated_payload                    = toa_wl00_catParameters_si_RAM.toa_ratedPayload;
+        txOut.toa_tilt_bore_dia                    = toa_wl00_catParameters_si_RAM.toa_tiltBoreDia;
+        txOut.toa_tilt_num_cyl                     = toa_wl00_catParameters_si_RAM.toa_tiltNumCyl;
+        txOut.toa_tilt_rod_dia                     = toa_wl00_catParameters_si_RAM.toa_tiltRodDia;
+        txOut.toa_tool_bc_length                   = toa_wl00_catParameters_si_RAM.toa_toolBcLength;
+        txOut.toa_tool_bc_angle                    = toa_wl00_catParameters_si_RAM.toa_toolBcAngle;
+        txOut.toa_payload_anc_adjusted             = toa_wl00_work.BlockIO.toa_payloadAncAdjusted;
+        txOut.toa_payload_anc_zeroed               = toa_wl00_work.BlockIO.toa_payloadAncZeroed;
+        txOut.toa_imu_cal_pitch_angle              = TOA_imu_pitch_cal;
+        txOut.toa_pfw_unsec_status                 = toa_wl00_work.BlockIO.toa_pfwUnsecStatus;
+        txOut.toa_pfw_unsec_bound_lower            = toa_wl00_work.BlockIO.toa_pfwUnsecBoundLower;
+        txOut.toa_pfw_unsec_bound_upper            = toa_wl00_work.BlockIO.toa_pfwUnsecBoundUpper;
+        txOut.toa_lw_spill_rate                    = toa_wl00_work.BlockIO.toa_lwSpillRate;
+        txOut.toa_lw_status                        = toa_wl00_work.BlockIO.toa_lwStatus;
+        txOut.toa_raw_dist                         = toa_wl00_work.BlockIO.toa_rawDist;
+        txOut.toa_raw_payload                      = toa_wl00_work.BlockIO.toa_rawPayload;
+        txOut.toa_payload_zeroed                   = toa_wl00_work.BlockIO.toa_payloadZeroed;
+        txOut.toa_pfw_is_warm                      = toa_wl00_work.BlockIO.toa_pfwIsWarm;
+        txOut.toa_pfw_sec_is_secure                = toa_wl00_work.BlockIO.toa_pfwSecIsSecure;
+        txOut.toa_pfw_sec_is_no_sliding            = toa_wl00_work.BlockIO.toa_pfwSecIsNoSliding;
+        txOut.toa_pfw_sec_is_no_collapsing         = toa_wl00_work.BlockIO.toa_pfwSecIsNoCollapsing;
+        txOut.toa_pfw_sec_is_racked                = toa_wl00_work.BlockIO.toa_pfwSecIsRacked;
+        txOut.toa_pfw_sec_min_bucket_ang           = toa_wl00_work.BlockIO.toa_pfwSecMinBucketAng;
+        txOut.toa_pfw_mc_ok                        = toa_wl00_work.BlockIO.toa_pfwMcOk;
+        txOut.toa_pfw_mc_maybe_stalled             = toa_wl00_work.BlockIO.toa_pfwMcMaybeStalled;
+        txOut.toa_pfw_mc_maybe_rack_stall          = toa_wl00_work.BlockIO.toa_pfwMcMaybeRackStall;
+        txOut.toa_pfw_mc_maybe_grounded            = toa_wl00_work.BlockIO.toa_pfwMcMaybeGrounded;
+        txOut.toa_stat_payload_nl_notch_one_up     = toa_wl00_work.BlockIO.toa_statPayloadNlNotchOneUp;
+        txOut.toa_stat_payload_nl_notch_one_low    = toa_wl00_work.BlockIO.toa_statPayloadNlNotchOneLow;
+        txOut.toa_stat_payload_nl_notch_one_size   = toa_wl00_work.BlockIO.toa_statPayloadNlNotchOneSize;
+        txOut.toa_stat_payload_nl_notch_two_up     = toa_wl00_work.BlockIO.toa_statPayloadNlNotchTwoUp;
+        txOut.toa_stat_payload_nl_notch_two_low    = toa_wl00_work.BlockIO.toa_statPayloadNlNotchTwoLow;
+        txOut.toa_stat_payload_nl_notch_two_size   = toa_wl00_work.BlockIO.toa_statPayloadNlNotchTwoSize;
+        txOut.toa_stat_payload_nl_one_up           = toa_wl00_work.BlockIO.toa_statPayloadNlOneUp;
+        txOut.toa_stat_payload_nl_one_low          = toa_wl00_work.BlockIO.toa_statPayloadNlOneLow;
+        txOut.toa_stat_payload_nl_one_size         = toa_wl00_work.BlockIO.toa_statPayloadNlOneSize;
+        txOut.toa_stat_payload_nl_two_up           = toa_wl00_work.BlockIO.toa_statPayloadNlTwoUp;
+        txOut.toa_stat_payload_nl_two_low          = toa_wl00_work.BlockIO.toa_statPayloadNlTwoLow;
+        txOut.toa_stat_payload_nl_two_size         = toa_wl00_work.BlockIO.toa_statPayloadNlTwoSize;
+        txOut.toa_pfw_nl_st_dev_est                = toa_wl00_work.BlockIO.toa_pfwNlStDevEst;
+        txOut.toa_pfw_nl_mean_est                  = toa_wl00_work.BlockIO.toa_pfwNlMeanEst;
+        txOut.toa_pfw_payload_filt_final           = toa_wl00_work.BlockIO.toa_pfwPayloadFiltFinal;
+        txOut.toa_pfw_payload_notch_filt_final     = toa_wl00_work.BlockIO.toa_pfwPayloadNotchFiltFinal;
+        txOut.toa_pfw_payload_notch_post           = toa_wl00_work.BlockIO.toa_pfwPayloadNotchPost;
+        txOut.toa_pfw_latch_invalidate             = toa_wl00_work.BlockIO.toa_pfwLatchInvalidate;
+        txOut.toa_imu_raw_eef_accl_x               = toa_wl00_work.BlockIO.toa_imuRawEefAcclX;
+        txOut.toa_imu_raw_eef_accl_y               = toa_wl00_work.BlockIO.toa_imuRawEefAcclY;
+        txOut.toa_imu_raw_eef_accl_z               = toa_wl00_work.BlockIO.toa_imuRawEefAcclZ;
+        txOut.toa_imu_neef_grav_x                  = toa_wl00_work.BlockIO.toa_imuNeefGravX;
+        txOut.toa_imu_neef_grav_y                  = toa_wl00_work.BlockIO.toa_imuNeefGravY;
+        txOut.toa_imu_neef_grav_z                  = toa_wl00_work.BlockIO.toa_imuNeefGravZ;
+        txOut.toa_imu_neef_pitch                   = toa_wl00_work.BlockIO.toa_imuNeefPitch;
+        txOut.toa_target_comp_margin               = toa_wl00_work.BlockIO.toa_targetCompMargin;
+        txOut.toa_target_payload_post_comp         = toa_wl00_work.BlockIO.toa_targetPayloadPostComp;
+        txOut.toa_target_payload_pre_comp          = toa_wl00_work.BlockIO.toa_targetPayloadPreComp;
+        txOut.toa_stat_payload_secure_two_size     = toa_wl00_work.BlockIO.toa_statPayloadSecureTwoSize;
+        txOut.toa_stat_payload_secure_one_upper    = toa_wl00_work.BlockIO.toa_statPayloadSecureOneUpper;
+        txOut.toa_stat_payload_secure_one_lower    = toa_wl00_work.BlockIO.toa_statPayloadSecureOneLower;
+        txOut.toa_stat_payload_secure_one_size     = toa_wl00_work.BlockIO.toa_statPayloadSecureOneSize;
+        txOut.toa_stat_payload_secure_two_upper    = toa_wl00_work.BlockIO.toa_statPayloadSecureTwoUpper;
+        txOut.toa_stat_payload_secure_two_lower    = toa_wl00_work.BlockIO.toa_statPayloadSecureTwoLower;
+        txOut.toa_send_cpm_live_payload            = toa_wl00_work.BlockIO.toa_sendCpmLivePayload;
+        TipoffModelTestPointsRosOut_->publish(txOut);
     }
 
     return (&TipoffAssistOut);

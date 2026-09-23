@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Get super project path from first argument, else default
+ssp=${1:-~/git/a6n2/ssp-CPM_Loader-ais}
+
+# Remove trailing slash
+ssp=$(echo "$ssp"|sed 's/\/$//g')
+
+# Print out the super project path for reference
+echo $ssp/
+
+# Launch all of the apps
+gnome-terminal --title "SCS" -e 'bash --norc -i -c ". startScs '"$ssp"'"'
+gnome-terminal --title="Job Manager" -e 'bash --norc -i -c ". startLpsSaJobMgrApp '"$ssp"'"'
+gnome-terminal --title="List Manager" -e 'bash --norc -i -c ". startLpsSaListMgrApp '"$ssp"'"'
+gnome-terminal --title="Totals" -e 'bash --norc -i -c ". startLpsSaTotalsApp '""'"'
+gnome-terminal --title="Totals Test" -e 'bash --norc -i -c ". startLpsSaTotalsTestApp '"$ssp"'"'
+gnome-terminal --title="Jhm2" -e 'bash --norc -i -c ". startAisJhm2DataServer '"$ssp"'"'
+gnome-terminal --title="lighttpd" -e 'bash --norc -i -c ". startLocalLighttpd '"$ssp"'"'
+gnome-terminal --title="Serial Printer" -e 'bash --norc -i -c ". startSerialPrinterApp '"$ssp"'"'
+#gnome-terminal --title="Serial Printer Test" -e 'bash --norc -i -c ". startSerialPrinterTestApp '"$ssp"'"'
+#gnome-terminal --title="Print Serial Port" -e 'bash --norc -i -c ". printSerialPort /dev/ttyS0"'
+

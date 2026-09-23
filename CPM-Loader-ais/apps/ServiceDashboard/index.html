@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Service Dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css?1505493345" rel="stylesheet">
+
+    <!-- webManager css -->
+    <link href="/css/webManager.css?1505493345" rel="stylesheet">
+
+    <!-- serviceDashboard css -->
+    <link href="css/loader.css?1505493345" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="/CPM/favicon.ico">
+
+  </head>
+
+  <body>
+    <div>
+      <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/index.html">
+              <img src="images/Cat.png" alt="Home"></img>
+            </a>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="/index.html">Home</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1>Payload Service Dashboard</h1>
+
+      <div class="panel-group">
+        <div class="panel panel-default service-dashboard-panel">
+          <div class="panel-body service-panel-ui">
+            <a href="/CPM/index.html" class="btn btn-primary btn-service-panel" id="launch-app-btn" target="_blank">
+              <img src="images/display.svg" class="my-icon">
+              Launch App
+            </a>
+          </div>
+          <div class="panel-body service-panel-demoui">
+            <a href="/CPM/DemoApp/index.html" class="btn btn-primary btn-service-panel-demo" id="launch-demo-app-btn">
+              DEMO APP
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-group" id="panel-group-1">
+        <!-- Panel 1: Lists -->
+        <div class="panel panel-default" id="panel-1">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-parent="#panel-group-1" data-target="#panel-1 .collapse">
+              <img src="images/list.svg" class="my-icon">
+              Lists
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <img src="images/material.svg" class="my-icon">
+                    Material List
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <a href="/CPM/cgi-bin/service_download_material_list.cgi" class="btn btn-primary btn-service-panel center-block">
+                    Download
+                  </a>
+                  <form method="POST" action="/CPM/cgi-bin/service_upload_material_list.cgi" enctype="multipart/form-data" id="material-list-file-form">
+                    <!-- COMPONENT START -->
+                    <div class="form-group btn-service-panel center-block">
+                      <div class="input-group">
+                        <span class="input-group-btn">
+                          <label class="btn btn-default">
+                            <input id="material-list-file-input" name="material-list" type="file" class="hidden">
+                             <span class="open-folder-icon"></span> Choose
+                          </label>
+                        </span>
+                        <input type="text" class="form-control" id="material-list-file-name" readonly>
+                        <span class="input-group-btn">
+                             <button class="btn btn-primary" id="material-list-file-submit" type="submit">Upload</button>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- COMPONENT END -->
+                  </form>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <img src="images/truck.svg" class="my-icon">
+                    Truck List
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <a href="/CPM/cgi-bin/service_download_truck_list.cgi" class="btn btn-primary btn-service-panel center-block">
+                    Download
+                  </a>
+                  <form method="POST" action="/CPM/cgi-bin/service_upload_truck_list.cgi" enctype="multipart/form-data" id="truck-list-file-form">
+                    <!-- COMPONENT START -->
+                    <div class="form-group btn-service-panel center-block">
+                      <div class="input-group">
+                        <span class="input-group-btn">
+                          <label class="btn btn-default">
+                            <input id="truck-list-file-input" name="truck-list" type="file" class="hidden">
+                             <span class="open-folder-icon"></span> Choose
+                          </label>
+                        </span>
+                        <input type="text" class="form-control" id="truck-list-file-name" readonly>
+                        <span class="input-group-btn">
+                             <button class="btn btn-primary" id="truck-list-file-submit" type="submit">Upload</button>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- COMPONENT END -->
+                  </form>
+                </div>
+              </div>
+              <div class="panel panel-default" id="ShoworHideOperatorId" style="display:block">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <img src="images/operator_id.svg" class="my-icon">
+                    Operator ID List
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <a href="/CPM/cgi-bin/service_download_operator_id_list.cgi" class="btn btn-primary btn-service-panel center-block">
+                    Download
+                  </a>
+                  <form method="POST" action="/CPM/cgi-bin/service_upload_operator_id_list.cgi" enctype="multipart/form-data" id="operator-id-list-file-form">
+                    <!-- COMPONENT START -->
+                    <div class="form-group btn-service-panel center-block">
+                      <div class="input-group">
+                        <span class="input-group-btn">
+                          <label class="btn btn-default">
+                            <input id="operator-id-list-file-input" name="operator-id-list" type="file" class="hidden">
+                             <span class="open-folder-icon"></span> Choose
+                          </label>
+                        </span>
+                        <input type="text" class="form-control" id="operator-id-list-file-name" readonly>
+                        <span class="input-group-btn">
+                             <button class="btn btn-primary" id="operator-id-list-file-submit" type="submit">Upload</button>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- COMPONENT END -->
+                  </form>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <img src="images/list.svg" class="my-icon">
+                    Custom List 1
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <a href="/CPM/cgi-bin/service_download_custom_list_1.cgi" class="btn btn-primary btn-service-panel center-block">
+                    Download
+                  </a>
+                  <form method="POST" action="/CPM/cgi-bin/service_upload_custom_list.cgi" enctype="multipart/form-data" id="custom-list-1-file-form">
+                    <!-- COMPONENT START -->
+                    <div class="form-group btn-service-panel center-block">
+                      <div class="input-group">
+                        <span class="input-group-btn">
+                          <label class="btn btn-default">
+                            <input id="custom-list-1-file-input" name="custom-list-1" type="file" class="hidden">
+                             <span class="open-folder-icon"></span> Choose
+                          </label>
+                        </span>
+                        <input type="text" class="form-control" id="custom-list-1-file-name" readonly>
+                        <span class="input-group-btn">
+                             <button class="btn btn-primary" id="custom-list-1-file-submit" type="submit">Upload</button>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- COMPONENT END -->
+                  </form>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <img src="images/list.svg" class="my-icon">
+                    Custom List 2
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <a href="/CPM/cgi-bin/service_download_custom_list_2.cgi" class="btn btn-primary btn-service-panel center-block">
+                    Download
+                  </a>
+                  <form method="POST" action="/CPM/cgi-bin/service_upload_custom_list.cgi" enctype="multipart/form-data" id="custom-list-2-file-form">
+                    <!-- COMPONENT START -->
+                    <div class="form-group btn-service-panel center-block">
+                      <div class="input-group">
+                        <span class="input-group-btn">
+                          <label class="btn btn-default">
+                            <input id="custom-list-2-file-input" name="custom-list-2" type="file" class="hidden">
+                             <span class="open-folder-icon"></span> Choose
+                          </label>
+                        </span>
+                        <input type="text" class="form-control" id="custom-list-2-file-name" readonly>
+                        <span class="input-group-btn">
+                             <button class="btn btn-primary" id="custom-list-2-file-submit" type="submit">Upload</button>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- COMPONENT END -->
+                  </form>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <img src="images/list.svg" class="my-icon">
+                    Custom List 3
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <a href="/CPM/cgi-bin/service_download_custom_list_3.cgi" class="btn btn-primary btn-service-panel center-block">
+                    Download
+                  </a>
+                  <form method="POST" action="/CPM/cgi-bin/service_upload_custom_list.cgi" enctype="multipart/form-data" id="custom-list-3-file-form">
+                    <!-- COMPONENT START -->
+                    <div class="form-group btn-service-panel center-block">
+                      <div class="input-group">
+                        <span class="input-group-btn">
+                          <label class="btn btn-default">
+                            <input id="custom-list-3-file-input" name="custom-list-3" type="file" class="hidden">
+                             <span class="open-folder-icon"></span> Choose
+                          </label>
+                        </span>
+                        <input type="text" class="form-control" id="custom-list-3-file-name" readonly>
+                        <span class="input-group-btn">
+                             <button class="btn btn-primary" id="custom-list-3-file-submit" type="submit">Upload</button>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- COMPONENT END -->
+                  </form>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <img src="images/list.svg" class="my-icon">
+                    Custom List 4
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <a href="/CPM/cgi-bin/service_download_custom_list_4.cgi" class="btn btn-primary btn-service-panel center-block">
+                    Download
+                  </a>
+                  <form method="POST" action="/CPM/cgi-bin/service_upload_custom_list.cgi" enctype="multipart/form-data" id="custom-list-4-file-form">
+                    <!-- COMPONENT START -->
+                    <div class="form-group btn-service-panel center-block">
+                      <div class="input-group">
+                        <span class="input-group-btn">
+                          <label class="btn btn-default">
+                            <input id="custom-list-4-file-input" name="custom-list-4" type="file" class="hidden">
+                             <span class="open-folder-icon"></span> Choose
+                          </label>
+                        </span>
+                        <input type="text" class="form-control" id="custom-list-4-file-name" readonly>
+                        <span class="input-group-btn">
+                             <button class="btn btn-primary" id="custom-list-4-file-submit" type="submit">Upload</button>
+                        </span>
+                      </div>
+                    </div>
+                    <!-- COMPONENT END -->
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Productivity Data -->
+        <div class="panel panel-default" id="panel-2">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-parent="#panel-group-1" data-target="#panel-2 .collapse">
+              Productivity Data
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+              <a href="/CPM/cgi-bin/service_download_vp3_all.cgi" class="btn btn-primary btn-service-panel center-block">
+                Download All
+              </a>
+              <a href="/CPM/cgi-bin/service_download_vp3_new.cgi" class="btn btn-primary btn-service-panel center-block">
+                Download New
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3d: Advanced Calibration -->
+        <div class="panel panel-default" id="panel-3d" style="display:block">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-parent="#panel-group-1" data-target="#panel-3d .collapse">
+              Advanced Calibration
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+              <div class="center-block" id="recent-weights-plot" style="width:100%;max-width:800px;height:500px;border:2px solid darkgray"></div>
+              <br>
+              <div class="center-block" style="width:100%;max-width:800px">
+                <table style="width:100%" border="1" id="recent-weights-table">
+                  <thead>
+                    <tr>
+                      <th colspan="3">Recent Weight Measurements</th>
+                    </tr>
+                    <tr>
+                      <th></th>
+                      <th>Calibrated Weight (tonnes)</th>
+                      <th>Displayed Weight (tonnes)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                  <tfoot>
+                  </tfoot>
+                </table>
+              </div>
+              <br>
+              <div class="center-block" id="adv-cal-adj-plot" style="width:100%;max-width:800px;height:500px;border:2px solid darkgray"></div>
+              <br>
+              <form id="weight-adjust-form">
+                <div class="form-group center-block" style="width:100%;max-width:800px;margin-top:1.75px;margin-bottom:1.75px">
+                  <p>WARNING: Adjusting the calibration will result in resetting the zero and span adjust (simple calibration).</p>
+                  <div class="input-group">
+                    <span class="input-group-addon">Calibrated measurement of </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-1-cal" placeholder="Write new value?">
+                    <span class="input-group-addon"> should be adjusted to </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-1-adj" placeholder="Write new value?">
+                    <div class="input-group-addon">
+                      <span class="input-group-text" id="weight-adjust-units-1">tonnes</span>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-addon">Calibrated measurement of </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-2-cal" placeholder="Write new value?">
+                    <span class="input-group-addon"> should be adjusted to </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-2-adj" placeholder="Write new value?">
+                    <div class="input-group-addon">
+                      <span class="input-group-text" id="weight-adjust-units-2">tonnes</span>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-addon">Calibrated measurement of </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-3-cal" placeholder="Write new value?">
+                    <span class="input-group-addon"> should be adjusted to </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-3-adj" placeholder="Write new value?">
+                    <div class="input-group-addon">
+                      <span class="input-group-text" id="weight-adjust-units-3">tonnes</span>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-addon">Calibrated measurement of </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-4-cal" placeholder="Write new value?">
+                    <span class="input-group-addon"> should be adjusted to </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-4-adj" placeholder="Write new value?">
+                    <div class="input-group-addon">
+                      <span class="input-group-text" id="weight-adjust-units-4">tonnes</span>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-addon">Calibrated measurement of </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-5-cal" placeholder="Write new value?">
+                    <span class="input-group-addon"> should be adjusted to </span>
+                    <input type="number" step="0.001" class="form-control" id="weight-adjust-input-5-adj" placeholder="Write new value?">
+                    <div class="input-group-addon">
+                      <span class="input-group-text" id="weight-adjust-units-5">tonnes</span>
+                    </div>
+                  </div>
+                  <button class="btn btn-danger" id="weight-adjust-reset" type="reset">Reset</button>
+                  <button class="btn btn-primary" id="weight-adjust-submit" type="submit">Write</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Panel 3c: Reweigh Warnings -->
+        <div class="panel panel-default" id="panel-3c" style="display:block">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-parent="#panel-group-1" data-target="#panel-3c .collapse">
+              Reweigh Warnings
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+              <form id="minimum-velocity-form">
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Minimum Velocity is <span id="minimum-velocity-value">?</span> mm/s</span>
+                    <input type="text" class="form-control" id="minimum-velocity-input" placeholder="Write new value?">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" id="minimum-velocity-submit" type="submit">Write</button>
+                    </span>
+                  </div>
+                </div>
+              </form>
+              <form id="maximum-pitch-form">
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Maximum Pitch Up is <span id="maximum-pitch-value">?</span> degrees</span>
+                    <input type="text" class="form-control" id="maximum-pitch-input" placeholder="Write new value?">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" id="maximum-pitch-submit" type="submit">Write</button>
+                    </span>
+                  </div>
+                </div>
+              </form>
+              <form id="minimum-pitch-form">
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Minimum Pitch Down is <span id="minimum-pitch-value">?</span> degrees</span>
+                    <input type="text" class="form-control" id="minimum-pitch-input" placeholder="Write new value?">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" id="minimum-pitch-submit" type="submit">Write</button>
+                    </span>
+                  </div>
+                </div>
+              </form>
+              <form id="maximum-roll-form">
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Maximum Roll Side-to-Side is <span id="maximum-roll-value">?</span> degrees</span>
+                    <input type="text" class="form-control" id="maximum-roll-input" placeholder="Write new value?">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" id="maximum-roll-submit" type="submit">Write</button>
+                    </span>
+                  </div>
+                </div>
+              </form>
+              <form id="imu-comp-enable-form">
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <label class="input-group-addon" style="text-align:start;width:100%;">Pitch and Roll Compensation is <span id="imu-comp-enable-value">?</span></label>
+                    <div class="input-group-btn">
+                      <button class="btn btn-primary" id="imu-comp-enable-submit" type="submit">?</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <br>
+              <div class="center-block" id="imu-plot" style="width:100%;max-width:800px;height:500px;border:2px solid darkgray"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3a: Tip-Off Weight -->
+        <div class="panel panel-default" id="panel-3a" style="display:block">
+            <div class="panel-heading">
+              <h4 class="panel-title" data-toggle="collapse" data-parent="#panel-group-1" data-target="#panel-3a .collapse">
+                Tip-Off Weight
+                <span class="caret"></span>
+              </h4>
+            </div>
+            <div class="panel-collapse collapse">
+              <div class="panel-body">
+
+                <form id="tipoff-weight-adjust-form">
+                  <!-- COMPONENT START -->
+                  <div class="form-group btn-service-panel center-block">
+                    <div class="input-group">
+                      <span class="input-group-addon">Tip-Off Target Weight #1 </span>
+                      <input type="number" step="0.01" class="form-control" id="tipoff-weight-1-input" placeholder="Write new value?">
+                      <div class="input-group-addon">
+                        <span class="input-group-text" id="tipoff-weight-units-1">tonnes</span>
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-addon">Weigh Range Weight #1 </span>
+                      <input type="number" step="0.01" class="form-control" id="weigh-range-weight-1-input" placeholder="Write new value?">
+                      <div class="input-group-addon">
+                        <span class="input-group-text" id="tipoff-weight-units-2">tonnes</span>
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-addon">Tip-Off Target Weight #2 </span>
+                      <input type="number" step="0.01" class="form-control" id="tipoff-weight-2-input" placeholder="Write new value?">
+                      <div class="input-group-addon">
+                        <span class="input-group-text" id="tipoff-weight-units-3">tonnes</span>
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-addon">Weigh Range Weight #2 </span>
+                      <input type="number" step="0.01" class="form-control" id="weigh-range-weight-2-input" placeholder="Write new value?">
+                      <div class="input-group-addon">
+                        <span class="input-group-text" id="tipoff-weight-units-4">tonnes</span>
+                      </div>
+                    </div>
+                    <button class="btn btn-primary" id="tipoff-weight-adjust-submit" type="submit">Write</button>
+                </div>
+                  <!-- COMPONENT END -->
+                </form>
+
+                <form id="tipoff-weight-reset-form">
+                <div class="btn-service-panel center-block">
+                  <table style="width:100%" border="1">
+                    <thead>
+                      <tr>
+                        <th colspan="3">Technical Troubleshooting Information</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Last Adjust Status</td>
+                        <td id="tipoff-adjust-status">?</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Tip-Off Weight Calibration Offset</td>
+                        <td id="tipoff-offset-value">?</td>
+                        <td id="tipoff-weight-units-5">tonnes</td>
+                      </tr>
+                      <tr>
+                        <td>Tip-Off Weight Calibration Slope</td>
+                        <td id="tipoff-slope-value">?</td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <button class="btn btn-primary" id="tipoff-weight-reset-submit" type="submit">Reset</button>
+                </div>
+                </form>
+
+                <form id="mach-imu-pitch-offset-form">
+                  <div class="form-group btn-service-panel center-block">
+                    <div class="input-group">
+                      <span class="input-group-addon">Machine IMU Pitch Offset is <span id="mach-imu-pitch-offset-value">?</span> degrees</span>
+                      <input type="text" class="form-control" id="mach-imu-pitch-offset-input" placeholder="Write new value?">
+                      <span class="input-group-btn">
+                        <button class="btn btn-primary" id="mach-imu-pitch-offset-submit" type="submit">Write</button>
+                      </span>
+                    </div>
+                  </div>
+                </form>
+
+              </div>
+            </div>
+          </div>
+
+        <!-- Panel 3b: UDP Transfer Details -->
+        <div class="panel panel-default" id="panel-3b">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-parent="#panel-group-1" data-target="#panel-3b .collapse">
+              UDP Transfer Details
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+              <button class="btn btn-primary" id="UDPEnabled" type="button">Enable UDP Transfer</button>
+              <form id="udp-ip-address-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Currently Configured Ip Address is <span id="desired-ip-address-value">?</span></span>
+                    <input type="text" class="form-control" id="desired-ip-address-input" placeholder="Enter New Ip Address?">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" id="desired-ip-address-submit" type="submit">Write</button>
+                    </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+              <form id="udp-port-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Currently Configured Port is <span id="desired-udp-port-value">?</span> </span>
+                    <input type="text" class="form-control" id="desired-udp-port-input" placeholder="Enter New port?">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" id="desired-udp-port-submit" type="submit">Write</button>
+                    </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 4: Printer Test -->
+        <div class="panel panel-default" id="panel-4">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-parent="#panel-group-1" data-target="#panel-4 .collapse">
+              Printer Test
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+              <button class="btn btn-primary" id="print-test-button-1" type="button">Print 1 Test Copy</button>
+              <button class="btn btn-primary" id="print-test-button-2" type="button">Print 2 Test Copies</button>
+              <button class="btn btn-primary" id="print-test-button-3" type="button">Print 3 Test Copies</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div>
+        <div class="container">
+          <p style="text-align:center">Caterpillar © 2019. All Rights Reserved.</p>
+        </div>
+      </div>
+
+      <!-- Pop-up -->
+      <div class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="pop-up-header" aria-hidden="true" id="pop-up">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" id="pop-up-header">Header</h4>
+            </div>
+            <div class="modal-body" id="pop-up-body">
+              <p>Body</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.min.js?1505493345"></script>
+    <script src="js/plotly-2.27.0.min.js" charset="utf-8"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/adv-cal.js"></script>
+    <script src="js/lft-reweigh.js"></script>
+    <script src="/js/bootstrap.min.js?1505493345"></script>
+  </body>
+</html>

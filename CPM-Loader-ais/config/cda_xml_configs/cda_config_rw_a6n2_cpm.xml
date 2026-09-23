@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CDAConfig>
+   <Client>
+      <Mode>4</Mode> <!-- Mode of operation of client 1-Disabled, 2-Unsecure Server on local host,3- Unsecure Server on remote host, 4-Secure Server on remote host-->
+      <EthInterface>eth0.20</EthInterface> <!-- The interface is valid only for the network of ECMs in 165.26.78. series-->
+   </Client>
+   <Server>
+      <Mode>1</Mode> <!-- Mode of operation of server 1-Disabled, 2-Unsecure Server on local host,3-Unsecure Server on remote host,4 - Secure server on remote host-->
+      <EthInterface>eth0.20</EthInterface>
+   </Server>
+</CDAConfig>

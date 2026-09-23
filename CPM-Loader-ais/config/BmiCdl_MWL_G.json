@@ -1,0 +1,78 @@
+{
+    "cdl2_cbs_ecm_header_t"  : {
+        "table_id"               : "0x00",
+        "table_format_level"     : "0x01",
+        "enabled"                : "0x00",
+        "num_table_entries"      : 2
+    },
+
+    "ecm_0": {
+        "ecm_name"               : "Caterpillar Monitoring System",
+        "ecm_id32"               : "0x1E",
+        "mid"                    : "0X1E",
+        "ecm_control"            : "0x00",
+        "cid"                    : "596",
+        "periodic_fnc_id32"      : "0x00",
+        "periodic_interval"      : "10"
+    },
+
+    "ecm_1": {
+        "ecm_name"               : "Transmission Control",
+        "ecm_id32"               : "0x51",
+        "mid"                    : "0X51",
+        "ecm_control"            : "0x00",
+        "cid"                    : "296",
+        "periodic_fnc_id32"      : "0x00",
+        "periodic_interval"      : "10"
+    },
+
+    "cdl2_cbs_parm_header_t" : {
+        "table_id"               : "0x00",
+        "table_format_level"     : "0x01",
+        "enabled"                : "0x00",
+        "num_table_entries"      : 3
+    },
+
+    "parameter_0": {
+        "param_name"             : "Hydraulic Oil Temperature",
+        "cdl2_cbs_parm_cdl_id_t" : "0x45",
+        "parm_control_req"       : "0x00",
+        "parm_control_rev"       : "0x00",
+        "parm_request_type"      : "3",
+        "parameter_type"         : "3",
+        "mid"                    : "0x1E",
+        "request_rate"           : "1000",
+        "Scaling"                : "1",
+        "Offset"                 : "0",
+        "Units"                  : "0",
+        "VarLengthParamType"     : "0"
+    },
+    "parameter_1": {
+        "param_name"             : "Ground Speed",
+        "cdl2_cbs_parm_cdl_id_t" : "0xF4FD",
+        "parm_control_req"       : "0x00",
+        "parm_control_rev"       : "0x00",
+        "parm_request_type"      : "1",
+        "parameter_type"         : "3",
+        "mid"                    : "0x51",
+        "request_rate"           : "100",
+        "Scaling"                : "0.0036",
+        "Offset"                 : "0",
+        "Units"                  : "0",
+        "VarLengthParamType"     : "0"
+    },
+    "parameter_2": {
+        "param_name"             : "Actual Gear",
+        "cdl2_cbs_parm_cdl_id_t" : "0xF5D9",
+        "parm_control_req"       : "0x00",
+        "parm_control_rev"       : "0x40",
+        "parm_request_type"      : "3",
+        "parameter_type"         : "2",
+        "mid"                    : "0x51",
+        "request_rate"           : "1000",
+        "Scaling"                : "1",
+        "Offset"                 : "0",
+        "Units"                  : "0",
+        "VarLengthParamType"     : "0"
+    }
+}

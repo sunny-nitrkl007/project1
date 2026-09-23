@@ -1,0 +1,35 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'testEnv' )
+testEnv.Append( LIBPATH = [ '#/apps/lib',
+			    testEnv[ 'SSP_DIR' ] + '/lps_pass_tracker-tgt_gcc_4.8.3_a6n2-a',			
+			 ] )
+
+testEnv.Append( CPPPATH = [ '#/apps/include', testEnv[ 'SSP_DIR' ] + '/lps_pass_tracker/include'] )
+
+sourceFiles = [
+    'hornOnStoreTest.cpp'
+]
+
+hornOnStoreTest = testEnv.Program(
+        target = 'hornOnStoreTest',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log' ]
+    )
+
+testEnv.InstallUnitTest( hornOnStoreTest, add_to_run_list = False )
+
+
+testEnv.Alias("hornOnStoreTest", "#bin/unit_test/hornOnStoreTest")
+
+

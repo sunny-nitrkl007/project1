@@ -1,0 +1,27 @@
+{
+    "ParamMsg": {
+        "ParameterList": [
+            {
+                "Param": {
+                    "MaterialInfo": [
+                        {
+                            "Param": {
+                                "id": "45"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "name": "Material Forty Five"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "density": "4545.001"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

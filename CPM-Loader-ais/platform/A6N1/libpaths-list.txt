@@ -1,0 +1,2 @@
+include ${TES_COMMON_DIR}/platform/_COMMON/libpaths-list.txt
+include ${TES_COMMON_DIR}/platform/A6N1/libpaths-list.txt

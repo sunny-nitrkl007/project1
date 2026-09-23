@@ -59,7 +59,6 @@ bool CalNVMReinitFlag = false;
 using namespace task;
 
 // This is the one and only one instance of this task.
-LpsSaWeighApp thisTask("LpsSaWeighApp");
 
 static float extractValFromString(const std::string& str);
 
@@ -72,7 +71,12 @@ RETURN VALUE:
 *******************************************************************************/
 AbstractTaskCore* task::getTaskImplementation(void)
 {
-    return &thisTask;
+    rclcpp::init(0, nullptr);
+    std::cout<<"[ROS2][Initialized]";
+    static LpsSaWeighApp l_thisTask("LpsSaWeighApp");
+    std::cout<<"[CPM][Object initialized]";
+    temp_thisTask=&l_thisTask;
+    return dynamic_cast<Task *>(&l_thisTask);
 }
 
 /******************************************************************************
@@ -118,31 +122,25 @@ LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
     tzInfo_{0, -1},
     demoInputs_(),
     LpsSaWeighScsReqstIn(nullptr),
-    LpsSaWeighScsRespOut(nullptr),
-    LpsSaWeighScsTxOut(nullptr),
-    LpsSaJobMgrScsReqstOut(nullptr),
-    ReadyToFlashStatusOutput(nullptr),
-    PwmIn(nullptr),
-    LpsSaJobMgrScsTxIn(nullptr),
-    DemoAppTxIn(nullptr),
-    AisJhm2TxInputScs(nullptr),
-    AutonomyConditionDiagnosticsTxInputChannel(nullptr),
-    MachineIn(nullptr),
-    LpsSaWeighScsInitDebugOut(nullptr),
-    LpsSaWeighScsDebugOut(nullptr),
-    LpsCalCmdScsReqstIn(nullptr),
-    LpsCalCmdScsRespOut(nullptr),
-    LpsNvmDumpChanOut(nullptr),
-    LpsNvmOnTheFlyDumpChanOut(nullptr),
+    LpsSaWeighScsRespOut_ROS2(nullptr),
+    LpsSaWeighScsTxOut_ROS2(nullptr),
+    LpsSaJobMgrReqstRosOut_(nullptr),
+    ReadyToFlashStatusRosOut_(nullptr),
+    LpsSaJobMgrTxRosIn_(nullptr),
+    DemoAppTxRosIn_(nullptr),
+    LpsSaWeighInitDebugRosOut_(nullptr),
+    LpsSaWeighDebugRosOut_(nullptr),
+    calCmdReqstSub_(nullptr),
+    calCmdRespRosOut_(nullptr),
+    LpsNvmCalRosOut_(nullptr),
+    LpsNvmCalOnTheFlyRosOut_(nullptr),
     DataLinkDataInput_(nullptr),
-    PartNumbersInput_(nullptr),
-    SystemHardwareHealthInput_(nullptr),
-    SystemHardwareHealthRequestOutput_(nullptr),
+    PartNumbersRosIn_(nullptr),
+    SystemHardwareHealthRosIn_(nullptr),
+    SystemHardwareHealthRequestRosOut_(nullptr),
     displayStateInput_(nullptr),
     printerCnfgInput_(nullptr),
     shmClockInput_(nullptr),
-    rosNode_(nullptr),
-    executor_(),
     LinkageCalInProgress(false),
     audibleTriggered_(LpsSaWeighTxChannel::TONE_NONE),
     audibleTriggerTimepoint_(),
@@ -150,7 +148,9 @@ LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
     prevWeighRangeIndicator_(LPS_IN_WEIGH_RANGE_NOT_WEIGHING),
     calLibMtx_(),
     transmitPeriodTime_(0.1f),
-    transmitPeriodCount_(0)
+    transmitPeriodCount_(0),
+    rosNode_(nullptr),
+    executor_()
 
 {
     OelBootupFlag = FALSE;
@@ -164,6 +164,55 @@ RETURN VALUE:
 *******************************************************************************/
 LpsSaWeighApp::~LpsSaWeighApp( )
 {
+    cleanupRosInterfaces();
+}
+
+void LpsSaWeighApp::cleanupRosInterfaces()
+{
+    calCmdReqstSub_.reset();
+
+    delete LpsSaWeighScsReqstIn;
+    LpsSaWeighScsReqstIn = nullptr;
+    delete LpsSaWeighScsRespOut_ROS2;
+    LpsSaWeighScsRespOut_ROS2 = nullptr;
+    delete LpsSaWeighScsTxOut_ROS2;
+    LpsSaWeighScsTxOut_ROS2 = nullptr;
+    delete LpsSaJobMgrReqstRosOut_;
+    LpsSaJobMgrReqstRosOut_ = nullptr;
+    delete ReadyToFlashStatusRosOut_;
+    ReadyToFlashStatusRosOut_ = nullptr;
+    delete LpsSaJobMgrTxRosIn_;
+    LpsSaJobMgrTxRosIn_ = nullptr;
+    delete DemoAppTxRosIn_;
+    DemoAppTxRosIn_ = nullptr;
+    delete LpsSaWeighInitDebugRosOut_;
+    LpsSaWeighInitDebugRosOut_ = nullptr;
+    delete LpsSaWeighDebugRosOut_;
+    LpsSaWeighDebugRosOut_ = nullptr;
+    delete calCmdRespRosOut_;
+    calCmdRespRosOut_ = nullptr;
+    delete LpsNvmCalRosOut_;
+    LpsNvmCalRosOut_ = nullptr;
+    delete LpsNvmCalOnTheFlyRosOut_;
+    LpsNvmCalOnTheFlyRosOut_ = nullptr;
+    delete DataLinkDataInput_;
+    DataLinkDataInput_ = nullptr;
+    delete PartNumbersRosIn_;
+    PartNumbersRosIn_ = nullptr;
+    delete SystemHardwareHealthRosIn_;
+    SystemHardwareHealthRosIn_ = nullptr;
+    delete SystemHardwareHealthRequestRosOut_;
+    SystemHardwareHealthRequestRosOut_ = nullptr;
+    delete displayStateInput_;
+    displayStateInput_ = nullptr;
+    delete AisJhm2TxRosIn_;
+    AisJhm2TxRosIn_ = nullptr;
+    delete AutonomyConditionDiagnosticsTxRosIn_;
+    AutonomyConditionDiagnosticsTxRosIn_ = nullptr;
+    delete printerCnfgInput_;
+    printerCnfgInput_ = nullptr;
+    delete shmClockInput_;
+    shmClockInput_ = nullptr;
 }
 
 /******************************************************************************
@@ -174,6 +223,7 @@ RETURN VALUE:
 *******************************************************************************/
 bool LpsSaWeighApp::initialize( )
 {
+
     if (ADVANCED == getApplicationVariant()) {
         AIS_LOG_INFO("LpsSaWeighApp::initialize for the ADVANCED application variant");
     }
@@ -498,172 +548,174 @@ bool LpsSaWeighApp::initialize( )
      * Initialising SCS Channels
      */
 
-    /* ROS2/DDS wrapper construction replaces InterfaceDb::bind()/
-       SCSOutData::initPublishInterface(). One shared node for the whole
-       app; every wrapper below just creates its own publisher/subscription
-       on it. Topic names are the original SCS channel name in
-       snake_case, minus the redundant Input/Output suffix -- and, for
-       the channels shared directly with JobMgr (LpsSaJobMgrReqstChannel,
-       LpsSaJobMgrTxChannel, AisJhm2TxChannel, AutonomyConditionDiagnostics
-       TxChannel, ShmClockInput), the exact same topic name JobMgr itself
-       uses, since these are the same live DDS topic on both sides. */
-    // rclcpp::init() must run once, before any Node is constructed -- this
-    // app builds as its own standalone process (SConscript Program()
-    // target, one task per process), so there's no risk of double-init
-    // from another task sharing this process.
-    if (!rclcpp::ok()) {
-        rclcpp::init(0, nullptr);
+    ConfigSection cs;
+    if ( !getTaskParser().getSection("ScsRxTimeouts", cs) )
+    {
+        AIS_LOG_FATAL( "Couldn't find ScsRxTimeouts Config Section in rb file" );
+	    return false;
     }
+
     rosNode_ = std::make_shared<rclcpp::Node>("weigh_app_node");
     executor_.add_node(rosNode_);
 
-    SystemHardwareHealthRequestOutput_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::SystemHardwareHealthRequest>(rosNode_, "system_hardware_health_request");
-    if (!SystemHardwareHealthRequestOutput_)
-    {
-        return false;
-    }
-
-    displayStateInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(rosNode_, "display_state");
+    displayStateInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(
+            rosNode_, "lps_sa_ui_display_state_interface");
     if (!displayStateInput_) {
-        AIS_LOG_ERROR("No DisplayStateInput input channel defined.");
+        AIS_LOG_ERROR("DisplayStateInput ROS2 input not initialized.");
         return false;
     }
 
-    printerCnfgInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfgInterfaceStorage>(rosNode_, "printer_cnfg");
+    printerCnfgInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg>(
+            rosNode_, "lps_sa_totals_printer_cnfg");
     if (!printerCnfgInput_) {
-        AIS_LOG_ERROR("No PrinterCnfgInput input channel defined.");
+        AIS_LOG_ERROR("No PrinterCnfgInput ROS2 interface initialized.");
         return false;
     }
 
-    SystemHardwareHealthInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::SystemHardwareHealthStorage>(rosNode_, "system_hardware_health");
-    if (!SystemHardwareHealthInput_) {
-        AIS_LOG_ERROR("No SystemHardwareHealthInput channel defined.");
-        return false;
-    }
-
-    PartNumbersInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PartNumbers>(rosNode_, "part_numbers");
-    if (!PartNumbersInput_) {
-        AIS_LOG_ERROR("No Part Numbers input channel defined.");
-        return false;
-    }
-
-    DataLinkDataInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DataLinkData>(rosNode_, "weigh_app_data_link_data");
+    DataLinkDataInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DataLinkData>(
+            rosNode_, "weigh_app_data_link_data");
     if (!DataLinkDataInput_) {
-        AIS_LOG_ERROR("DataLinkDataInput interface not defined");
+        AIS_LOG_ERROR("DataLinkDataInput ROS2 input not initialized.");
         return false;
     }
 
-    LpsSaJobMgrScsReqstOut = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(rosNode_, "lps_sa_job_mgr_reqst_channel");
-    if (!LpsSaJobMgrScsReqstOut) {
-        AIS_LOG_ERROR("LpsSaJobMgrReqstChannelOutput interface not defined");
+    PartNumbersRosIn_ =
+        new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PartNumbers>(
+            rosNode_, "part_numbers");
+    if (!PartNumbersRosIn_) {
+        AIS_LOG_ERROR("PartNumbers ROS2 input not initialized.");
         return false;
     }
 
-    ReadyToFlashStatusOutput = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::ReadyToFlashStatus>(rosNode_, "ready_to_flash_status");
-    if (!ReadyToFlashStatusOutput)
-    {
+    SystemHardwareHealthRosIn_ =
+        new ros2_wrapper::RosInputInterface<
+            weigh_app_interfaces::msg::SystemHardwareHealthStorage>(
+                rosNode_, "system_hardware_health");
+    if (!SystemHardwareHealthRosIn_) {
+        AIS_LOG_ERROR("SystemHardwareHealth ROS2 input not initialized.");
         return false;
     }
 
-    AutonomyConditionDiagnosticsTxInputChannel = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(rosNode_, "autonomy_condition_diagnostics_tx_channel");
-    if (!AutonomyConditionDiagnosticsTxInputChannel) {
-        AIS_LOG_ERROR("AutonomyConditionDiagnosticsTxChannelInput interface not defined");
+    LpsSaJobMgrReqstRosOut_ = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(
+            rosNode_, "lps_sa_job_mgr_reqst_channel");
+    if (!LpsSaJobMgrReqstRosOut_) {
+        AIS_LOG_ERROR("LpsSaJobMgrReqstChannel ROS2 output not initialized.");
         return false;
     }
 
-    LpsSaWeighScsTxOut = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode_, "lps_sa_weigh_tx_channel");
-    if (!LpsSaWeighScsTxOut) {
-         AIS_LOG_ERROR("Interface LpsSaWeighTxChannelOutput not configured.");
+    SystemHardwareHealthRequestRosOut_ =
+        new ros2_wrapper::RosOutputInterface<
+            weigh_app_interfaces::msg::SystemHardwareHealthRequest>(
+                rosNode_, "system_hardware_health_request");
+    if (!SystemHardwareHealthRequestRosOut_) {
+        AIS_LOG_ERROR("SystemHardwareHealthRequest ROS2 output not initialized.");
+        return false;
+    }
+
+    ReadyToFlashStatusRosOut_ =
+        new ros2_wrapper::RosOutputInterface<
+            weigh_app_interfaces::msg::ReadyToFlashStatus>(
+                rosNode_, "ready_to_flash_status");
+    if (!ReadyToFlashStatusRosOut_) {
+        AIS_LOG_ERROR("ReadyToFlashStatus ROS2 output not initialized.");
+        return false;
+    }
+
+    LpsSaWeighScsTxOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode_, "lps_sa_weigh_tx_channel");
+    if (!LpsSaWeighScsTxOut_ROS2) {
+         AIS_LOG_ERROR("Interface LpsSaWeighScsTxOut_ROS2 not configured.");
          return false;
     }
 
-    LpsSaWeighScsRespOut = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>(rosNode_, "lps_sa_weigh_resp_channel");
-    if (!LpsSaWeighScsRespOut) {
+    LpsSaWeighScsRespOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>(rosNode_, "lps_sa_weigh_resp_channel");
+    if (!LpsSaWeighScsRespOut_ROS2) {
         AIS_LOG_ERROR("Interface LpsSaWeighRespChannelOutput not configured.");
         return false;
     }
 
-    LpsSaWeighScsInitDebugOut = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel>(rosNode_, "lps_sa_weigh_init_debug_channel");
-    if (!LpsSaWeighScsInitDebugOut) {
-        AIS_LOG_ERROR("Interface LpsSaWeighInitDebugChannelOutput not configured.");
+    LpsSaWeighInitDebugRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel>(
+            rosNode_, "lps_sa_weigh_init_debug_channel");
+    if (!LpsSaWeighInitDebugRosOut_) {
+        AIS_LOG_ERROR("LpsSaWeighInitDebugChannel ROS2 output not initialized.");
         return false;
     }
-    else {
-        LpsSaWeighScsInitDebugTx();
-    }
+    LpsSaWeighScsInitDebugTx();
 
-    LpsSaWeighScsDebugOut = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighDebugChannel>(rosNode_, "lps_sa_weigh_debug_channel");
-    if (!LpsSaWeighScsDebugOut) {
-        AIS_LOG_ERROR("Interface LpsSaWeighDebugChannelOutput not configured.");
+    // AIS SCS leg (LpsSaWeighDebugChannelOutput) is forwarded by ScsToRos2Bridge.
+    LpsSaWeighDebugRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighDebugChannel>(
+            rosNode_, "lps_sa_weigh_debug_channel");
+    if (!LpsSaWeighDebugRosOut_) {
+        AIS_LOG_ERROR("LpsSaWeighDebugChannel ROS2 output not initialized.");
         return false;
     }
 
     LpsSaWeighScsReqstIn = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>(rosNode_, "lps_sa_weigh_reqst_channel");
     if (!LpsSaWeighScsReqstIn) {
-        //LpsSaWeighScsReqstIn->addNewDataSlot(boost::bind(&LpsSaWeighApp::LpsSaWeighReqstRead, this ) );
         AIS_LOG_ERROR("Interface LpsSaWeighReqstChannelInput not configured.");
         return false;
     }
 
-    PwmIn = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PwmInputChannels>(rosNode_, "pwm_input_channels");
-    if (!PwmIn) {
-         AIS_LOG_ERROR("Interface PwmInputChannelsInput not configured.");
-         return false;
-    }
 
-    MachineIn = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::Machine>(rosNode_, "machine");
-    if (!MachineIn) {
-         AIS_LOG_ERROR("Interface MachineInput not configured.");
-         return false;
-    }
-
-    LpsSaJobMgrScsTxIn = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(rosNode_, "lps_sa_job_mgr_tx_channel");
-    if (!LpsSaJobMgrScsTxIn) {
-         AIS_LOG_ERROR("Interface LpsSaJobMgrTxChannelInput not configured.");
-         return false;
-    }
-
-    DemoAppTxIn = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DemoAppTxChannel>(rosNode_, "demo_app_tx_channel");
-    if (!DemoAppTxIn) {
-        AIS_LOG_ERROR("DemoAppTxChannelInput interface not configured");
+    LpsSaJobMgrTxRosIn_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(
+            rosNode_, "lps_sa_job_mgr_tx_channel");
+    if (!LpsSaJobMgrTxRosIn_) {
+        AIS_LOG_ERROR("LpsSaJobMgrTxChannel ROS2 input not initialized.");
         return false;
     }
 
-    AisJhm2TxInputScs = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode_, "ais_jhm2_tx_channel");
-    if (!AisJhm2TxInputScs) {
-        AIS_LOG_ERROR("Interface AisJhm2TxChannelInput not configured.");
+    DemoAppTxRosIn_ =
+        new ros2_wrapper::RosInputInterface<
+            weigh_app_interfaces::msg::DemoAppTxChannel>(
+                rosNode_, "demo_app_tx_channel");
+    if (!DemoAppTxRosIn_) {
+        AIS_LOG_ERROR("DemoAppTxChannel ROS2 input not initialized.");
         return false;
     }
 
-    LpsCalCmdScsReqstIn = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::CalMgrCmdReqst>(rosNode_, "cal_mgr_cmd_reqst");
-    if (!LpsCalCmdScsReqstIn) {
-        AIS_LOG_ERROR("Interface CalMgrCmdReqstInput not configured.");
-        return false;
-    }
-    else {
-        LpsCalCmdScsReqstIn->addNewDataSlot(boost::bind(&LpsSaWeighApp::LpsSaWeighCalReqstCallback, this));
-    }
-
-    LpsCalCmdScsRespOut = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>(rosNode_, "cal_mgr_cmd_resp");
-    if (!LpsCalCmdScsRespOut) {
-        AIS_LOG_ERROR("Interface CalMgrCmdRespOutput not configured.");
+    calCmdReqstSub_ = rosNode_->create_subscription<weigh_app_interfaces::msg::CalMgrCmdReqst>(
+            "cal_mgr_cmd_reqst",
+            rclcpp::QoS(5),
+            std::bind(&LpsSaWeighApp::LpsSaWeighCalReqstCallback, this, std::placeholders::_1));
+    if (!calCmdReqstSub_) {
+        AIS_LOG_ERROR("Failed to create CalMgrCmdReqst ROS2 subscription.");
         return false;
     }
 
-    shmClockInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(rosNode_, "shm_clock");
+    calCmdRespRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>(
+            rosNode_, "cal_mgr_cmd_resp");
+    if (!calCmdRespRosOut_) {
+        AIS_LOG_ERROR("CalMgrCmdResp ROS2 output not initialized.");
+    }
+
+    shmClockInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(
+            rosNode_, "shm_clock_input");
     if (!shmClockInput_) {
-        AIS_LOG_ERROR("No ShmClockInput input channel defined.");
+        AIS_LOG_ERROR("ShmClockInput ROS2 input not initialized.");
         return false;
     }
 
-    LpsNvmDumpChanOut = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalDataChannel>(rosNode_, "lps_sa_nvm_cal_data_channel");
-    if (!LpsNvmDumpChanOut) {
-        AIS_LOG_ERROR("Interface LpsSaNvmCalDataChannelOutput not configured.");
+    LpsNvmCalRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalDataChannel>(
+            rosNode_, "lps_sa_nvm_cal_data_channel");
+    if (!LpsNvmCalRosOut_) {
+        AIS_LOG_ERROR("LpsSaNvmCalDataChannel ROS2 output not initialized.");
     }
 
-    LpsNvmOnTheFlyDumpChanOut = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel>(rosNode_, "lps_sa_nvm_cal_on_the_fly_data_channel");
-    if (!LpsNvmOnTheFlyDumpChanOut) {
-        AIS_LOG_ERROR("Interface LpsSaNvmCalOnTheFlyDataChannelOutput not configured.");
+    LpsNvmCalOnTheFlyRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel>(
+            rosNode_, "lps_sa_nvm_cal_on_the_fly_data_channel");
+    if (!LpsNvmCalOnTheFlyRosOut_) {
+        AIS_LOG_ERROR("LpsSaNvmCalOnTheFlyDataChannel ROS2 output not initialized.");
+    }
+
+    AisJhm2TxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode_, "ais_jhm2_tx_channel");
+    if (!AisJhm2TxRosIn_) {
+        AIS_LOG_ERROR("Interface AisJhm2TxRosIn_ not configured.");
+        return false;
+    }
+
+    AutonomyConditionDiagnosticsTxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(rosNode_, "autonomy_condition_diagnostics_tx_channel");
+    if (!AutonomyConditionDiagnosticsTxRosIn_) {
+         AIS_LOG_ERROR("Interface AutonomyConditionDiagnosticsTxRosIn_ not configured.");
+         return false;
     }
 
     /* Initialize time information. */
@@ -686,6 +738,8 @@ RETURN VALUE:
 
 bool LpsSaWeighApp::executive( )
 {
+    // ROS2/DDS: drain pending callbacks
+    // Must run before their get()/publish() --
     executor_.spin_some();
 
     static bool cal_data_published = false;
@@ -704,11 +758,11 @@ bool LpsSaWeighApp::executive( )
     /* Did we receive new ProductID? 
         If we did, we need to create new 
           appdata/CPM/debug/product_id.txt file */
-    if (nullptr != PartNumbersInput_) {
+    if (PartNumbersRosIn_) {
         weigh_app_interfaces::msg::PartNumbers partNumbers;
 
-        while (PartNumbersInput_->get(partNumbers)) {
-            /* We receive new ProductID */
+        while (PartNumbersRosIn_->get(partNumbers)) {
+            /* We receive new ProductID */  
             if (partNumbers.product_id_num_set) {
                 std::string productId = partNumbers.product_id_num;
                 if (sealTracker_.reportProductId(productId)) {
@@ -767,22 +821,25 @@ bool LpsSaWeighApp::executive( )
 
 void LpsSaWeighApp::flashEnablerUpdate() {
 
-    weigh_app_interfaces::msg::ReadyToFlashStatus m_readyToFlashStatus;
-    m_readyToFlashStatus.ready_code = weigh_app_interfaces::msg::ReadyToFlashStatus::APP_READY_CODE_OK_TO_FLASH;
-    m_readyToFlashStatus.host_name = getHostName();
-    m_readyToFlashStatus.task_name = getTaskName();
+    weigh_app_interfaces::msg::ReadyToFlashStatus readyToFlashStatus;
+    readyToFlashStatus.ready_code = APP_READY_CODE_OK_TO_FLASH;
+    readyToFlashStatus.host_name = getHostName();
+    readyToFlashStatus.task_name = getTaskName();
 
     // if lft is installed and sealed and flash is disabled, then disable flash
     if (payloadCalNvmTbl_.legalForTradeInstalled && sealTracker_.isSealed() &&
             !cnfg_.flashEnabled) {
-        m_readyToFlashStatus.ready_code = weigh_app_interfaces::msg::ReadyToFlashStatus::APP_READY_CODE_PAYLOAL_LEGAL_FOR_TRADE_IS_SEALED;
+        readyToFlashStatus.ready_code =
+            (int16_t)APP_READY_CODE_PAYLOAL_LEGAL_FOR_TRADE_IS_SEALED;
     }
     else {
         // allow flash
     }
 
     // publish
-    ReadyToFlashStatusOutput->publish(m_readyToFlashStatus);
+    if (ReadyToFlashStatusRosOut_) {
+        ReadyToFlashStatusRosOut_->publish(readyToFlashStatus);
+    }
 }
 
 bool LpsSaWeighApp::setHydOilTempEnableStatus(bool enabled) {
@@ -948,14 +1005,15 @@ DESCRIPTION:
 PARAMETER DESCRIPTION:
 RETURN VALUE:
 *******************************************************************************/
-void LpsSaWeighApp::LpsSaWeighCalReqstCallback()
+void LpsSaWeighApp::LpsSaWeighCalReqstCallback(
+        const weigh_app_interfaces::msg::CalMgrCmdReqst::SharedPtr msg)
 {
-    weigh_app_interfaces::msg::CalMgrCmdReqst calMgrCmdReq;
+    if (!msg) { return; }
 
-    while (LpsCalCmdScsReqstIn->get(calMgrCmdReq)) {
-        if (calMgrCmdReq.calibration_request.calibration_reqst_flag) {
-            uint16_t calId = calMgrCmdReq.calibration_request.cal_id;
-            CAL_MGR_MC_E calCmd = static_cast<CAL_MGR_MC_E>(calMgrCmdReq.calibration_request.calcmd);
+    if (msg->calibration_request.calibration_reqst_flag) {
+        {
+            uint16_t calId = msg->calibration_request.cal_id;
+            CAL_MGR_MC_E calCmd = static_cast<CAL_MGR_MC_E>(msg->calibration_request.calcmd);
 
             AIS_LOG_DEBUG("CalibrationRequest - id %d, cmd %d", calId, calCmd);
 
@@ -968,8 +1026,9 @@ void LpsSaWeighApp::LpsSaWeighCalReqstCallback()
                 std::lock_guard<std::mutex> lck(calLibMtx_);
 
                 // Update the cal_iterm
-                memcpy(cal_iterm, calMgrCmdReq.calibration_request.cal_iterm.data(),
-                        std::min(sizeof(cal_iterm), calMgrCmdReq.calibration_request.cal_iterm.size() * sizeof(uint32_t)));
+                const auto& calIterm = msg->calibration_request.cal_iterm;
+                constexpr size_t calItermMaxBytes = ((CAL_LAST_ITERM_BIT >> 5) + 1) * sizeof(unsigned_32);
+                memcpy(cal_iterm, calIterm.data(), std::min(calIterm.size() * sizeof(uint32_t), calItermMaxBytes));
 
                 // Update calibration
                 switch (calId) {
@@ -1022,108 +1081,102 @@ void LpsSaWeighApp::LpsSaWeighCalReqstCallback()
                 }
 
                 // Build the response
-                calMgrCmdResp.calibration_resp.resp_code = static_cast<uint8_t>(LPS_SA_CAL_SUCCESS);
-                calMgrCmdResp.calibration_resp.cal_resp = static_cast<uint8_t>(calResp);
-                calMgrCmdResp.calibration_resp.error = LpsSaWeighInfoTbl.error;
-                calMgrCmdResp.calibration_resp.step_no = LpsSaWeighInfoTbl.stepNo;
-                calMgrCmdResp.calibration_resp.warning = LpsSaWeighInfoTbl.warning;
+                calMgrCmdResp.calibration_resp.resp_code        = static_cast<uint8_t>(LPS_SA_CAL_SUCCESS);
+                calMgrCmdResp.calibration_resp.cal_resp         = static_cast<uint8_t>(calResp);
+                calMgrCmdResp.calibration_resp.error            = LpsSaWeighInfoTbl.error;
+                calMgrCmdResp.calibration_resp.step_no          = LpsSaWeighInfoTbl.stepNo;
+                calMgrCmdResp.calibration_resp.warning          = LpsSaWeighInfoTbl.warning;
                 calMgrCmdResp.calibration_resp.enable_qual_read = LpsCalGetQualReadStatus();
 
                 // Build the cal OTF data
                 LpsCalStatus_t calStatusFlags;
                 LpsCalGetCalStatus(&calStatusFlags);
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.status_flags.cal_in_progress = calStatusFlags.CalInProgress;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.status_flags.empty_bkt_cal_done = calStatusFlags.EmptyBktCalDone;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.status_flags.full_bkt_cal_done = calStatusFlags.FullBktCalDone;
+                auto& otf = calOtfData.lps_sa_nvm_calibration_data_on_the_fly;
 
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.lift_he_pres_stat = weighUpdtTbl.LiftCylHePres.Stat;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.lift_re_pres_stat = weighUpdtTbl.LiftCylRePres.Stat;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.lift_cyl_length_norm_stat = weighUpdtTbl.LiftCylLengthNorm.Stat;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.hyd_oil_temp_stat = weighUpdtTbl.HydOilTemp.Stat;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.lift_cyl_vel_stat = weighUpdtTbl.LiftCylVel.Stat;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.tilt_cyl_length_norm_stat = weighUpdtTbl.TiltCylLengthNorm.Stat;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.bkt_angle_stat = weighUpdtTbl.BktAngle.Stat;
+                otf.status_flags.cal_in_progress    = calStatusFlags.CalInProgress;
+                otf.status_flags.empty_bkt_cal_done = calStatusFlags.EmptyBktCalDone;
+                otf.status_flags.full_bkt_cal_done  = calStatusFlags.FullBktCalDone;
 
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.hyd_oil_temp_met = LpsCalWrkTbl.CurveFitInfo.HydOilTempMet;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.enforce_raise_detent = LpsCalWrkTbl.CurveFitInfo.EnforceRaiseDetent;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.enforce_lower_detent = LpsCalWrkTbl.CurveFitInfo.EnforceLowerDetent;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.raise_fast_vel_done = LpsCalWrkTbl.CurveFitInfo.RaiseFastVelDone;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.raise_slow_fit_done = LpsCalWrkTbl.CurveFitInfo.RaiseSlowFitDone;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.raise_fast_fit_done = LpsCalWrkTbl.CurveFitInfo.RaiseFastFitDone;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.lower_slow_fit_done = LpsCalWrkTbl.CurveFitInfo.LowerSlowFitDone;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.internal_step = LpsCalWrkTbl.CurveFitInfo.InternalStep;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.raise_num_points = LpsCalWrkTbl.CurveFitInfo.LpsCalRaiseCurveFitData.TotalNumPoints;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.lower_num_points = LpsCalWrkTbl.CurveFitInfo.LpsCalLowerCurveFitData.TotalNumPoints;
+                otf.cal_updates.lift_he_pres_stat          = static_cast<int32_t>(weighUpdtTbl.LiftCylHePres.Stat);
+                otf.cal_updates.lift_re_pres_stat          = static_cast<int32_t>(weighUpdtTbl.LiftCylRePres.Stat);
+                otf.cal_updates.lift_cyl_length_norm_stat  = static_cast<int32_t>(weighUpdtTbl.LiftCylLengthNorm.Stat);
+                otf.cal_updates.hyd_oil_temp_stat          = static_cast<int32_t>(weighUpdtTbl.HydOilTemp.Stat);
+                otf.cal_updates.lift_cyl_vel_stat          = static_cast<int32_t>(weighUpdtTbl.LiftCylVel.Stat);
+                otf.cal_updates.tilt_cyl_length_norm_stat  = static_cast<int32_t>(weighUpdtTbl.TiltCylLengthNorm.Stat);
+                otf.cal_updates.bkt_angle_stat             = static_cast<int32_t>(weighUpdtTbl.BktAngle.Stat);
 
-                { // LpsCalIMUResults_t -> weigh_app_interfaces::msg::LpsCalIMUResults, field-by-field (different types now)
-                    const LpsCalIMUResults_t& src = LpsCalWrkTbl.CurveFitInfo.LpsCalIMUResultsData;
-                    auto& dst = calOtfData.lps_sa_nvm_calibration_data_on_the_fly.curve_info.imu_cal_results;
-                    dst.full_slow_imu_offset_temp1 = src.FullSlowImuOffsetTemp1;
-                    dst.full_slow_imu_offset_temp2 = src.FullSlowImuOffsetTemp2;
-                    dst.full_slow_imu_offset_temp3 = src.FullSlowImuOffsetTemp3;
-                    dst.full_slow_lumped_weight_temp1 = src.FullSlowLumpedWeightTemp1;
-                    dst.full_slow_lumped_weight_temp2 = src.FullSlowLumpedWeightTemp2;
-                    dst.full_slow_lumped_weight_temp3 = src.FullSlowLumpedWeightTemp3;
-                    dst.empty_slow_imu_offset_temp1 = src.EmptySlowImuOffsetTemp1;
-                    dst.empty_slow_imu_offset_temp2 = src.EmptySlowImuOffsetTemp2;
-                    dst.empty_slow_imu_offset_temp3 = src.EmptySlowImuOffsetTemp3;
-                    dst.empty_slow_lumped_weight_temp1 = src.EmptySlowLumpedWeightTemp1;
-                    dst.empty_slow_lumped_weight_temp2 = src.EmptySlowLumpedWeightTemp2;
-                    dst.empty_slow_lumped_weight_temp3 = src.EmptySlowLumpedWeightTemp3;
-                    dst.full_slow_imu_offset_final = src.FullSlowImuOffsetFinal;
-                    dst.empty_slow_imu_offset_final = src.EmptySlowImuOffsetFinal;
-                    dst.full_slow_lumped_weight_final = src.FullSlowLumpedWeightFinal;
-                    dst.empty_slow_lumped_weight_final = src.EmptySlowLumpedWeightFinal;
-                }
+                otf.curve_info.hyd_oil_temp_met      = LpsCalWrkTbl.CurveFitInfo.HydOilTempMet;
+                otf.curve_info.enforce_raise_detent  = LpsCalWrkTbl.CurveFitInfo.EnforceRaiseDetent;
+                otf.curve_info.enforce_lower_detent  = LpsCalWrkTbl.CurveFitInfo.EnforceLowerDetent;
+                otf.curve_info.raise_fast_vel_done   = LpsCalWrkTbl.CurveFitInfo.RaiseFastVelDone;
+                otf.curve_info.raise_slow_fit_done   = LpsCalWrkTbl.CurveFitInfo.RaiseSlowFitDone;
+                otf.curve_info.raise_fast_fit_done   = LpsCalWrkTbl.CurveFitInfo.RaiseFastFitDone;
+                otf.curve_info.lower_slow_fit_done   = LpsCalWrkTbl.CurveFitInfo.LowerSlowFitDone;
+                otf.curve_info.internal_step         = LpsCalWrkTbl.CurveFitInfo.InternalStep;
+                otf.curve_info.raise_num_points      = LpsCalWrkTbl.CurveFitInfo.LpsCalRaiseCurveFitData.TotalNumPoints;
+                otf.curve_info.lower_num_points      = LpsCalWrkTbl.CurveFitInfo.LpsCalLowerCurveFitData.TotalNumPoints;
 
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.lift_lever_info_lever_info_available = LpsCalWrkTbl.Update.LiftLeverInfo.LeverInfoAvailable;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_updates.lift_lever_info_faulted = LpsCalWrkTbl.Update.LiftLeverInfo.Faulted;
+                const LpsCalIMUResults_t& imu = LpsCalWrkTbl.CurveFitInfo.LpsCalIMUResultsData;
+                otf.curve_info.imu_cal_results.full_slow_imu_offset_temp1      = imu.FullSlowImuOffsetTemp1;
+                otf.curve_info.imu_cal_results.full_slow_imu_offset_temp2      = imu.FullSlowImuOffsetTemp2;
+                otf.curve_info.imu_cal_results.full_slow_imu_offset_temp3      = imu.FullSlowImuOffsetTemp3;
+                otf.curve_info.imu_cal_results.full_slow_lumped_weight_temp1   = imu.FullSlowLumpedWeightTemp1;
+                otf.curve_info.imu_cal_results.full_slow_lumped_weight_temp2   = imu.FullSlowLumpedWeightTemp2;
+                otf.curve_info.imu_cal_results.full_slow_lumped_weight_temp3   = imu.FullSlowLumpedWeightTemp3;
+                otf.curve_info.imu_cal_results.empty_slow_imu_offset_temp1     = imu.EmptySlowImuOffsetTemp1;
+                otf.curve_info.imu_cal_results.empty_slow_imu_offset_temp2     = imu.EmptySlowImuOffsetTemp2;
+                otf.curve_info.imu_cal_results.empty_slow_imu_offset_temp3     = imu.EmptySlowImuOffsetTemp3;
+                otf.curve_info.imu_cal_results.empty_slow_lumped_weight_temp1  = imu.EmptySlowLumpedWeightTemp1;
+                otf.curve_info.imu_cal_results.empty_slow_lumped_weight_temp2  = imu.EmptySlowLumpedWeightTemp2;
+                otf.curve_info.imu_cal_results.empty_slow_lumped_weight_temp3  = imu.EmptySlowLumpedWeightTemp3;
+                otf.curve_info.imu_cal_results.full_slow_imu_offset_final      = imu.FullSlowImuOffsetFinal;
+                otf.curve_info.imu_cal_results.empty_slow_imu_offset_final     = imu.EmptySlowImuOffsetFinal;
+                otf.curve_info.imu_cal_results.full_slow_lumped_weight_final   = imu.FullSlowLumpedWeightFinal;
+                otf.curve_info.imu_cal_results.empty_slow_lumped_weight_final  = imu.EmptySlowLumpedWeightFinal;
 
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lps_cal_ovr_state = LpsCalWrkTbl.Ov.LpsCalOvrState;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lift_bottom_flag = LpsCalWrkTbl.Ov.LiftBottomFlag;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lift_top_flag = LpsCalWrkTbl.Ov.LiftTopFlag;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lps_cal_app_inf_cal_ovr_active = LpsCalWrkTbl.Ov.LpsCalAppInfCalOvrActive;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lps_cal_app_inf_lower_cmd_lmt = LpsCalWrkTbl.Ov.LpsCalAppInfLowerCmdLmt;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lps_cal_app_inf_raise_cmd_lmt = LpsCalWrkTbl.Ov.LpsCalAppInfRaiseCmdLmt;
+                otf.cal_updates.lift_lever_info_lever_info_available = LpsCalWrkTbl.Update.LiftLeverInfo.LeverInfoAvailable;
+                otf.cal_updates.lift_lever_info_faulted              = LpsCalWrkTbl.Update.LiftLeverInfo.Faulted;
 
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lift_faulted = LpsSaWeighInfoTbl.LiftLeverInfo.Faulted;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lift_in_center = LpsSaWeighInfoTbl.LiftLeverInfo.InCenter;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lift_in_lower_detent = LpsSaWeighInfoTbl.LiftLeverInfo.InLowerDetent;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lift_in_raise_detent = LpsSaWeighInfoTbl.LiftLeverInfo.InRaiseDetent;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.lift_valve_cmd_percent = LpsSaWeighInfoTbl.LiftLeverInfo.ValveCmdPercent;
-
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.cal_ovr_acknowledge = LpsCalWrkTbl.Update.CalOvrAcknowledge;
+                otf.cal_overrides.lps_cal_ovr_state              = LpsCalWrkTbl.Ov.LpsCalOvrState;
+                otf.cal_overrides.lift_bottom_flag               = LpsCalWrkTbl.Ov.LiftBottomFlag;
+                otf.cal_overrides.lift_top_flag                  = LpsCalWrkTbl.Ov.LiftTopFlag;
+                otf.cal_overrides.lps_cal_app_inf_cal_ovr_active = LpsCalWrkTbl.Ov.LpsCalAppInfCalOvrActive;
+                otf.cal_overrides.lps_cal_app_inf_lower_cmd_lmt  = LpsCalWrkTbl.Ov.LpsCalAppInfLowerCmdLmt;
+                otf.cal_overrides.lps_cal_app_inf_raise_cmd_lmt  = LpsCalWrkTbl.Ov.LpsCalAppInfRaiseCmdLmt;
+                otf.cal_overrides.lift_faulted                   = LpsSaWeighInfoTbl.LiftLeverInfo.Faulted;
+                otf.cal_overrides.lift_in_center                 = LpsSaWeighInfoTbl.LiftLeverInfo.InCenter;
+                otf.cal_overrides.lift_in_lower_detent           = LpsSaWeighInfoTbl.LiftLeverInfo.InLowerDetent;
+                otf.cal_overrides.lift_in_raise_detent           = LpsSaWeighInfoTbl.LiftLeverInfo.InRaiseDetent;
+                otf.cal_overrides.lift_valve_cmd_percent         = LpsSaWeighInfoTbl.LiftLeverInfo.ValveCmdPercent;
+                otf.cal_overrides.cal_ovr_acknowledge            = LpsCalWrkTbl.Update.CalOvrAcknowledge;
 
                 /* tilt overrides */
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.cal_tilt_override_complete = LpsCalWrkTbl.Info.CalTiltOverrideComplete;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.cal_tilt_override_fail = LpsCalWrkTbl.Info.CalTiltOverrideFail;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.count_of_samples = LpsCalWrkTbl.Ov.LpsCalTiltOv.CountOfSamples;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.desired_tilt_extmm = LpsCalWrkTbl.Ov.LpsCalTiltOv.DesiredTiltExtmm;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.lps_cal_tilt_ovr_start_request = LpsCalWrkTbl.Ov.LpsCalTiltOv.LpsCalTiltOvrStartRequest;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.lps_cal_tilt_ovr_state = LpsCalWrkTbl.Ov.LpsCalTiltOv.LpsCalTiltOvrState;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.tilt_dump_cmd_ovr = LpsCalWrkTbl.Ov.LpsCalTiltOv.TiltDumpCmdOvr;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.tilt_noise_max = LpsCalWrkTbl.Ov.LpsCalTiltOv.TiltNoiseMax;
-                calOtfData.lps_sa_nvm_calibration_data_on_the_fly.cal_overrides.tilt_overrides.tilt_noise_min = LpsCalWrkTbl.Ov.LpsCalTiltOv.TiltNoiseMin;
+                otf.cal_overrides.tilt_overrides.cal_tilt_override_complete   = LpsCalWrkTbl.Info.CalTiltOverrideComplete;
+                otf.cal_overrides.tilt_overrides.cal_tilt_override_fail       = LpsCalWrkTbl.Info.CalTiltOverrideFail;
+                otf.cal_overrides.tilt_overrides.count_of_samples             = LpsCalWrkTbl.Ov.LpsCalTiltOv.CountOfSamples;
+                otf.cal_overrides.tilt_overrides.desired_tilt_extmm           = LpsCalWrkTbl.Ov.LpsCalTiltOv.DesiredTiltExtmm;
+                otf.cal_overrides.tilt_overrides.lps_cal_tilt_ovr_start_request = LpsCalWrkTbl.Ov.LpsCalTiltOv.LpsCalTiltOvrStartRequest;
+                otf.cal_overrides.tilt_overrides.lps_cal_tilt_ovr_state       = LpsCalWrkTbl.Ov.LpsCalTiltOv.LpsCalTiltOvrState;
+                otf.cal_overrides.tilt_overrides.tilt_dump_cmd_ovr            = LpsCalWrkTbl.Ov.LpsCalTiltOv.TiltDumpCmdOvr;
+                otf.cal_overrides.tilt_overrides.tilt_noise_max               = LpsCalWrkTbl.Ov.LpsCalTiltOv.TiltNoiseMax;
+                otf.cal_overrides.tilt_overrides.tilt_noise_min               = LpsCalWrkTbl.Ov.LpsCalTiltOv.TiltNoiseMin;
 
             }
 
             // Send Response
-            if (nullptr != LpsCalCmdScsRespOut) {
-                if (!LpsCalCmdScsRespOut->publish(calMgrCmdResp)) {
+            if (nullptr != calCmdRespRosOut_) {
+                if (!calCmdRespRosOut_->publish(calMgrCmdResp)) {
                     AIS_LOG_ERROR("Could not publish calibration response.");
                 }
             }
             else {
-                AIS_LOG_ERROR("LpsCalCmdScsRespOut is null.");
+                AIS_LOG_ERROR("calCmdRespRosOut_ is null.");
             }
 
             // Send the Cal OTF Data
-            if (nullptr != LpsNvmOnTheFlyDumpChanOut) {
-                LpsNvmOnTheFlyDumpChanOut->publish(calOtfData);
+            if (nullptr != LpsNvmCalOnTheFlyRosOut_) {
+                LpsNvmCalOnTheFlyRosOut_->publish(calOtfData);
             }
-        }
-        else {
-            // Do nothing
         }
     }
 }
@@ -1275,6 +1328,55 @@ static float extractValFromString(const std::string& str)
     return number;
 }
 
+class RosDataLinkParamAdapter {
+public:
+    explicit RosDataLinkParamAdapter(const weigh_app_interfaces::msg::DataLinkParam& param) :
+            param_(param) {}
+
+    bool IsPIDDataReceived() const { return param_.pid_data_received; }
+    uint32_t GetSid() const { return param_.sid; }
+    uint32_t GetParamId() const { return param_.param_id; }
+    uint16_t GetLastValueDsi() const { return param_.last_value_dsi; }
+    float GetLastValueEng() const { return static_cast<float>(param_.last_value_eng); }
+    float GetLastGoodValueEng() const { return static_cast<float>(param_.last_good_value_eng); }
+    float GetScaling() const { return param_.scaling; }
+    float GetOffset() const { return param_.offset; }
+    uint8_t GetUnits() const { return param_.units; }
+    const std::vector<uint8_t>& GetLastValueVector() const { return param_.last_value_vector; }
+    const uint8_t* GetVarParamBlock() const { return param_.var_param_block.data(); }
+    size_t GetVarParamBlockLength() const { return param_.var_param_block.size(); }
+    uint16_t GetVarLengthParamDsi() const { return param_.var_length_param_dsi; }
+
+    DataLinkParamInfo::DlpParamIdentifierType_t GetParamIdentifierType() const {
+        return static_cast<DataLinkParamInfo::DlpParamIdentifierType_t>(param_.identifier_type);
+    }
+
+    VarLengthDataLinkParamPool::VarLengthParamType GetVarLengthParamType() const {
+        return static_cast<VarLengthDataLinkParamPool::VarLengthParamType>(param_.var_length_param_type);
+    }
+
+    template <typename T>
+    T GetLastValue() const;
+
+private:
+    const weigh_app_interfaces::msg::DataLinkParam& param_;
+};
+
+template <>
+inline int16_t RosDataLinkParamAdapter::GetLastValue<int16_t>() const {
+    return param_.last_value_i16;
+}
+
+template <>
+inline uint16_t RosDataLinkParamAdapter::GetLastValue<uint16_t>() const {
+    return param_.last_value_u16;
+}
+
+template <>
+inline float RosDataLinkParamAdapter::GetLastValue<float>() const {
+    return param_.last_value_f32;
+}
+
 /******************************************************************************
 FUNCTION NAME:LpsJobMgrTxRead
 DESCRIPTION:
@@ -1284,7 +1386,7 @@ RETURN VALUE:
 void LpsSaWeighApp::LpsJobMgrTxRead( )
 {
     job_mgr_interfaces::msg::LpsSaJobMgrTxChannel jobMgrIn;
-    while (LpsSaJobMgrScsTxIn->get(jobMgrIn)) {
+    while (LpsSaJobMgrTxRosIn_->get(jobMgrIn)) {
         LpsSaWeighInfoTbl.passCount = jobMgrIn.pass_count;
         LpsSaWeighInfoTbl.TruckTargetWeight = jobMgrIn.truck_target_weight;
         LpsSaWeighInfoTbl.TruckStartWeight = jobMgrIn.truck_start_weight;
@@ -1326,29 +1428,7 @@ void LpsSaWeighApp::LpsJobMgrTxRead( )
         }
     }
 
-    // demoInputs_ stays on its real, old type (see LpsSaWeighApp.h) -- drain
-    // the wrapper into a new-typed local, then copy every field across.
-    weigh_app_interfaces::msg::DemoAppTxChannel demoInputsNew;
-    while (DemoAppTxIn->get(demoInputsNew)) {
-        demoInputs_.liftposition = demoInputsNew.liftposition;
-        demoInputs_.liftposition_rate = demoInputsNew.liftposition_rate;
-        demoInputs_.tiltposition = demoInputsNew.tiltposition;
-        demoInputs_.tiltposition_rate = demoInputsNew.tiltposition_rate;
-        demoInputs_.payload = demoInputsNew.payload;
-        demoInputs_.payload_rate = demoInputsNew.payload_rate;
-        demoInputs_.dig = demoInputsNew.dig;
-        demoInputs_.wrw = demoInputsNew.wrw;
-        demoInputs_.llw = demoInputsNew.llw;
-        demoInputs_.dump = demoInputsNew.dump;
-        demoInputs_.pdump = demoInputsNew.pdump;
-        demoInputs_.rack = demoInputsNew.rack;
-        demoInputs_.carry = demoInputsNew.carry;
-        demoInputs_.weight1 = demoInputsNew.weight1;
-        demoInputs_.pres_lift_he_demo = demoInputsNew.pres_lift_he_demo;
-        demoInputs_.pres_lift_re_demo = demoInputsNew.pres_lift_re_demo;
-        demoInputs_.angle_lift_demo = demoInputsNew.angle_lift_demo;
-        demoInputs_.angle_AFE_demo = demoInputsNew.angle_afe_demo;
-        demoInputs_.angle_ABC_demo = demoInputsNew.angle_abc_demo;
+    while (DemoAppTxRosIn_ && DemoAppTxRosIn_->get(demoInputs_)) {
     }
 }
 
@@ -1384,38 +1464,39 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
     weigh_app_interfaces::msg::DataLinkData dlData;
     while (DataLinkDataInput_->get(dlData)) {
-        for (auto& dlParam : dlData.params) {
+        for (const auto& dlParamRos : dlData.params) {
+            RosDataLinkParamAdapter dlParam(dlParamRos);
             // Skip this if no new data is received.
-            if (!dlParam.pid_data_received) {
+            if (!dlParam.IsPIDDataReceived()) {
                 continue;
             }
 
             AIS_LOG_INFO("sid %x paramId %x  dsi %x ParamValue raw %d eng %f scaling %f offset %f units %d",
-                    dlParam.sid,
-                    dlParam.param_id, dlParam.last_value_dsi,
-                    dlParam.last_value_f32, dlParam.last_value_eng,
-                    dlParam.scaling, dlParam.offset,
-                    dlParam.units);
+                    dlParam.GetSid(),
+                    dlParam.GetParamId(), dlParam.GetLastValueDsi(),
+                    dlParam.GetLastValue<float>(), dlParam.GetLastValueEng(),
+                    dlParam.GetScaling(), dlParam.GetOffset(),
+                    dlParam.GetUnits());
 
             // check Hyd-Oil--Temp DIAG only if we have selected a machine
             if (!LpsSaWeighInfoTbl.DiagState[ACDDiagPopUp::MACHINE_MODEL_NOT_SET]) {
-                switch (dlParam.identifier_type) {
+                switch (dlParam.GetParamIdentifierType()) {
                 // CDL PIDs
-                case (weigh_app_interfaces::msg::DataLinkParam::IDENTIFIER_TYPE_PID): {
-                    switch (dlParam.param_id) {
+                case (DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID): {
+                    switch (dlParam.GetParamId()) {
                     case BMI_CDL_PID_HYD_OIL_TEMP:
                     {
                         bool isBad;
 
-                        if (0 == dlParam.last_value_dsi) {
-                            WeighPidTbl.HydOilTemp = (float)dlParam.last_value_eng;
+                        if (0 == dlParam.GetLastValueDsi()) {
+                            WeighPidTbl.HydOilTemp = (float)dlParam.GetLastValueEng();
                             isBad = false;
-                            AIS_LOG_DEBUG("Hydraulic Oil Temp received: %f", (float)dlParam.last_value_eng);
+                            AIS_LOG_DEBUG("Hydraulic Oil Temp received: %f", (float)dlParam.GetLastValueEng());
                         }
                         else {
                             WeighPidTbl.HydOilTemp = (float)HYDRAULIC_OIL_TEMP_MIN_VALID_DATA;  // which is -32736.0
                             isBad = true;
-                            AIS_LOG_DEBUG("Hydraulic Oil Temp PID DSI reported: %d", dlParam.last_value_dsi);
+                            AIS_LOG_DEBUG("Hydraulic Oil Temp PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
 
                         // Set the diagnostic flag if supported.
@@ -1431,105 +1512,105 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     case BMI_CDL_PID_DESIRED_GEAR:
                     case BMI_CDL_PID_ACTUAL_GEAR:
                     {
-                        if (0 == dlParam.last_value_dsi) {
+                        if (0 == dlParam.GetLastValueDsi()) {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_OK;
-                            weighUpdtTbl.RequestedGear.Val = (uint16_t)dlParam.last_value_eng;
+                            weighUpdtTbl.RequestedGear.Val = (uint16_t)dlParam.GetLastValueEng();
 
-                            AIS_LOG_DEBUG("Actual/Desired Gear PID received: %d", (uint16_t)dlParam.last_value_eng);
+                            AIS_LOG_DEBUG("Actual/Desired Gear PID received: %d", (uint16_t)dlParam.GetLastValueEng());
                         }
                         else {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_BAD;
-                            weighUpdtTbl.RequestedGear.Val = (uint16_t)dlParam.last_good_value_eng;
+                            weighUpdtTbl.RequestedGear.Val = (uint16_t)dlParam.GetLastGoodValueEng();
 
-                            AIS_LOG_DEBUG("Actual/Desired Gear PID DSI reported: %d", dlParam.last_value_dsi);
+                            AIS_LOG_DEBUG("Actual/Desired Gear PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
                         break;
                     }
 
                     case BMI_CDL_PID_DIRECTION_SWITCH_POSITION:
                     {
-                        if (0 == dlParam.last_value_dsi) {
+                        if (0 == dlParam.GetLastValueDsi()) {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_OK;
 
-                            if ((uint16_t)dlParam.last_good_value_eng == 0) {
+                            if ((uint16_t)dlParam.GetLastGoodValueEng() == 0) {
                                 weighUpdtTbl.RequestedGear.Val = 0x1000; /* Reverse, PID 0xF5D7 */
                             }
-                            else if ((uint16_t)dlParam.last_good_value_eng == 1) {
+                            else if ((uint16_t)dlParam.GetLastGoodValueEng() == 1) {
                                 weighUpdtTbl.RequestedGear.Val = 0x4000; /* Forward, PID 0xF5D7 */
                             }
                             else {
                                 weighUpdtTbl.RequestedGear.Val = 0x0000; /* not forward, not reverse, PID 0xF5D7 */
                             }
 
-                            AIS_LOG_DEBUG("Direction Switch Position PID received: %d", (uint16_t)dlParam.last_good_value_eng);
+                            AIS_LOG_DEBUG("Direction Switch Position PID received: %d", (uint16_t)dlParam.GetLastGoodValueEng());
                         }
                         else {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_BAD;
 
-                            AIS_LOG_DEBUG("Direction Switch Position PID DSI reported: %d", dlParam.last_value_dsi);
+                            AIS_LOG_DEBUG("Direction Switch Position PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
                         break;
                     }
 
                     case BMI_CDL_PID_TRANSMISSION_GEAR:
                     {
-                        if (0 == dlParam.last_value_dsi) {
+                        if (0 == dlParam.GetLastValueDsi()) {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_OK;
 
-                            if ((uint8_t)dlParam.last_good_value_eng & 0x80) {
+                            if ((uint8_t)dlParam.GetLastGoodValueEng() & 0x80) {
                                 weighUpdtTbl.RequestedGear.Val = 0x4000; /* Forward, PID 0xF5D7 */
                             }
-                            else if ((uint8_t)dlParam.last_good_value_eng & 0x20) {
+                            else if ((uint8_t)dlParam.GetLastGoodValueEng() & 0x20) {
                                 weighUpdtTbl.RequestedGear.Val = 0x1000; /* Reverse, PID 0xF5D7 */
                             }
                             else {
                                 weighUpdtTbl.RequestedGear.Val = 0x0000; /* not forward, not reverse, PID 0xF5D7 */
                             }
 
-                            AIS_LOG_DEBUG("Transmission Gear PID received: %d", (uint8_t)dlParam.last_good_value_eng);
+                            AIS_LOG_DEBUG("Transmission Gear PID received: %d", (uint8_t)dlParam.GetLastGoodValueEng());
                         }
                         else {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_BAD;
 
-                            AIS_LOG_DEBUG("Transmission Gear PID DSI reported: %d", dlParam.last_value_dsi);
+                            AIS_LOG_DEBUG("Transmission Gear PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
                         break;
                     }
                     case BMI_CDL_PID_TIP_ASSIST_ENABLE:
                     {
-                        if (0 == dlParam.last_value_dsi) {
-                            if (0x000C == (uint16_t)dlParam.last_good_value_eng)
+                        if (0 == dlParam.GetLastValueDsi()) {
+                            if (0x000C == (uint16_t)dlParam.GetLastGoodValueEng())
                                 LpsSaWeighInfoTbl.TipOffAssistEnable = true;   /* enabled */
                             else
                                 LpsSaWeighInfoTbl.TipOffAssistEnable = false;   /* disabled */
 
-                            AIS_LOG_DEBUG("Tip-off Assist Enable val: %d", (uint8_t)dlParam.last_good_value_eng );
+                            AIS_LOG_DEBUG("Tip-off Assist Enable val: %d", (uint8_t)dlParam.GetLastGoodValueEng() );
                         }
                         else {
                             LpsSaWeighInfoTbl.TipOffAssistEnable = 0;   /* disabled */
-                            AIS_LOG_DEBUG("Tip-off Assist Enable PID DSI reported: %d", dlParam.last_value_dsi );
+                            AIS_LOG_DEBUG("Tip-off Assist Enable PID DSI reported: %d", dlParam.GetLastValueDsi() );
                         }
                         break;
                     }
                     case BMI_CDL_PID_LOAD_HOLD_CHECK_VALVE:
                     {
-                        if (0 == dlParam.last_value_dsi) {
-                            if (0x0010 == dlParam.last_value_i16)
+                        if (0 == dlParam.GetLastValueDsi()) {
+                            if (0x0010 == dlParam.GetLastValue<int16_t>())
                                 setLoadCheckValveInstallStatus(true);   /* HBCV is installed */
                             else
                                 setLoadCheckValveInstallStatus(false); /* HBCV is not installed */
 
-                            AIS_LOG_DEBUG("Load hold valve check valve installation val: %d", dlParam.last_value_i16 );
+                            AIS_LOG_DEBUG("Load hold valve check valve installation val: %d", dlParam.GetLastValue<int16_t>() );
                         }
                         else {
-                            AIS_LOG_DEBUG("Load hold valve check valve installation PID DSI reported: %d", dlParam.last_value_dsi );
+                            AIS_LOG_DEBUG("Load hold valve check valve installation PID DSI reported: %d", dlParam.GetLastValueDsi() );
                         }
                         break;
                     }
                     case BMI_CDL_PID_GROUND_SPEED:
                     {
-                        int16_t value = dlParam.last_value_i16;
-                        uint16_t dsi = dlParam.last_value_dsi;
+                        int16_t value = dlParam.GetLastValue<int16_t>();
+                        uint16_t dsi = dlParam.GetLastValueDsi();
 
                         if (0 == dsi) {
                             // Store ground speed in mm/sec/bit (0.0036 km/hr/bit)
@@ -1546,8 +1627,8 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     }
                     case BMI_CDL_PID_GROUND_SPEED_PID18:
                     {
-                        float value = dlParam.last_good_value_eng;
-                        uint8_t dsi = dlParam.last_value_dsi;
+                        float value = dlParam.GetLastGoodValueEng();
+                        uint8_t dsi = dlParam.GetLastValueDsi();
 
                         if (0 == dsi) {
                             // Store ground speed in mm/sec/bit (1mph/bit = 447.04mms/bit)
@@ -1564,8 +1645,8 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     }
                     case BMI_CDL_PID_MACHINE_IDLE_STATUS: // Machine Idle Status
                     {
-                        uint16_t value = dlParam.last_value_u16;
-                        uint16_t dsi = dlParam.last_value_dsi;
+                        uint16_t value = dlParam.GetLastValue<uint16_t>();
+                        uint16_t dsi = dlParam.GetLastValueDsi();
                         chassisImu_.rxPIDD10AB5(value, dsi);
                         break;
                     }
@@ -1575,8 +1656,8 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         // Only used for AU2020 and Not legal for Trade
                         if (!payloadCalNvmTbl_.legalForTradeInstalled &&
                                 ADVANCED == getApplicationVariant()) {
-                            float lift_full_lower_dc = dlParam.last_good_value_eng;
-                            uint16_t dsi = dlParam.last_value_dsi;
+                            float lift_full_lower_dc = dlParam.GetLastGoodValueEng();
+                            uint16_t dsi = dlParam.GetLastValueDsi();
 
                             if (!dsi) {
                                 /* set cal value if its different */
@@ -1605,8 +1686,8 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         // Only used for AU2020 and Not legal for Trade
                         if (!payloadCalNvmTbl_.legalForTradeInstalled &&
                                 ADVANCED == getApplicationVariant()) {
-                            float lift_full_raise_dc = dlParam.last_good_value_eng;
-                            uint16_t dsi = dlParam.last_value_dsi;
+                            float lift_full_raise_dc = dlParam.GetLastGoodValueEng();
+                            uint16_t dsi = dlParam.GetLastValueDsi();
 
                             if (!dsi) {
                                 /* set cal value if its different */
@@ -1635,8 +1716,8 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         // Only used for AU2020 and Not legal for Trade
                         if (!payloadCalNvmTbl_.legalForTradeInstalled &&
                                 ADVANCED == getApplicationVariant()) {
-                            float tilt_full_rack_dc = dlParam.last_good_value_eng;
-                            uint16_t dsi = dlParam.last_value_dsi;
+                            float tilt_full_rack_dc = dlParam.GetLastGoodValueEng();
+                            uint16_t dsi = dlParam.GetLastValueDsi();
 
                             if (!dsi) {
                                 /* set cal value if its different */
@@ -1665,8 +1746,8 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         // Only used for AU2020 and Not legal for Trade
                         if (!payloadCalNvmTbl_.legalForTradeInstalled &&
                                 ADVANCED == getApplicationVariant()) {
-                            float tilt_full_dump_dc = dlParam.last_good_value_eng;
-                            uint16_t dsi = dlParam.last_value_dsi;
+                            float tilt_full_dump_dc = dlParam.GetLastGoodValueEng();
+                            uint16_t dsi = dlParam.GetLastValueDsi();
 
                             if (!dsi) {
                                 /* set cal value if its different */
@@ -1692,11 +1773,11 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     case BMI_CDL_PID_LEGAL_FOR_TRADE_SW_ID:
                     {
-                        if ((0x2E == dlParam.sid) &&
-                                (0 == dlParam.last_value_dsi) &&
-                                (dlParam.last_value_vector.size() < 27) &&
+                        if ((0x2E == dlParam.GetSid()) &&
+                                (0 == dlParam.GetLastValueDsi()) &&
+                                (dlParam.GetLastValueVector().size() < 27) &&
                                 (ADVANCED == getApplicationVariant())) {
-                            const auto& lftSwId = dlParam.last_value_vector;
+                            const auto& lftSwId = dlParam.GetLastValueVector();
                             std::string LegalForTradeSwIdentifier(lftSwId.begin(), lftSwId.end());
 
                             auto pos = LegalForTradeSwIdentifier.rfind(".");
@@ -1718,10 +1799,10 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     }
                     break;
-                }/* case (weigh_app_interfaces::msg::DataLinkParam::IDENTIFIER_TYPE_PID) */
+                }/* case (DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID) */
 
-                case (weigh_app_interfaces::msg::DataLinkParam::IDENTIFIER_TYPE_CAT_EXT): {
-                    switch (dlParam.param_id) {
+                case (DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_CAT_EXT): {
+                    switch (dlParam.GetParamId()) {
                     case BMI_CAT_EXT_FLASH_INFORMATION_MESSAGE: {
                         // Data Recieved
                         // Dta: F0 03
@@ -1731,10 +1812,10 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         // 81 08 45 54 4E 33 36 39 34 38
                         // 90 2 0 2 2 1 0
                         // 84 0
-                        uint8_t len = dlParam.var_param_block.size();
+                        uint8_t len = dlParam.GetVarParamBlockLength();
 
-                        if ((0x2E == dlParam.sid) &&
-                                (0 == dlParam.last_value_dsi) &&
+                        if ((0x2E == dlParam.GetSid()) &&
+                                (0 == dlParam.GetLastValueDsi()) &&
                                 (len > 2) &&
                                 (ADVANCED == getApplicationVariant())) {
                             std::string lastServiceToolSerialNumber;
@@ -1742,7 +1823,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                             std::string ecmSerialNumber;
 
                             // Locate the block of the data
-                            const uint8_t* data = dlParam.var_param_block.data();
+                            const uint8_t* data = dlParam.GetVarParamBlock();
 
                             // Scan for Last Service Tool SN, SW Part Number and ECM Serial Number
                             // Skip the F003 Record
@@ -1834,16 +1915,16 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     }
                     break;
-                }/* case (weigh_app_interfaces::msg::DataLinkParam::IDENTIFIER_TYPE_CAT_EXT) */
+                }/* case (DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_CAT_EXT) */
 
-                case (weigh_app_interfaces::msg::DataLinkParam::IDENTIFIER_TYPE_PUBLIC_PGN): {
-                    switch (dlParam.param_id) {
+                case (DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PUBLIC_PGN): {
+                    switch (dlParam.GetParamId()) {
                     // Angular Rate Information (ARI)
                     case (61482): {
-                        if (weigh_app_interfaces::msg::DataLinkParam::VAR_LENGTH_PARAM_TYPE_PGN == dlParam.var_length_param_type) {
-                            uint16_t dsi = dlParam.last_value_dsi;
-                            uint8_t len = dlParam.var_param_block.size();
-                            const uint8_t* data = dlParam.var_param_block.data();
+                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                            uint16_t dsi = dlParam.GetLastValueDsi();
+                            uint8_t len = dlParam.GetVarParamBlockLength();
+                            const uint8_t* data = dlParam.GetVarParamBlock();
 
                             // Let the chassis imu know about this.
                             chassisImu_.rxPGN61482(data, len, dsi);
@@ -1853,13 +1934,13 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     // IMU - ECU Identification Information
                     case (64965): {
-                        if (weigh_app_interfaces::msg::DataLinkParam::VAR_LENGTH_PARAM_TYPE_PGN == dlParam.var_length_param_type) {
-                            uint16_t dsi = dlParam.last_value_dsi;
-                            uint8_t len = dlParam.var_param_block.size();
+                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                            uint16_t dsi = dlParam.GetLastValueDsi();
+                            uint8_t len = dlParam.GetVarParamBlockLength();
 
                             // Parse the messages
-                            if (len && (0 == dsi) && 0x82==dlParam.sid) {
-                                const uint8_t* data = dlParam.var_param_block.data();
+                            if (len && (0 == dsi) && 0x82==dlParam.GetSid()) {
+                                const uint8_t* data = dlParam.GetVarParamBlock();
                                 uint8_t dataIdx = 0;
                                 std::string imu_id_info[6];
                                 uint8_t temp;
@@ -1902,13 +1983,13 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     // IMU - Software Identification
                     case (65242): {
-                        if (weigh_app_interfaces::msg::DataLinkParam::VAR_LENGTH_PARAM_TYPE_PGN == dlParam.var_length_param_type) {
-                            uint16_t dsi = dlParam.last_value_dsi;
-                            uint8_t len = dlParam.var_param_block.size();
+                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                            uint16_t dsi = dlParam.GetLastValueDsi();
+                            uint8_t len = dlParam.GetVarParamBlockLength();
 
                             // Parse the messages
-                            if (len && (0 == dsi) && 0x82==dlParam.sid) {
-                                const uint8_t* data = dlParam.var_param_block.data();
+                            if (len && (0 == dsi) && 0x82==dlParam.GetSid()) {
+                                const uint8_t* data = dlParam.GetVarParamBlock();
 
                                 // ignore first byte (number of fields)
                                 std::string imu_sw_id_string = std::string((const char*)(data+1), len-1);
@@ -1927,13 +2008,13 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     // Acceleration Sensor (ACCS)
                     case (61485): {
-                        if (weigh_app_interfaces::msg::DataLinkParam::VAR_LENGTH_PARAM_TYPE_PGN == dlParam.var_length_param_type) {
-                            uint16_t dsi = dlParam.last_value_dsi;
-                            uint8_t len = dlParam.var_param_block.size();
+                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                            uint16_t dsi = dlParam.GetLastValueDsi();
+                            uint8_t len = dlParam.GetVarParamBlockLength();
 
                             // Parse the messages for Tip-Off Assist
                             if ((0 == dsi) && (len >= 7)) {
-                                const uint8_t* data = dlParam.var_param_block.data();
+                                const uint8_t* data = dlParam.GetVarParamBlock();
                                 uint16_t temp;
                                 OEL_UNPACK_LE_16(data, temp);
                                 LpsSaWeighInfoTbl.TipoffInputs.eef_imu_accelY = (float)temp*0.01-320;
@@ -1959,7 +2040,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                             }
 
                             // Let the chassis imu know about this.
-                            chassisImu_.rxPGN61485(dlParam.var_param_block.data(), len, dsi);
+                            chassisImu_.rxPGN61485(dlParam.GetVarParamBlock(), len, dsi);
                         }
                         else {
                             LpsSaWeighInfoTbl.TipoffInputs.input_status.flag.imu_accel_bad = 1;
@@ -1971,10 +2052,10 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     }
                     // PGN 61451  ELECTRONIC STEERING CONTROL (ESC1)
                     case (61451): {
-                        if ((weigh_app_interfaces::msg::DataLinkParam::VAR_LENGTH_PARAM_TYPE_PGN == dlParam.var_length_param_type) &&
-                                (0 == dlParam.var_length_param_dsi) &&
-                                dlParam.var_param_block.size() >= 8) {
-                            const uint8_t* data = dlParam.var_param_block.data();
+                        if ((VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) &&
+                                (0 == dlParam.GetVarLengthParamDsi()) &&
+                                dlParam.GetVarParamBlockLength() >= 8) {
+                            const uint8_t* data = dlParam.GetVarParamBlock();
                             uint16_t temp;
                             OEL_UNPACK_LE_16(data, temp);
                             LpsSaWeighInfoTbl.TipoffInputs.steering_angle = (float)temp/256.0-125;
@@ -1994,10 +2075,10 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     }
                     // EEC1
                     case (61444): {
-                        if ((weigh_app_interfaces::msg::DataLinkParam::VAR_LENGTH_PARAM_TYPE_PGN == dlParam.var_length_param_type) &&
-                                (0 == dlParam.var_length_param_dsi) &&
-                                dlParam.var_param_block.size() >= 5) {
-                            const uint8_t* data = dlParam.var_param_block.data();
+                        if ((VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) &&
+                                (0 == dlParam.GetVarLengthParamDsi()) &&
+                                dlParam.GetVarParamBlockLength() >= 5) {
+                            const uint8_t* data = dlParam.GetVarParamBlock();
                             uint16_t temp;
                             data += 3; // Advance to byte 4
                             OEL_UNPACK_LE_16_NO_INCR(data, temp);
@@ -2022,14 +2103,14 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     default: {
                         break;
                     }
-                    } /* switch (dlParam.param_id)*/
+                    } /* switch (dlParam.GetParamId())*/
                     break;
-                } /* case (weigh_app_interfaces::msg::DataLinkParam::IDENTIFIER_TYPE_PUBLIC_PGN)*/
+                } /* case (DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PUBLIC_PGN)*/
 
                 default: {
                     break;
                 }
-                } /* switch (dlParam.identifier_type */
+                } /* switch (dlParam.GetParamIdentifierType() */
             } /* if (DIAG_INACTIVE == LpsSaWeighInfoTbl.DiagState.flag.MachineModelNotSet */
         } /* for each DataLinkParam */
     } /* while (DataLinkDataInput_->get(dlData))*/
@@ -2057,6 +2138,7 @@ RETURN VALUE:
 void  LpsSaWeighApp::cleanup( )
 {
     AIS_LOG_INFO("LpsSaWeighApp::cleanup");
+    cleanupRosInterfaces();
     if (rclcpp::ok()) {
         rclcpp::shutdown();
     }

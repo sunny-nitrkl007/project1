@@ -7,34 +7,15 @@
 #include <limits>
 #include <string>
 
-#include <rclcpp/rclcpp.hpp>
-#include <ros2_wrapper/RosInputInterface.h>
-#include <ros2_wrapper/RosOutputInterface.h>
+#include "rclcpp/rclcpp.hpp"
+#include "ros2wrapper/RosInputInterface.h"
+#include "ros2wrapper/RosOutputInterface.h"
 
 #include <cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp>
 #include <cpm_common_interfaces/msg/lps_sa_weigh_resp_channel.hpp>
 #include <cpm_common_interfaces/msg/lps_sa_weigh_tx_channel.hpp>
 #include <cpm_common_interfaces/msg/weigh_reqst_channel_command.hpp>
 
-// New, separate class -- deliberately NOT a change to LpsSaWeighAppInf.hpp
-// itself, which stays byte-for-byte identical to the original. That file is
-// shared common/interfaces code; at least one other real component
-// (AisJhm2RequestProcessor, part of the legacy UI infrastructure, still
-// SCS-only) holds its own LpsSaWeighAppInf instance and calls methods
-// (sendRequestGetResponse(), waitForResponse(), etc.) that LpsSaJobMgrApp
-// itself never uses. Editing the shared header in place -- even just
-// retyping requestOutput_/responseInput_/txInput_ -- would break that
-// unrelated caller as soon as this changed tree is copied back over the
-// original repo. So: leave the original alone, and give LpsSaJobMgrApp its
-// own class with only the 3 methods it actually calls (confirmed via
-// LpsSaJobMgrScs.cpp: start(), sendRequest(), waitForTxData() -- nothing
-// else). Same design/threading reasoning as LpsSaWeighAppInf.hpp would have
-// needed if it were being converted for real: RosInputInterface<T> has no
-// callback/notification mechanism (poll-only via get()), so there is no
-// background thread left to wake a blocking waiter -- waitForTxData() is a
-// single-shot poll of whatever executor_.spin_some() already delivered this
-// tick, not a real wait. See LpsSaJobMgrApp.cpp's executive() for where
-// spin_some() runs (always before this class's methods, same thread).
 class DDSWeighAppInf {
 public:
     static constexpr std::chrono::milliseconds timeoutDurationDefault() { return std::chrono::milliseconds(250); }
@@ -78,11 +59,13 @@ public:
         return (nullptr != requestOutput_) && (nullptr != responseInput_) && (nullptr != txInput_);
     }
 
-    /*
-     * Stop the interface service. No connections to tear down under the
-     * poll-based wrapper (nothing was subscribed to in the first place).
-     */
     bool stop() {
+        delete requestOutput_;
+        requestOutput_ = nullptr;
+        delete responseInput_;
+        responseInput_ = nullptr;
+        delete txInput_;
+        txInput_ = nullptr;
         return true;
     }
 
@@ -109,14 +92,13 @@ public:
 
     /*
      * Poll for tx data that reflects the changes made by the last request.
-     * Drains both responseInput_ (to tighten the freshness gate once our
-     * request's response arrives) and txInput_, then reports whether the
+     * Drains both responseInput_ and txInput_, then reports whether the
      * most recent tx data is new enough to reflect that response. Returns
      * false, same as a real timeout, if nothing new enough has arrived by
-     * this tick -- there is no actual multi-tick wait to perform it.
+     * this tick --
      */
     bool waitForTxData(cpm_common_interfaces::msg::LpsSaWeighTxChannel& txData, const std::chrono::milliseconds& timeoutDuration = timeoutDurationDefault()) {
-        (void)timeoutDuration; // retained for call-site compatibility; no real blocking wait is possible, see class comment
+        (void)timeoutDuration;
 
         drainResponseInput();
         drainTxInput();

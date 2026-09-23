@@ -1,0 +1,25 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Need to compile against the c99 standard
+myEnv.Append(CFLAGS = [
+    '-std=gnu99',
+    '-Wno-unused-variable',
+    '-Wno-unused-parameter',
+    '-Wno-unused-function'
+])
+
+myEnv.Append( CPPPATH = [ '#/libs/apriltag' ] )
+sourceFiles = [
+    #'main.cpp'
+    'apriltag_demo.c'
+]
+
+AprilTagReader = myEnv.Program(
+        target = 'AprilTagReader',
+        source = sourceFiles,
+        LIBS = [ 'apriltag', 'm' ]
+    )
+
+myEnv.InstallBinary(AprilTagReader)
+myEnv.Alias("AprilTagReader", "#bin/AprilTagReader")

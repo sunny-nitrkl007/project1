@@ -1,0 +1,1 @@
+This scenario is selected if the MSN/robot is not recognized in the ApplicationTable.rb

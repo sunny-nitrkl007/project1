@@ -1,0 +1,19 @@
+#####
+# RpaClientTask will attempt to delete the included files/directories
+# Lines that start with '#' are ignored (can be commented out)
+# ~/ can be used in place of $(HOME)
+# '*' wildcards are permitted for file names
+#####
+
+# Delete all hlogs and snapshots (do not delete the entire directory in case the deleted files are logged to this path)
+~/appdata/CPM/log/*.hlog
+~/appdata/CPM/log/snapshots
+~/log/productionLogs/*.hlog
+~/log/productionLogs/snapshots
+
+# Delete the log files, backup log files, nvm, and/or staged content as desired
+#/opt/tmp/outputFiles/*.out
+#/opt/tmp/outputFiles/backup
+#/opt/tmp/outputFiles/config
+#/opt/tmp/outputFiles/nvm
+#/opt/tmp/outputFiles/stage

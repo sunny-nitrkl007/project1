@@ -1,0 +1,12 @@
+#To build for 32-bit A6N2 target (with changes to Makefile):
+make project_a6n2_32bit 
+or
+make release_a6n2_32bit 
+
+#To run app on A6N2, need to patchelf the executable to point to 32-bit loader before download to box:
+patchelf  --set-interpreter /opt/software/lib/ld-linux.so.2 bin/aisXcpServerTask
+
+#To build static xcp library, add the following to the sandbox/SConscript file
+testEnv.buildit( 'xcp-server/xcp_server', ['suse'] )
+
+

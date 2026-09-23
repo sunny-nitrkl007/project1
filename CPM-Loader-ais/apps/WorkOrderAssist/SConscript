@@ -1,0 +1,30 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+myEnv.Append(CCFLAGS = ['-Werror'])
+
+# Need to use Boost regex because std::regex is seriously sick for gcc 4.8
+# https://www.gnu.org/software/gcc/gcc-4.9/changes.html
+myEnv.Append(CXXFLAGS = '-DUSE_BOOST_REGEX')
+
+myEnv.Append( LIBPATH = [ '#/apps/lib' ] )
+myEnv.Append( CPPPATH = [ '#/apps/include' ] )
+sourceFiles = [
+    'SettingsStorage.cpp',
+    'WorkOrderAssistApp.cpp'
+]
+
+WorkOrderAssist = myEnv.Program(
+        target = 'WorkOrderAssist',
+        source = sourceFiles,
+        LIBS = [ 'ais_task',
+                 'ais_config',
+                 'ais_log',
+                 'crypto',
+                 myEnv['BOOST_REGEX']
+		]
+    )
+
+myEnv.InstallBinary(WorkOrderAssist)
+myEnv.Alias("WorkOrderAssist", "#bin/WorkOrderAssist")

@@ -1,0 +1,27 @@
+{
+    "ParamMsg": {
+        "ParameterList": [
+            {
+                "Param": {
+                    "TruckInfo": [
+                        {
+                            "Param": {
+                                "id": "2"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "name": "Truck Two"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "targetWeight": "10.000"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "LifetimeTotals": {
+        "weight": {
+            "value": "140.00"
+        },
+        "loadCount": {
+            "value": "7"
+        },
+        "passCount": {
+            "value": "21"
+        }
+    },
+    "TripATotals": {
+        "weight": {
+            "value": "120.00"
+        },
+        "loadCount": {
+            "value": "6"
+        },
+        "passCount": {
+            "value": "18"
+        }
+    },
+    "TripBTotals": {
+        "weight": {
+            "value": "140.00"
+        },
+        "loadCount": {
+            "value": "7"
+        },
+        "passCount": {
+            "value": "21"
+        }
+    }
+}

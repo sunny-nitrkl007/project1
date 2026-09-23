@@ -1,0 +1,492 @@
+{
+
+"CDL_PID":
+{
+    "Tilt Angle, absolute": {
+        "CDL PID"              : "0xF47A",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.01",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "596"
+    },
+
+    "Hydraulic Oil Temp": {
+        "CDL PID"              : "0x45",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "3",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "596"
+    },
+
+    "Store Switch": {
+        "CDL PID"              : "0xF1AA",
+        "Data Size(bytes)"     : "1",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Tilt Lever Position": {
+        "CDL PID"              : "0xF49C",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "596"
+    },
+
+    "Tip-Off Assist Mode Status": {
+        "CDL PID"              : "0xD118CE",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Implement Linkage Configuration": {
+        "CDL PID"              : "0xD10049",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Implement Tool Configuration": {
+        "CDL PID"              : "0xD10321",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Tip-Off Assist Enable": {
+        "CDL PID"              : "0xD118CA",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "<SEA> Production Measurement Level 2 Feature Installation Status": {
+        "CDL PID"              : "0xD11884",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Production Measurement Feature Enable Status": {
+        "CDL PID"              : "0xD10EE7",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Implement Operation Status": {
+        "CDL PID"              : "0xD106D9",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Product ID": {
+        "CDL PID"              : "0xF82D",
+        "Data Size(bytes)"     : "9",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "10000",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "5000",
+        "Attributes"           : "",
+        "RequestType"          : "3",
+        "VarLengthDataType"    : "4",
+        "ParameterType"        : "12",
+        "Cid"                  : "596"
+    },
+
+    "Payload Add Switch Position (manual add)": {
+        "CDL PID"              : "0XD11890",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Lift Cylinder Load Hold Check Valve Installation Status": {
+        "CDL PID"              : "0xD10F6E",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Lift Linkage Position Sensor Full Lower Duty Cycle": {
+        "CDL PID"              : "0xD010FB",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.01",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Lift Linkage Position Sensor Full Raise Duty Cycle": {
+        "CDL PID"              : "0xD010FA",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.01",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Tilt Linkage Position Sensor Full Dump Duty Cycle": {
+        "CDL PID"              : "0xD010FD",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.01",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Tilt Linkage Position Sensor Full Rackback Duty Cycle": {
+        "CDL PID"              : "0xD010FC",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.01",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Payload Legal For Trade Measurement Software Identifier": {
+        "CDL PID"              : "0xF9C0",
+        "Data Size(bytes)"     : "27",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "9000",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "5000",
+        "Attributes"           : "",
+        "RequestType"          : "3",
+        "VarLengthDataType"    : "8",
+        "ParameterType"        : "12",
+        "Cid"                  : "596"
+    },
+
+    "Switch Panel Button #1 Control Mode": {
+        "CDL PID"              : "0xD11ECE",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Switch Panel Button #2 Control Mode": {
+        "CDL PID"              : "0xD11ECF",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Switch Panel Button #3 Control Mode": {
+        "CDL PID"              : "0xD11ED0",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Switch Panel Button #1 Status": {
+        "CDL PID"              : "0xD11ECB",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Switch Panel Button #2 Status": {
+        "CDL PID"              : "0xD11ECC",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Switch Panel Button #3 Status": {
+        "CDL PID"              : "0xD11ECD",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x2E",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "596"
+    },
+
+    "Tire Module Info": {
+        "CDL PID"              : "0x0800",
+        "Data Size(bytes)"     : "7",
+        "Source J1939 Address" : "0x33",
+        "Request Rate(ms)"     : "10000",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "50000",
+        "Attributes"           : "",
+        "RequestType"          : "4",
+        "VarLengthDataType"    : "5",
+        "ParameterType"        : "12",
+        "Cid"                  : "3473"
+    }
+
+},
+
+"PGN":
+{
+    "PROPRIETARY A (PROPA)": {
+        "PGN"               : "61184",
+        "Source Address"    : "255",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "1",
+        "Cid"               : "200",
+        "SPN List"          : "2550"
+    },
+
+    "IMU Rate": {
+        "PGN"               : "61482",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "2000",
+        "Priority"          : "6",
+        "Control Bitfield"  : "3",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "4983,4984,4985,4986,4987,4988,4989"
+    },
+
+    "IMU Accel": {
+        "PGN"               : "61485",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "2000",
+        "Priority"          : "6",
+        "Control Bitfield"  : "3",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "5347,5348,5349,5350,5351,5352,5353"
+    },
+
+    "IMU Identification": {
+        "PGN"               : "64965",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "2901,2902,2903,2904,4304,6714"
+    },
+
+    "IMU Software Identification": {
+        "PGN"               : "65242",
+        "Source Address"    : "0x82",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "0",
+        "Cid"               : "1893",
+        "SPN List"          : "965,234"
+    },
+
+    "TPRI": {
+        "PGN"               : "64953",
+        "Source Address"    : "0x33",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "0",
+        "Cid"               : "3473",
+        "SPN List"          : "3190,3191"
+    }
+    
+}
+}

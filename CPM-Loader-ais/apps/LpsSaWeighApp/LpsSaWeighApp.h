@@ -16,24 +16,53 @@ DESCRIPTION:
 
 #include <ais/task/Task.h>
 
-#include <interfaces/LpsSaUI/DisplayStateInterfaceInputChannel.h>
+// ---- ROS2/DDS wrapper layer 
+#include "rclcpp/rclcpp.hpp"
+#include "RosInputInterface.h"
+#include "RosOutputInterface.h"
+
+#include "cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp"
+#include <cpm_common_interfaces/msg/lps_sa_job_mgr_reqst_channel.hpp>
+#include <cpm_common_interfaces/msg/lps_sa_weigh_resp_channel.hpp>
+#include <cpm_common_interfaces/msg/lps_sa_weigh_tx_channel.hpp>
+#include <cpm_common_interfaces/msg/ais_jhm2_tx_channel.hpp>
+#include <cpm_common_interfaces/msg/autonomy_condition_diagnostics_tx_channel.hpp>
+#include <cpm_common_interfaces/msg/lps_sa_ui_display_state_interface.hpp>
+#include <cpm_common_interfaces/msg/shm_clock_input.hpp>
+#include <job_mgr_interfaces/msg/lps_sa_job_mgr_tx_channel.hpp>
+#include <weigh_app_interfaces/msg/lps_sa_weigh_init_debug_channel.hpp>
+#include <weigh_app_interfaces/msg/ready_to_flash_status.hpp>
+#include <weigh_app_interfaces/msg/part_numbers.hpp>
+#include <weigh_app_interfaces/msg/demo_app_tx_channel.hpp>
+#include <weigh_app_interfaces/msg/system_hardware_health_request.hpp>
+#include <weigh_app_interfaces/msg/system_hardware_health_storage.hpp>
+#include <weigh_app_interfaces/msg/lps_sa_weigh_debug_channel.hpp>
+#include <weigh_app_interfaces/msg/lps_sa_nvm_cal_data_channel.hpp>
+#include <weigh_app_interfaces/msg/lps_sa_nvm_cal_on_the_fly_data_channel.hpp>
+#include <weigh_app_interfaces/msg/cal_mgr_cmd_reqst.hpp>
+#include <weigh_app_interfaces/msg/cal_mgr_cmd_resp.hpp>
+#include <weigh_app_interfaces/msg/data_link_data.hpp>
+#include <weigh_app_interfaces/msg/lps_sa_totals_printer_cnfg.hpp>
+
 #include <interfaces/LpsSaWeighReqstChannel/InterfaceTypes.h>
 #include <interfaces/DemoAppTxChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaWeighRespChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaWeighTxChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaWeighInitDebugChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaWeighDebugChannel/InterfaceTypes.h>
+
 #include <interfaces/LpsSaJobMgrTxChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaJobMgrReqstChannel/InterfaceTypes.h>
 #include <interfaces/AisJhm2TxChannel/InterfaceTypes.h>
 #include <interfaces/PwmInputChannels/InterfaceTypes.h>
 #include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
 #include <interfaces/ShmClock/InterfaceTypes.h>
-#include <interfaces/LpsSaTotals/PrinterCnfgInterfaceInputChannel.h>
+
 
 #include <interfaces/Machine/InterfaceTypes.h>
 #include <interfaces/LpsSaNvmCalDataChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaNvmCalOnTheFlyDataChannel/InterfaceTypes.h>
+
 
 #include <interfaces/CalMgrCmdReqst/InterfaceTypes.h>
 #include <interfaces/CalMgrCmdResp/InterfaceTypes.h>
@@ -41,6 +70,7 @@ DESCRIPTION:
 #include <autonomyConditions/conditions/PayLdOverLdLimitExceeded.h>
 
 #ifndef _Tpms2DataLinkChannel_h_
+
 #include <interfaces/DataLinkData/InterfaceTypes.h>
 #endif
 
@@ -52,6 +82,9 @@ DESCRIPTION:
 #include <ais/interfaces/SystemHardwareHealthRequest/InterfaceTypes.h>
 
 #include <interfaces/ReadyToFlashStatus/InterfaceTypes.h>
+
+#include <interfaces/AisJhm2TxChannel/InterfaceTypes.h>
+#include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
 
 #include <mlComms/scsIo/ScsOutputs.h>
 #include <scsIOContainer/SCSOutData.h>
@@ -66,36 +99,6 @@ DESCRIPTION:
 
  #include <stdlib.h>
 
-#include <rclcpp/rclcpp.hpp>
-#include <ros2_wrapper/RosInputInterface.h>
-#include <ros2_wrapper/RosOutputInterface.h>
-
-#include <cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp>
-#include <cpm_common_interfaces/msg/lps_sa_weigh_resp_channel.hpp>
-#include <cpm_common_interfaces/msg/lps_sa_weigh_tx_channel.hpp>
-#include <cpm_common_interfaces/msg/lps_sa_job_mgr_reqst_channel.hpp>
-
-#include <job_mgr_interfaces/msg/lps_sa_job_mgr_tx_channel.hpp>
-#include <cpm_common_interfaces/msg/ais_jhm2_tx_channel.hpp>
-#include <cpm_common_interfaces/msg/autonomy_condition_diagnostics_tx_channel.hpp>
-#include <cpm_common_interfaces/msg/shm_clock_input.hpp>
-#include <cpm_common_interfaces/msg/lps_sa_ui_display_state_interface.hpp>
-
-#include <weigh_app_interfaces/msg/ready_to_flash_status.hpp>
-#include <weigh_app_interfaces/msg/pwm_input_channels.hpp>
-#include <weigh_app_interfaces/msg/demo_app_tx_channel.hpp>
-#include <weigh_app_interfaces/msg/lps_sa_weigh_init_debug_channel.hpp>
-#include <weigh_app_interfaces/msg/lps_sa_weigh_debug_channel.hpp>
-#include <weigh_app_interfaces/msg/cal_mgr_cmd_reqst.hpp>
-#include <weigh_app_interfaces/msg/cal_mgr_cmd_resp.hpp>
-#include <weigh_app_interfaces/msg/lps_sa_nvm_cal_data_channel.hpp>
-#include <weigh_app_interfaces/msg/lps_sa_nvm_cal_on_the_fly_data_channel.hpp>
-#include <weigh_app_interfaces/msg/data_link_data.hpp>
-#include <weigh_app_interfaces/msg/part_numbers.hpp>
-#include <weigh_app_interfaces/msg/system_hardware_health.hpp>
-#include <weigh_app_interfaces/msg/system_hardware_health_request.hpp>
-#include <weigh_app_interfaces/msg/lps_sa_totals_printer_cnfg_interface.hpp>
-#include <weigh_app_interfaces/msg/machine.hpp>
 
 #ifndef __LPS_COMMON_TYPE_DEF_H__
 #include <LpsCommonTypeDef.h>
@@ -400,48 +403,43 @@ private:
         int32_t index;
     } tzInfo_;
 
-    // demoInputs_ and inPwm_ stay on their real, old types (not wrappers):
-    // both are read directly, via plain field access, by unchanged
-    // business-logic files (sa/LpsSaProcessInputs.cpp,
-    // adv/LpsAdvProcessInputs.cpp) that are not part of this migration's
-    // file scope. Confirmed via a real case-sensitivity mismatch
-    // (old field `angle_ABC_demo` vs the generated message's
-    // `angle_abc_demo`) that converting demoInputs_ would silently break
-    // those files.
-    DemoAppTxChannel demoInputs_;
+    weigh_app_interfaces::msg::DemoAppTxChannel demoInputs_;
 
     ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>* LpsSaWeighScsReqstIn;
-    ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* LpsSaWeighScsRespOut;
-    ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>* LpsSaWeighScsTxOut;
-    ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>* LpsSaJobMgrScsReqstOut;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::ReadyToFlashStatus>* ReadyToFlashStatusOutput;
-    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PwmInputChannels>* PwmIn;
-    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>* LpsSaJobMgrScsTxIn;
-    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DemoAppTxChannel>* DemoAppTxIn;
-    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>* AisJhm2TxInputScs;
-    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>* AutonomyConditionDiagnosticsTxInputChannel;
-    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::Machine>* MachineIn;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel>* LpsSaWeighScsInitDebugOut;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighDebugChannel>* LpsSaWeighScsDebugOut;
-    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::CalMgrCmdReqst>* LpsCalCmdScsReqstIn;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>* LpsCalCmdScsRespOut;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalDataChannel>* LpsNvmDumpChanOut;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel>* LpsNvmOnTheFlyDumpChanOut;
+    ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* LpsSaWeighScsRespOut_ROS2;
+    ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>* LpsSaWeighScsTxOut_ROS2;
+
+    // ROS2/DDS shared node + executor
+    rclcpp::Node::SharedPtr rosNode_;
+    rclcpp::executors::SingleThreadedExecutor executor_;
+    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>* LpsSaJobMgrTxRosIn_;
+    ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>* LpsSaJobMgrReqstRosOut_;
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::ReadyToFlashStatus>* ReadyToFlashStatusRosOut_;
+    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DemoAppTxChannel>* DemoAppTxRosIn_;
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel>* LpsSaWeighInitDebugRosOut_;
+    // AIS SCS leg (LpsSaWeighDebugChannelOutput) is forwarded by ScsToRos2Bridge.
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighDebugChannel>* LpsSaWeighDebugRosOut_;
+    rclcpp::Subscription<weigh_app_interfaces::msg::CalMgrCmdReqst>::SharedPtr calCmdReqstSub_;
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>* calCmdRespRosOut_;
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalDataChannel>*        LpsNvmCalRosOut_;
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel>* LpsNvmCalOnTheFlyRosOut_;
     ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DataLinkData>* DataLinkDataInput_;
-    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PartNumbers>* PartNumbersInput_;
-    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::SystemHardwareHealthStorage>* SystemHardwareHealthInput_;
-    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::SystemHardwareHealthRequest>* SystemHardwareHealthRequestOutput_;
+    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PartNumbers>* PartNumbersRosIn_;
+    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::SystemHardwareHealthStorage>* SystemHardwareHealthRosIn_;
+    ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::SystemHardwareHealthRequest>* SystemHardwareHealthRequestRosOut_;
     ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>* displayStateInput_;
 
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>* AisJhm2TxRosIn_;
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>* AutonomyConditionDiagnosticsTxRosIn_;
+
     // For receiving the current printer configuration
-    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfgInterfaceStorage>* printerCnfgInput_;
+    ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg>* printerCnfgInput_;
 
     ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>* shmClockInput_;
 
-    rclcpp::Node::SharedPtr rosNode_;
-    rclcpp::executors::SingleThreadedExecutor executor_;
-
     bool LinkageCalInProgress;
+
+    void cleanupRosInterfaces();
 
     LpsSaApplicationVariant_t getApplicationVariant();
     void PwmInputRead();
@@ -455,7 +453,6 @@ private:
     void LpsSaScsSendZeroRqst();
 
     bool LpsSaScsSendReqstResponse(LpsSaWeighReqstChannel::Command command, bool success);
-    bool LpsSaScsSendReqstResponse(const LpsSaWeighReqstChannelStorage& request, bool success, const std::string& arg1 = "");
     bool LpsSaScsSendReqstResponse(const cpm_common_interfaces::msg::LpsSaWeighReqstChannel& request, bool success, const std::string& arg1 = "");
     void LpsSaScsChkForReqst();
     LpsSaInitErrorType_t LpsSaInit(void);
@@ -526,7 +523,7 @@ private:
     std::mutex calLibMtx_;
     boolean CalLibInit(void);
     void CalLibUpdt(void);
-    void LpsSaWeighCalReqstCallback();
+    void LpsSaWeighCalReqstCallback(const weigh_app_interfaces::msg::CalMgrCmdReqst::SharedPtr msg);
 
     CAL_MGR_MR_E LpsSaTiltRotaryLinkageSensorCalibration (CAL_MGR_MC_E Cmd,
             uint16_t CalId, unsigned_8* StepNo, uint16_t* CalError);
@@ -614,6 +611,6 @@ void AppUpdtCalNvmTbl(const LpsCalNvmTbl_t* pCalData);
 ** -- Data Declarations --
 *******************************************************************************/
 // This is the one and only one instance of this task.
-extern LpsSaWeighApp thisTask;
+LpsSaWeighApp *temp_thisTask;
 
 #endif

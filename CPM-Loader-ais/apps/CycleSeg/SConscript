@@ -1,0 +1,44 @@
+#!/usr/bin/python
+Import('testEnv')
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+#myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-function', '-Wno-overflow'])
+
+# Include the super-project directory so that we can find
+# cyc_seg_wl_00_x86_64-b and cyc_seg_wl_inf source files.
+Repository(myEnv[ 'SSP_DIR' ] + '/cyc_seg')
+
+myEnv.Append(CPPPATH = [
+    '#/cyc_seg_wl_inf/include',
+    '#/cyc_seg_wl_00_x86_64-b/include',
+    myEnv[ 'SSP_DIR' ] + '/libsl/include_R2012B',
+    myEnv[ 'SSP_DIR' ] + '/libsl/include',
+    myEnv[ 'TES_COMMON_DIR' ] + '/prod/common/interfaces/VP3Record',
+    myEnv[ 'SSP_DIR' ] + '/mach_prod_gps-interface/include'
+])
+
+myEnv.Append( LIBPATH = [ myEnv[ 'SSP_DIR' ] + '/mach_prod_gps-a/tgt_gcc_arm64_guest-a/' ] )
+
+sourceFiles = \
+    Glob('*.cpp') + \
+    Glob('#/cyc_seg_wl_00_x86_64-b/src/*.c') + \
+    Glob('#/cyc_seg_wl_inf/src/LIBINFO_WL_if.c')
+
+CycleSeg = myEnv.Program( 
+        target = 'CycleSeg',
+        source = sourceFiles,
+        LIBS = ['ais_task', 'ais_config', 'ais_log',
+                'ProdDataInterface',
+                '_gps', 'ksw', 'dbg_log', 'ipc',
+                'clock_realtime',
+                'clock_integral',
+                'clock_',
+                'clock_nvm',
+                'clock_sync',
+                'sl_cal'
+        ]
+    )
+
+myEnv.InstallBinary(CycleSeg)
+myEnv.Alias("CycleSeg", "#bin/CycleSeg")

@@ -1,0 +1,124 @@
+#!/usr/bin/python
+
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-function'])
+
+# Check if gRPC is supported - enabled for all platforms EXCEPT A7H4
+import os
+# Detect platform from environment or build directory
+platform = os.environ.get('PLATFORM', '').lower()
+if not platform and 'A7H4' in myEnv.get('SSP_DIR', ''):
+    platform = 'a7h4'
+
+GRPC_SUPPORTED = platform.lower() != 'a7h4' and not 'a7h4' in myEnv.get('SSP_DIR', '').lower()
+
+if GRPC_SUPPORTED:
+    myEnv.Append(CCFLAGS = ['-DGRPC_SUPPORTED'])
+    print("GRPC_SUPPORTED: Enabled - gRPC and CDA libraries will be linked")
+else:
+    # Explicitly remove GRPC_SUPPORTED flag if it exists in parent environment
+    if '-DGRPC_SUPPORTED' in myEnv.get('CCFLAGS', []):
+        ccflags = myEnv['CCFLAGS']
+        ccflags = [flag for flag in ccflags if flag != '-DGRPC_SUPPORTED']
+        myEnv['CCFLAGS'] = ccflags
+    print("GRPC_SUPPORTED: Disabled (A7H4 platform detected) - gRPC and CDA libraries will NOT be linked")
+
+# Include the super-project directory so that we can find lps_common
+# source files.
+Repository(myEnv[ 'SSP_DIR' ])
+
+# Include paths
+myEnv.Append(CPPPATH = [
+    '#/apps/include',
+    '#/lps_common/include',
+    myEnv[ 'TES_COMMON_DIR' ] + '/protobuf/proto/',
+])
+
+sourceFiles = [
+    # This file is built in various apps, so we need to give the object a unique path for this app.
+    myEnv.Object('LpsCommonWeight', '#/lps_common/src/LpsCommonWeight.c'),
+    'LpsSaTotalsApp.cpp',
+    'LpsSaTotalsHistory.cpp',
+    'LpsSaTotalsLifetime.cpp',
+    'LpsSaTotalsMaterial.cpp',
+    'LpsSaTotalsLoadHistory.cpp',
+    'LpsSaTotalsPrinterInfo.cpp',
+    'LpsSaTotalsLastLoad.cpp',
+    'LpsSaTotalsTelemetry.cpp',
+    'LpsSaTotalsMapped.cpp',
+    'LpsSaTotalsPrintUtils.cpp',
+    # 'CDAUSBWrite/CDAUSBWrite.pb.cc',
+    # 'CDAUSBWrite/CDAUSBWrite.grpc.pb.cc',
+    'CPMTicket/CPMTicket.pb.cc',
+    myEnv[ 'TES_COMMON_DIR'] + '/protobuf/proto/TMAC_Telemetry_Transfer.pb.cc',
+]
+
+# Build base library list
+libsList = [ 'ais_task',
+         'ais_config',
+         'ais_log',
+         'hal_boot',
+         'hal_util',
+         'hal_error',
+         'protobuf',
+         'app_log',
+         'dbg_log',
+         'fsa',
+         'boringssl',
+         'z',
+         'pugixml',
+         'dbg_log'
+]
+# A7H4 (arm64_guest) does not have these A6N2/x86-specific libraries
+if myEnv['PLATFORM'] == 'A7H4':
+    a7h4_unavailable = [
+        'grpc',
+        'grpc++',
+        'hal_util',          # not in tgt_gcc_arm64_guest (confirmed by bmiJ1939 SConscript)
+        'hal_error',         # not in tgt_gcc_arm64_guest (confirmed by bmiJ1939 SConscript)
+        'boringssl',         # not in tgt_gcc_arm64_guest
+    ]
+    libsList = [lib for lib in libsList if lib not in a7h4_unavailable]
+    # hal_boot -> hal_boot_read_location_code -> hal_pulsei_get_discrete -> hal_ipc_client
+    # hal_ipc_client needs ipc_client_init/ipc_client_send from libipc.a
+    # ipc appears early in libsList so must be repeated after hal_ipc_client for correct link order
+    libsList.append('hal_pulsei')
+    libsList.append('hal_ipc_client')
+    libsList.append('ipc')   # repeated: hal_ipc_client needs ipc_client_init/ipc_client_send
+
+
+# Add CDA-specific libraries if gRPC is supported
+if GRPC_SUPPORTED:
+    libsList.extend(['CDAUSBWrite_protobuf', 'grpc++', 'grpc'])
+
+LpsSaTotalsApp = myEnv.Program(
+    target = 'LpsSaTotalsApp',
+    source = sourceFiles,
+    LIBS = libsList
+)
+
+myEnv.InstallBinary( LpsSaTotalsApp )
+myEnv.Alias("LpsSaTotalsApp", "#bin/LpsSaTotalsApp")
+
+# Install an app that makes big totals for testing
+myEnv.InstallBinary(
+    myEnv.Program(
+        target = 'LpsSaTotalsMakeTotalsTest',
+        source = ['test/LpsSaTotalsMakeBigTotals.cpp'],
+        LIBS = ['ais_task', 'ais_config', 'ais_log']
+    )
+)
+myEnv.Alias("LpsSaTotalsMakeTotalsTest", "#bin/LpsSaTotalsMakeTotalsTest")
+
+myEnv.InstallUnitTest(
+    myEnv.Program(
+        target = 'LpsSaTotalsTestApp',
+        source = ['test/LpsSaTotalsTestApp.cpp'],
+        LIBS = ['ais_task', 'ais_config', 'ais_log']
+    ),
+    #add_to_run_list = False
+)
+myEnv.Alias('LpsSaTotalsTestApp', '#bin/unit_test/LpsSaTotalsTestApp')

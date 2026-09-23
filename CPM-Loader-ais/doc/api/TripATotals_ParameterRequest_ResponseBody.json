@@ -1,0 +1,27 @@
+{
+    "ParamMsg": {
+        "ParameterList": [
+            {
+                "Param": {
+                    "TripATotals": [
+                        {
+                            "Param": {
+                                "weight": "120.00"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "loadCount": "6"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "passCount": "18"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

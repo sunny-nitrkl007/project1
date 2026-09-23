@@ -11,21 +11,24 @@
 ## @attention All rights reserved
 ## @attention Carnegie Mellon Proprietary
 ###############################################################################
+import os
+import glob
+ 
 Import( 'testEnv' )
 myEnv = testEnv.Clone();
-
+BASE_PATH = '/home/u_subras91/CPM/ssp-CPM_Loader-ais'
 targetAppVariant = myEnv.get('TARGET_APP_VARIANT', None)
-
+ 
 # Please people, stop creating so many warnings!
 #myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-function', '-Wno-unused-variable'])
-
+ 
 # Add the root of this repository to the search path
 myEnv.Append(CPPPATH = ['#'])
-
+ 
 # Include the super-project directory so that we can find lps_common
 # source files.
 Repository(myEnv[ 'SSP_DIR' ])
-
+ 
 myEnv.Append(CPPPATH = [
     '#/lps_weighing/include',
     '#/lps_cal/include',
@@ -41,11 +44,65 @@ myEnv.Append(CPPPATH = [
     '#/sss/include',
     '#/TES-common-ais/prod/common/chrono',
 ])
-
+ 
+ 
+#Addon------------------------------
+ 
+ros2_libs = []
+ 
+ros2_lib_dir = BASE_PATH + '/ros2_models/lib'
+ 
+for so in glob.glob(os.path.join(ros2_lib_dir, '*', 'lib*.so')):
+    ros2_libs.append(os.path.basename(so)[3:-3])
+ 
+print(ros2_libs)
+ 
+for d in glob.glob(BASE_PATH + '/ros2_jazzy_sdk/include/*'):
+    if os.path.isdir(d):
+        myEnv.Append(CPPPATH=[d])
+ 
+#ros2wrapper
+for d in glob.glob(BASE_PATH + '/CPM-Loader-ais/prod/common/ros2wrapper'):
+    if os.path.isdir(d):
+        myEnv.Append(CPPPATH=[d])
+         
+ 
+myEnv.Append(
+    CPPPATH=[
+        BASE_PATH + '/ros2_models/include'
+    ]
+)
+ 
+ 
+ROS_LIB_PATHS = [
+    BASE_PATH + '/ros2_jazzy_sdk/lib',
+    BASE_PATH + '/ros2_models/lib/cpm_common_interfaces',
+    BASE_PATH + '/ros2_models/lib/job_mgr_interfaces',
+    BASE_PATH + '/ros2_models/lib/weigh_app_interfaces',
+]
+ 
+myEnv.Append(LIBPATH=ROS_LIB_PATHS)
+ 
+myEnv.Append(
+    LINKFLAGS=[
+        flag
+        for p in ROS_LIB_PATHS
+        for flag in (
+            '-Wl,-rpath,' + p,
+            '-Wl,-rpath-link,' + p
+        )
+    ]
+)
+ 
+ 
+ 
+#------------------------------------------------------
+ 
+ 
 # Include the super-project directory so that we can find
 # toa_wl_00_x86_64-b and toa_wl_inf source files.
 Repository(myEnv['SSP_DIR'] + '/tipoff_assist')
-
+ 
 # Add tipoff assist paths
 myEnv.Append(CPPPATH = [
     '#/toa_wl00_inf/include',
@@ -53,7 +110,7 @@ myEnv.Append(CPPPATH = [
     '#/toa_wl00_x86_64-b/src/',
     '#/toa_wl00/c_src/',
 ])
-
+ 
 sourceFiles = \
     Glob('*.cpp') + \
     Glob('src_app/*.c') + \
@@ -71,11 +128,8 @@ sourceFiles = \
             
 if targetAppVariant is not None:
     sourceFiles += Glob(targetAppVariant + '/*.cpp')
-
-LpsSaWeighApp = myEnv.Program(
-        target = 'LpsSaWeighApp',
-        source = sourceFiles,
-        LIBS = [ 'ais_task',
+ 
+base_libs = [    'ais_task',
                  'commTask',
                  'ais_config',
                  'ais_log',
@@ -92,9 +146,33 @@ LpsSaWeighApp = myEnv.Program(
                  'socketCanBase',
                  'sl_cal',
                  'version',
+                 'rclcpp',
+                 'rcl',
+                 'rcutils',
+                 'rmw',
+                 'rmw_implementation',
+                 'rcl_yaml_param_parser',
+                 'rcl_logging_interface',
+                 'rcl_interfaces__rosidl_typesupport_cpp',
+                 'rosidl_typesupport_cpp',
+                 'rosidl_runtime_c',
+                 'tracetools',
+                 'ament_index_cpp',
+                 'rcpputils',
+                 File(BASE_PATH + '/ros2_jazzy_sdk/lib/liblibstatistics_collector.so'),
+                 'statistics_msgs__rosidl_typesupport_cpp',
+                 'rosgraph_msgs__rosidl_typesupport_cpp',
+                 'type_description_interfaces__rosidl_typesupport_c',
+                 'std_msgs__rosidl_typesupport_cpp'   
         ]
+ 
+ 
+LpsSaWeighApp = myEnv.Program(
+        target = 'LpsSaWeighApp',
+        source = sourceFiles,
+        LIBS = base_libs + ros2_libs
     )
-
+ 
 myEnv.InstallBinary( LpsSaWeighApp )
-
+ 
 myEnv.Alias("LpsSaWeighApp", "#bin/LpsSaWeighApp")

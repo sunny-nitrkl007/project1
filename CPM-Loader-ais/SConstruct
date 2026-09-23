@@ -1,0 +1,133 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConstruct
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     Main SConstruct file.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+## @attention Originally developed by Tartan Racing
+###############################################################################
+
+import os, sys
+
+os.environ[ 'TLD' ] = os.path.abspath(os.path.join(os.getcwd(), '../'))
+
+"""
+update import path so we can import SConsAppInclude.py content
+"""
+dirDefaults = {
+    'AIS_TLD'                   : '',
+    'AIS_BUILD_TOOLS'           : os.path.join( 'prod', 'ais_build_tools', 'content' ),
+    'AIS_POSELIB_CONTENT'       : os.path.join( 'prod', 'positioningLib', 'content' ),
+    'AIS_PLANNINGLIB_CONTENT'   : os.path.join( 'prod', 'planningLib', 'content' ),
+    'AIS_DETECT_CONTENT'        : os.path.join( 'prod', 'detectCommon', 'content' ),
+    'AIS_CT_CONTENT'            : os.path.join( 'prod', 'coretech' ),
+    'AIS_CORETECH_CONTENT'      : os.path.join( 'prod', 'coretech' ),
+    'AIS_MC_CONTENT'            : os.path.join( 'prod', 'machineCommon', 'content' ),
+    'AIS_MACHINE_COMMON_CONTENT' : os.path.join( 'prod', 'machineCommon', 'content' ),
+    'AIS_PC_CONTENT'            : os.path.join( 'prod', 'platformCommon', 'content' ),
+    'AIS_PLATFORM_COMMON_CONTENT' : os.path.join( 'prod', 'platformCommon', 'content' ),
+    'AIS_PLATFORM_COMMON_DIR'   : os.path.join( 'prod', 'platformCommon', 'content' ),
+    'AIS_OLM_CONTENT'           : os.path.join( 'prod', 'overlayManager', 'content' ),
+    'AHS_DEPS_CONTENT'          : os.path.join( 'prod', 'ahs_dependencies', 'content' ),
+    'AIS_AC_CONTENT'            : os.path.join( 'prod', 'astopCommon', 'content' ),
+    '_1A_IC_CONTENT'            : os.path.join( 'prod', '1A', '1AInterfacesCommon' ),
+    '_1A_SDD_CONTENT'           : os.path.join( 'prod', '1A', '1ASensorDriversDev' ),
+    # this an absolute path based on the Top Level Directory of the repo
+    'CONFIG_SOURCE_DIR'    : os.path.join( os.environ[ 'TLD' ], 'config' ),
+    # default path for app includes and libs txt files
+    # 'APP_PLATFORM_DIR'          : 'platform'
+}
+
+# cycle through the default keys and update based the environment
+for var in sorted( dirDefaults.keys() ):
+    os.environ[var] = os.path.abspath(os.path.join(os.getcwd(), '../../eta-ais/', dirDefaults[var]))
+    print( ' => %s = %s' % ( var, os.environ[var] ) )
+
+# Set platform-specific platformCommon paths based on PLATFORM env var
+_platform = os.environ.get('PLATFORM', '')
+if _platform in ('A7H4', 'JTX2'):
+    _ssp_suffix = os.path.join('prod', 'platformCommon', 'content', 'ssp-linux-is7')
+    _tgt_suffix = os.path.join(_ssp_suffix, 'tgt_gcc_arm64_guest')
+else:
+    _ssp_suffix = os.path.join('prod', 'platformCommon', 'content', 'ssp-linux-is6')
+    _tgt_suffix = os.path.join(_ssp_suffix, 'tgt_gcc_5.1.0_a6n2')
+os.environ['AIS_PC_SSP_CONTENT'] = os.path.abspath(os.path.join(os.getcwd(), '../../eta-ais/', _ssp_suffix))
+os.environ['AIS_PC_TARGET_CONTENT'] = os.path.abspath(os.path.join(os.getcwd(), '../../eta-ais/', _tgt_suffix))
+print( ' => %s = %s' % ( 'AIS_PC_SSP_CONTENT', os.environ['AIS_PC_SSP_CONTENT'] ) )
+print( ' => %s = %s' % ( 'AIS_PC_TARGET_CONTENT', os.environ['AIS_PC_TARGET_CONTENT'] ) )
+
+os.environ['APP_PLATFORM_DIR'] = os.path.abspath(os.getcwd() + '/../platform')
+print( ' => %s = %s' % ( 'APP_PLATFORM_DIR', os.environ['APP_PLATFORM_DIR'] ) )
+os.environ['TES_COMMON_DIR'] = os.path.abspath(os.getcwd() + '/../../TES-common-ais')
+print( ' => %s = %s' % ( 'TES_COMMON_DIR', os.environ['TES_COMMON_DIR'] ) )
+os.environ['SSP_DIR'] = os.path.abspath(os.getcwd() + '/../..')
+print( ' => %s = %s' % ( 'SSP_DIR', os.environ['SSP_DIR'] ) )
+
+"""
+SCons AIS common imports
+"""
+sys.path.append( os.environ[ 'AIS_BUILD_TOOLS' ] )
+from SConsAppInclude import setBuildUnitTests
+from SConsAppInclude import createBaseEnv
+from SConsAppInclude import handleBuildOptions
+from SConsAppInclude import buildit
+from SConsAppInclude import setTuningParameter
+
+#############################################################################
+## Create the Base Environment
+#############################################################################
+baseEnv = createBaseEnv()
+baseEnv['APP_PLATFORM_DIR'] = os.environ['APP_PLATFORM_DIR']
+baseEnv['TES_COMMON_DIR'] = os.environ['TES_COMMON_DIR']
+baseEnv['SSP_DIR'] = os.environ['SSP_DIR']
+baseEnv['TARGET_APP_VARIANT'] = baseEnv.get('ECM_VARIANT', None)
+
+# A7H4 platform does not have protobuf available
+if _platform == 'A7H4':
+    baseEnv.Append(CPPDEFINES=['NO_PROTOBUF_SUPPORT'])
+
+#############################################################################
+## Add application specific options
+#############################################################################
+# AddOption('--app_path', nargs=0)
+
+#############################################################################
+## TuningParameters - arguments: module, parameter, value
+## Note that this will affect all tasks that use the model, for example
+## DatalinkManager will affect Acd2 and TestDatalinkManager, etc...
+## See SConsAppInclude.py::setTuningParameter for information on the modules/params
+## Alternatively, set the TUNING_PARAMETRS_FILE in the Makefile
+#############################################################################
+
+#-- Acd2/DatalinkManager Ethernet PGT
+# setTuningParameter('DATALINKMANAGER','CSF_PGT_CLIENT_MAX_GRP_UDP_RX_BYTES', 512)   # Default 1024
+
+#-- PCM - Disable Keyswitch Override
+# setTuningParameter('PCM','THIS_IS_PLATFORM_THAT_SUPPORTS_KSO', 0)
+
+# Determine --targetAppVariant
+
+#############################################################################
+## Export AFTER configuration is complete
+#############################################################################
+Export('baseEnv')
+
+#############################################################################
+## Now define all the directories to build
+#############################################################################
+toBuild = handleBuildOptions()
+
+#############################################################################
+## Build the project
+#############################################################################
+baseEnv['TO_BUILD'] = toBuild
+while toBuild:
+    component = toBuild.pop( 0 )
+    print( "Building '%s'" % ( component ) )
+    buildit(component, baseEnv['OS'] )

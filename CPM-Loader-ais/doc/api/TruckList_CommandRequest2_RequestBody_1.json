@@ -1,0 +1,12 @@
+{ "TruckList": [
+    { "id": 400, "name": "Truck 400", "targetWeight": 400.1 },
+    { "id": 401, "name": "Truck 401", "targetWeight": 401.2 },
+    { "id": 402, "name": "Truck 402", "targetWeight": 402.3 },
+    { "id": 403, "name": "Truck 403", "targetWeight": 403.4 },
+    { "id": 404, "name": "Truck 404", "targetWeight": 404.5 },
+    { "id": 405, "name": "Truck 405", "targetWeight": 405.6 },
+    { "id": 406, "name": "Truck 406", "targetWeight": 406.7 },
+    { "id": 407, "name": "Truck 407", "targetWeight": 407.8 },
+    { "id": 408, "name": "Truck 408", "targetWeight": 408.9 },
+    { "id": 409, "name": "Truck 409"}
+] }

@@ -1,0 +1,119 @@
+###############################################################################
+## @file      SConscript
+## @brief     SConscript for the JobMgrScsRos2Bridge application.
+##
+## Copies the ROS2 linking recipe already proven working in
+## apps/LpsSaJobMgrApp/SConscript (same BASE_PATH, same ros2_jazzy_sdk /
+## ros2_models discovery, same rpath handling) -- this bridge has no
+## lps_pass_tracker dependency, so that glob is omitted.
+###############################################################################
+import os
+import glob
+
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-function'])
+
+# Add the root of this repository to the search path
+myEnv.Append(CPPPATH = ['#'])
+
+# Include the super-project directory so that we can find lps_common, lps_cal, etc.
+Repository(myEnv['SSP_DIR'])
+
+myEnv.Append(CPPPATH = [
+    '#/lps_weighing/include',
+    '#/lps_cal/include',
+    '#/lps_common/include',
+    '#/lps_app_common/include',
+    '#/lps_weighing/src',
+    '#/lps_cal/src',
+    '#/lps_cal/src/imu',
+    '#/libsl/include_PostR2014a',
+    '#/libsl/include',
+    '#/sss/include',
+    '#/TES-common-ais/prod/common/chrono',
+    '#/eta-ais/prod/platformCommon/content/tgt_gcc_5.1.0_a6n2/lib_a4/hmpl/include',
+])
+
+#Addon------------------------------
+BASE_PATH = '/home/u_subras91/CPM/ssp-CPM_Loader-ais'
+
+ros2_libs = []
+
+ros2_lib_dir = BASE_PATH + '/ros2_models/lib'
+
+for so in glob.glob(os.path.join(ros2_lib_dir, '*', 'lib*.so')):
+    ros2_libs.append(os.path.basename(so)[3:-3])
+
+print(ros2_libs)
+
+for d in glob.glob(BASE_PATH + '/ros2_jazzy_sdk/include/*'):
+    if os.path.isdir(d):
+        myEnv.Append(CPPPATH=[d])
+
+#ros2wrapper
+for d in glob.glob(BASE_PATH + '/CPM-Loader-ais/prod/common/ros2wrapper'):
+    if os.path.isdir(d):
+        myEnv.Append(CPPPATH=[d])
+
+myEnv.Append(
+    CPPPATH=[
+        BASE_PATH + '/ros2_models/include'
+    ]
+)
+
+ROS_LIB_PATHS = [
+    BASE_PATH + '/ros2_jazzy_sdk/lib',
+    BASE_PATH + '/ros2_models/lib/cpm_common_interfaces',
+    BASE_PATH + '/ros2_models/lib/job_mgr_interfaces',
+    BASE_PATH + '/ros2_models/lib/weigh_app_interfaces',
+]
+
+myEnv.Append(LIBPATH=ROS_LIB_PATHS)
+
+myEnv.Append(
+    LINKFLAGS=[
+        flag
+        for p in ROS_LIB_PATHS
+        for flag in (
+            '-Wl,-rpath,' + p,
+            '-Wl,-rpath-link,' + p
+        )
+    ]
+)
+
+#------------------------------------------------------
+
+sourceFiles = Glob('*.cpp')
+
+base_libs = [    'ais_task',
+                 'ais_config',
+                 'ais_log',
+                 'rclcpp',
+                 'rcl',
+                 'rcutils',
+                 'rmw',
+                 'rmw_implementation',
+                 'rcl_yaml_param_parser',
+                 'rcl_logging_interface',
+                 'rcl_interfaces__rosidl_typesupport_cpp',
+                 'rosidl_typesupport_cpp',
+                 'rosidl_runtime_c',
+                 'tracetools',
+                 'ament_index_cpp',
+                 'rcpputils',
+                 File(BASE_PATH + '/ros2_jazzy_sdk/lib/liblibstatistics_collector.so'),
+                 'statistics_msgs__rosidl_typesupport_cpp',
+                 'rosgraph_msgs__rosidl_typesupport_cpp',
+                 'type_description_interfaces__rosidl_typesupport_c',
+                 'std_msgs__rosidl_typesupport_cpp' ]
+
+ScsToRos2Bridge = myEnv.Program(
+        target = 'ScsToRos2Bridge',
+        source = sourceFiles,
+        LIBS = base_libs + ros2_libs
+    )
+
+myEnv.InstallBinary( ScsToRos2Bridge )
+myEnv.Alias("ScsToRos2Bridge", "#bin/ScsToRos2Bridge")

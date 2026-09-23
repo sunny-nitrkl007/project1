@@ -1,0 +1,2 @@
+include ${TES_COMMON_DIR}/platform/_COMMON/includes-list.txt
+include platform/common/includes-list.txt

@@ -1,0 +1,313 @@
+{
+
+"CDL_PID":
+{
+    "Total Fuel (high res)": {
+        "CDL PID"              : "0xFE5D",
+        "Data Size(bytes)"     : "4",
+        "Source J1939 Address" : "0x00",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.001",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "4",
+        "Cid"                  : "590"
+    },
+
+    "Direction Switch Position": {
+        "CDL PID"              : "0xF074",
+        "Data Size(bytes)"     : "1",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "0",
+        "Cid"                  : "296"
+    },
+
+    "Ground Speed": {
+        "CDL PID"              : "0xF4FD",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.0036",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "296"
+    },
+
+    "Tire Rolling Radius": {
+        "CDL PID"              : "0xD00461",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "296"
+    },
+
+    "External Force": {
+        "CDL PID"              : "0xD01E8C",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "0.0001",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "signed type, dsi used, swap bytes",
+        "RequestType"          : "1",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "3",
+        "Cid"                  : "296"
+    },
+
+    "Operator ID Change count": {
+        "CDL PID"              : "0xD01F89",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "296"
+    },
+
+    "Machine Idle Status": {
+        "CDL PID"              : "0XD10AB5",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "296"
+    },
+
+    "Weigh Units Trans": {
+        "CDL PID"              : "0xD10938",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x03",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "296"
+    },
+
+    "Product Link Module GPS Position Status": {
+        "CDL PID"              : "0xF84D",
+        "Data Size(bytes)"     : "15",
+        "Source J1939 Address" : "0x25",
+        "Request Rate(ms)"     : "1000",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "5000",
+        "Attributes"           : "",
+        "RequestType"          : "3",
+        "VarLengthDataType"    : "1",
+        "ParameterType"        : "12",
+        "Cid"                  : "1089"
+    },
+
+    "Units": {
+        "CDL PID"              : "0xF25B",
+        "Data Size(bytes)"     : "1",
+        "Source J1939 Address" : "0x28",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "6",
+        "Cid"                  : "2448"
+    },
+
+    "Selected Language": {
+        "CDL PID"              : "0xD0022C",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x28",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "2448"
+    },
+
+    "Weigh Units": {
+        "CDL PID"              : "0xD10938",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x28",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "2448"
+    },
+
+    "Weigh Precision": {
+        "CDL PID"              : "0xD11B8D",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x28",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "2448"
+    },
+
+    "Backlight Percent": {
+        "CDL PID"              : "0xD0022B",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x28",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used, swap bytes",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "2448"
+    },
+
+    "Service mode": {
+        "CDL PID"              : "0xD1000E",
+        "Data Size(bytes)"     : "2",
+        "Source J1939 Address" : "0x28",
+        "Request Rate(ms)"     : "100",
+        "Scaling"              : "1",
+        "Offset"               : "0",
+        "Units"                : "0",
+        "Timeout(ms)"          : "1000",
+        "Attributes"           : "dsi used",
+        "RequestType"          : "2",
+        "VarLengthDataType"    : "0",
+        "ParameterType"        : "2",
+        "Cid"                  : "2448"
+    }
+
+},
+
+"CAT_EXT_ID":
+{
+    "SECURITY SYSTEM CURRENT SECURITY ID INFORMATION": {
+        "CAT EXTID"              : "0xF0B2",
+        "Source Address"         : "0x03",
+        "Priority"               : "6",
+        "Request Rate(ms)"       : "0",
+        "RestrAdtReadParam"      : "0xD01F89"
+    },
+
+    "FLASH INFORMATION MESSAGE": {
+        "CAT EXTID"              : "0xF003",
+        "Source Address"         : "0x2E",
+        "Priority"               : "3",
+        "Request Rate(ms)"       : "60000",
+        "RestrAdtReadParam"      : "0"
+    }
+},
+
+"PGN":
+{
+    "PROPRIETARY A (PROPA)": {
+        "PGN"               : "61184",
+        "Source Address"    : "255",
+        "Timeout(ms)"       : "0",
+        "Priority"          : "6",
+        "Control Bitfield"  : "1",
+        "Handler Index"     : "1",
+        "Cid"               : "200",
+        "SPN List"          : "2550"
+    },
+
+    "Steering Angle": {
+        "PGN"               : "61451",
+        "Source Address"    : "0x13",
+        "Timeout(ms)"       : "1000",
+        "Priority"          : "6",
+        "Control Bitfield"  : "3",
+        "Handler Index"     : "0",
+        "Cid"               : "167",
+        "SPN List"          : "2927"
+    },
+
+    "Engine Speed": {
+        "PGN"               : "61444",
+        "Source Address"    : "0x00",
+        "Timeout(ms)"       : "1000",
+        "Priority"          : "6",
+        "Control Bitfield"  : "3",
+        "Handler Index"     : "0",
+        "Cid"               : "40",
+        "SPN List"          : "190"
+    },
+
+    "Fuel Rate": {
+        "PGN"               : "65266",
+        "Source Address"    : "0x00",
+        "Timeout(ms)"       : "5000",
+        "Priority"          : "6",
+        "Control Bitfield"  : "3",
+        "Handler Index"     : "0",
+        "Cid"               : "96",
+        "SPN List"          : "183"
+    }
+
+}
+}

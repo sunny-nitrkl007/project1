@@ -1,0 +1,16 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-variable'])
+
+appLogCapture = myEnv.Program(
+    target = 'app_log_capture',
+    source = 'main.cpp',
+)
+
+# Install the executable
+myEnv.InstallBinary(appLogCapture)
+
+# Install the script
+myEnv.InstallScript('queue_app_logs_to_ftb.sh')

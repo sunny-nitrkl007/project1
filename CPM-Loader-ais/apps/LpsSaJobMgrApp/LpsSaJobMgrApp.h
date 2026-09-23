@@ -32,62 +32,36 @@ DESCRIPTION:
 
 #include <interfaces/LpsSaJobMgrDebugChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaJobMgrTxChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaJobMgrReqstChannel/InterfaceTypes.h>
-#include <interfaces/SwitchInputScs/InterfaceTypes.h>
 #include <interfaces/OutputChannel/InterfaceTypes.h>
-#include <interfaces/AisJhm2TxChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaLoadRecordChannel/Channel/Output/channel.h>
 #include <interfaces/LpsSaLoadRecordChannel/LpsSaLoadRecordChannel.h>
-#include <interfaces/LpsSaJobMgrRespChannel/LpsSaJobMgrRespChannel.h>
-#include <interfaces/LpsSaJobMgrReqstChannel/LpsSaJobMgrReqstChannel.h>
-#include <interfaces/LpsSaJobMgrRespChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaUI/DisplayStateInterfaceInputChannel.h>
 #include <interfaces/ShmClock/InterfaceTypes.h>
 #include <interfaces/DataLinkData/InterfaceTypes.h>
 #include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
 #include <interfaces/EventDiagnosticData/InterfaceTypes.h>
-
-// weighAppInf_ uses DDSWeighAppInf, NOT LpsSaWeighAppInf.hpp -- that header
-// is shared common/interfaces code, and at least one other real component
-// (AisJhm2RequestProcessor, legacy UI infrastructure, still SCS-only) holds
-// its own instance and depends on its original raw-SCS-typed API. Editing
-// it in place would break that unrelated caller once this tree is copied
-// back over the original repo. DDSWeighAppInf is a new, separate class
-// with only the 3 methods LpsSaJobMgrApp actually calls (confirmed via
-// LpsSaJobMgrScs.cpp) -- LpsSaWeighAppInf.hpp itself is untouched.
+#include <interfaces/LpsSaWeighReqstChannel/LpsSaWeighAppInf.hpp>
+ 
+/*Additional ROS2 interfaces*/
 #include <interfaces/LpsSaWeighReqstChannel/DDSWeighAppInf.hpp>
-
-// ---- ROS2/DDS wrapper layer (Development-Plan.txt Step 4.1) ----------------
-// NOTE: the interface-type includes above are KEPT, not removed -- they
-// still supply real struct/enum types this file and LpsSaJobMgrSimpleCal.h
-// depend on directly (SimpleCalData_t, DispBestBktWt_t, the tip-off/manual-
-// add enums, etc.). Only the raw SCS channel POINTER types below are being
-// replaced; the underlying AIS struct definitions are untouched.
-#include <rclcpp/rclcpp.hpp>
-#include <ros2_wrapper/RosInputInterface.h>
-#include <ros2_wrapper/RosOutputInterface.h>
-
-#include <job_mgr_interfaces/msg/lps_sa_job_mgr_tx_channel.hpp>
-#include <job_mgr_interfaces/msg/lps_sa_job_mgr_resp_channel.hpp>
-#include <job_mgr_interfaces/msg/lps_sa_job_mgr_debug_channel.hpp>
-#include <job_mgr_interfaces/msg/switch_input_scs.hpp>
-#include <job_mgr_interfaces/msg/output_channel.hpp>
-#include <cpm_common_interfaces/msg/ais_jhm2_tx_channel.hpp>
-#include <cpm_common_interfaces/msg/lps_sa_ui_display_state.hpp>
-#include <cpm_common_interfaces/msg/lps_sa_ui_display_state_interface.hpp>
+#include "rclcpp/rclcpp.hpp"
+#include "ros2wrapper/RosInputInterface.h"
+#include "ros2wrapper/RosOutputInterface.h"
+#include "cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp"
 #include <cpm_common_interfaces/msg/shm_clock_input.hpp>
-#include <job_mgr_interfaces/msg/data_link_data.hpp>
-#include <job_mgr_interfaces/msg/lps_sa_load_record_channel.hpp>
-#include <cpm_common_interfaces/msg/autonomy_condition_diagnostics_tx_channel.hpp>
-#include <job_mgr_interfaces/msg/event_diagnostic_data.hpp>
-#include <cpm_common_interfaces/msg/lps_sa_job_mgr_reqst_channel.hpp>
-// weighAppInf_'s 3 direct-DDS channels (WeighReqst/Resp/Tx) are converted
-// inside the shared header itself (interfaces/LpsSaWeighReqstChannel/
-// LpsSaWeighAppInf.hpp, Development-Plan.txt Step 6.1) -- this include
-// pulls in the message types LpsSaWeighAppInf.hpp uses.
-#include <cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp>
+#include <cpm_common_interfaces/msg/lps_sa_ui_display_state_interface.hpp>
 #include <cpm_common_interfaces/msg/lps_sa_weigh_resp_channel.hpp>
 #include <cpm_common_interfaces/msg/lps_sa_weigh_tx_channel.hpp>
+#include <cpm_common_interfaces/msg/lps_sa_job_mgr_reqst_channel.hpp>
+#include <job_mgr_interfaces/msg/lps_sa_job_mgr_resp_channel.hpp>
+#include <cpm_common_interfaces/msg/ais_jhm2_tx_channel.hpp>
+#include <job_mgr_interfaces/msg/lps_sa_load_record_channel.hpp>
+#include <job_mgr_interfaces/msg/switch_input_scs.hpp>
+#include <job_mgr_interfaces/msg/data_link_data.hpp>
+#include <job_mgr_interfaces/msg/event_diagnostic_data.hpp>
+#include <cpm_common_interfaces/msg/autonomy_condition_diagnostics_tx_channel.hpp>
+#include <job_mgr_interfaces/msg/lps_sa_job_mgr_tx_channel.hpp>
+#include <job_mgr_interfaces/msg/lps_sa_job_mgr_debug_channel.hpp>
+#include <job_mgr_interfaces/msg/output_channel.hpp>
 
 #include "LpsSaJobMgrTasks.h"
 #include "LpsSaJobMgrCnfg.h"
@@ -176,34 +150,29 @@ private:
 
     LpsJobMgrJobTrackerInfoTbl_t     LpsJobMgrJobTrackerInfoTbl;
 
-    /* ROS2/DDS wrappers -- replace the raw SCS channel objects. Member names
-       kept identical to the originals; only the declared type changes.
-       ->get()/->publish() call syntax is unchanged at every call site. */
+    /*SCS  Interfaces*/
+    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>* LpsSaJobMgrTxRosOut_;
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>* LpsSaJobMgrReqstIn;
+    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrDebugChannel>* LpsSaJobMgrDebugRosOut_;
+    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrRespChannel>* LpsSaJobMgrRespChannelOutput_;
+
+    bool weighAppTxDataReceived_;
+    DDSWeighAppInf weighAppInf_; // WeighApp Interface
+
+    // ---- ROS2/DDS shared node + executor
     rclcpp::Node::SharedPtr rosNode_;
     rclcpp::executors::SingleThreadedExecutor executor_;
 
-    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>        *LpsSaJobMgrScsTxOut;/* from job manager write param to UI*/
-    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>   *LpsSaJobMgrScsReqstIn;/*get request from UI*/
-    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrDebugChannel>     *LpsSaJobMgrScsDebugOut;/*Debug symbols*/
-    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrRespChannel>      *LpsSaJobMgrRespChannelOutput_;
+    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>* LpsSaSwitchInput;
+    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>* LpsSaOutputChannelRosOut_;
 
-    bool weighAppTxDataReceived_;
-    DDSWeighAppInf weighAppInf_; // WeighApp Interface -- converted Step 6.1, see Challenges-And-Decisions.txt 6.11.
-                                  // DDSWeighAppInf, not LpsSaWeighAppInf -- see include comment above.
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>* AisJhm2TxInput;
 
-    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>               *LpsSaSwitchInput;
-    ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>               *LpsSaOutputChannelOut;
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>* displayStateInputRos_;
 
-    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>             *AisJhm2TxInputScs;
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>* ShmClockInputRos;
 
-    // Type corrected during Step 4.2 -- see LpsSaUIDisplayStateInterface.msg
-    // header for why this needs the wrapper type, not LpsSaUIDisplayState
-    // directly.
-    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>* displayStateInput_;
-
-    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>                *ShmClockInputScs;
-
-    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::DataLinkData>                 *dataLinkDataInput_;
+    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::DataLinkData>* dataLinkDataInputRos_;
 
     ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaLoadRecordChannel>* loadRecordOutputChannel_;
 
@@ -223,18 +192,20 @@ private:
 
     std::chrono::steady_clock::time_point storeRejectedExpireTime;
 
-    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>* autonomyConditionDiagnosticsTxInputChannel_;
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>* autonomyConditionDiagnosticsTxInputRos_;
     bool SEALevel1EssentialsInstalled_;
     bool SEALevel2ProInstalled_;
     bool SEALegalForTradeInstalled_;
 
-    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>* eddtInputChannel_;
+    ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>* eddtInputRos_;
 
     bool loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord);
 
     bool saveConfig(void);
 
     bool parseUiConfigurableFeatures(void);	// check if Show/Hide config has tip-off disabled
+
+    void cleanupRosInterfaces();
 
     void LpsSaJobMgrPtInit(void);/* Pass tracker lib Initialization*/
     boolean LpsSaJobMgrPtUpdate(void);/*Job Manager App Pt Lib Update*/
@@ -246,7 +217,7 @@ private:
 
     boolean LpsSaJobMgrScsRx(void);/*get parameters from weighing app*/
     boolean LpsSaJobMgrScsTx(void);/*write param to UI*/
-    void LpsSaJobMgrScsSendCmd(uint8_t command); /* send command to weighing app; value is cpm_common_interfaces::msg::WeighReqstChannelCommand::* */
+    void LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command command); /* send command to weighing app */
     void LpsSaJobMgrSendCmdToWeighApp(void);
     void LpsSaJobMgrHandleTipOffBtnStates(void);
     void AisJhmDataServerTxRead(void);
@@ -260,6 +231,10 @@ private:
 
     // Reset LpsPtInputs flags
     void resetLpsPtInputFlags(void);
+
+    /* Load record conversion: AIS SCS -> ROS2 msg, for publishing via loadRecordOutputChannel_ */
+    static job_mgr_interfaces::msg::LpsSaLoadRecordChannel convertLoadRecordToRos(const LpsSaLoadRecordChannel& scs);
+    static job_mgr_interfaces::msg::LpsSaJobMgrTxChannel convertJobMgrTxToRos(const LpsSaJobMgrTxChannel& scs);
 
     LpsWeighBktWtAccuracy_t totalWeightAccuracy_;
 

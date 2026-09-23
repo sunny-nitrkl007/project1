@@ -1,0 +1,69 @@
+{
+    "ParamMsg": {
+        "ParameterList": [
+            {
+                "Param": {
+                    "LifetimeTotals": [
+                        {
+                            "Param": {
+                                "weight": "140.00"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "loadCount": "7"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "passCount": "21"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "Param": {
+                    "TripATotals": [
+                        {
+                            "Param": {
+                                "weight": "120.00"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "loadCount": "6"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "passCount": "18"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "Param": {
+                    "TripBTotals": [
+                        {
+                            "Param": {
+                                "weight": "140.00"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "loadCount": "7"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "passCount": "21"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

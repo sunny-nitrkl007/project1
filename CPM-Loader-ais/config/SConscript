@@ -1,0 +1,61 @@
+#!/usr/bin/python
+import os
+Import('baseEnv')
+my_env = baseEnv.Clone();
+
+configDir = my_env['CONFIG_SOURCE_DIR']
+
+target_app_variant = my_env.get('TARGET_APP_VARIANT', None)
+
+# File extention types that must be synced
+configFileTypes = [
+    'conf',
+    'csv',
+    'json',
+    'mwf',
+    'rb',
+    'txt',
+    'xml',
+]
+
+# Add all file types with relative paths to configFiles
+config_files = []
+for fileType in configFileTypes:
+    config_files += my_env.Glob('*.' + fileType)
+    if target_app_variant is not None:    
+        print('target_app_variant:' + target_app_variant)
+        config_files += my_env.Glob(target_app_variant + '/*.' + fileType)
+
+
+# If a variant directory is provided, copy those files also
+#if target_app_variant is not None:
+    # These files must be uniquely named from those in the base dir or scons will throw
+#    config_files += \
+#        my_env.Glob(target_app_variant + '/*.rb') + \
+#        my_env.Glob(target_app_variant + '/*.json') + \
+#        my_env.Glob(target_app_variant + '/*.conf') + \
+#        my_env.Glob(target_app_variant + '/*.xml') + \
+#        my_env.Glob(target_app_variant + '/*.txt')
+
+# Directory where log (.out) files are stored
+# config_files.append("outputFileDir")
+
+# Debugging
+for configFile in config_files:
+    print(configFile)
+
+# Install the base and variant config files "flattened"
+my_env.InstallConfigs(configDir, config_files, flatten=True)
+
+# Install the production/ActiveTasks.rb file in the "production" scenario directory
+# as well as the default scenario production/Unknown
+my_env.InstallConfig(configDir, 'production/ActiveTasks.rb', flatten=False)
+my_env.InstallConfig(configDir, 'production/Unknown/ActiveTasks.rb', flatten=False)
+#my_env.InstallConfig(configDir, 'production/Unknown', 'production/ActiveTasks.rb')
+
+# Install the connection manager config files
+my_env.InstallConfigs(configDir, my_env.Glob('conn_mgr_xml_configs/*.xml'))
+
+# Install the demo/ActiveTasks.rb file in the "demo" scenario directory
+my_env.InstallConfig(configDir, 'demo/ActiveTasks.rb')
+

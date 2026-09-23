@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Get port path from first argument, else default
+port=${1:-/dev/ttyS0}
+
+cat ${port}
+
+sleep 5s

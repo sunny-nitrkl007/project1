@@ -1,0 +1,142 @@
+//******************************************************************************
+// Copyright 2022 Caterpillar Inc. All rights reserved.
+// -----------------------------------------------------------------------------
+// File name: CPMTicket.proto
+//
+// Description:  Represents a Caterpillar Production Measurement (CPM) ticket.
+//               A ticket contains the information recorded as part of a payload
+//               transaction; the weight, material type, time, etc.
+//******************************************************************************/
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+package cat.cpm.ticket;
+
+// Message representing a ticket.
+message Ticket
+{
+    // Enumeration of all supported ticket trigger types
+    enum TRIGGER
+    {
+        AUTO = 0;  // Default value
+        TICKET_NOT_FOR_TRADE = 1;
+        TICKET_LEGAL_FOR_TRADE = 2;
+    }
+    
+    // Message representing a timestamp with the machine service hour meter, if applicable
+    message Timestamp
+    {
+        // Timestamp
+        google.protobuf.Timestamp time = 1;
+        
+        // Service Hour Meter in seconds - optional
+        google.protobuf.UInt32Value hour_meter = 2;
+		
+        // Local Time Offset in minutes - optional
+        // localTime = utcTime + offset
+        google.protobuf.Int32Value local_time_offset = 3;
+    }
+    
+    // Message representing a measurement.
+    // This is typically a pass, or increment, in the subtotal
+    // Each one of these is equivalent to the legacy VP3 file payload record.
+    message Measurement
+    {
+        enum ACCURACY
+        {
+            NONE = 0;  // Default value
+            LOW = 1;
+            MEDIUM = 2;
+            HIGH = 3;
+        }
+
+        // Time this that measurement was taken
+        Timestamp time = 1;
+
+        // Measurement weight in tonnes - optional
+        google.protobuf.FloatValue weight = 2;
+        
+        // Measurement accuracy
+        ACCURACY accuracy = 3;
+    }
+    
+    // Message representing a subtotal
+    // Each one of these is equivalent to the legacy VP3 file load record.
+    message Subtotal
+    {
+        // Time that this subtotal began
+        Timestamp start_time = 1;
+        
+        // Time that this subtotal ended
+        Timestamp end_time = 2;
+        
+        // Truck id - optional
+        google.protobuf.UInt32Value truck_id = 3;
+        
+        // Truck name - optional
+        string truck_name = 4;
+        
+        // Truck target weight in tonnes - optional.
+        google.protobuf.FloatValue truck_target_weight = 5;
+        
+        // Material id - optional
+        google.protobuf.UInt32Value material_id = 6;
+
+        // Material name - optional
+        string material_name = 7;
+
+        // Material density in kg/m^3 - optional
+        google.protobuf.FloatValue material_density = 8;
+        
+        // Custom tag 1 - optional
+        string tag_1 = 9;
+
+        // Custom tag 2 - optional
+        string tag_2 = 10;
+
+        // Custom tag 3 - optional
+        string tag_3 = 11;
+
+        // Custom tag 4 - optional
+        string tag_4 = 12;
+
+        // Subtotal weight in tonnes - optional.
+        // Same as sum of measurement weights.
+        google.protobuf.FloatValue subtotal_weight = 13;
+        
+        // Sequence or passes, each a measurement, could be empty.
+        // Each one of these is equivalent to the legacy VP3 file payload record.
+        repeated Measurement passes = 14;
+    }
+    
+    // Type of trigger that led to creating this ticket
+    TRIGGER trigger = 1;
+
+    // Time that this ticket began
+    // Same as the start time of the first subtotal
+    Timestamp start_time = 2;
+    
+    // Time that this ticket ended
+    // Same as the end time of the last subtotal
+    Timestamp end_time = 3;
+
+    // Unique ticket id, optional
+    // - If ticket id is empty or missing, eTicket is not supported
+    string ticket_id = 4;  // Example: "23-12-08-03-23-34-23456"
+
+    // Ticket number - optional
+    google.protobuf.UInt32Value ticket_number = 5;
+        
+    // Total weight in tonnes - optional
+    // Same as sum of subtotal weights.
+    google.protobuf.FloatValue total_weight = 6;
+    
+    // Sequence of subtotals, could be empty.
+    // Each one of these is equivalent to the legacy VP3 file load record.
+    repeated Subtotal subtotals = 7;
+    
+    // Textual representation of the printed ticket, optional
+    string text = 8;
+}

@@ -1,0 +1,33 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'testEnv' )
+testEnv.Append( LIBPATH = [ '#/apps/lib',
+              ] )
+
+sourceFiles = [
+    'OperatorIdTest.cpp'
+]
+
+OperatorIdTest = testEnv.Program(
+        target = 'OperatorIdTest',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log', 'CPMOperatorIdList',             testEnv['BOOST_SERIALIZATION'],
+            'jhm2RequestProc', 'aisJhm2RequestProc']
+    )
+
+testEnv.InstallUnitTest( OperatorIdTest)
+
+
+testEnv.Alias("OperatorIdTest", "#bin/unit_test/OperatorIdTest")
+
+

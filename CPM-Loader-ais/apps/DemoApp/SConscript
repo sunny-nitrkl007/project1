@@ -1,0 +1,69 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+myEnv.Append(CCFLAGS = ['-Werror'])
+
+# This is to get 'boost/cgi/...'
+myEnv.Append(CPPPATH = ['#../TES-common-ais/prod/common/jhm2']);
+
+cgiLibs = [
+    myEnv['BOOST_SYSTEM'],
+    myEnv['BOOST_FILESYSTEM']
+]
+
+Repository(myEnv[ 'SSP_DIR' ])
+
+
+myEnv.Append( LIBPATH = [ '#/apps/lib' ] )
+myEnv.Append( CPPPATH = [ '#/apps/include' ] )
+
+
+myEnv.Append(CPPPATH = [
+    'include',
+    'src/',
+])
+
+myEnv.Append(CPPPATH = [
+    '#/libsl/include_PostR2014a',
+    '#/libsl/include',
+    '#/lps_app_common/include',
+    '#/sss/include',
+])
+sourceFiles = \
+    Glob('*.cpp') + \
+    Glob('src/*.c')
+
+
+DemoApp = myEnv.Program( 
+        target = 'DemoApp',
+        source = sourceFiles,
+        LIBS = [ 'ais_task',
+                 'ais_config',
+                 'ais_log',
+                 'sl_cal'
+         ]
+    )
+
+myEnv.InstallBinary( DemoApp )
+myEnv.Alias("DemoApp", "#bin/DemoApp")
+# Install DemoUI Web App
+myEnv.InstallWeb(['index.html'], 'DemoApp/')
+myEnv.InstallWeb(Glob('./css/*'), 'DemoApp/css/')
+myEnv.InstallWeb(Glob('./images/*'), 'DemoApp/images/')
+myEnv.InstallWeb(Glob('./js/*'), 'DemoApp/js/')
+
+
+

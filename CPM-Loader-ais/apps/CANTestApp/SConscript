@@ -1,0 +1,36 @@
+###############################################################################
+## @file      SConscript
+## @brief     SConscript for the baseMachineInterface application.
+##
+## @attention COPYRIGHT (C) 2015 CATERPILLAR INC. ALL RIGHTS RESERVED.
+## @attention
+## @attention Copyright (C) 2015
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+# create environment
+Import( 'infEnv' )
+localEnv = infEnv.Clone();
+
+# build our content
+sourceFiles = [ 
+   'CANTestApp.cpp',
+   #'src_app/app_task.c',
+   #'src_app/app_rtos_config_posix.c',
+   #'src_app/app_inits.c',
+   #'src_CAN/app_can_init.c',
+]
+
+CANTestApp_bin = localEnv.ProgramWrapper(
+    target = 'CANTestApp',
+        source = sourceFiles,
+        LIBS = ['ais_task',
+                'socketCanBase',
+                 ]
+    )
+
+localEnv.InstallUnitTest( CANTestApp_bin, add_to_run_list = False )
+

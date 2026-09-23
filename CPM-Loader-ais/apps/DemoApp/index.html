@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Service Dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css?1505493345" rel="stylesheet">
+
+    <!-- webManager css -->
+    <link href="/css/webManager.css?1505493345" rel="stylesheet">
+
+    <!-- DemoApp css -->
+    <link href="css/loader.css?1505493345" rel="stylesheet">
+
+  </head>
+
+  </body>
+    <div>
+      <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/index.html">
+              <img src="images/Cat.png" alt="Home"></img>
+            </a>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="/index.html">Home</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1>Demo App Inputs</h1>
+      
+      <div class="panel-group" id="panel-group-1">
+      
+        <!-- Panel 1 -->
+        <div class="panel panel-default" id="panel-1">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-target="#panel-1 .collapse">
+              SIMPLE BUTTONS:
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+			  
+              <button class="btn btn-primary" id="demo123">ENABLE DEMO MODE</button>
+              <br>
+              <br>
+              <marquee class="btn btn-primary" id="scroll123" behavior="alternate">To come out of demo mode close your web browser, wait for 1 minute and restart......!!!!!! </marquee>
+              <br>
+              <br>
+              <button class="btn btn-primary" id="dig123">LOAD WEIGHT</button>
+              <button class="btn btn-primary" id="wrw123">GET WRW</button>
+              <button class="btn btn-primary" id="llw123">GET LLW</button>
+              <button class="btn btn-primary" id="dump123">DO FULL DUMP</button>
+              <button class="btn btn-primary" id="partial123">DO PARTIAL DUMP</button>
+              <button class="btn btn-primary" id="carry123">GO TO CARRY</button>
+              <button class="btn btn-primary" id="store123">STORE</button>
+              
+            </div>
+          </div>
+        </div>
+        
+        <!-- Panel 2 -->
+        <div class="panel panel-default" id="panel-2">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-target="#panel-2 .collapse">
+              COMMANDS:
+              <span class="caret"></span>
+            </h4>
+          </div>
+          <div class="panel-collapse collapse">
+            <div class="panel-body">
+			              
+              <form id="desired-lift-position-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Current Lift Position is <span id="desired-lift-position-value">?</span> percentage</span>
+                    <input type="text" class="form-control" id="desired-lift-position-input" placeholder="Write new value?">
+	                <span class="input-group-btn">
+                      <button class="btn btn-primary" id="desired-lift-position-submit" type="submit">Write</button>
+    		        </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+              <form id="desired-lift-position-rate-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Current Lift Position rate is <span id="desired-lift-position-rate-value">?</span> percent/sec</span>
+                    <input type="text" class="form-control" id="desired-lift-position-rate-input" placeholder="Write new value?">
+	                <span class="input-group-btn">
+                      <button class="btn btn-primary" id="desired-lift-position-rate-submit" type="submit">Write</button>
+    		        </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+              <form id="desired-tilt-position-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Current Tilt Position is <span id="desired-tilt-position-value">?</span> percentage</span>
+                    <input type="text" class="form-control" id="desired-tilt-position-input" placeholder="Write new value?">
+	                <span class="input-group-btn">
+                      <button class="btn btn-primary" id="desired-tilt-position-submit" type="submit">Write</button>
+    		        </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+              <form id="desired-tilt-position-rate-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Current Tilt Position Rate is <span id="desired-tilt-position-rate-value">?</span> percent/sec</span>
+                    <input type="text" class="form-control" id="desired-tilt-position-rate-input" placeholder="Write new value?">
+	                <span class="input-group-btn">
+                      <button class="btn btn-primary" id="desired-tilt-position-rate-submit" type="submit">Write</button>
+    		        </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+              <form id="payload-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Current Payload is <span id="payload-value">?</span> tonnes</span>
+                    <input type="text" class="form-control" id="payload-input" placeholder="Write new value?">
+	                <span class="input-group-btn">
+                      <button class="btn btn-primary" id="payload-submit" type="submit">Write</button>
+    		        </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+              <form id="payload-rate-form">
+                <!-- COMPONENT START -->
+                <div class="form-group btn-service-panel center-block">
+                  <div class="input-group">
+                    <span class="input-group-addon">Current Payload Rate is <span id="payload-rate-value">?</span> tonnes/sec</span>
+                    <input type="text" class="form-control" id="payload-rate-input" placeholder="Write new value?">
+	                <span class="input-group-btn">
+                      <button class="btn btn-primary" id="payload-rate-submit" type="submit">Write</button>
+    		        </span>
+                  </div>
+                </div>
+                <!-- COMPONENT END -->
+              </form>
+              
+              <svg height="700" width="800">
+                <g id="bucket">
+                  <g transform="translate(400,250)">
+                    <g>
+                      <polygon points="0,10 0,40 20,60 70,70 110,0 10,0" style="fill:black" transform="scale(1,-1)" />
+                      <animateTransform id="id1123" attributeName="transform" type="rotate" dur="4s" from="0 100 250" to="0 100 250" fill="freeze" repeatCount="1"/>
+                    </g>
+                  </g>
+                  <animateTransform id="id2123" attributeName="transform" type="rotate" dur="4s" from="0 100 250" to="0 100 250" fill="freeze" repeatCount="1"/>        
+                </g>
+     
+                <g id="boom">
+                  <!--<g>-->
+                    <polygon points="0,0 150,20 300,0 150,-20" style="fill:#FFCC00;stroke:black;stroke-width:2" transform="translate(100,250) scale(1,-1)" />
+                    <animateTransform id="id3123" attributeName="transform" type="rotate" dur="4s" from="0" to="0" fill="freeze" repeatCount="1"/>
+                  <!--</g>-->
+                </g>
+              </svg>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- Footer -->
+      <div>
+        <div class="container">
+          <p style="text-align:center">Caterpillar © 2019. All Rights Reserved.</p>
+        </div>
+      </div>
+
+      <!-- Pop-up -->
+      <div class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="pop-up-header" aria-hidden="true" id="pop-up">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" id="pop-up-header">Header</h4>
+            </div>
+            <div class="modal-body" id="pop-up-body">
+              <p>Body</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.min.js?1505493345"></script>
+    <script src="/js/bootstrap.min.js?1505493345"></script>
+    <script src="js/loader.js"></script>
+  </body>
+</html>

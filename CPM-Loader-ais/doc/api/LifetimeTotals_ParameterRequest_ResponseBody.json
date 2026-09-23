@@ -1,0 +1,27 @@
+{
+    "ParamMsg": {
+        "ParameterList": [
+            {
+                "Param": {
+                    "LifetimeTotals": [
+                        {
+                            "Param": {
+                                "weight": "140.00"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "loadCount": "7"
+                            }
+                        },
+                        {
+                            "Param": {
+                                "passCount": "21"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

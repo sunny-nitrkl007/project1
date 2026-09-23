@@ -1,4 +1,4 @@
-/*******************************************************************************
+ /*******************************************************************************
 ** COPYRIGHT (C) 2016-2017 CATERPILLAR INC. ALL RIGHTS RESERVED.
 --------------------------------------------------------------------------------
 FILE NAME: LpsSaJobMgrScs.cc
@@ -27,16 +27,7 @@ DESCRIPTION:
 ** -- #Define, Struct's, Typedef's, Enum's --
 *******************************************************************************/
 #define STG4 3                        //STG4 is index 3 in the array of STG_values.
-// !!! UNVERIFIED PLACEHOLDER -- DO NOT HARDWARE-TEST UNTIL FIXED !!!
-// The real numeric value of OutputChannel::Port::OUTPUT_SINK_3 is not
-// found ANYWHERE in this checkout -- this #define was its only occurrence
-// in the whole tree (confirmed by repo-wide grep). This drives a real
-// GPIO pin (see original comment: PIN29_GPIO88), so the value below is
-// deliberately an obviously-fake sentinel, not a guess dressed up as real.
-// Confirm the true value against interfaces/OutputChannel/OutputChannel.h
-// once that folder is sourced (it does not exist in this checkout either
-// -- see Challenges-And-Decisions.txt 3.3), then replace 0xFF here.
-#define HORN_PORT_NUMBER   0xFF    //OUTPUT_APP_PORT_SINK3_PIN29_GPIO88 -- UNVERIFIED, see comment above
+#define HORN_PORT_NUMBER   OutputChannel::Port::OUTPUT_SINK_3    //OUTPUT_APP_PORT_SINK3_PIN29_GPIO88
 
 #define PAYLOAD_DETAIL_JSON_FILENAME (R"(/tmp/appdata/CPM/LpsSaJobMgrApp/PayloadDetails.json)")
 
@@ -61,17 +52,14 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
     }
 
     { // Check for store request
-        // SwitchInputScs.msg is a scoped reconstruction (real struct not in
-        // this checkout -- see Challenges-And-Decisions.txt 3.3): the real
-        // get_STG_value(STG4)==STG::CLOSED test collapses to a single
-        // `closed` field, since that's the only comparison any consumer in
-        // the whole tree ever makes against index STG4.
         job_mgr_interfaces::msg::SwitchInputScs STG_Input;
         bool storeRequest = false;
 
-        /* The store button has higher priority compared to LPS Job Mgr request. */
+        /* The store button has higher priority compared to LPS Job Mgr request.
+           STG4 is at index 3 (confirmed from SwitchInputApp.cpp:121 which writes
+           STG4_FILE_LOC into currentStates[3]); CLOSED == 1 per STG.msg constants. */
         while (LpsSaSwitchInput->get(STG_Input)) {
-            if (STG_Input.closed) {
+            if (STG_Input.stg_values[3].value == job_mgr_interfaces::msg::STG::CLOSED) {
                 storeRequest = true;
             }
         }
@@ -147,11 +135,9 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
     }
 
     // Read display state and go into standby if we are in verification mode.
-    if (nullptr != displayStateInput_) {
+    if (nullptr != displayStateInputRos_) {
         cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface displayState;
-        while (displayStateInput_->get(displayState)) {
-            // isInVerificationMode() (DisplayState.hpp:62) is a trivial
-            // accessor: `return inVerificationMode_;` -- direct field read.
+        while (displayStateInputRos_->get(displayState)) {
             LpsJobMgrJobTrackerInfoTbl.inVerificationMode = displayState.state.in_verification_mode;
             if (LpsJobMgrJobTrackerInfoTbl.inVerificationMode &&
                     (LpsJobMgrJobTrackerInfoTbl.OperationMode != LPS_SA_JOB_MGR_STANDBY_MODE)) {
@@ -161,12 +147,13 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         }
     }
 
+    // Use ROS2 message type for JobMgr requests (drained from RosInputInterface)
     cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel reqIn;
     bool loadRecordChanged = false;
     bool configChanged = false;
-
-    /* Retrieve SCS channel data */
-    while (LpsSaJobMgrScsReqstIn->get(reqIn)) {
+    /* Retrieve request channel data */
+    if (nullptr != LpsSaJobMgrReqstIn) {
+        while (LpsSaJobMgrReqstIn->get(reqIn)) {
         bool success = true;
 
         // Select target type first because this sets the context for the sub-requests.
@@ -182,72 +169,68 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
          */
         for (const auto& r : reqIn.requests) {
             switch (r.command) {
-            // Original accessors (materialId(), materialName(), tagValue(), etc.)
-            // returned arg1-4 depending on command -- see LpsSaJobMgrReqst.msg
-            // header for the full mapping. Direct field access now, same
-            // underlying data.
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_ID): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_ID): {
                 tasks_.getCurrentTaskLoad().setMaterialId(r.arg3);
                 AIS_LOG_NOTICE("Load Change - materialId");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_NAME): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_NAME): {
                 tasks_.getCurrentTaskLoad().setMaterialName(r.arg1);
                 AIS_LOG_NOTICE("Load Change - materialName");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_DENSITY): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_DENSITY): {
                 tasks_.getCurrentTaskLoad().setMaterialDensity(r.arg2);
                 AIS_LOG_NOTICE("Load Change - materialDensity");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_ID): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_ID): {
                 tasks_.getCurrentTaskLoad().setTruckId(r.arg3);
                 AIS_LOG_NOTICE("Load Change - truckId");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_NAME): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_NAME): {
                 tasks_.getCurrentTaskLoad().setTruckName(r.arg1);
                 AIS_LOG_NOTICE("Load Change - truckName");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_TARGET_WEIGHT): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_TARGET_WEIGHT): {
                 tasks_.getCurrentTaskLoad().setTotalTargetWeight(r.arg2);
                 AIS_LOG_NOTICE("Load Change - truckTargetWeight");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG1): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG1): {
                 tasks_.getCurrentTaskLoad().setTag1(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG1 = %s (%s)", r.arg1.c_str(), r.arg4.c_str());
+                AIS_LOG_NOTICE("WRITE_TAG1 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG2): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG2): {
                 tasks_.getCurrentTaskLoad().setTag2(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG2 = %s (%s)", r.arg1.c_str(), r.arg4.c_str());
+                AIS_LOG_NOTICE("WRITE_TAG2 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG3): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG3): {
                 tasks_.getCurrentTaskLoad().setTag3(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG3 = %s (%s)", r.arg1.c_str(), r.arg4.c_str());
+                AIS_LOG_NOTICE("WRITE_TAG3 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
-            case (job_mgr_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG4): {
+            case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG4): {
                 tasks_.getCurrentTaskLoad().setTag4(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG4 = %s (%s)", r.arg1.c_str(), r.arg4.c_str());
+                AIS_LOG_NOTICE("WRITE_TAG4 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             default: {
-                break; // out of switch-case
+                break;
             }
             }
         }
@@ -520,10 +503,6 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             break; // out of switch-case
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_SUBTOTAL_INFO): {
-            // subtotal_command, not "command" -- LpsSaJobMgrSubtotalInfo.msg
-            // renamed this field specifically to avoid confusion with the
-            // channel's own top-level Command enum (different type entirely,
-            // this one is a plain string).
             auto command = reqIn.data_subtotal_info.subtotal_command;
             auto newStepNumber = reqIn.data_subtotal_info.new_step_number;
             auto currentStepNumber = reqIn.data_subtotal_info.current_step_number;
@@ -639,26 +618,31 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         saveConfig();
     }
 }
+}
 
 /* Send the response to JobMgr Helper */
 bool LpsSaJobMgrApp::sendReqstResponse(const cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel& request, bool success) {
     // Build the response
+    // Prefer ROS2 output if configured
     job_mgr_interfaces::msg::LpsSaJobMgrRespChannel response;
-    response.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count();
     response.app_name = request.app_name;
     response.app_request_id = request.app_request_id;
-    response.command = request.command; // same nested message type both sides, whole-struct copy is correct
+    // time_point_ns: use steady_clock now in nanoseconds
+    response.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+    // command mapping
+    // map request.command to response command value if applicable
+    response.command.value = static_cast<uint8_t>(request.command.value);
     response.success = success;
 
-    if (LpsSaJobMgrRespChannelOutput_) {   /* Publish Response */
+    if (nullptr != LpsSaJobMgrRespChannelOutput_) {
         if (LpsSaJobMgrRespChannelOutput_->publish(response)) {
-            AIS_LOG_INFO("Published response, command=%d, success=%d", request.command.value, success);
+            AIS_LOG_INFO("Published ROS2 response, success=%d", success);
             return true;
         }
     }
 
-    AIS_LOG_ERROR("Failed to publish response, command=%d, success=%d", request.command.value, success);
+    AIS_LOG_ERROR("Failed to publish ROS2 response, success=%d", success);
     return false;
 }
 
@@ -671,10 +655,13 @@ RETURN VALUE:
 *******************************************************************************/
 void LpsSaJobMgrApp::AisJhmDataServerTxRead()
 {
+    // Prefer ROS2 input if present
     cpm_common_interfaces::msg::AisJhm2TxChannel AisJhm2TxIn;
-    while (AisJhm2TxInputScs->get(AisJhm2TxIn)) {
-        if (AisJhm2TxIn.simplecal_data.new_data_flag) {
-            simpleCal_.eraseEntry(AisJhm2TxIn.simplecal_data.time_stamp);
+    if (nullptr != AisJhm2TxInput) {
+        while (AisJhm2TxInput->get(AisJhm2TxIn)) {
+            if (AisJhm2TxIn.simplecal_data.new_data_flag) {
+                simpleCal_.eraseEntry(AisJhm2TxIn.simplecal_data.time_stamp);
+            }
         }
     }
 }
@@ -704,17 +691,13 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsEddtRead()
         63038, 63039, 63040, 63041, 63042, 63043, 63044, 63045, 63046, 63078
     };
 
-    if (nullptr != eddtInputChannel_) {
+    if (nullptr != eddtInputRos_) {
         job_mgr_interfaces::msg::EventDiagnosticData data;
 
         // Clear TipoffAssistActiveEid
-        LpsJobMgrJobTrackerInfoTbl.TipoffAssistActiveEid = 0;
+        LpsJobMgrJobTrackerInfoTbl.TipoffAssistActiveEid = 0;       
 
-        while (eddtInputChannel_->get(data)) {
-            // getListOfEventDiagnostics() (EventDiagnosticData.h:129-131) is a
-            // trivial `return &m_activeDiagnostics;` -- active_diagnostics is a
-            // real vector member here, never null, so the pointer/null-check
-            // dance collapses away.
+        while (eddtInputRos_->get(data)) {
             bool memoryFull = false;
 
             for (const auto& diag : data.active_diagnostics) {
@@ -725,7 +708,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsEddtRead()
 
                 if ((SCL_DCLI_FAULT_ACTIVE == diag.status) ||
                         (SCL_DCLI_FAULT_ACTIVE_AND_LOGGED == diag.status)) {
-                    uint_fast16_t eid = diag.cid; // getCID() (Diagnostic.h:162-165) is `return cid;`
+                    uint_fast16_t eid = diag.cid;
                     if (toaEids.count(eid) > 0) {
                         LpsJobMgrJobTrackerInfoTbl.TipoffAssistActiveEid = eid;
                     }
@@ -748,18 +731,16 @@ RETURN VALUE:
 *******************************************************************************/
 void LpsSaJobMgrApp::LpsSaJobMgrScsSHMRead( )
 {
-    if (nullptr != ShmClockInputScs) {
-        cpm_common_interfaces::msg::ShmClockInput shmClock;
-        while (ShmClockInputScs->get(shmClock)) {
-            int32_t offset = shmClock.utc_offset_min;
+    if (nullptr != ShmClockInputRos) {
+        cpm_common_interfaces::msg::ShmClockInput shmClockRos;
+        while (ShmClockInputRos->get(shmClockRos)) {
+            ShmClock shmClock;
+            shmClock.set_SHM(shmClockRos.shm_sec);
+            shmClock.set_UTC_offset(shmClockRos.utc_offset_min);
+            shmClock.set_TZ(shmClockRos.tzone_info.data(), shmClockRos.tzone_info.size());
+            int32_t offset = shmClock.get_UTC_offset();
             tzone_tx_comm_struct tzone;
-            // Real get_tz_struct(tzone_tx_comm_struct&, ShmClock&) (ais_chrono/tz.hpp:287)
-            // just extracts the raw 20-byte TZ blob via shmClock.get_TZ() and calls
-            // the lower-level byte-array overload (tz.hpp:259) -- called that
-            // overload directly instead, using the raw bytes already preserved
-            // verbatim in ShmClockInput.msg's tzone_info field. No old-typed
-            // ShmClock object needed at all.
-            if (tes_common_ais::get_tz_struct(shmClock.tzone_info.data(), shmClock.tzone_info.size(), tzone)) {
+            if (tes_common_ais::get_tz_struct(tzone, shmClock)) {
                 if ((tzInfo_.offset != offset) || (tzInfo_.index != tzone.tzone_id)) {
                     std::string tzStr = tes_common_ais::makeTZString(tzone);
                     if (tes_common_ais::setTZString(tzStr)) {
@@ -778,7 +759,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsSHMRead( )
                 AIS_LOG_ERROR("Could not get tzone_tx_comm_struct");
             }
 
-            serviceHourMeter_ = shmClock.shm_sec;
+            serviceHourMeter_ = shmClockRos.shm_sec;
         }
     }
 }
@@ -795,21 +776,16 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsDataLinkDataRead( )
 #define TIPOFF_ASSSIST_PID  0xD118CE
 #define MANUAL_ADD_PID     0xD11890
 
-    // !!! UNVERIFIED PLACEHOLDER -- DataLinkParam::DATA_LINK_PARAM_IDENTIFIER_PID
-    // has no numeric value anywhere in this checkout either (see
-    // DataLinkParam.msg header) -- same class of gap as HORN_PORT_NUMBER.
-    constexpr uint8_t DATA_LINK_PARAM_IDENTIFIER_PID_UNVERIFIED = 0xF3;
-
     job_mgr_interfaces::msg::DataLinkData dlData;
 
-    while (dataLinkDataInput_->get(dlData)) {
-        for (auto& dlParam : dlData.params) {
+    while (dataLinkDataInputRos_->get(dlData)) {
+        for (const auto& dlParam : dlData.params) {
             // Skip this if no new data is received.
             if (!dlParam.pid_data_received) {
                 continue;
             }
 
-            if (dlParam.identifier_type == DATA_LINK_PARAM_IDENTIFIER_PID_UNVERIFIED) {
+            if (dlParam.identifier_type == 0) {
                 if (dlParam.param_id == STORE_BUTTON_PID) {
                     if (0 == dlParam.last_value_dsi) {
                         uint8_t dlValue = dlParam.last_good_value_u8;
@@ -952,27 +928,26 @@ RETURN VALUE:boolean
 *******************************************************************************/
 bool LpsSaJobMgrApp::LpsSaJobMgrHornOnStoreAction()
 {
-    // !!! UNVERIFIED PLACEHOLDERS -- DO NOT HARDWARE-TEST UNTIL FIXED !!!
-    // OutputChannel::State::PORT_ON/PORT_OFF and
-    // OutputChannel::ChangeDuration::NO_FLASH have no numeric value anywhere
-    // in this checkout either (same class of gap as HORN_PORT_NUMBER above,
-    // see Challenges-And-Decisions.txt 3.3). Sentinels below are
-    // deliberately obviously-fake, not guesses -- confirm against
-    // interfaces/OutputChannel/OutputChannel.h once sourced.
-    constexpr uint8_t PORT_ON_UNVERIFIED  = 0xF0;
-    constexpr uint8_t PORT_OFF_UNVERIFIED = 0xF1;
-    constexpr uint8_t NO_FLASH_UNVERIFIED = 0xF2;
-
-    job_mgr_interfaces::msg::OutputChannel outputChannel;
-    job_mgr_interfaces::msg::OutputCmd command;
-    command.output_port = HORN_PORT_NUMBER;
-    command.initial_state = PORT_ON_UNVERIFIED;
-    command.state_change_duration = NO_FLASH_UNVERIFIED;
-    command.total_duration = 2;
-    command.final_state = PORT_OFF_UNVERIFIED;
-    outputChannel.commands.push_back(command);
-    if (nullptr != LpsSaOutputChannelOut) {
-        return LpsSaOutputChannelOut->publish(outputChannel);
+    OutputChannel outputChannel;
+    OutputChannel::OutputCmd command;
+    command.OutputPort = HORN_PORT_NUMBER;
+    command.InitialState = OutputChannel::State::PORT_ON;
+    command.StateChangeDuration = OutputChannel::ChangeDuration::NO_FLASH;
+    command.TotalDuration = 2;
+    command.FinalState = OutputChannel::State::PORT_OFF;
+    outputChannel.AddOutputAppCmd(command);
+    if (nullptr != LpsSaOutputChannelRosOut_) {
+        job_mgr_interfaces::msg::OutputChannel rosOutput;
+        for (const auto& command : outputChannel.GetOutputAppCmds()) {
+            job_mgr_interfaces::msg::OutputCmd rosCommand;
+            rosCommand.output_port = static_cast<uint8_t>(command.OutputPort);
+            rosCommand.initial_state = static_cast<uint8_t>(command.InitialState);
+            rosCommand.state_change_duration = static_cast<uint8_t>(command.StateChangeDuration);
+            rosCommand.total_duration = command.TotalDuration;
+            rosCommand.final_state = static_cast<uint8_t>(command.FinalState);
+            rosOutput.commands.push_back(rosCommand);
+        }
+        return LpsSaOutputChannelRosOut_->publish(rosOutput);
     }
     return false;
 }
@@ -986,51 +961,40 @@ RETURN VALUE:boolean
 boolean LpsSaJobMgrApp::LpsSaJobMgrScsTx()
 {
     bool scsCmdRet=false;
-    job_mgr_interfaces::msg::LpsSaJobMgrTxChannel txOut;
-    // Original AIS Datum type set this in its constructor. The new message
-    // type is plain data with no constructor side effects, so it's set
-    // explicitly here instead, preserving the original "stamped at
-    // construction" behavior.
-    txOut.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::steady_clock::now().time_since_epoch()).count();
+    LpsSaJobMgrTxChannel txOut;
     /* frame SCS channel data to UI*/
-    if (LpsSaJobMgrScsTxOut) {
+    if (LpsSaJobMgrTxRosOut_) {
 
         { // Update current task load information
             const LpsSaLoadRecordChannelStorage& loadRecord = tasks_.getCurrentTaskLoad();
             const LpsSaLoadRecordSubtotal& subtotal = loadRecord.getCurrentSubtotal();
-            txOut.task_number = tasks_.getCurrentTaskNumber();
-            txOut.material_id = subtotal.materialId;
-            txOut.material_name = subtotal.materialName;
-            txOut.material_density = subtotal.materialDensity;
-            txOut.truck_id = subtotal.truckId;
-            txOut.truck_name = subtotal.truckName;
-            txOut.truck_target_weight = subtotal.truckTargetWeightTonnes;
+            txOut.taskNumber = tasks_.getCurrentTaskNumber();
+            txOut.materialId = subtotal.materialId;
+            txOut.materialName = subtotal.materialName;
+            txOut.materialDensity = subtotal.materialDensity;
+            txOut.truckId = subtotal.truckId;
+            txOut.truckName = subtotal.truckName;
+            txOut.truckTargetWeight = subtotal.truckTargetWeightTonnes;
 
             if (0.0f != subtotal.truckTargetWeightTonnes) {
-                txOut.remaining_weight = subtotal.truckTargetWeightTonnes - LpsSaJobMgrWmOutput.truck_weight;
+                txOut.remainingWeight = subtotal.truckTargetWeightTonnes - LpsSaJobMgrWmOutput.truck_weight;
             }
             else {
-                txOut.remaining_weight = 0.0f;
+                txOut.remainingWeight = 0.0f;
             }
 
             txOut.tag1 = subtotal.tag1;
             txOut.tag2 = subtotal.tag2;
             txOut.tag3 = subtotal.tag3;
             txOut.tag4 = subtotal.tag4;
-            txOut.custom_list_name1 = subtotal.customListName1;
-            txOut.custom_list_name2 = subtotal.customListName2;
-            txOut.custom_list_name3 = subtotal.customListName3;
-            txOut.custom_list_name4 = subtotal.customListName4;
+            txOut.customListName1 = subtotal.customListName1;
+            txOut.customListName2 = subtotal.customListName2;
+            txOut.customListName3 = subtotal.customListName3;
+            txOut.customListName4 = subtotal.customListName4;
 
-            txOut.pass_count               = LpsSaJobMgrWmOutput.passcount;
-            txOut.truck_start_weight       = LpsSaJobMgrWmOutput.truck_start_weight;
+            txOut.passCount               = LpsSaJobMgrWmOutput.passcount;
+            txOut.TruckStartWeight        = LpsSaJobMgrWmOutput.truck_start_weight;
 
-            // Local computation still uses the real, untouched AIS enum type --
-            // subtotal.weightTonnes()/loadRecord.weightTonnes() are business
-            // logic (LpsSaLoadRecordSubtotal.h), not edited for this migration.
-            // Converted into the new message's nested WeighBktWtAccuracy.value
-            // only at the point of assignment below.
             LpsWeighBktWtAccuracy_t subtotalWeightAccuracy;
             float subtotalWeight = subtotal.weightTonnes(subtotalWeightAccuracy);
 
@@ -1060,151 +1024,132 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrScsTx()
                 }
             }
 
-            txOut.truck_weight = subtotalWeight;
-            txOut.truck_weight_accuracy.value = static_cast<uint8_t>(subtotalWeightAccuracy);
+            txOut.truckWeight = subtotalWeight;
+            txOut.truckWeightAccuracy = subtotalWeightAccuracy;
 
-            txOut.total_weight = totalWeight;
-            txOut.total_weight_accuracy.value = static_cast<uint8_t>(totalWeightAccuracy);
+            txOut.totalWeight = totalWeight;
+            txOut.totalWeightAccuracy = totalWeightAccuracy;
 
             totalWeightAccuracy_ = totalWeightAccuracy;
 
             // current load subtotal count
-            txOut.subtotal_count = loadRecord.subtotalCount();
+            txOut.subtotalCount = loadRecord.subtotalCount();
 
-            txOut.target_type = (uint8_t)loadRecord.targetType();
+            txOut.targetType = (uint8_t)loadRecord.targetType();
             if (loadRecord.targetType() == LpsSaLoadRecordTargetType::SINGLE) {
-                txOut.split_mode_enabled = false;
+                txOut.splitModeEnabled = false;
             }
             else {
-                txOut.split_mode_enabled = true;
+                txOut.splitModeEnabled = true;
             }
 
-            txOut.step_number = loadRecord.getCurrentSubtotalIndex();
+            txOut.stepNumber = loadRecord.getCurrentSubtotalIndex();
 
-            txOut.icon_type = subtotal.iconType;
+            txOut.iconType = subtotal.iconType;
 
-            txOut.target_passes = subtotal.targetPasses;
+            txOut.targetPasses = subtotal.targetPasses;
         }
 
-        txOut.operation_mode = static_cast<uint16_t>(LpsJobMgrJobTrackerInfoTbl.OperationMode);
+        txOut.OperationMode = LpsJobMgrJobTrackerInfoTbl.OperationMode;
 
-        txOut.manual_tip_off_state    = static_cast<uint8_t>(LpsJobMgrJobTrackerInfoTbl.ManualTipOffState);
-        txOut.tip_off_state.value     = static_cast<uint8_t>(LpsJobMgrJobTrackerInfoTbl.TipOffState);
+        txOut.ManualTipOffState       = LpsJobMgrJobTrackerInfoTbl.ManualTipOffState;
+        txOut.TipOffState             = LpsJobMgrJobTrackerInfoTbl.TipOffState;
 
         // Standby State
         if (LpsSaJobMgrWmOutput.standby_active) {
-            txOut.standby_state.value = cpm_common_interfaces::msg::StandbyState::ACTIVATED;
+            txOut.StandbyState = LPS_SA_JOB_MGR_STANDBY_ACTIVATED;
         }
         else {
-            txOut.standby_state.value = cpm_common_interfaces::msg::StandbyState::DEACTIVATED;
+            txOut.StandbyState = LPS_SA_JOB_MGR_STANDBY_DEACTIVATED;
         }
 
         // Clear or -1 Button is Showing?
         if (LpsSaJobMgrWmOutput.show_clear_not_minus_one) {
-            txOut.clear_minus_one_enable_stat = job_mgr_interfaces::msg::LpsSaJobMgrTxChannel::CLEAR_BTN_ENABLED;
+            txOut.ClearMinusOneEnableStat = LPS_SA_JOB_MGR_CLEAR_BTN_ENABLED;
         }
         else {
-            txOut.clear_minus_one_enable_stat = job_mgr_interfaces::msg::LpsSaJobMgrTxChannel::MINUS_ONE_BTN_ENABLED;
+            txOut.ClearMinusOneEnableStat = LPS_SA_JOB_MGR_MINUS_ONE_BTN_ENABLED;
         }
 
-        txOut.disp_best_bkt_wt.val = LpsJobMgrJobTrackerInfoTbl.DispBestBktWt.val;
-        txOut.disp_best_bkt_wt.is_ok = LpsJobMgrJobTrackerInfoTbl.DispBestBktWt.isOk;
+        txOut.DispBestBktWt = LpsJobMgrJobTrackerInfoTbl.DispBestBktWt;
 
-        txOut.tip_off_trigger_type.value = static_cast<uint8_t>((LpsSaTipOffTriggerType_t)config_.tipOffTriggerType);
-        txOut.tip_off_state_cfg.value = static_cast<uint8_t>((LpsSaJobMgrTipOffState_t)config_.tipOffMode);
+        txOut.TipOffTriggerType = (LpsSaTipOffTriggerType_t)config_.tipOffTriggerType;
+        txOut.TipOffStateCfg = (LpsSaJobMgrTipOffState_t)config_.tipOffMode;
 
         if (SEALegalForTradeInstalled_) {
-            txOut.auto_store_pass_count = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MAX;
+            txOut.AutoStorePassCount = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MAX;
         }
         else {
-            txOut.auto_store_pass_count = config_.autoStorePassCount;
+            txOut.AutoStorePassCount = config_.autoStorePassCount;
         }
 
         /* SEA Level2 (Pro) interlock */
         if (SEALevel2ProInstalled_) {
-            txOut.auto_truck_id_enabled = config_.autoTruckIdEnabled;
-            txOut.auto_material_id_enabled = config_.autoMaterialIdEnabled;
-            txOut.manual_add_enabled = config_.manualAddEnabled;
-            txOut.multi_task_enabled = config_.multiTaskEnabled;
-            txOut.multi_task_count = tasks_.getNumberOfTasks();
-            txOut.truck_list_enabled = config_.truckListEnabled;
-            txOut.material_list_enabled = config_.materialListEnabled;
-            txOut.tag1_enabled = config_.tag1Enabled;
-            txOut.tag2_enabled = config_.tag2Enabled;
-            txOut.tag3_enabled = config_.tag3Enabled;
-            txOut.tag4_enabled = config_.tag4Enabled;
+            txOut.AutoTruckIdEnabled = config_.autoTruckIdEnabled;
+            txOut.AutoMaterialIdEnabled = config_.autoMaterialIdEnabled;
+            txOut.manualAddEnabled = config_.manualAddEnabled;
+            txOut.multiTaskEnabled = config_.multiTaskEnabled;
+            txOut.multiTaskCount = tasks_.getNumberOfTasks();
+            txOut.truckListEnabled = config_.truckListEnabled;
+            txOut.materialListEnabled = config_.materialListEnabled;
+            txOut.tag1Enabled = config_.tag1Enabled;
+            txOut.tag2Enabled = config_.tag2Enabled;
+            txOut.tag3Enabled = config_.tag3Enabled;
+            txOut.tag4Enabled = config_.tag4Enabled;
         }
         else {
             /* level2 (Pro) not installed, disable Pro features */
-            txOut.auto_truck_id_enabled = false;
-            txOut.auto_material_id_enabled = false;
-            txOut.manual_add_enabled = false;
-            txOut.multi_task_enabled = false;
-            txOut.multi_task_count = 0;
-            txOut.truck_list_enabled = false;
-            txOut.material_list_enabled = false;
-            txOut.tag1_enabled = false;
-            txOut.tag2_enabled = false;
-            txOut.tag3_enabled = false;
-            txOut.tag4_enabled = false;
-            txOut.split_mode_enabled = false;
+            txOut.AutoTruckIdEnabled = false;
+            txOut.AutoMaterialIdEnabled = false;
+            txOut.manualAddEnabled = false;
+            txOut.multiTaskEnabled = false;
+            txOut.multiTaskCount = 0;
+            txOut.truckListEnabled = false;
+            txOut.materialListEnabled = false;
+            txOut.tag1Enabled = false;
+            txOut.tag2Enabled = false;
+            txOut.tag3Enabled = false;
+            txOut.tag4Enabled = false;
+            txOut.splitModeEnabled = false;
         }
 
         if (LpsSaJobMgrWmOutput.tip_off_active) {
-            txOut.tipoff_active = true;
+            txOut.TipoffActive = true;
         }
         else {
-            txOut.tipoff_active = false;
+            txOut.TipoffActive = false;
         }
 
-        txOut.tipoff_assist_active = LpsJobMgrJobTrackerInfoTbl.TipoffAssistActive;
-        txOut.tipoff_assist_active_eid = LpsJobMgrJobTrackerInfoTbl.TipoffAssistActiveEid;
+        txOut.tipoffAssistActive = LpsJobMgrJobTrackerInfoTbl.TipoffAssistActive;
+        txOut.tipoffAssistActiveEid = LpsJobMgrJobTrackerInfoTbl.TipoffAssistActiveEid;
 
-        txOut.req_pload_ctrl_sys_stat = static_cast<uint16_t>(LpsJobMgrJobTrackerInfoTbl.ReqPloadCtrlSysStat);
+        txOut.ReqPloadCtrlSysStat = LpsJobMgrJobTrackerInfoTbl.ReqPloadCtrlSysStat;
 
-        // simpleCal_.getSimpleCalData() is untouched business logic
-        // (LpsSaJobMgrSimpleCal.h/.cpp) -- still fills the OLD deque<SimpleCalData_t>
-        // type. Converted element-by-element into the new message's array,
-        // since ROS2 arrays are std::vector, not std::deque, and the element
-        // type itself is different too.
-        {
-            std::deque<SimpleCalData_t> simpleCalDataOld;
-            simpleCal_.getSimpleCalData(simpleCalDataOld);
-            txOut.simple_cal_data.clear();
-            for (const auto& item : simpleCalDataOld) {
-                job_mgr_interfaces::msg::SimpleCalData newItem;
-                newItem.time_stamp = item.timeStamp;
-                newItem.truck_wt = item.truckWt;
-                newItem.zeroed_truck_wt = item.zeroedTruckWt;
-                txOut.simple_cal_data.push_back(newItem);
-            }
-        }
+        simpleCal_.getSimpleCalData(txOut.simpleCalData);
 
-        txOut.store_count = LpsJobMgrJobTrackerInfoTbl.storePressCount;
+        txOut.storeCount = LpsJobMgrJobTrackerInfoTbl.storePressCount;
 
         // Show the "Payload Store:Not Available" info pop-up until at least this time is met.
         if (storeRejectedExpireTime > std::chrono::steady_clock::now()) {
-            txOut.store_rejected = true;
+            txOut.storeRejected = true;
         }
         else {
-            txOut.store_rejected = false;
+            txOut.storeRejected = false;
         }
 
         if (LpsSaJobMgrWmOutput.manual_add_available) {
-            txOut.manual_add_available = true;
+            txOut.manualAddAvailable = true;
         }
         else {
-            txOut.manual_add_available = false;
+            txOut.manualAddAvailable = false;
         }
 
-        txOut.horn_store_state = config_.hornStoreEnable
-            ? job_mgr_interfaces::msg::LpsSaJobMgrTxChannel::HORN_SOUND
-            : job_mgr_interfaces::msg::LpsSaJobMgrTxChannel::HORN_NOT_SOUND;
+        txOut.HornStoreState = config_.hornStoreEnable ? SOUND_HORN : NOT_SOUND_HORN;
 
         // LFT disabled state for current task
-        txOut.lft_disabled = tasks_.currentTaskGetLFTDisable();
+        txOut.lftDisabled = tasks_.currentTaskGetLFTDisable();
 
-        scsCmdRet=LpsSaJobMgrScsTxOut->publish( txOut );
+        scsCmdRet=LpsSaJobMgrTxRosOut_->publish(convertJobMgrTxToRos(txOut));
     }
 
     if(!scsCmdRet)
@@ -1223,15 +1168,15 @@ DESCRIPTION: It will send the cmd to weighing App through SCS channel by polling
 PARAMETER DESCRIPTION:                        
 RETURN VALUE:             
 *******************************************************************************/
-void LpsSaJobMgrApp::LpsSaJobMgrScsSendCmd(uint8_t command)
+void LpsSaJobMgrApp::LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command command)
 {
     cpm_common_interfaces::msg::LpsSaWeighReqstChannel request;
 
     switch (command) {
-    case (cpm_common_interfaces::msg::WeighReqstChannelCommand::RESET_BEST_BUCKET_WEIGHT):
-    case (cpm_common_interfaces::msg::WeighReqstChannelCommand::CAPTURE_CYLINDER_EXTENSION_REFERENCE):
-    case (cpm_common_interfaces::msg::WeighReqstChannelCommand::CLEAR_REWEIGH_WARNING): {
-        request.command.value = command;
+    case (LpsSaWeighReqstChannel::Command::RESET_BEST_BUCKET_WEIGHT):
+    case (LpsSaWeighReqstChannel::Command::CAPTURE_CYLINDER_EXTENSION_REFERENCE):
+    case (LpsSaWeighReqstChannel::Command::CLEAR_REWEIGH_WARNING): {
+        request.command.value = static_cast<uint8_t>(command);
         break;
     }
     default: {
@@ -1240,8 +1185,10 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsSendCmd(uint8_t command)
     }
     }
 
-    if (!weighAppInf_.sendRequest(request)) {
-        AIS_LOG_ERROR("Failed to send weigh app request.");
+    if (weighAppInf_.sendRequest(request)) {
+        AIS_LOG_ERROR("[ROS2] Published weigh app request, command=%d", static_cast<int>(command));
+    } else {
+        AIS_LOG_ERROR("[ROS2] Failed to send weigh app request.");
     }
 }
 

@@ -1,0 +1,25 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the test/ directory.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+testEnv = baseEnv.Clone();
+Export( 'testEnv' )
+
+testEnv.buildit( 'TireRevTestApp', ['suse'] )
+testEnv.buildit( 'DigTimerTestApp', ['suse'] )
+
+if (testEnv[ 'PLATFORM' ] != 'x86_64-linux-gnu'):
+    testEnv.buildit( 'OperatorIdTest', ['suse'] )
+    # LpsSaTotalsTelemetryTest uses protoc 3.0.0 generated files incompatible with protobuf 5.x
+    if testEnv['PLATFORM'] not in ['A7H4']:
+        testEnv.buildit( 'LpsSaTotalsTelemetryTest', ['suse'] )

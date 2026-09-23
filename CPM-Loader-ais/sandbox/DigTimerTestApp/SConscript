@@ -1,0 +1,36 @@
+###############################################################################
+## @file      SConscript
+## @brief     SConscript for the baseMachineInterface application.
+##
+## @attention COPYRIGHT (C) 2015 CATERPILLAR INC. ALL RIGHTS RESERVED.
+## @attention
+## @attention Copyright (C) 2015
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+# create environment
+Import( 'testEnv' )
+localEnv = testEnv.Clone();
+
+localEnv.Append(CPPPATH = ['#prod/infrastructure/catdl']);
+localEnv.Append( LIBPATH = [ '#/apps/lib',
+              ] )
+
+# build our content
+sourceFiles = [ 
+   'DigTimerTestApp.cpp',
+]
+
+DigTimerTestApp = localEnv.ProgramWrapper(
+    target = 'DigTimerTestApp',
+        source = sourceFiles,
+        LIBS = ['ais_task',
+                 ]
+    )
+
+localEnv.InstallUnitTest( DigTimerTestApp)
+
+localEnv.Alias("DigTimerTestApp", "#bin/unit_test/DigTimerTestApp")

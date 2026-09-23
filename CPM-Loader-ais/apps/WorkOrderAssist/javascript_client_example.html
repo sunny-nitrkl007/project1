@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>WebSocket Test</title>
+</head>
+<body>
+<script>
+"use strict";
+var ws;
+window.onload = function() {
+  ws = new WebSocket("ws://165.26.79.19:55555/woa");
+  ws.onmessage = function(evt) {
+    console.log("WebSocket message received:", evt);
+    document.getElementById("output").innerHTML = evt.data;
+  };
+  ws.onopen = function(evt) {
+    console.log("WebSocket is open now.");
+  };
+  ws.onclose = function(evt) {
+    console.log("WebSocket is closed now (", evt.code, "), ", evt.reason);
+  };
+  ws.onerror = function(evt) {
+    console.error("WebSocket error observed:", evt);
+  };
+}
+
+window.onclose = function() {
+  ws.close();
+}
+
+function onClickSetSite() {
+  let siteId = prompt("Enter Site Id:", "1");
+  ws.send('{"Command": "SetSiteId", "Data": {"SiteId": ' + siteId + '}}');
+}
+
+function onClickGetSites() {
+  ws.send('{"Command": "GetSites"}');
+}
+
+function onClickGetJobs() {
+  ws.send('{"Command": "GetJobs"}');
+}
+
+function onClickGetZoneSummaries() {
+  ws.send('{"Command": "GetZoneSummaries"}');
+}
+
+function onClickSetJobDoing() {
+  let jobId = prompt("Enter Job Id:", "1");
+  ws.send('{"Command": "SetJobState", "Data": {"Id": ' + jobId + ', "State": "doing"}}');
+}
+
+function onClickSetJobToDo() {
+  let jobId = prompt("Enter Job Id:", "1");
+  ws.send('{"Command": "SetJobState", "Data": {"Id": ' + jobId + ', "State": "to-do"}}');
+}
+
+function onClickSetJobLoaded() {
+  let jobId = prompt("Enter Job Id:", "1");
+  let passCount = prompt("Enter Pass Count:", "3");
+  let weight = prompt("Enter Weight:", "24.0");
+  ws.send('{"Command": "SetJobLoadedTest", "Data": {"Id": ' + jobId + ', "PassCount": ' + passCount + ', "Weight": ' + weight + '}}');
+}
+
+function onClickReadSettings() {
+  ws.send('{"Command": "ReadSettings"}');
+}
+
+function onClickWriteSettings() {
+  let n = prompt("Enter Job Warning Threshold:", "20.0");
+  ws.send('{"Command": "WriteSettings", "Data": {"JobTimeWarningMinutes": ' + n + '}}');
+}
+
+</script>
+<button onclick="onClickGetSites()">Get Sites</button>
+<button onclick="onClickSetSite()">Set Site</button>
+<br>
+<button onclick="onClickGetJobs()">Get Jobs</button>
+<button onclick="onClickGetZoneSummaries()">Get Zone Summaries</button>
+<br>
+<button onclick="onClickSetJobDoing()">Set Job Doing</button>
+<button onclick="onClickSetJobToDo()">Set Job ToDo</button>
+<button onclick="onClickSetJobLoaded()">Set Job Loaded</button>
+<br>
+<button onclick="onClickReadSettings()">Read Settings</button>
+<button onclick="onClickWriteSettings()">Write Settings</button>
+<p id="output"></p>
+</body>
+</html>

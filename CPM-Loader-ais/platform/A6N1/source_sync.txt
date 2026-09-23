@@ -1,0 +1,7 @@
+apps
+config
+platform/A6N1
+platform/common
+prod
+sandbox
+SConstruct

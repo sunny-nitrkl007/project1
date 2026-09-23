@@ -1,0 +1,16 @@
+setup
+
+cd ~/git/a6n2/ssp-linux/lib_oss/grpc-a/tgt_gcc_4.4.3_ubuntu
+git checkout grpc_v1.0.0_2018.1.0
+
+SSP_LINUX_PATH=~/git/a6n2/ssp-linux/
+PROTO_FILE_PATH=~/git/temp/
+PROTO_FILE_NAME=CPMTicket.proto
+CPP_FILE_PATH=~/git/temp/
+
+Generate grpc proto files (not needed since we use filetransferbridgeapp to send)
+${SSP_LINUX_PATH}/lib_oss/grpc-a/tgt_gcc_4.4.3_ubuntu/protoc/protoc --proto_path=${PROTO_FILE_PATH} --grpc_out=${CPP_FILE_PATH} --plugin=protoc-gen-grpc=${SSP_LINUX_PATH}/lib_oss/grpc-a/tgt_gcc_4.4.3_ubuntu/protoc/grpc_cpp_plugin ${PROTO_FILE_PATH}/${PROTO_FILE_NAME}
+
+Generate proto files: 
+${SSP_LINUX_PATH}/lib_oss/grpc-a/tgt_gcc_4.4.3_ubuntu/protoc/protoc --proto_path=${PROTO_FILE_PATH} --cpp_out=${CPP_FILE_PATH} ${PROTO_FILE_PATH}/${PROTO_FILE_NAME}
+

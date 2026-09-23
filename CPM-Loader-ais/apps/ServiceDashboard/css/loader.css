@@ -1,0 +1,75 @@
+/* CSS specific for Service Dashboard page */
+/* Make collapsable panels more obvious */
+.panel-title:hover {
+  cursor: pointer;
+}
+
+.my-icon {
+    width: 30px;
+    height: auto;
+}
+
+.open-folder-icon {
+    font-family: arial,sans-serif;
+}
+
+/* Making primary button Cat yellow */
+.btn-primary{
+  color:#000;
+  background-color:#FFCC00;
+  border-color:#FF9900
+}
+.btn-primary:hover,.btn-primary:focus,.btn-primary:active,.btn-primary.active,.open .dropdown-toggle.btn-primary{
+  color:#000;
+  background-color:#FF9900;
+  border-color:#FF9900
+}
+.btn-primary.disabled,.btn-primary[disabled],fieldset[disabled] .btn-primary,.btn-primary.disabled:hover,.btn-primary[disabled]:hover,fieldset[disabled] .btn-primary:hover,.btn-primary.disabled:focus,.btn-primary[disabled]:focus,fieldset[disabled] .btn-primary:focus,.btn-primary.disabled:active,.btn-primary[disabled]:active,fieldset[disabled] .btn-primary:active,.btn-primary.disabled.active,.btn-primary[disabled].active,fieldset[disabled] .btn-primary.active{
+  background-color:#FF9900;
+  border-color:#FF9900
+}
+
+/*  Enable Dowload All System Watches DropDown to be visible
+  over the Buttons layer.*/
+.panel-default.service-dashboard-panel{
+  overflow: visible;
+}
+
+.btn-service-panel {
+  min-width: 100px;
+  max-width: 500px;
+  margin-top: 1.75px;
+  margin-bottom: 1.75px;
+}
+
+tfoot td {
+  border: 3px solid;
+}
+
+thead tr :first-child {
+  text-align: center;
+}
+
+table, th, td {
+  padding: 3px;
+  border: 1px solid;
+}
+
+
+/* Make the Button swtich to a menu like appearence on lower
+  browser window sizes make it more readable without horizontal scrolling. */
+@media (min-width:100px) and (max-width:575px) 
+{
+  .btn-service-panel {
+    width: 100%;
+  }
+}
+
+/* Adjust padding in two line mode when more than one button is available on
+  second line. */
+@media (min-width:576px) and (max-width:1200px) 
+{
+  .btn-service-panel {
+  }
+}
+

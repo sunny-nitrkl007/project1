@@ -1,0 +1,24 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+myEnv.Append(CPPPATH = ['xcp_server/linux', 
+                        '#/lps_cal/include',
+                        ])
+
+sourceFiles = [
+    'xcp_server/XCPServer.c',
+    'xcp_server/XCPServer_mem.c',
+    'xcp_server/db/XCPServerDb.cpp',
+    'xcp_server/linux/XCPHal.c',
+    'XcpServerTask.cpp',
+    'xcpServerDb.cpp'
+]
+
+aisXcpServer = myEnv.Program(
+        target = 'aisXcpServer',
+        source = sourceFiles,
+        LIBS = [ 'ais_task' ]
+    )
+
+myEnv.InstallBinary(aisXcpServer)
+

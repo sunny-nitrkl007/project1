@@ -1,0 +1,3164 @@
+{
+	"info": {
+		"_postman_id": "f5c3f088-1e00-49f7-a464-752063c5e53c",
+		"name": "Standalone Payload",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Lists",
+			"item": [
+				{
+					"name": "Get Truck List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=TruckList",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "TruckList"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Custom List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=CustomList1",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "CustomList1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Custom List Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=CustomListSettings",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "CustomListSettings"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Custom Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=CustomInfo",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "CustomInfo"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Custom List Settings",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"CustomListSettings_Wr\": {\n\t\t\"list3Enabled\": true\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Custom Info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"CustomInfo_Wr\": {\n\t\t\"tag1\": \"Pavan\",\n\t\t\"tag2\": \"Aaron\",\n\t\t\"tag3\": \"Eric\",\n\t\t\"tag4\": \"Khyati\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Custom List",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"CustomList4\": [\r\n    { \"name\":\"Item 1\" },\r\n    { \"name\":\"Item 2\" },\r\n    { \"name\":\"Item 3\" },\r\n    { \"name\":\"Item 4\" },\r\n    { \"name\":\"Item 5\" }\r\n] }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Truck List 1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TruckList\": [\r\n    { \"id\": 400, \"name\": \"Truck 400\", \"targetWeight\": 400.1 },\r\n    { \"id\": 401, \"name\": \"Truck 401\", \"targetWeight\": 401.2 },\r\n    { \"id\": 402, \"name\": \"Truck 402\", \"targetWeight\": 402.3 },\r\n    { \"id\": 403, \"name\": \"Truck 403\", \"targetWeight\": 403.4 },\r\n    { \"id\": 404, \"name\": \"Truck 404\", \"targetWeight\": 404.5 },\r\n    { \"id\": 405, \"name\": \"Truck 405\", \"targetWeight\": 405.6 },\r\n    { \"id\": 406, \"name\": \"Truck 406\", \"targetWeight\": 406.7 },\r\n    { \"id\": 407, \"name\": \"Truck 407\", \"targetWeight\": 407.8 },\r\n    { \"id\": 408, \"name\": \"Truck 408\", \"targetWeight\": 408.9 },\r\n    { \"id\": 409, \"name\": \"Truck 409\"}\r\n] }\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Truck List 2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TruckList\": [\r\n    { \"id\": 100, \"name\": \"Truck 100\", \"targetWeight\": 100.0 },\r\n    { \"id\": 101, \"name\": \"Truck 101\", \"targetWeight\": 101.0 },\r\n    { \"id\": 102, \"name\": \"Truck 102\", \"targetWeight\": 102.0 },\r\n    { \"id\": 103, \"name\": \"Truck 103\", \"targetWeight\": 103.0 },\r\n    { \"id\": 104, \"name\": \"Truck 104\", \"targetWeight\": 104.0 },\r\n    { \"id\": 105, \"name\": \"Truck 105\", \"targetWeight\": 105.0 },\r\n    { \"id\": 106, \"name\": \"Truck 106\", \"targetWeight\": 106.0 },\r\n    { \"id\": 107, \"name\": \"Truck 107\", \"targetWeight\": 107.0 },\r\n    { \"id\": 108, \"name\": \"Truck 108\", \"targetWeight\": 108.0 },\r\n    { \"id\": 109, \"name\": \"Truck 109\", \"targetWeight\": 109.0 }\r\n] }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Truck List Empty",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"TruckList\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Truck List Wrong",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TruckList\": {} }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Material List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=MaterialList",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "MaterialList"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Material List 1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"MaterialList\": [\r\n    { \"id\": 100, \"name\": \"Material 100\", \"density\": 100.1 },\r\n    { \"id\": 101, \"name\": \"Material 101\", \"density\": 101.2 },\r\n    { \"id\": 102, \"name\": \"Material 102\", \"density\": 102.3 },\r\n    { \"id\": 103, \"name\": \"Material 103\", \"density\": 103.4 },\r\n    { \"id\": 104, \"name\": \"Material 104\", \"density\": 104.5 },\r\n    { \"id\": 105, \"name\": \"Material 105\", \"density\": 105.6 },\r\n    { \"id\": 106, \"name\": \"Material 106\", \"density\": 106.7 },\r\n    { \"id\": 107, \"name\": \"Material 107\", \"density\": 107.8 },\r\n    { \"id\": 108, \"name\": \"Material 108\", \"density\": 108.9 },\r\n    { \"id\": 109, \"name\": 109, \"density\": \"hi\" }\r\n] }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Material List 2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"MaterialList\": [\r\n    { \"id\": 200, \"name\": \"Material 200\", \"density\": 200.0 },\r\n    { \"id\": 201, \"name\": \"Material 201\", \"density\": 201.0 },\r\n    { \"id\": 202, \"name\": \"Material 202\", \"density\": 202.0 },\r\n    { \"id\": 203, \"name\": \"Material 203\", \"density\": 203.0 },\r\n    { \"id\": 204, \"name\": \"Material 204\", \"density\": 204.0 },\r\n    { \"id\": 205, \"name\": \"Material 205\", \"density\": 205.0 },\r\n    { \"id\": 206, \"name\": \"Material 206\", \"density\": 206.0 },\r\n    { \"id\": 207, \"name\": \"Material 207\", \"density\": 207.0 },\r\n    { \"id\": 208, \"name\": \"Material 208\", \"density\": 208.0 },\r\n    { \"id\": 209, \"name\": \"Material 209\", \"density\": 209.0 }\r\n] }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Material List Empty",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"MaterialList\": [] }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Totals",
+			"item": [
+				{
+					"name": "Get Material Totals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=MaterialTotals",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "MaterialTotals"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tag Totals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=Tag1Totals",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "Tag1Totals"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Truck Totals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=TruckTotals",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "TruckTotals"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lifetime Totals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=LifetimeTotals",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "LifetimeTotals"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trip B Totals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=TripBTotals",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "TripBTotals"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trip A Totals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=TripATotals",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "TripATotals"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Totals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=AllTotals",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "AllTotals"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Material Totals",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"MaterialTotals_Clr\": \"\" }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Truck Totals",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TruckTotals_ClrAll\": \"truck10\" }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Tag Totals",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"Tag4Totals_ClrAll\": true }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Truck Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TruckReport_Clr\": \"\" }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Material Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"MaterialTotals_Req\": true }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Trip A",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TripATotals_Clr\": true }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Trip B",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TripBTotals_Clr\": true }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Trip A & B",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TripATotals_Clr\": true, \"TripBTotals_Clr\": true }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Printer",
+			"item": [
+				{
+					"name": "Print Material Totals",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"MaterialTotals_Prt\": \"\" }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Print Truck Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"TruckReport_Prt\": \"\" }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Print Stored Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"StoredTicket_Prt\": \"\" }"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Print Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"Test_Prt\": 1 }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Printer Cnfg",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=PrinterCnfg",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "PrinterCnfg"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Printer Cnfg",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"PrinterCnfg_Wr\": {\n\t\t\"installed\": false,\n\t\t\"numCopies\": 2,\n        \"leadingBlankLines\": 1,\n        \"trailingBlankLines\": 3,\n        \"headerLine1\": \"Test34\",\n        \"headerLine2\": \"Test23\",\n        \"headerLine3\": \"Test11\",\n        \"footerLine1\": \"Test22\",\n        \"ticketNumber\": 1080,\n        \"dateFromat\": 1649,\n        \"dateSeparator\": 1657\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}&installed=false&numCopies=2&headerLine1=test1&headerLine2=test2&headerLine3=test3&footerLine1=test4&ticketNumber=1080&dateFormat=1649&dateSeparator=1657",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								},
+								{
+									"key": "installed",
+									"value": "false"
+								},
+								{
+									"key": "numCopies",
+									"value": "2"
+								},
+								{
+									"key": "headerLine1",
+									"value": "test1"
+								},
+								{
+									"key": "headerLine2",
+									"value": "test2"
+								},
+								{
+									"key": "headerLine3",
+									"value": "test3"
+								},
+								{
+									"key": "footerLine1",
+									"value": "test4"
+								},
+								{
+									"key": "ticketNumber",
+									"value": "1080"
+								},
+								{
+									"key": "dateFormat",
+									"value": "1649"
+								},
+								{
+									"key": "dateSeparator",
+									"value": "1657"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Display",
+			"item": [
+				{
+					"name": "Get Display Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=DisplaySettings,ServiceMode_Rd,ServicePassword_Rd",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "DisplaySettings,ServiceMode_Rd,ServicePassword_Rd"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Local Time",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=LocalTime",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "LocalTime"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Display Settings",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"DisplaySettings_Wr\": {\n\t\t\"units\": 1,\n\t\t\"language\": 1,\n\t\t\"brightness\": 90,\n\t\t\"timeFormat\": 0,\n\t\t\"dateFormat\": 1650,\n\t\t\"weightUnits\": 990,\n\t\t\"weightResolution\": 1,\n\t\t\"payloadSystemDisplayMode\": 1645\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Display Settings Weight Units",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"DisplaySettings_Wr\": {\n\t\t\"units\": 1,\n\t\t\"weightUnits\": 2007,\n\t\t\"weightPrecision\": 3\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enter Service Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ServicePassword_Wr\": 1925\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enter Service Mode",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"ServiceMode_Wr\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Heartbeat",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=Heartbeat&did=1234",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "Heartbeat"
+								},
+								{
+									"key": "did",
+									"value": "1234"
+								}
+							]
+						},
+						"description": "Get the heartbeat information."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Show/Hide Config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=UI_SHOW_FEATURE_CONFIG",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "UI_SHOW_FEATURE_CONFIG"
+								}
+							]
+						},
+						"description": "Get the UI Show/Hide Config."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Detailed Diagnostics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=DetailedDiagnostics",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "DetailedDiagnostics"
+								}
+							]
+						},
+						"description": "Get the UI Show/Hide Config."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Popup",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=ActiveInfo_Rd,ActiveEvent_Rd,ActiveDiag_Rd",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "ActiveInfo_Rd,ActiveEvent_Rd,ActiveDiag_Rd"
+								}
+							]
+						},
+						"description": "Get the Popup data."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payload Settings",
+			"item": [
+				{
+					"name": "Get Payload Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=PayloadSettings",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "PayloadSettings"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cal Weight",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=SuggestedCalWeightEntry_Rd",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "SuggestedCalWeightEntry_Rd"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Simple Cal",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=SimpleCalList_Rd",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "SimpleCalList_Rd"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Manual Add Enable Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"PayloadSettings_Wr\": {\n\t\t\"manualAddEnabled\": 0\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Hyd Oil Temp Enable Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"PayloadSettings_Wr\": {\n\t\t\"hydOilTempEnabled\": 1\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Multi Task Enable Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"PayloadSettings_Wr\": {\n\t\t\"multiTaskEnabled\": 1\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Horn On Store Enable Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"PayloadSettings_Wr\": {\n\t\t\"hornStoreEnable\": 0\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Calibration Weight",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"CalibrationWeightEntry_Wr\": 8.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Target Weight",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"TargetWeightEntry\": 10.0\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Target, Material, Truck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=TargetWeight,TruckInfo,MaterialInfo",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "TargetWeight,TruckInfo,MaterialInfo"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Truck Info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"TruckInfo_Wr\": {\n\t\t\"id\": 2,\n\t\t\"name\": \"--\",\n\t\t\"targetWeight\": 22.2\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Material Info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"MaterialInfo_Wr\": {\n\t\t\"id\": 45,\n\t\t\"name\": \"--\",\n\t\t\"density\": 4545.001\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payload Buttons",
+			"item": [
+				{
+					"name": "Clear",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"ClearEnable\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Store",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"StoreReqstEnable\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reweigh",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"ReWeighEnable\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Manual Add",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"ManualAdd\":1}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Select Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"SelectTask\":2}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LFT",
+			"item": [
+				{
+					"name": "Set LFT Seal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"LFTSealed_Wr\": true\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set LFT Sensor Ids",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"LFTSensorIds_Wr\": {\n\t\t\"liftPositionSensorId\": \"Sensor 1\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set LFT Settings",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"LFTSettings_Wr\": {\n\t\t\"verificationModeEnabled\": false\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Work Tool Info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"WorkToolInfo_Wr\": {\n\t\t\"id\": \"Fork!\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get LFT Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=LFTSummary",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "LFTSummary"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get LFT Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=LFTSettings",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "LFTSettings"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get LFT Sealed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=LFTSealed",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "LFTSealed"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get LFT Sensor Ids",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=LFTSensorIds",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "LFTSensorIds"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Work Tool Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=WorkToolInfo",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "WorkToolInfo"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ticket History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=TicketHistory&localDate=2024-11-04&page=previous",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "TicketHistory"
+								},
+								{
+									"key": "localDate",
+									"value": "2024-11-04"
+								},
+								{
+									"key": "page",
+									"value": "previous"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Service History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=FileRequest&fileRequested=ServiceHistory",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "FileRequest"
+								},
+								{
+									"key": "fileRequested",
+									"value": "ServiceHistory"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "USB",
+			"item": [
+				{
+					"name": "Set USBSave",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"USBSave\": 1 }"
+						},
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{CmdRequestType}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get USBSaveProgress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=USBSaveProgress",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "USBSaveProgress"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get USBSave",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=USBSave",
+							"protocol": "http",
+							"host": [
+								"165",
+								"26",
+								"79",
+								"19"
+							],
+							"port": "8080",
+							"path": [
+								"CPM",
+								"cgi-bin",
+								"jhm2CgiApp.cgi"
+							],
+							"query": [
+								{
+									"key": "requestType",
+									"value": "{{ParamRequestType}}"
+								},
+								{
+									"key": "paramsRequested",
+									"value": "USBSave"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Payload Info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=PayloadInfo",
+					"protocol": "http",
+					"host": [
+						"165",
+						"26",
+						"79",
+						"19"
+					],
+					"port": "8080",
+					"path": [
+						"CPM",
+						"cgi-bin",
+						"jhm2CgiApp.cgi"
+					],
+					"query": [
+						{
+							"key": "requestType",
+							"value": "{{ParamRequestType}}"
+						},
+						{
+							"key": "paramsRequested",
+							"value": "PayloadInfo"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Machine Model",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{ParamRequestType}}&paramsRequested=MM_Selected_Rd",
+					"protocol": "http",
+					"host": [
+						"165",
+						"26",
+						"79",
+						"19"
+					],
+					"port": "8080",
+					"path": [
+						"CPM",
+						"cgi-bin",
+						"jhm2CgiApp.cgi"
+					],
+					"query": [
+						{
+							"key": "requestType",
+							"value": "{{ParamRequestType}}"
+						},
+						{
+							"key": "paramsRequested",
+							"value": "MM_Selected_Rd"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Invalid Request",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType=InvalidRequest&paramsRequested=PayloadInfo",
+					"protocol": "http",
+					"host": [
+						"165",
+						"26",
+						"79",
+						"19"
+					],
+					"port": "8080",
+					"path": [
+						"CPM",
+						"cgi-bin",
+						"jhm2CgiApp.cgi"
+					],
+					"query": [
+						{
+							"key": "requestType",
+							"value": "InvalidRequest"
+						},
+						{
+							"key": "paramsRequested",
+							"value": "PayloadInfo"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reboot",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://165.26.79.19:8080/CoreInfrastructure/cgi-bin/trigger_reboot.cgi?appname=networkconfig",
+					"protocol": "http",
+					"host": [
+						"165",
+						"26",
+						"79",
+						"19"
+					],
+					"port": "8080",
+					"path": [
+						"CoreInfrastructure",
+						"cgi-bin",
+						"trigger_reboot.cgi"
+					],
+					"query": [
+						{
+							"key": "appname",
+							"value": "networkconfig"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BEMSim Cnfg",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"BEMSimCnfg_Wr\": {\n        \"enabled\": 1,\n        \"chargerCapacity\": 250.00,\n        \"engineDerateEnabled\": 0,\n        \"stateOfCharge\": 92.0\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://165.26.79.19:8080/CPM/cgi-bin/jhm2CgiApp.cgi?requestType={{CmdRequestType}}&enabled=1.00&chargerCapacity=250.00&engineDerateEnabled=0.00&stateOfCharge=0.23",
+					"protocol": "http",
+					"host": [
+						"165",
+						"26",
+						"79",
+						"19"
+					],
+					"port": "8080",
+					"path": [
+						"CPM",
+						"cgi-bin",
+						"jhm2CgiApp.cgi"
+					],
+					"query": [
+						{
+							"key": "requestType",
+							"value": "{{CmdRequestType}}"
+						},
+						{
+							"key": "enabled",
+							"value": "1.00",
+							"description": "Values 0.0(disabled) or 1.00 (enabled)"
+						},
+						{
+							"key": "chargerCapacity",
+							"value": "250.00",
+							"description": "Values:22.00, 44.00, 120.00, 250.00"
+						},
+						{
+							"key": "engineDerateEnabled",
+							"value": "0.00",
+							"description": "Values 0.0(disabled) or 1.00 (enabled)"
+						},
+						{
+							"key": "stateOfCharge",
+							"value": "0.23",
+							"description": "Values 0.0 to 100.00 for percent SoC"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ParamRequestType",
+			"value": "ParameterRequest2"
+		},
+		{
+			"key": "CmdRequestType",
+			"value": "CommandRequest2"
+		}
+	]
+}

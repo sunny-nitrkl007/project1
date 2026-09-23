@@ -1,0 +1,48 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-function'])
+
+# Include the super-project directory so that we can find lps_common
+# source files.
+Repository(myEnv[ 'SSP_DIR' ])
+
+# Include paths
+myEnv.Append(CPPPATH = [
+    '#/apps/include',
+    '#/lps_common/include',
+    '#/TES-common-ais/prod/common/chrono',    
+])
+
+sourceFiles = [
+    # This file is built in various apps, so we need to give the object a unique path for this app.
+    myEnv.Object('LpsCommonWeight', '#/lps_common/src/LpsCommonWeight.c'),
+    'LpsSaListMgrApp.cpp',
+    '#/prod/common/interfaces/LpsSaListMgr/CPMListSync/CPMList.pb.cc',
+]
+
+LpsSaListMgrApp = myEnv.Program( 
+        target = 'LpsSaListMgrApp',
+        source = sourceFiles,
+        LIBS = [ 'ais_task',
+                 'protobuf',
+                 'ais_config',
+                 'ais_log',
+                 'crypto',
+                 'CPMOperatorIdList'                                  
+         ]
+    )
+
+myEnv.InstallBinary( LpsSaListMgrApp )
+myEnv.Alias("LpsSaListMgrApp", "#bin/LpsSaListMgrApp")
+
+myEnv.InstallUnitTest(
+    myEnv.Program(
+        target = 'LpsSaListMgrTestApp',
+        source = ['test/LpsSaListMgrTestApp.cpp'],
+        LIBS = ['ais_task', 'ais_config', 'ais_log']
+    ),
+    #add_to_run_list = False
+)
+myEnv.Alias('LpsSaListMgrTestApp', '#bin/unit_test/LpsSaListMgrTestApp')

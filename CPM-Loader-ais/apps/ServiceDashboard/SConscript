@@ -1,0 +1,61 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+# myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-variable'])
+
+# This is to get 'boost/cgi/...'
+myEnv.Append(CPPPATH = ['#../TES-common-ais/prod/common/jhm2']);
+
+cgiLibs = [
+    myEnv['BOOST_SYSTEM'],
+    myEnv['BOOST_FILESYSTEM']
+]
+
+uploadMaterialListCgi = myEnv.Program(
+    target = 'service_upload_material_list.cgi',
+    source = 'service_upload_material_list.cpp',
+    LIBS = cgiLibs
+)
+
+uploadTruckListCgi = myEnv.Program(
+    target = 'service_upload_truck_list.cgi',
+    source = 'service_upload_truck_list.cpp',
+    LIBS = cgiLibs
+)
+
+uploadOperatorIdListCgi = myEnv.Program(
+    target = 'service_upload_operator_id_list.cgi',
+    source = 'service_upload_operator_id_list.cpp',
+    LIBS = cgiLibs
+)
+
+uploadCustomListCgi = myEnv.Program(
+    target = 'service_upload_custom_list.cgi',
+    source = 'service_upload_custom_list.cpp',
+    LIBS = cgiLibs
+)
+
+# Install Cgi Endpoints
+myEnv.InstallCgi([
+    'service_download_truck_list.cgi',
+    'service_download_material_list.cgi',
+    'service_download_operator_id_list.cgi',
+    'service_download_custom_list_1.cgi',
+    'service_download_custom_list_2.cgi',
+    'service_download_custom_list_3.cgi',
+    'service_download_custom_list_4.cgi',
+    'service_download_list.sh',
+    uploadMaterialListCgi,
+    uploadTruckListCgi,
+    uploadOperatorIdListCgi,
+    uploadCustomListCgi,
+    'service_download_vp3_all.cgi',
+    'service_download_vp3_new.cgi'
+])
+
+# Install Service Dashboard Web App
+myEnv.InstallWeb(['index.html'], 'ServiceDashboard/')
+myEnv.InstallWeb(Glob('./css/*'), 'ServiceDashboard/css/')
+myEnv.InstallWeb(Glob('./images/*'), 'ServiceDashboard/images/')
+myEnv.InstallWeb(Glob('./js/*'), 'ServiceDashboard/js/')

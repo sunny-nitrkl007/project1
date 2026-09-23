@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>cpm_scs_bridge</name>
+  <version>0.1.0</version>
+  <description>
+    Development-Plan.txt Step 7: relays the JobMgr/WeighApp DDS topics that
+    still need to reach not-yet-migrated SCS peers (legacy UI, hardware,
+    DisplayApp) -- and the reverse direction -- by binding the real SCS
+    channels via task::InterfaceDb alongside rclcpp publishers/subscribers
+    on the same topics JobMgr/WeighApp already use.
+  </description>
+  <maintainer email="aawara.sunny@gmail.com">sunny</maintainer>
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>cpm_common_interfaces</depend>
+  <depend>job_mgr_interfaces</depend>
+  <depend>weigh_app_interfaces</depend>
+
+  <!--
+    NOTE: this package also links against the AIS SDK (ais/task/Task.h,
+    task::InterfaceDb, and the real per-channel interface headers under
+    interfaces/<Channel>/) the same way LpsSaJobMgrApp/LpsSaWeighApp do via
+    their SConscript CPPPATH/LIBPATH. That SDK is not an ament/colcon
+    package and isn't declared as a <depend> here -- see CMakeLists.txt's
+    AIS_SDK_ROOT block, which mirrors the same "point this at your real
+    site-2 SDK install" placeholder pattern already used and documented for
+    the Stage 1 folders' SConscript wiring.
+  -->
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

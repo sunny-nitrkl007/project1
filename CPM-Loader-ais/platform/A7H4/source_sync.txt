@@ -1,0 +1,8 @@
+apps
+config
+platform/A7H4
+platform/A7H4-adv
+platform/common
+prod
+sandbox
+SConstruct
