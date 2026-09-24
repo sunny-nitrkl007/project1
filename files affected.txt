@@ -1,0 +1,60 @@
+FILES AFFECTED 
+-----------------------------------------------------------------------
+
+App core (Task inheritance, initialize/executive/cleanup, entry point):
+   - apps/LpsSaJobMgrApp/LpsSaJobMgrApp.h
+   - apps/LpsSaJobMgrApp/LpsSaJobMgrApp.cpp
+   - apps/LpsSaWeighApp/LpsSaWeighApp.h
+   - apps/LpsSaWeighApp/LpsSaWeighApp.cpp
+
+ConfigSection (ais_config) call sites - the 16 from point 1:
+   - apps/LpsSaJobMgrApp/LpsSaJobMgrApp.cpp (5 sites)
+   - apps/LpsSaWeighApp/LpsSaCalibration.cpp (3 sites)
+   - apps/LpsSaWeighApp/LpsSaChassisIMU.h (2 sites, plus the
+     TaskParser&-typed function signature itself)
+   - apps/LpsSaWeighApp/LpsSaLinkageTables.cpp (2 sites)
+   - apps/LpsSaWeighApp/LpsSaWeighApp.cpp (2 more sites, on top of
+     being a core file above)
+   - apps/LpsSaWeighApp/LpsSaWeighApp.h (1 include site)
+
+commTask (WeighApp only):
+   - apps/LpsSaWeighApp/LpsSaWeighApp.h (inheritance)
+   - apps/LpsSaWeighApp/LpsSaWeighApp.cpp (commInitialize() call site)
+
+Other WeighApp source still pulling in AIS Task headers:
+   - apps/LpsSaWeighApp/adv/TipoffAssist.cpp (includes ais/task/Task.h)
+
+Build files - both currently link ais_task/ais_config/ais_log
+(and commTask for WeighApp) as base libraries; both need a new
+entry point in place of what AIS Task's main() provides today:
+   - apps/LpsSaJobMgrApp/SConscript
+   - apps/LpsSaWeighApp/SConscript
+
+Process launch / supervision config (point 3 territory) - these
+currently register both apps as AIS Tasks, with PCM autoRestart
+behavior defined here:
+   - config/ExecutionTable_CPM.rb
+   - config/CommonTasks.rb (autoRestart, timeBetweenRestarts_s per app)
+
+Config files (stay in place either way - AIS looks up the .rb by
+name regardless of contents, per the config migration report):
+   - config/LpsSaJobMgrApp.rb
+   - config/LpsSaWeighApp.rb
+   - config/ros2/lps_sa_job_mgr_app_params.yaml (drafted, unmerged)
+   - config/ros2/lps_sa_weigh_app_params.yaml (drafted, unmerged)
+   - config/SConscript (deploys config files to target; 'yaml' is
+     not currently in its configFileTypes whitelist - a real gap
+     for actually shipping the YAML files above)
+
+Test fixture (point 6):
+   - Weigh App's existing automated test fixture, itself built on
+     AIS Task - needs to be identified precisely and reworked; not
+     yet pinned down to exact file paths in this pass.
+
+Not yet identified, because they depend on decisions not yet made:
+   - Whatever new entry point/main() replaces AIS Task's bootstrap
+     for both apps (point 5) - does not exist yet.
+   - Whatever process-health/supervision replacement or compatibility
+     layer is decided on (point 3) - does not exist yet.
+   - Whatever scheduling/priority-sync mechanism is decided on
+     (point 8) - does not exist yet.
