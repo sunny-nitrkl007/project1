@@ -1,0 +1,138 @@
+AIS TASK FRAMEWORK MIGRATION - JOB MANAGER & WEIGH APP
+Status update and time justification
+=========================================================================
+
+BACKGROUND
+-----------------------------------------------------------------------
+Communication migration (all 45 channels across Job Manager and Weigh
+App, plus the SCS-to-ROS2 bridge for legacy raw-SCS consumers) is
+complete and has been tested on the A7H4 target.
+
+The next phase is removing the AIS Task framework itself from these
+two applications - i.e. no longer building them as AIS "Task" processes,
+so they run as standalone ROS2 nodes with no AIS framework dependency
+left in the binary.
+
+Scope: LpsSaJobMgrApp and LpsSaWeighApp only.   
+
+Task migration scope specifically covers: ais_task, ais_config,
+ais_log, and commTask (a small WeighApp-only mixin). 
+
+
+PROGRESS UPDATE
+-----------------------------------------------------------------------
+Communication changes from SCS based to DDS and AIS logging migration across both apps
+has been completed.
+
+Config migration (Ruby .rb to ROS2 YAML parameters) is partially done in a
+separate branch, not yet merged, built, or run: 7 of the config keys across
+both apps have YAML files and guarded code overrides written (old .rb stays
+primary; YAML only overrides if actually deployed - nothing is removed and
+nothing changes behavior until a YAML file is placed on the target). See
+"Configuration format" below for what's done, what's blocked, and why.
+
+WHY THIS PHASE STILL TAKES TIME
+-----------------------------------------------------------------------
+
+1. Remaining mechanical call sites.
+   16 ConfigSection reads (task configuration access) across both
+   apps still need to be replaced, all still present and unchanged
+   today. This counts code locations that use the AIS ConfigSection
+   type. Each one has to be swapped and re-verified to
+   compile and behave correctly.
+
+2. Weigh App carries more coupling than Job Manager, and it is not
+   uniform extra work - two of the cases are structurally harder,
+   not just more of the same.
+   - Weigh App inherits from two AIS base classes (task::Task AND a
+     second mixin, commTask), where Job Manager only inherits one.
+     commTask is small (one function, commInitialize(), which just
+     calls the platform's oel_sys_init()), but it is a second call
+     site that has to be found and handled alongside the main Task
+     removal, not skipped because it looks minor.
+
+3. Process supervision needs to be checked.
+   Today, the platform's process manager (PCM) tracks whether Job
+   Manager and Weigh App are alive by reading a health message that
+   only the AIS Task framework produces internally (cycle rate,
+   execution count, task state). If Task is removed with no
+   replacement, PCM will silently believe both processes have died,
+   even though they are running fine. This has to be decided (keep
+   supervision with a small compatibility layer, or move supervision
+   to a different mechanism) before implementation starts, not
+   discovered partway through.
+
+4. Removing Task also removes the thing currently driving the 50 Hz
+   loop, and its replacement can only be checked on hardware.
+   Weigh App's control loop is timed today by AIS Task's own
+   CycleBasedExecutive - the drift-compensated timer inside Task/
+   TaskCore that calls executive() at the configured rate (the same
+   internal mechanism flagged in point 7 for cycleRate_hz). Once Task
+   is removed, that timer is gone and has to be replaced with a
+   ROS2-native equivalent that the app owns itself.
+
+5. Removing Task means replacing a shutdown guarantee it currently
+   provides, not just deleting code.
+   Today, AIS Task is what catches the shutdown signal and decides
+   when to call cleanup() - that is exactly why both apps' cleanup()
+   can safely tear down their ROS2 interfaces first and then do
+   further work (NVM/file writes) afterward, in an order the app
+   controls. Once Task is removed, ROS2's own default signal handling
+   takes over, and by default it can tear down communication on its
+   own as soon as a shutdown signal arrives - before app cleanup code
+   gets to run in the order it currently expects. Whatever replaces
+   Task's entry point has to deliberately reproduce that same
+   guarantee (run cleanup to completion, in app-controlled order,
+   before communication tears down), or an ordering that is safe
+   today stops being safe by default. This kind of issue does not
+   fail loudly - it fails silently during shutdown, which is the kind
+   of thing that only surfaces in the field, not in a normal test run.
+
+6. The existing automated test fixture for Weigh App is itself built
+   on the AIS framework.
+   It has to be reworked before it can be trusted to validate the
+   migrated code - a test harness built on the thing being removed
+   cannot verify that the removal worked correctly.
+
+7. Configuration format - progress made
+   7 distinct config keys across both apps (storage paths, cycle
+   rate, truck-cal limits, etc.) already have a working YAML +
+   guarded-override pattern drafted - safe, additive, not yet built
+   or run. This does not reduce the 16 in point 1: the old
+   ConfigSection read behind each of these 7 keys is kept exactly as
+   it is today, since the new YAML path only overrides it if
+   deployed, and more than one key can share a single ConfigSection
+   declaration. 
+   
+ 8.Separately, three settings - scheduler, schedulerPriority (both apps), and
+   cycleRate_hz (JobMgr only) - were confirmed to be read exclusively
+   by AIS Task/TaskCore internals (sched_setscheduler(), the
+   CycleBasedExecutive thread), not by either app's own code.
+   This needs to be worked out properly, not just replicated as a
+   number: setting an equivalent scheduler/priority in ROS2 is not
+   just a local choice for these two apps. Every other AIS task on
+   this platform is still running under AIS's own SCHED_RR priority
+   scheme after this migration, unaffected and unchanged. Whatever
+   priority JobMgr and WeighApp end up with on the ROS2 side has to
+   stay correctly ranked against those still-AIS priorities on the
+   same box, or real-time contention between an AIS task and a ROS2
+   task could behave differently than it does today. How to keep AIS
+   task priorities and ROS2 task priorities in sync on one machine is
+   an open question that needs a decision, not just a code change.
+
+8. Several other config keys, and the verification of the drafted
+   work itself, are also not done yet - for reasons unrelated to
+   Task removal.
+   - loggerThreshold (both apps) - sets the AIS logger's verbosity,
+     not something either app's business logic reads. 
+   - ChassisIMU.*  -
+     the value is read
+     inside a function that takes AIS's TaskParser& as a parameter,
+     so migrating it means changing that function's signature and
+     its caller together. A draft exists but was never compiled -
+     no build environment was available where this config work was
+     done, so an unverified signature change was deliberately left
+     out rather than risk it.
+   
+
+
