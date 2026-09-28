@@ -12,6 +12,7 @@ DESCRIPTION:
 #include <chrono>
 #include <fstream>
 #include <cstdio>
+#include <cstdlib>
 #include <iostream>
 
 #include <hal_boot_proto.h>
@@ -62,6 +63,27 @@ using namespace task;
 
 static float extractValFromString(const std::string& str);
 
+// Requires $CAT_CONFIG_DIR/ros2/<yamlFileName> to exist; fails (no .rb fallback) if not.
+/*static*/ bool LpsSaWeighApp::buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options)
+{
+    const char* configDir = std::getenv("CAT_CONFIG_DIR");
+    if (nullptr == configDir) {
+        AIS_LOG_FATAL("CAT_CONFIG_DIR not set; required ROS2 params file %s cannot be located.", yamlFileName.c_str());
+        return false;
+    }
+
+    boost::filesystem::path yamlPath = boost::filesystem::path(configDir) / "ros2" / yamlFileName;
+
+    boost::system::error_code ec;
+    if (!boost::filesystem::exists(yamlPath, ec) || ec) {
+        AIS_LOG_FATAL("Required ROS2 params file not found: %s", yamlPath.c_str());
+        return false;
+    }
+
+    options.arguments({"--ros-args", "--params-file", yamlPath.string()});
+    AIS_LOG_INFO("Loaded ROS2 params file: %s", yamlPath.c_str());
+    return true;
+}
 
 /******************************************************************************
 FUNCTION NAME:getTaskImplementation
@@ -235,8 +257,22 @@ bool LpsSaWeighApp::initialize( )
         return false;
     }
 
+    // ROS2 params file is now required -- moved up so its overrides land before cycleRate_hz etc. are used below.
+    rclcpp::NodeOptions rosOptions;
+    if (!buildRosNodeOptionsWithParamsFile("lps_sa_weigh_app_params.yaml", rosOptions)) {
+        return false;
+    }
+    rosNode_ = std::make_shared<rclcpp::Node>("weigh_app_node", rosOptions);
+    executor_.add_node(rosNode_);
+
     { /* Weighing App execution rate in Hz */
-        getTaskConfig().get("cycleRate_hz", LpsSaWeighInfoTbl.CycleRate_hz);
+        // Declared with no real default (PARAMETER_NOT_SET) so we can tell whether YAML actually set it.
+        rosNode_->declare_parameter("cycle_rate_hz", rclcpp::ParameterValue());
+        rclcpp::Parameter cycleRateParam = rosNode_->get_parameter("cycle_rate_hz");
+        if (cycleRateParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+            LpsSaWeighInfoTbl.CycleRate_hz = static_cast<float_32>(cycleRateParam.as_double());
+        }
+
         AIS_LOG_INFO("cycleRate_hz %f", LpsSaWeighInfoTbl.CycleRate_hz);
     }
 
@@ -256,12 +292,11 @@ bool LpsSaWeighApp::initialize( )
     NvmInitialize();
 
     { // Set up storage root
-        ConfigSection& configs = getTaskConfig();
-
-        std::string configStr;
-
-        if (configs.get("tempRoot", configStr)) {
-            tempRoot_ = configStr;
+        // Declared with no real default (PARAMETER_NOT_SET) so we can tell whether YAML actually set it.
+        rosNode_->declare_parameter("temp_root", rclcpp::ParameterValue());
+        rclcpp::Parameter tempRootParam = rosNode_->get_parameter("temp_root");
+        if (tempRootParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+            tempRoot_ = tempRootParam.as_string();
         }
         else {
             tempRoot_ = DEFAULT_TEMP_ROOT;
@@ -269,8 +304,10 @@ bool LpsSaWeighApp::initialize( )
 
         tes_common_ais::directory::create(tempRoot_);
 
-        if (configs.get("storageRoot", configStr)) {
-            storageRoot_ = configStr;
+        rosNode_->declare_parameter("storage_root", rclcpp::ParameterValue());
+        rclcpp::Parameter storageRootParam = rosNode_->get_parameter("storage_root");
+        if (storageRootParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+            storageRoot_ = storageRootParam.as_string();
         }
         else {
             storageRoot_ = DEFAULT_STORAGE_ROOT;
@@ -288,7 +325,12 @@ bool LpsSaWeighApp::initialize( )
 
         // Get App Tx Period in Seconds
         {
-            if (!configs.get("CPMExecTxPeriod", transmitPeriodTime_)) {
+            rosNode_->declare_parameter("cpm_exec_tx_period", rclcpp::ParameterValue());
+            rclcpp::Parameter txPeriodParam = rosNode_->get_parameter("cpm_exec_tx_period");
+            if (txPeriodParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+                transmitPeriodTime_ = txPeriodParam.as_double();
+            }
+            else {
                 transmitPeriodTime_ = 0.1; // 100 ms
                 AIS_LOG_ERROR("Could not read 'CPMExecTxPeriod'");
             }
@@ -555,8 +597,7 @@ bool LpsSaWeighApp::initialize( )
 	    return false;
     }
 
-    rosNode_ = std::make_shared<rclcpp::Node>("weigh_app_node");
-    executor_.add_node(rosNode_);
+    // rosNode_ construction moved up to the top of this function -- see comment there.
 
     displayStateInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(
             rosNode_, "lps_sa_ui_display_state_interface");

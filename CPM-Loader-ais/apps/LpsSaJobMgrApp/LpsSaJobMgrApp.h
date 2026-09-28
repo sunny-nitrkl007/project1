@@ -201,6 +201,9 @@ private:
 
     bool loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord);
 
+    // Loads $CAT_CONFIG_DIR/ros2/<yamlFileName>; false if missing
+    static bool buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options);
+
     bool saveConfig(void);
 
     bool parseUiConfigurableFeatures(void);	// check if Show/Hide config has tip-off disabled

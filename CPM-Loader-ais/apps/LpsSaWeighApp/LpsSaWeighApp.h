@@ -439,6 +439,9 @@ private:
 
     bool LinkageCalInProgress;
 
+    // Loads $CAT_CONFIG_DIR/ros2/<yamlFileName>; false if missing (no .rb fallback).
+    static bool buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options);
+
     void cleanupRosInterfaces();
 
     LpsSaApplicationVariant_t getApplicationVariant();

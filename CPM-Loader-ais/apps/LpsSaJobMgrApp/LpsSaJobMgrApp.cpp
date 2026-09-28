@@ -8,6 +8,7 @@ DESCRIPTION:
 ** -- #Include's --
 *******************************************************************************/
 #include <chrono>
+#include <cstdlib>
 
 #include <boost/filesystem.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -26,6 +27,28 @@ DESCRIPTION:
 #include "LpsSaJobMgrApp.h"
 
 namespace fs = boost::filesystem;
+
+// Requires $CAT_CONFIG_DIR/ros2/<yamlFileName> to exist; fails (no .rb fallback) if not.
+/*static*/ bool LpsSaJobMgrApp::buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options)
+{
+    const char* configDir = std::getenv("CAT_CONFIG_DIR");
+    if (nullptr == configDir) {
+        AIS_LOG_FATAL("CAT_CONFIG_DIR not set; required ROS2 params file %s cannot be located.", yamlFileName.c_str());
+        return false;
+    }
+
+    fs::path yamlPath = fs::path(configDir) / "ros2" / yamlFileName;
+
+    boost::system::error_code ec;
+    if (!fs::exists(yamlPath, ec) || ec) {
+        AIS_LOG_FATAL("Required ROS2 params file not found: %s", yamlPath.c_str());
+        return false;
+    }
+
+    options.arguments({"--ros-args", "--params-file", yamlPath.string()});
+    AIS_LOG_INFO("Loaded ROS2 params file: %s", yamlPath.c_str());
+    return true;
+}
 
 // This is the file that all of the tasks are stored in.
 // A "task" is basically an in process load record.
@@ -138,12 +161,20 @@ bool LpsSaJobMgrApp::initialize( )
 
     getLogger().log_info( "JobManager::initialize" );
 
-    { // Get the configs.
-        ConfigSection& configs = getTaskConfig();
+    // moved up so its overrides land before storageRoot_ etc. are used below.
+    rclcpp::NodeOptions rosOptions;
+    if (!buildRosNodeOptionsWithParamsFile("lps_sa_job_mgr_app_params.yaml", rosOptions)) {
+        return false;
+    }
+    rosNode_ = std::make_shared<rclcpp::Node>("job_mgr_node", rosOptions);
+    executor_.add_node(rosNode_);
 
-        std::string storageRoot;
-        if (configs.get("storageRoot", storageRoot)) {
-            storageRoot_ = storageRoot;
+    { // Get the configs.
+        // Declared with no real default (PARAMETER_NOT_SET) so we can tell whether YAML actually set it.
+        rosNode_->declare_parameter("storage_root", rclcpp::ParameterValue());
+        rclcpp::Parameter storageRootParam = rosNode_->get_parameter("storage_root");
+        if (storageRootParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+            storageRoot_ = storageRootParam.as_string();
         }
         else {
             storageRoot_ = DEFAULT_STORAGE_ROOT;
@@ -174,10 +205,10 @@ bool LpsSaJobMgrApp::initialize( )
         }
 
         { // Simple Cal Max Trucks
-            uint_least32_t simpleCalMaxTrucksSupported;
-            if (configs.get("SimpleCalMaxTrucksSupported", simpleCalMaxTrucksSupported)) {
-                // Got max simple cal trucks from config
-                simpleCal_.setMaxQueueSize(simpleCalMaxTrucksSupported);
+            rosNode_->declare_parameter("simple_cal_max_trucks_supported", rclcpp::ParameterValue());
+            rclcpp::Parameter maxTrucksParam = rosNode_->get_parameter("simple_cal_max_trucks_supported");
+            if (maxTrucksParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+                simpleCal_.setMaxQueueSize(static_cast<uint_least32_t>(maxTrucksParam.as_int()));
             }
         }
 
@@ -226,8 +257,7 @@ bool LpsSaJobMgrApp::initialize( )
     tzInfo_.offset = 0;
     tzInfo_.index = -1;
 
-    rosNode_ = std::make_shared<rclcpp::Node>("job_mgr_node");
-    executor_.add_node(rosNode_);
+    // rosNode_ construction moved up to the top of this function -- see comment there.
 
     /* Initialsing SCS interface*/
     LpsSaJobMgrTxRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(rosNode_, "lps_sa_job_mgr_tx_channel");

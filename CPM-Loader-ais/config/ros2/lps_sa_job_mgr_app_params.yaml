@@ -1,0 +1,43 @@
+# ROS2 parameter file for LpsSaJobMgrApp.
+#
+# This is an ADDITIVE replacement for the "Parameters" block of
+# config/LpsSaJobMgrApp.rb. It intentionally covers only the keys that are
+# actually read by app code via getTaskConfig()/ConfigSection (verified at
+# LpsSaJobMgrApp.cpp:142-221). Values below are transcribed 1:1 from
+# config/LpsSaJobMgrApp.rb -- do not change a value here without updating
+# the .rb file's comment/reference, and vice versa, until cutover (see
+# config_migration_plan.md Phase 5).
+#
+# NOT covered here (documented, intentionally excluded):
+#   - scheduler / schedulerPriority: no ROS2 parameter equivalent exists.
+#     These remain under AIS task::Task control (sched_setscheduler call in
+#     TaskCore.cpp) until task::Task itself is replaced. See
+#     config_migration_plan.md risk table.
+#   - cycleRate_hz: for THIS app, this key is consumed only by the AIS
+#     task::Task base class itself (BasicTask<_Policy>::parseExecutiveConfiguration(),
+#     ais_task/ais/task/Task.cpp:244), where it drives the underlying
+#     CycleBasedExecutive thread that calls LpsSaJobMgrApp::executive() at
+#     10 Hz. LpsSaJobMgrApp.cpp/.h do NOT read this key themselves for any
+#     business-logic purpose (verified: no getTaskConfig().get("cycleRate_hz", ...)
+#     call exists in this app's own source, unlike LpsSaWeighApp which reads
+#     it a second time for its own use). Since it only feeds task::Task's
+#     internal executive loop, there is no app-level ROS2 parameter to hook
+#     it into -- same category as scheduler/schedulerPriority. Migrating the
+#     actual executive cycle timing to ROS2 (e.g. a wall timer) would require
+#     replacing task::Task itself, which is explicitly out of scope for this
+#     config-only migration (see config_migration_plan.md non-goals).
+#   - loggerThreshold: AIS-side log verbosity setting for the AIS logger
+#     (getLogger()/AIS_LOG_*), not a value read by app business logic. Not
+#     wired into ROS2 params in this phase; RCLCPP logging verbosity is
+#     configured independently via --ros-args --log-level if/when ais_log
+#     calls are migrated to RCLCPP_* (separate, later effort).
+#
+# Node name below MUST match the string passed to
+# std::make_shared<rclcpp::Node>("job_mgr_node") in LpsSaJobMgrApp.cpp:229.
+job_mgr_node:
+  ros__parameters:
+    # LpsSaJobMgrApp.rb: "storageRoot" => "/opt/appdata/CPM/LpsSaJobMgrApp/nvm"
+    storage_root: "/opt/appdata/CPM/LpsSaJobMgrApp/nvm"
+
+    # LpsSaJobMgrApp.rb: "SimpleCalMaxTrucksSupported" => 15
+    simple_cal_max_trucks_supported: 15

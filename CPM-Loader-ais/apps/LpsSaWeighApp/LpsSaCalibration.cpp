@@ -206,7 +206,13 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
     LpsMachSpecificCfg_t& machSpecificCfg = weighInitTbl.MachSpecificCfg;
 
     // Weighing library set to 20 msec execution rate
-    getTaskConfig().get("CPMExecRate", weighInitTbl.ExecRate);
+    // Declared with no real default (PARAMETER_NOT_SET) so we can tell whether YAML actually set it.
+    rosNode_->declare_parameter("cpm_exec_rate", rclcpp::ParameterValue());
+    rclcpp::Parameter execRateParam = rosNode_->get_parameter("cpm_exec_rate");
+    if (execRateParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+        weighInitTbl.ExecRate = static_cast<decltype(weighInitTbl.ExecRate)>(execRateParam.as_double());
+    }
+
     AIS_LOG_INFO("CPMExecRate %f", weighInitTbl.ExecRate);
 
     // Load the default calibration table from the ruby file
