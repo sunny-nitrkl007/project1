@@ -1,0 +1,68 @@
+SCS's InputInterface<T>::get(T&) and OutputInterface<T>::publish(const T&) are the only two methods business logic ever calls to communicate.
+ C++ doesn't care what's inside a class — only that a call like channel->publish(x) resolves to a method with a matching name and signature.
+ So RosInputInterface<T>/RosOutputInterface<T> are template classes that expose the exact same two method names, but internally hold an
+ rclcpp::Publisher<T>/rclcpp::Subscription<T> instead of SCS's shared-memory objects. 
+ Every call site in LpsSaJobMgrScs.cpp — channel->publish(x), while (channel->get(x)) — compiles and runs completely unchanged. 
+ Only two things actually change: the declared type of the pointer (in LpsSaJobMgrApp.h) and the construction line (in initialize(), where 
+ new ros_wrapper::RosOutputInterface<T>(rosNode_, "topic_name") replaces InterfaceDb::fetch(...)).
+ Somewhere else in the system, a RosOutputInterface<T>::publish() call (or any other publisher on that same topic name + type) sends a message.
+DDS carries the serialized bytes to every subscriber matching that topic+type — including this one.
+rclcpp deserializes the bytes back into a real T object, wraps it in a std::shared_ptr<T> (so nobody has to manually new/delete it — that's 
+why it's a SharedPtr and not a raw T), and hands that shared pointer to whichever callback is registered — this lambda.
+That handoff doesn't happen instantly when the message hits the wire, though — it's queued internally and only actually runs when something 
+pumps the executor. That's executor_.spin_some(), called once per tick from executive(). spin_some() is the thing that 
+checks "any pending callbacks?" and invokes them synchronously, right there — that's the exact moment msg gets its value and this 
+lambda body executes.
+
+RosOutputInterface<T>::publish() — the simple side
+
+RosOutputInterface(node, topicName, qosDepth) {
+    publisher_ = node->create_publisher<T>(topicName, qosDepth);
+}
+bool publish(const T& data) {
+    try { publisher_->publish(data); return true; }
+    catch (...) { return false; }
+}
+This is nearly a direct pass-through. "Publish now" means the same thing in both worlds — rclcpp serializes the message and hands it 
+to DDS immediately. The try/catch exists purely to preserve SCS's original bool return contract 
+(callers like LpsSaOutputChannelOut->publish(outputChannel) check the return value), not because rclcpp normally throws.
+
+RosInputInterface<T>::get() — the side that actually needed design work
+This one isn't a pass-through, because rclcpp subscriptions don't work like SCS's polling get() at all — 
+a subscription's callback only fires when something spins the node. Nothing happens automatically the instant a message arrives.
+
+
+RosInputInterface(node, topicName, qosDepth) {
+    subscription_ = node->create_subscription<T>(topicName, qosDepth,
+        [this](const typename T::SharedPtr msg) { queue_.push(*msg); });
+}
+bool get(T& data) {
+    if (queue_.empty()) return false;
+    data = queue_.front();
+    queue_.pop();
+    return true;
+}
+So there are two separate halves:
+
+A subscription callback that does nothing but push every message it receives onto an internal std::queue<T>.
+get(), which just drains that queue — pop the front, return true; empty, return false. 
+That's exactly the SCS drain contract while (channel->get(x)) {...} already assumes everywhere in the real code.
+The missing piece is what makes the callback actually fire. That's executor_.spin_some() — one new line added inside 
+the existing executive() body, called once per cycle, before any get() calls. 
+It tells rclcpp "process everything that's arrived since I last checked" — which runs every pending subscription's callback
+ synchronously, filling each wrapper's queue, and then returns immediately (never blocks waiting for more).
+
+Why no mutex, and why a queue instead of a single cached value
+Both of these came directly out of comparing this design against a reference example (ROS2_custom_Code.zip) earlier:
+
+Queue, not a single cached "latest" value: that example's subscriber overwrote one cached value on each new message. Real SCS get() is called in drain loops throughout this codebase — if two messages arrive between polls, a single-value cache would silently lose the first one. A real std::queue<T> doesn't.
+No mutex: the reference example spins on its own background thread, so it genuinely needs one (callback thread vs. caller thread race). This design doesn't have that race — spin_some() and every get() call run on the same thread, sequentially, inside one executive() tick. The callback that fills the queue is guaranteed to have already finished by the time get() runs afterward, so there's nothing to guard against.
+Putting it together for one real cycle
+
+executive() tick:
+  1. executor_.spin_some()          <- drains DDS, fills every wrapper's queue
+  2. while (LpsSaSwitchInput->get(x)) { ... }   <- drains that wrapper's queue
+  3. ... other get()/publish() calls, same pattern ...
+  4. LpsSaJobMgrScsTxOut->publish(txOut)        <- straight to DDS, immediately
+One honest caveat, tying back to where we actually are: the mechanism itself is complete and correct, but right now nothing is publishing on the other end of most of these topics yet — WeighApp's own wrapper conversion (Step 5) and the Bridge (Step 7) haven't been built. So get() calls will correctly return false every time until those exist; the plumbing works, the pipe isn't connected end-to-end yet.
+

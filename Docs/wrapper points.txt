@@ -1,0 +1,67 @@
+1. App holds a pointer typed as the publishing/subscribing interface for the channel it uses
+LpsSaWeighReqstChannelOutput* requestOutput — that type is a typedef for OutputInterface<LpsSaWeighReqstChannel>, 
+and OutputInterface<T> declares virtual bool publish(const T&) = 0. The = 0 means: no body, just a promise that something will implement this.
+The typedef is in that channel's InterfaceTypes.h; the pure-virtual declaration is in OutputInterface.h.
+
+2. InterfaceDb::fetch() is a lookup by string name.
+You hand it the text "LpsSaWeighReqstChannelOutput", it hands back a real object — whatever was registered under that exact name at startup. 
+
+3. Both InputInterface.h and OutputInterface.h declare the same two functions — get() and publish() — 
+and that shape is all our wrapper needs to match.
+Whatever object step 2 found, it was always going to expose get(T&) or publish(const T&), because that's the contract every channel 
+implementation is required to fill. 
+
+Our wrapper (RosInputInterface/RosOutputInterface) implements that exact same shape directly — no lookup, no registry, . 
+You just construct it (new RosOutputInterface<T>(node, "topic_name")) and it is the real thing immediately. Since it matches the 
+same get()/publish() shape the app already knew how to call, every existing line of code that used the channel didn't need to change.
+
+
+ROS2/DDS is publish-subscribe. A publisher sends a message onto a named topic without knowing or caring who's listening. 
+Any node subscribed to that topic gets its own copy our wrapper rides directly on that mechanism.
+
+new ros2_wrapper::RosOutputInterface<T>(rosNode_, "topic_name")
+and publish() is one real line right there in the same class — publisher_->publish(data) — straight into DDS. 
+
+Under the hood, RosInputInterface<T> wraps an rclcpp::Subscription whose callback pushes every arriving message into a real std::queue<T>; 
+get() pops one at a time.
+
+RosInputInterface(const rclcpp::Node::SharedPtr& node,
+                       const std::string& topicName, size_t qosDepth = 10) {
+        subscription_ = node->create_subscription<T>(topicName, qosDepth,
+            [this](const typename T::SharedPtr msg) { queue_.push(*msg); });
+
+node->create_subscription<T>() is the real rclcpp API call that it registers a new subscription on that node for message type T 
+(e.g. job_mgr_interfaces::msg::LpsSaJobMgrTxChannel) on the given topic. 
+The third argument is a callback lambda that rclcpp invokes automatically, on whatever thread calls spin_some(), 
+every time a message actually arrives on that topic.
+When a message arrives, ROS2 invokes that subscription callback — which does exactly one thing: push it onto a plain std::queue<T>
+
+Every real call site in LpsSaJobMgrScs.cpp/LpsSaScs.cpp was written against the old SCS API: channel->get(x) in a while loop to 
+drain pending messages, channel->publish(x) returning a bool.
+Rather than rewrite every one of those call sites, this class presents the old interface (get(T&) returning bool, same signature as 
+interfaces::baseTypes::InputInterface<T>::get()) on the outside, while using the new 
+mechanism (create_subscription + callback) on the inside. Every real call site keeps compiling and behaving identically — only the 
+declared member type changes, from a raw SCS pointer to ros_wrapper::RosInputInterface<T>*. That's the whole point of an 
+adapter/wrapper layer: absorb the API mismatch in one small, shared place instead of at every call site.
+
+-> When node->create_subscription<T>(topicName, qosDepth, lambda) ran back in the constructor, all that did was register the
+lambda with rclcpp and tell the DDS layer "this node wants this topic." rclcpp does not automatically run that lambda the instant a message 
+lands — nothing is watching for that on its own. The lambda just sits there, associated with the subscription, waiting to be invoked. 
+That's what "pending" means: registered, with data now available underneath it, but not yet actually called.
+
+->executor_.spin_some() is the thing that actually asks. This is the crux of it. When that line runs, the executor:
+
+Asks the middleware for every entity registered on rosNode_ — "do you currently have anything ready?" This is the moment the DDS-level queue
+from previous step actually gets checked.
+For everything that says "yes, I have data," it takes the registered callback and invokes it right there
+Invoking our lambda means: queue_.push(*msg) runs now, for the first time. Before this exact moment, the message existed somewhere in 
+DDS's own buffers — our RosInputInterface::queue_ was empty. This line is the handoff from "DDS has it" to "our code has it."
+
+Say WeighApp publishes 3 status messages in the time between two of JobMgr's ticks:
+1.Tick N's spin_some() runs, finds nothing new, returns.
+2.WeighApp publishes message A. DDS delivers it in the background; it sits in the DDS-level queue. JobMgr's queue_ is still empty — 
+no one has called spin_some() since.
+3.WeighApp publishes B, then C. Same thing — DDS-level queue now effectively holds 3 messages worth of "ready" data (up to qosDepth's limit).
+4.Tick N+1 begins. executor_.spin_some() runs, finds the subscription is ready, and fires the callback — pushing what's arrived into queue_.
+5.LpsSaWeighScsTxOut->get(x) (or whichever channel) is called afterward in the same tick, in the existing 
+while (channel->get(x)) {...} drain loop, and pulls everything out of queue_ 
