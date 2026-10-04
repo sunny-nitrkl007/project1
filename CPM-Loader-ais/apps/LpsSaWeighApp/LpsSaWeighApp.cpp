@@ -14,6 +14,8 @@ DESCRIPTION:
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include <hal_boot_proto.h>
 #include <ecminfolib_public.h>
@@ -57,49 +59,43 @@ DESCRIPTION:
 *******************************************************************************/
 bool CalNVMReinitFlag = false;
 
-using namespace task;
+namespace {
 
-// This is the one and only one instance of this task.
+std::string parseLegacyInstanceName(int argc, char** argv, std::vector<char*>& rosArgv)
+{
+    std::string nodeName = "LpsSaWeighApp";
+    rosArgv.push_back(argv[0]);
+
+    for (int idx = 1; idx < argc; ++idx) {
+        const std::string arg(argv[idx]);
+
+        if ((arg == "--instance") || (arg == "--instanceName")) {
+            if ((idx + 1) < argc) {
+                nodeName = argv[++idx];
+            }
+            continue;
+        }
+
+        const std::string instancePrefix = "--instance=";
+        const std::string instanceNamePrefix = "--instanceName=";
+        if (0 == arg.find(instancePrefix)) {
+            nodeName = arg.substr(instancePrefix.size());
+            continue;
+        }
+        if (0 == arg.find(instanceNamePrefix)) {
+            nodeName = arg.substr(instanceNamePrefix.size());
+            continue;
+        }
+
+        rosArgv.push_back(argv[idx]);
+    }
+
+    return nodeName;
+}
+
+} // namespace
 
 static float extractValFromString(const std::string& str);
-
-// Requires $CAT_CONFIG_DIR/ros2/<yamlFileName> to exist; fails (no .rb fallback) if not.
-/*static*/ bool LpsSaWeighApp::buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options)
-{
-    const char* configDir = std::getenv("CAT_CONFIG_DIR");
-    if (nullptr == configDir) {
-        AIS_LOG_FATAL("CAT_CONFIG_DIR not set; required ROS2 params file %s cannot be located.", yamlFileName.c_str());
-        return false;
-    }
-
-    boost::filesystem::path yamlPath = boost::filesystem::path(configDir) / "ros2" / yamlFileName;
-
-    boost::system::error_code ec;
-    if (!boost::filesystem::exists(yamlPath, ec) || ec) {
-        AIS_LOG_FATAL("Required ROS2 params file not found: %s", yamlPath.c_str());
-        return false;
-    }
-
-    options.arguments({"--ros-args", "--params-file", yamlPath.string()});
-    AIS_LOG_INFO("Loaded ROS2 params file: %s", yamlPath.c_str());
-    return true;
-}
-
-/******************************************************************************
-FUNCTION NAME:getTaskImplementation
-DESCRIPTION:
-PARAMETER DESCRIPTION:
-RETURN VALUE:
-*******************************************************************************/
-AbstractTaskCore* task::getTaskImplementation(void)
-{
-    rclcpp::init(0, nullptr);
-    std::cout<<"[ROS2][Initialized]";
-    static LpsSaWeighApp l_thisTask("LpsSaWeighApp");
-    std::cout<<"[CPM][Object initialized]";
-    temp_thisTask=&l_thisTask;
-    return dynamic_cast<Task *>(&l_thisTask);
-}
 
 /******************************************************************************
 FUNCTION NAME:LpsSaWeighApp
@@ -108,7 +104,7 @@ PARAMETER DESCRIPTION:
 RETURN VALUE:
 *******************************************************************************/
 LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
-    Task( taskName ),
+    rclcpp::Node( taskName ),
     WeighPidTbl(),
     linkage_table_cnfg(),
     machineProperties(),
@@ -140,6 +136,8 @@ LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
     testFixture_(),
     storageRoot_(DEFAULT_STORAGE_ROOT),
     tempRoot_(DEFAULT_TEMP_ROOT),
+    taskParser_(),
+    taskConfig_("Parameters"),
     serviceHourMeter_(0),
     tzInfo_{0, -1},
     demoInputs_(),
@@ -171,11 +169,11 @@ LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
     calLibMtx_(),
     transmitPeriodTime_(0.1f),
     transmitPeriodCount_(0),
-    rosNode_(nullptr),
-    executor_()
+    executiveTimer_(nullptr)
 
 {
     OelBootupFlag = FALSE;
+    temp_thisTask = this;
 }
 
 /******************************************************************************
@@ -237,6 +235,28 @@ void LpsSaWeighApp::cleanupRosInterfaces()
     shmClockInput_ = nullptr;
 }
 
+bool LpsSaWeighApp::parseTaskConfiguration()
+{
+    const char* configDir = std::getenv("CAT_CONFIG_DIR");
+    if (nullptr == configDir) {
+        AIS_LOG_ERROR("CAT_CONFIG_DIR is not set; cannot parse LpsSaWeighApp config.");
+        return false;
+    }
+
+    taskParser_.setTaskParamDirectory(configDir);
+    if (!taskParser_.parseTask(get_name())) {
+        AIS_LOG_ERROR("Error parsing task config file for %s", get_name());
+        return false;
+    }
+
+    if (!taskParser_.getTaskParameters(taskConfig_)) {
+        AIS_LOG_ERROR("Task's Parameters section is not defined for %s", get_name());
+        return false;
+    }
+
+    return true;
+}
+
 /******************************************************************************
 FUNCTION NAME:Initialize
 DESCRIPTION:
@@ -257,22 +277,8 @@ bool LpsSaWeighApp::initialize( )
         return false;
     }
 
-    // ROS2 params file is now required -- moved up so its overrides land before cycleRate_hz etc. are used below.
-    rclcpp::NodeOptions rosOptions;
-    if (!buildRosNodeOptionsWithParamsFile("lps_sa_weigh_app_params.yaml", rosOptions)) {
-        return false;
-    }
-    rosNode_ = std::make_shared<rclcpp::Node>("weigh_app_node", rosOptions);
-    executor_.add_node(rosNode_);
-
     { /* Weighing App execution rate in Hz */
-        // Declared with no real default (PARAMETER_NOT_SET) so we can tell whether YAML actually set it.
-        rosNode_->declare_parameter("cycle_rate_hz", rclcpp::ParameterValue());
-        rclcpp::Parameter cycleRateParam = rosNode_->get_parameter("cycle_rate_hz");
-        if (cycleRateParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
-            LpsSaWeighInfoTbl.CycleRate_hz = static_cast<float_32>(cycleRateParam.as_double());
-        }
-
+        getTaskConfig().get("cycleRate_hz", LpsSaWeighInfoTbl.CycleRate_hz);
         AIS_LOG_INFO("cycleRate_hz %f", LpsSaWeighInfoTbl.CycleRate_hz);
     }
 
@@ -286,17 +292,18 @@ bool LpsSaWeighApp::initialize( )
     }
 
     /* Starting up OEL layer */
-    commInitialize();
+    oel_sys_init();
 
     /* Reading parameters from CSNS NVM */
     NvmInitialize();
 
     { // Set up storage root
-        // Declared with no real default (PARAMETER_NOT_SET) so we can tell whether YAML actually set it.
-        rosNode_->declare_parameter("temp_root", rclcpp::ParameterValue());
-        rclcpp::Parameter tempRootParam = rosNode_->get_parameter("temp_root");
-        if (tempRootParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
-            tempRoot_ = tempRootParam.as_string();
+        ConfigSection& configs = getTaskConfig();
+
+        std::string configStr;
+
+        if (configs.get("tempRoot", configStr)) {
+            tempRoot_ = configStr;
         }
         else {
             tempRoot_ = DEFAULT_TEMP_ROOT;
@@ -304,10 +311,8 @@ bool LpsSaWeighApp::initialize( )
 
         tes_common_ais::directory::create(tempRoot_);
 
-        rosNode_->declare_parameter("storage_root", rclcpp::ParameterValue());
-        rclcpp::Parameter storageRootParam = rosNode_->get_parameter("storage_root");
-        if (storageRootParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
-            storageRoot_ = storageRootParam.as_string();
+        if (configs.get("storageRoot", configStr)) {
+            storageRoot_ = configStr;
         }
         else {
             storageRoot_ = DEFAULT_STORAGE_ROOT;
@@ -325,12 +330,7 @@ bool LpsSaWeighApp::initialize( )
 
         // Get App Tx Period in Seconds
         {
-            rosNode_->declare_parameter("cpm_exec_tx_period", rclcpp::ParameterValue());
-            rclcpp::Parameter txPeriodParam = rosNode_->get_parameter("cpm_exec_tx_period");
-            if (txPeriodParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
-                transmitPeriodTime_ = txPeriodParam.as_double();
-            }
-            else {
+            if (!configs.get("CPMExecTxPeriod", transmitPeriodTime_)) {
                 transmitPeriodTime_ = 0.1; // 100 ms
                 AIS_LOG_ERROR("Could not read 'CPMExecTxPeriod'");
             }
@@ -597,24 +597,24 @@ bool LpsSaWeighApp::initialize( )
 	    return false;
     }
 
-    // rosNode_ construction moved up to the top of this function -- see comment there.
+        auto rosNode = shared_from_this();
 
     displayStateInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(
-            rosNode_, "lps_sa_ui_display_state_interface");
+            rosNode, "lps_sa_ui_display_state_interface");
     if (!displayStateInput_) {
         AIS_LOG_ERROR("DisplayStateInput ROS2 input not initialized.");
         return false;
     }
 
     printerCnfgInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg>(
-            rosNode_, "lps_sa_totals_printer_cnfg");
+            rosNode, "lps_sa_totals_printer_cnfg");
     if (!printerCnfgInput_) {
         AIS_LOG_ERROR("No PrinterCnfgInput ROS2 interface initialized.");
         return false;
     }
 
     DataLinkDataInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DataLinkData>(
-            rosNode_, "weigh_app_data_link_data");
+            rosNode, "weigh_app_data_link_data");
     if (!DataLinkDataInput_) {
         AIS_LOG_ERROR("DataLinkDataInput ROS2 input not initialized.");
         return false;
@@ -622,7 +622,7 @@ bool LpsSaWeighApp::initialize( )
 
     PartNumbersRosIn_ =
         new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PartNumbers>(
-            rosNode_, "part_numbers");
+            rosNode, "part_numbers");
     if (!PartNumbersRosIn_) {
         AIS_LOG_ERROR("PartNumbers ROS2 input not initialized.");
         return false;
@@ -631,14 +631,14 @@ bool LpsSaWeighApp::initialize( )
     SystemHardwareHealthRosIn_ =
         new ros2_wrapper::RosInputInterface<
             weigh_app_interfaces::msg::SystemHardwareHealthStorage>(
-                rosNode_, "system_hardware_health");
+                rosNode, "system_hardware_health");
     if (!SystemHardwareHealthRosIn_) {
         AIS_LOG_ERROR("SystemHardwareHealth ROS2 input not initialized.");
         return false;
     }
 
     LpsSaJobMgrReqstRosOut_ = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(
-            rosNode_, "lps_sa_job_mgr_reqst_channel");
+            rosNode, "lps_sa_job_mgr_reqst_channel");
     if (!LpsSaJobMgrReqstRosOut_) {
         AIS_LOG_ERROR("LpsSaJobMgrReqstChannel ROS2 output not initialized.");
         return false;
@@ -647,7 +647,7 @@ bool LpsSaWeighApp::initialize( )
     SystemHardwareHealthRequestRosOut_ =
         new ros2_wrapper::RosOutputInterface<
             weigh_app_interfaces::msg::SystemHardwareHealthRequest>(
-                rosNode_, "system_hardware_health_request");
+                rosNode, "system_hardware_health_request");
     if (!SystemHardwareHealthRequestRosOut_) {
         AIS_LOG_ERROR("SystemHardwareHealthRequest ROS2 output not initialized.");
         return false;
@@ -656,26 +656,26 @@ bool LpsSaWeighApp::initialize( )
     ReadyToFlashStatusRosOut_ =
         new ros2_wrapper::RosOutputInterface<
             weigh_app_interfaces::msg::ReadyToFlashStatus>(
-                rosNode_, "ready_to_flash_status");
+                rosNode, "ready_to_flash_status");
     if (!ReadyToFlashStatusRosOut_) {
         AIS_LOG_ERROR("ReadyToFlashStatus ROS2 output not initialized.");
         return false;
     }
 
-    LpsSaWeighScsTxOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode_, "lps_sa_weigh_tx_channel");
+    LpsSaWeighScsTxOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode, "lps_sa_weigh_tx_channel");
     if (!LpsSaWeighScsTxOut_ROS2) {
          AIS_LOG_ERROR("Interface LpsSaWeighScsTxOut_ROS2 not configured.");
          return false;
     }
 
-    LpsSaWeighScsRespOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>(rosNode_, "lps_sa_weigh_resp_channel");
+    LpsSaWeighScsRespOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>(rosNode, "lps_sa_weigh_resp_channel");
     if (!LpsSaWeighScsRespOut_ROS2) {
         AIS_LOG_ERROR("Interface LpsSaWeighRespChannelOutput not configured.");
         return false;
     }
 
     LpsSaWeighInitDebugRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel>(
-            rosNode_, "lps_sa_weigh_init_debug_channel");
+            rosNode, "lps_sa_weigh_init_debug_channel");
     if (!LpsSaWeighInitDebugRosOut_) {
         AIS_LOG_ERROR("LpsSaWeighInitDebugChannel ROS2 output not initialized.");
         return false;
@@ -684,13 +684,13 @@ bool LpsSaWeighApp::initialize( )
 
     // AIS SCS leg (LpsSaWeighDebugChannelOutput) is forwarded by ScsToRos2Bridge.
     LpsSaWeighDebugRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighDebugChannel>(
-            rosNode_, "lps_sa_weigh_debug_channel");
+            rosNode, "lps_sa_weigh_debug_channel");
     if (!LpsSaWeighDebugRosOut_) {
         AIS_LOG_ERROR("LpsSaWeighDebugChannel ROS2 output not initialized.");
         return false;
     }
 
-    LpsSaWeighScsReqstIn = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>(rosNode_, "lps_sa_weigh_reqst_channel");
+    LpsSaWeighScsReqstIn = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>(rosNode, "lps_sa_weigh_reqst_channel");
     if (!LpsSaWeighScsReqstIn) {
         AIS_LOG_ERROR("Interface LpsSaWeighReqstChannelInput not configured.");
         return false;
@@ -698,7 +698,7 @@ bool LpsSaWeighApp::initialize( )
 
 
     LpsSaJobMgrTxRosIn_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(
-            rosNode_, "lps_sa_job_mgr_tx_channel");
+            rosNode, "lps_sa_job_mgr_tx_channel");
     if (!LpsSaJobMgrTxRosIn_) {
         AIS_LOG_ERROR("LpsSaJobMgrTxChannel ROS2 input not initialized.");
         return false;
@@ -707,13 +707,13 @@ bool LpsSaWeighApp::initialize( )
     DemoAppTxRosIn_ =
         new ros2_wrapper::RosInputInterface<
             weigh_app_interfaces::msg::DemoAppTxChannel>(
-                rosNode_, "demo_app_tx_channel");
+                rosNode, "demo_app_tx_channel");
     if (!DemoAppTxRosIn_) {
         AIS_LOG_ERROR("DemoAppTxChannel ROS2 input not initialized.");
         return false;
     }
 
-    calCmdReqstSub_ = rosNode_->create_subscription<weigh_app_interfaces::msg::CalMgrCmdReqst>(
+    calCmdReqstSub_ = create_subscription<weigh_app_interfaces::msg::CalMgrCmdReqst>(
             "cal_mgr_cmd_reqst",
             rclcpp::QoS(5),
             std::bind(&LpsSaWeighApp::LpsSaWeighCalReqstCallback, this, std::placeholders::_1));
@@ -723,37 +723,37 @@ bool LpsSaWeighApp::initialize( )
     }
 
     calCmdRespRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>(
-            rosNode_, "cal_mgr_cmd_resp");
+            rosNode, "cal_mgr_cmd_resp");
     if (!calCmdRespRosOut_) {
         AIS_LOG_ERROR("CalMgrCmdResp ROS2 output not initialized.");
     }
 
     shmClockInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(
-            rosNode_, "shm_clock_input");
+            rosNode, "shm_clock_input");
     if (!shmClockInput_) {
         AIS_LOG_ERROR("ShmClockInput ROS2 input not initialized.");
         return false;
     }
 
     LpsNvmCalRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalDataChannel>(
-            rosNode_, "lps_sa_nvm_cal_data_channel");
+            rosNode, "lps_sa_nvm_cal_data_channel");
     if (!LpsNvmCalRosOut_) {
         AIS_LOG_ERROR("LpsSaNvmCalDataChannel ROS2 output not initialized.");
     }
 
     LpsNvmCalOnTheFlyRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel>(
-            rosNode_, "lps_sa_nvm_cal_on_the_fly_data_channel");
+            rosNode, "lps_sa_nvm_cal_on_the_fly_data_channel");
     if (!LpsNvmCalOnTheFlyRosOut_) {
         AIS_LOG_ERROR("LpsSaNvmCalOnTheFlyDataChannel ROS2 output not initialized.");
     }
 
-    AisJhm2TxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode_, "ais_jhm2_tx_channel");
+    AisJhm2TxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode, "ais_jhm2_tx_channel");
     if (!AisJhm2TxRosIn_) {
         AIS_LOG_ERROR("Interface AisJhm2TxRosIn_ not configured.");
         return false;
     }
 
-    AutonomyConditionDiagnosticsTxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(rosNode_, "autonomy_condition_diagnostics_tx_channel");
+    AutonomyConditionDiagnosticsTxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(rosNode, "autonomy_condition_diagnostics_tx_channel");
     if (!AutonomyConditionDiagnosticsTxRosIn_) {
          AIS_LOG_ERROR("Interface AutonomyConditionDiagnosticsTxRosIn_ not configured.");
          return false;
@@ -779,10 +779,6 @@ RETURN VALUE:
 
 bool LpsSaWeighApp::executive( )
 {
-    // ROS2/DDS: drain pending callbacks
-    // Must run before their get()/publish() --
-    executor_.spin_some();
-
     static bool cal_data_published = false;
     if  (!cal_data_published) {
         /* Publish the key-on calibration data from NVM through SCS one-time for XCP app.
@@ -860,12 +856,29 @@ bool LpsSaWeighApp::executive( )
     return true;
 }
 
+void LpsSaWeighApp::startExecutiveTimer( )
+{
+    double cycleRateHz = LpsSaWeighInfoTbl.CycleRate_hz;
+    if (cycleRateHz <= 0.0) {
+        AIS_LOG_WARN("Invalid cycleRate_hz %f, defaulting to 50 Hz", cycleRateHz);
+        cycleRateHz = 50.0;
+    }
+
+    const auto period = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::duration<double>(1.0 / cycleRateHz));
+    executiveTimer_ = create_wall_timer(period, [this]() {
+        if (!executive()) {
+            RCLCPP_ERROR(get_logger(), "LpsSaWeighApp executive failed");
+        }
+    });
+}
+
 void LpsSaWeighApp::flashEnablerUpdate() {
 
     weigh_app_interfaces::msg::ReadyToFlashStatus readyToFlashStatus;
     readyToFlashStatus.ready_code = APP_READY_CODE_OK_TO_FLASH;
     readyToFlashStatus.host_name = getHostName();
-    readyToFlashStatus.task_name = getTaskName();
+    readyToFlashStatus.task_name = get_name();
 
     // if lft is installed and sealed and flash is disabled, then disable flash
     if (payloadCalNvmTbl_.legalForTradeInstalled && sealTracker_.isSealed() &&
@@ -2179,10 +2192,8 @@ RETURN VALUE:
 void  LpsSaWeighApp::cleanup( )
 {
     AIS_LOG_INFO("LpsSaWeighApp::cleanup");
+    executiveTimer_.reset();
     cleanupRosInterfaces();
-    if (rclcpp::ok()) {
-        rclcpp::shutdown();
-    }
 
     // If oel hasn't booted up, then writing the nvm won't work.
     if (FALSE == OelBootupFlag) {
@@ -2372,4 +2383,30 @@ LpsSaWeighTxChannel::AudibleAnnunciationPriority_t LpsSaWeighApp::getAudibleComm
     prevWeighRangeIndicator_ = indicator;
 
     return tone;
+}
+
+int main(int argc, char** argv)
+{
+    std::vector<char*> rosArgv;
+    std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
+    int rosArgc = static_cast<int>(rosArgv.size());
+
+    rclcpp::init(rosArgc, rosArgv.data());
+
+    auto app = std::make_shared<LpsSaWeighApp>(nodeName);
+    bool initialized = app->parseTaskConfiguration() && app->initialize();
+    if (initialized) {
+        app->startExecutiveTimer();
+        rclcpp::spin(app);
+    }
+    else {
+        RCLCPP_ERROR(app->get_logger(), "Failed to initialize LpsSaWeighApp");
+    }
+
+    app->cleanup();
+    if (rclcpp::ok()) {
+        rclcpp::shutdown();
+    }
+
+    return initialized ? 0 : 1;
 }

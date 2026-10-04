@@ -129,10 +129,9 @@ sourceFiles = \
 if targetAppVariant is not None:
     sourceFiles += Glob(targetAppVariant + '/*.cpp')
  
-base_libs = [    'ais_task',
-                 'commTask',
-                 'ais_config',
+base_libs = [    'ais_config',
                  'ais_log',
+                 'ais_serialization',
                  'nvm',
                  'hal_canv3',
                  'hal_boot',

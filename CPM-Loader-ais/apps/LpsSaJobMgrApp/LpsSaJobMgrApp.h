@@ -28,7 +28,6 @@ DESCRIPTION:
 #include <LpsPtPublic.h>
 #endif
 #include <LpsPrivate.h>
-#include <ais/task/Task.h>
 
 #include <interfaces/LpsSaJobMgrDebugChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaJobMgrTxChannel/InterfaceTypes.h>
@@ -94,15 +93,16 @@ typedef enum
 } LpsSaJobMgrInitErrorType_t;
 
 
-class LpsSaJobMgrApp: public task::Task
+class LpsSaJobMgrApp: public rclcpp::Node
 {
 public:
     LpsSaJobMgrApp( const std::string& taskName );
-    virtual ~LpsSaJobMgrApp( );
+    ~LpsSaJobMgrApp( ) override;
 
-    virtual bool initialize( );
-    virtual bool executive( );
-    virtual void cleanup( );
+    bool initialize( );
+    bool executive( );
+    void cleanup( );
+    void startExecutiveTimer( );
 
 protected:
     inline std::string makeStoragePath(const std::string& fileName) const {
@@ -159,9 +159,7 @@ private:
     bool weighAppTxDataReceived_;
     DDSWeighAppInf weighAppInf_; // WeighApp Interface
 
-    // ---- ROS2/DDS shared node + executor
-    rclcpp::Node::SharedPtr rosNode_;
-    rclcpp::executors::SingleThreadedExecutor executor_;
+    rclcpp::TimerBase::SharedPtr executiveTimer_;
 
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>* LpsSaSwitchInput;
     ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>* LpsSaOutputChannelRosOut_;
@@ -200,9 +198,6 @@ private:
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>* eddtInputRos_;
 
     bool loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord);
-
-    // Loads $CAT_CONFIG_DIR/ros2/<yamlFileName>; false if missing
-    static bool buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options);
 
     bool saveConfig(void);
 

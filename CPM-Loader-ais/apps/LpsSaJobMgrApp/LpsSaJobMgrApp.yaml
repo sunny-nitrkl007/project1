@@ -1,0 +1,9 @@
+LpsSaJobMgrApp:
+  ros__parameters:
+    cycle_rate_hz: 10.0
+    storage_root: "/opt/appdata/CPM/LpsSaJobMgrApp/nvm"
+    simple_cal_max_trucks_supported: 15
+    horn_store_enable: false
+    auto_store_pass_count_default: 999
+    internal_msn: "CAT99999"
+    ui_show_feature_config_json_file_path: ""

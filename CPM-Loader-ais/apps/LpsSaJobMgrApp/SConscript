@@ -89,9 +89,8 @@ sourceFiles = \
     Glob('*.cpp') + \
     Glob(myEnv[ 'SSP_DIR' ] + '/lps_pass_tracker/src/*.c')
 
-base_libs = [    'ais_task',
-                 'ais_config',
-                 'ais_log',
+base_libs = [    'ais_log',
+                 'ais_serialization',
                  'rclcpp',
                  'rcl',
                  'rcutils',
@@ -118,6 +117,7 @@ LpsSaJobMgrApp = myEnv.Program(
     )
 
 myEnv.InstallBinary( LpsSaJobMgrApp )
+myEnv.InstallConfig(Dir('.').abspath, 'LpsSaJobMgrApp.yaml')
 myEnv.Alias("JobMgrApp", "#bin/LpsSaJobMgrApp")
 
 

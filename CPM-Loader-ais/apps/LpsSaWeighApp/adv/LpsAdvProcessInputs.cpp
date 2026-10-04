@@ -27,7 +27,7 @@ LpsUpdtErrorTypes_t LpsSaWeighApp::ProcessInputs()
 
     /* Initialize tipoff if not already initialized */
     if (!tipoff_initialized) {
-        LpsTipoffAssist.initialize(machineProperties, rosNode_);
+        LpsTipoffAssist.initialize(machineProperties, shared_from_this());
         tipoff_initialized = true;
     }
 

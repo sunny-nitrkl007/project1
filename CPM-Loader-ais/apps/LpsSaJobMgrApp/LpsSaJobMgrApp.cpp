@@ -8,7 +8,8 @@ DESCRIPTION:
 ** -- #Include's --
 *******************************************************************************/
 #include <chrono>
-#include <cstdlib>
+#include <string>
+#include <vector>
 
 #include <boost/filesystem.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -27,28 +28,6 @@ DESCRIPTION:
 #include "LpsSaJobMgrApp.h"
 
 namespace fs = boost::filesystem;
-
-// Requires $CAT_CONFIG_DIR/ros2/<yamlFileName> to exist; fails (no .rb fallback) if not.
-/*static*/ bool LpsSaJobMgrApp::buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options)
-{
-    const char* configDir = std::getenv("CAT_CONFIG_DIR");
-    if (nullptr == configDir) {
-        AIS_LOG_FATAL("CAT_CONFIG_DIR not set; required ROS2 params file %s cannot be located.", yamlFileName.c_str());
-        return false;
-    }
-
-    fs::path yamlPath = fs::path(configDir) / "ros2" / yamlFileName;
-
-    boost::system::error_code ec;
-    if (!fs::exists(yamlPath, ec) || ec) {
-        AIS_LOG_FATAL("Required ROS2 params file not found: %s", yamlPath.c_str());
-        return false;
-    }
-
-    options.arguments({"--ros-args", "--params-file", yamlPath.string()});
-    AIS_LOG_INFO("Loaded ROS2 params file: %s", yamlPath.c_str());
-    return true;
-}
 
 // This is the file that all of the tasks are stored in.
 // A "task" is basically an in process load record.
@@ -69,22 +48,41 @@ namespace fs = boost::filesystem;
 /*******************************************************************************
 ** -- Data Declarations --
 *******************************************************************************/
-using namespace task;
+namespace {
 
-
-/******************************************************************************
-FUNCTION NAME:task::getTaskImplementation
-DESCRIPTION:
-PARAMETER DESCRIPTION:
-RETURN VALUE:
-*******************************************************************************/
-AbstractTaskCore* task::getTaskImplementation(void)
+std::string parseLegacyInstanceName(int argc, char** argv, std::vector<char*>& rosArgv)
 {
-    rclcpp::init(0, nullptr);
-    std::cout<<"[ROS2][Initialized][JOB_MANAGER]";
-    static LpsSaJobMgrApp thisTask("LpsSaJobMgrApp");
-    return dynamic_cast<Task *>(&thisTask);
+    std::string nodeName = "LpsSaJobMgrApp";
+    rosArgv.push_back(argv[0]);
+
+    for (int idx = 1; idx < argc; ++idx) {
+        const std::string arg(argv[idx]);
+
+        if ((arg == "--instance") || (arg == "--instanceName")) {
+            if ((idx + 1) < argc) {
+                nodeName = argv[++idx];
+            }
+            continue;
+        }
+
+        const std::string instancePrefix = "--instance=";
+        const std::string instanceNamePrefix = "--instanceName=";
+        if (0 == arg.find(instancePrefix)) {
+            nodeName = arg.substr(instancePrefix.size());
+            continue;
+        }
+        if (0 == arg.find(instanceNamePrefix)) {
+            nodeName = arg.substr(instanceNamePrefix.size());
+            continue;
+        }
+
+        rosArgv.push_back(argv[idx]);
+    }
+
+    return nodeName;
 }
+
+} // namespace
 
 /******************************************************************************
 FUNCTION NAME:LpsSaJobMgrApp::LpsSaJobMgrApp()
@@ -93,10 +91,10 @@ PARAMETER DESCRIPTION:
 RETURN VALUE:
 *******************************************************************************/
 LpsSaJobMgrApp::LpsSaJobMgrApp(const std::string& taskName):
-    Task(taskName), LpsJobMgrJobTrackerInfoTbl(),
+    rclcpp::Node(taskName), LpsJobMgrJobTrackerInfoTbl(),
     LpsSaJobMgrTxRosOut_(nullptr), LpsSaJobMgrReqstIn(nullptr), LpsSaJobMgrDebugRosOut_(nullptr), LpsSaJobMgrRespChannelOutput_(nullptr),
     weighAppTxDataReceived_(false), weighAppInf_(),
-    rosNode_(nullptr), executor_(),
+    executiveTimer_(nullptr),
     LpsSaSwitchInput(nullptr), LpsSaOutputChannelRosOut_(nullptr), AisJhm2TxInput(nullptr), displayStateInputRos_(nullptr),
     ShmClockInputRos(nullptr), dataLinkDataInputRos_(nullptr), loadRecordOutputChannel_(nullptr),
     tasks_(), config_(), stats_(), simpleCal_(), storageRoot_(DEFAULT_STORAGE_ROOT), defaultTargetWeight_(0.0),
@@ -159,94 +157,51 @@ bool LpsSaJobMgrApp::initialize( )
     bool everythingOk = true;
     LpsSaJobMgrCnfg defaultConfig;
 
-    getLogger().log_info( "JobManager::initialize" );
-
-    // moved up so its overrides land before storageRoot_ etc. are used below.
-    rclcpp::NodeOptions rosOptions;
-    if (!buildRosNodeOptionsWithParamsFile("lps_sa_job_mgr_app_params.yaml", rosOptions)) {
-        return false;
-    }
-    rosNode_ = std::make_shared<rclcpp::Node>("job_mgr_node", rosOptions);
-    executor_.add_node(rosNode_);
+    RCLCPP_INFO(get_logger(), "JobManager::initialize");
 
     { // Get the configs.
-        // Declared with no real default (PARAMETER_NOT_SET) so we can tell whether YAML actually set it.
-        rosNode_->declare_parameter("storage_root", rclcpp::ParameterValue());
-        rclcpp::Parameter storageRootParam = rosNode_->get_parameter("storage_root");
-        if (storageRootParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
-            storageRoot_ = storageRootParam.as_string();
-        }
-        else {
-            storageRoot_ = DEFAULT_STORAGE_ROOT;
-        }
+        declare_parameter<std::string>("storage_root", DEFAULT_STORAGE_ROOT);
+        declare_parameter<int>("simple_cal_max_trucks_supported", 0);
+        declare_parameter<bool>("horn_store_enable", false);
+        declare_parameter<int>("auto_store_pass_count_default", LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_DEFAULT);
+        declare_parameter<std::string>("internal_msn", machineMSN);
+        declare_parameter<std::string>("ui_show_feature_config_json_file_path", "");
+
+        storageRoot_ = get_parameter("storage_root").as_string();
 
         stats_.setFilePath(storageRoot_ / STATS_FILENAME_BIN);
 
         simpleCal_.setFilePath(storageRoot_ / SIMPLE_CAL_FILENAME_BIN);
 
         { // Default Horn Store Enable
-            ConfigSection machineCfg;
-
-            defaultConfig.hornStoreEnable = false;
-
-            if (getTaskParser().getSection("MachineSpecificConfig", machineCfg)) {
-                bool hornStoreEnable;
-                if (machineCfg.get("HornStoreEnable", hornStoreEnable)) {
-                    defaultConfig.hornStoreEnable = hornStoreEnable;
-                    AIS_LOG_INFO("Default HornStoreEnable is: %d", defaultConfig.hornStoreEnable);
-                }
-                else {
-                    AIS_LOG_INFO("Config section item not found, default HornStoreEnable is: %d", defaultConfig.hornStoreEnable);
-                }
-            }
-            else {
-                AIS_LOG_WARN("MachineSpecificConfig section not found, default HornStoreEnable is: %d", defaultConfig.hornStoreEnable);
-            }
+            defaultConfig.hornStoreEnable = get_parameter("horn_store_enable").as_bool();
+            AIS_LOG_INFO("Default HornStoreEnable is: %d", defaultConfig.hornStoreEnable);
         }
 
         { // Simple Cal Max Trucks
-            rosNode_->declare_parameter("simple_cal_max_trucks_supported", rclcpp::ParameterValue());
-            rclcpp::Parameter maxTrucksParam = rosNode_->get_parameter("simple_cal_max_trucks_supported");
-            if (maxTrucksParam.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
-                simpleCal_.setMaxQueueSize(static_cast<uint_least32_t>(maxTrucksParam.as_int()));
+            int simpleCalMaxTrucksSupported = get_parameter("simple_cal_max_trucks_supported").as_int();
+            if (simpleCalMaxTrucksSupported > 0) {
+                // Got max simple cal trucks from config
+                simpleCal_.setMaxQueueSize(static_cast<uint_least32_t>(simpleCalMaxTrucksSupported));
             }
         }
 
         { // Default Auto Store Pass Count
-            ConfigSection machineCfg;
-
             defaultConfig.autoStorePassCount = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_DEFAULT;
-
-            if (getTaskParser().getSection("MachineSpecificConfig", machineCfg)) {
-                uint16_t autoStorePassCount;
-                if (machineCfg.get("AutoStorePassCountDefault", autoStorePassCount)) {
-                    if (autoStorePassCount > LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MAX) {
-                        autoStorePassCount = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MAX;
-                    }
-                    else if (autoStorePassCount < LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MIN) {
-                        autoStorePassCount = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MIN;
-                    }
-
-                    defaultConfig.autoStorePassCount = autoStorePassCount;
-                    AIS_LOG_INFO("Default AutoStorePassCount is: %d", defaultConfig.autoStorePassCount);
-                }
-                else {
-                    AIS_LOG_INFO("Config section item not found, default AutoStorePassCount is: %d", defaultConfig.autoStorePassCount);
-                }
+            int autoStorePassCount = get_parameter("auto_store_pass_count_default").as_int();
+            if (autoStorePassCount > LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MAX) {
+                autoStorePassCount = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MAX;
             }
-            else {
-                AIS_LOG_WARN("MachineSpecificConfig section not found, default AutoStorePassCount is: %d", defaultConfig.autoStorePassCount);
+            else if (autoStorePassCount < LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MIN) {
+                autoStorePassCount = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MIN;
             }
+
+            defaultConfig.autoStorePassCount = static_cast<uint16_t>(autoStorePassCount);
+            AIS_LOG_INFO("Default AutoStorePassCount is: %d", defaultConfig.autoStorePassCount);
         }
 
         { // MSN
-            ConfigSection machineType;
-            if (!getTaskParser().getSection("MachineType", machineType)) {
-                AIS_LOG_ERROR("MachineType section not found");
-            }
-            else {
-                machineType.get("InternalMsn", machineMSN);
-            }
+            machineMSN = get_parameter("internal_msn").as_string();
         }
 
         AIS_LOG_INFO("Storage Root: %s", storageRoot_.c_str());
@@ -257,25 +212,25 @@ bool LpsSaJobMgrApp::initialize( )
     tzInfo_.offset = 0;
     tzInfo_.index = -1;
 
-    // rosNode_ construction moved up to the top of this function -- see comment there.
+    auto rosNode = shared_from_this();
 
     /* Initialsing SCS interface*/
-    LpsSaJobMgrTxRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(rosNode_, "lps_sa_job_mgr_tx_channel");
-    LpsSaJobMgrReqstIn = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(rosNode_, "lps_sa_job_mgr_reqst_channel");
-    LpsSaJobMgrDebugRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrDebugChannel>(rosNode_, "lps_sa_job_mgr_debug_channel");
-    LpsSaJobMgrRespChannelOutput_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrRespChannel>(rosNode_, "lps_sa_job_mgr_resp_channel");
-    LpsSaSwitchInput = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>(rosNode_, "switch_input_scs");
-    LpsSaOutputChannelRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>(rosNode_, "output_channel");
-    AisJhm2TxInput = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode_, "ais_jhm2_tx_channel");
+    LpsSaJobMgrTxRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(rosNode, "lps_sa_job_mgr_tx_channel");
+    LpsSaJobMgrReqstIn = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(rosNode, "lps_sa_job_mgr_reqst_channel");
+    LpsSaJobMgrDebugRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrDebugChannel>(rosNode, "lps_sa_job_mgr_debug_channel");
+    LpsSaJobMgrRespChannelOutput_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaJobMgrRespChannel>(rosNode, "lps_sa_job_mgr_resp_channel");
+    LpsSaSwitchInput = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>(rosNode, "switch_input_scs");
+    LpsSaOutputChannelRosOut_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>(rosNode, "output_channel");
+    AisJhm2TxInput = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode, "ais_jhm2_tx_channel");
 
     displayStateInputRos_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(
-            rosNode_, "lps_sa_ui_display_state_interface");
+            rosNode, "lps_sa_ui_display_state_interface");
 
-    ShmClockInputRos = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(rosNode_, "shm_clock_input");
-    dataLinkDataInputRos_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::DataLinkData>(rosNode_, "data_link_data");
+    ShmClockInputRos = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(rosNode, "shm_clock_input");
+    dataLinkDataInputRos_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::DataLinkData>(rosNode, "data_link_data");
     autonomyConditionDiagnosticsTxInputRos_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(
-            rosNode_, "autonomy_condition_diagnostics_tx_channel");
-    eddtInputRos_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>(rosNode_, "event_diagnostic_data");
+            rosNode, "autonomy_condition_diagnostics_tx_channel");
+    eddtInputRos_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>(rosNode, "event_diagnostic_data");
 
     if ( !ShmClockInputRos )
     {
@@ -331,13 +286,13 @@ bool LpsSaJobMgrApp::initialize( )
 
     { // Initialize the WeighApp interface
         ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>* requestOutput =
-                new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>(rosNode_, "lps_sa_weigh_reqst_channel");
+            new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>(rosNode, "lps_sa_weigh_reqst_channel");
         ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* responseInput =
-                new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>(rosNode_, "lps_sa_weigh_resp_channel");
+            new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>(rosNode, "lps_sa_weigh_resp_channel");
         ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>* txInput =
-                new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode_, "lps_sa_weigh_tx_channel");
+            new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode, "lps_sa_weigh_tx_channel");
 
-        if (!weighAppInf_.start(getTaskName(), requestOutput, responseInput, txInput)) {
+        if (!weighAppInf_.start(get_name(), requestOutput, responseInput, txInput)) {
             AIS_LOG_ERROR("Failed to start weigh app interface.");
             everythingOk = false;
         }
@@ -346,7 +301,7 @@ bool LpsSaJobMgrApp::initialize( )
     }
 
     // Get the load record output channel (now ROS2-only, bridge forwards to AIS SCS consumers)
-    loadRecordOutputChannel_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaLoadRecordChannel>(rosNode_, "lps_sa_load_record_channel");
+    loadRecordOutputChannel_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaLoadRecordChannel>(rosNode, "lps_sa_load_record_channel");
     if (nullptr == loadRecordOutputChannel_) {
         AIS_LOG_ERROR("\n Load record ROS2 output channel not initialized.");
         everythingOk = false;
@@ -420,10 +375,8 @@ bool LpsSaJobMgrApp::parseUiConfigurableFeatures() {
     bool ret = false;
 
     try {
-        ConfigSection cs;
-        if (getTaskParser().getSection("MachineSpecificConfig", cs)) {
-            std::string uiConfigJsonFilePath;
-            if (cs.get("UI_SHOW_FEATURE_CONFIG_JSON_FILE_PATH", uiConfigJsonFilePath)) {
+        std::string uiConfigJsonFilePath = get_parameter("ui_show_feature_config_json_file_path").as_string();
+        if (!uiConfigJsonFilePath.empty()) {
                 AIS_LOG_INFO("JSON file found: %s", uiConfigJsonFilePath.c_str());
 
                 // Load JSON
@@ -439,13 +392,9 @@ bool LpsSaJobMgrApp::parseUiConfigurableFeatures() {
                 }
 
                 ret = true;
-            }
-            else {
-                AIS_LOG_ERROR("UI_SHOW_FEATURE_CONFIG_JSON_FILE_PATH not found in MachineSpecificConfig");
-            }
         }
         else {
-            AIS_LOG_ERROR("MachineSpecificConfig section not found");
+            AIS_LOG_ERROR("ui_show_feature_config_json_file_path parameter not set");
         }
     }
     catch (const fs::filesystem_error& e) {
@@ -471,10 +420,7 @@ RETURN VALUE:
 *******************************************************************************/
 bool LpsSaJobMgrApp::executive( )
 {
-    getLogger().log_debug( "Executing JobManager Task" );
-
-    // ROS2/DDS: drain pending callbacks for weighAppInf_'s 3 channels
-    executor_.spin_some();
+    RCLCPP_DEBUG(get_logger(), "Executing JobManager Task");
 
     if (nullptr != autonomyConditionDiagnosticsTxInputRos_) {
         cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel txData;
@@ -501,14 +447,14 @@ bool LpsSaJobMgrApp::executive( )
     ret=LpsSaJobMgrScsRx();
     if(SUCCESS != ret)
     {
-        getLogger().log_error("\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsRx' function return code = %d\n",__LINE__,ret );
+        RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsRx' function return code = %d\n", __LINE__, ret);
     }
 
     ret = LpsSaJobMgrPtUpdate();
 
     if(SUCCESS != ret)
     {
-        getLogger().log_error( "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrPtUpdate' function return code = %d\n",__LINE__,ret );
+        RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrPtUpdate' function return code = %d\n", __LINE__, ret);
 
         return FAIL;
     }
@@ -517,7 +463,7 @@ bool LpsSaJobMgrApp::executive( )
     ret =LpsSaJobMgrScsTx();
     if(SUCCESS != ret)
     {
-        getLogger().log_error( "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsTx' function return code = %d\n",__LINE__,ret );
+        RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsTx' function return code = %d\n", __LINE__, ret);
 
         return FAIL;
     }
@@ -547,6 +493,25 @@ bool LpsSaJobMgrApp::executive( )
 
 }
 
+void LpsSaJobMgrApp::startExecutiveTimer( )
+{
+    double cycleRateHz = 10.0;
+    declare_parameter<double>("cycle_rate_hz", cycleRateHz);
+    cycleRateHz = get_parameter("cycle_rate_hz").as_double();
+    if (cycleRateHz <= 0.0) {
+        AIS_LOG_WARN("Invalid cycle_rate_hz parameter %f, defaulting to 10 Hz", cycleRateHz);
+        cycleRateHz = 10.0;
+    }
+
+    const auto period = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::duration<double>(1.0 / cycleRateHz));
+    executiveTimer_ = create_wall_timer(period, [this]() {
+        if (!executive()) {
+            RCLCPP_ERROR(get_logger(), "LpsSaJobMgrApp executive failed");
+        }
+    });
+}
+
 /******************************************************************************
 FUNCTION LpsSaJobMgrApp::cleanup( )
 DESCRIPTION:
@@ -555,10 +520,8 @@ RETURN VALUE:
 *******************************************************************************/
 void LpsSaJobMgrApp::cleanup( ) {
     AIS_LOG_INFO("LpsSaJobMgrApp::cleanup");
+    executiveTimer_.reset();
     cleanupRosInterfaces();
-    if (rclcpp::ok()) {
-        rclcpp::shutdown();
-    }
 
     // Wait for possible write to robot file
     sleep(2);
@@ -632,4 +595,30 @@ bool LpsSaJobMgrApp::loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord) {
 
 bool LpsSaJobMgrApp::saveConfig() {
     return config_.save(makeStoragePath(CONFIG_FILENAME_BIN));
+}
+
+int main(int argc, char** argv)
+{
+    std::vector<char*> rosArgv;
+    std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
+    int rosArgc = static_cast<int>(rosArgv.size());
+
+    rclcpp::init(rosArgc, rosArgv.data());
+
+    auto app = std::make_shared<LpsSaJobMgrApp>(nodeName);
+    bool initialized = app->initialize();
+    if (initialized) {
+        app->startExecutiveTimer();
+        rclcpp::spin(app);
+    }
+    else {
+        RCLCPP_ERROR(app->get_logger(), "Failed to initialize LpsSaJobMgrApp");
+    }
+
+    app->cleanup();
+    if (rclcpp::ok()) {
+        rclcpp::shutdown();
+    }
+
+    return initialized ? 0 : 1;
 }

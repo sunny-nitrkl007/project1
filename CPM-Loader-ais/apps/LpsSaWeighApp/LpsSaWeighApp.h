@@ -14,7 +14,7 @@ DESCRIPTION:
 
 #include <boost/filesystem.hpp>
 
-#include <ais/task/Task.h>
+#include <ais/config/TaskParser.h>
 
 // ---- ROS2/DDS wrapper layer 
 #include "rclcpp/rclcpp.hpp"
@@ -124,8 +124,6 @@ DESCRIPTION:
 #include <LpsCommonLookUpTblUtility.h>
 #endif
 
-#include <commTask/commTask.h>
-
 #include <nvm.h>
 #include <scl_prmsw.h>
 
@@ -203,16 +201,18 @@ extern "C" {
 /*******************************************************************************
 ** -- #Define, Struct's, Typedef's, Enum's --
 *******************************************************************************/
-class LpsSaWeighApp : public task::Task, public commTask
+class LpsSaWeighApp : public rclcpp::Node
 {
 public:
 
     LpsSaWeighApp( const std::string& taskName );
-    virtual ~ LpsSaWeighApp( );
+    ~ LpsSaWeighApp( ) override;
 
-    virtual bool initialize( );
-    virtual bool executive( );
-    virtual void cleanup( );
+    bool parseTaskConfiguration( );
+    bool initialize( );
+    bool executive( );
+    void cleanup( );
+    void startExecutiveTimer( );
 
     void UpdtCalNvmTbl(const LpsCalNvmTbl_t* pCalNvmTbl);
 
@@ -222,6 +222,21 @@ protected:
     }
 
 private:
+    ConfigSection& getTaskConfig() { return taskConfig_; }
+    const ConfigSection& getTaskConfig() const { return taskConfig_; }
+    TaskParser& getTaskParser() { return taskParser_; }
+    const TaskParser& getTaskParser() const { return taskParser_; }
+    void setAutonomyCondition(const AutonomyCondition& condition) {
+        AIS_LOG_DEBUG("Set autonomy condition %s", condition.getConditionType().c_str());
+    }
+    template<typename Condition>
+    void clearAutonomyCondition() {
+        AIS_LOG_DEBUG("Clear autonomy condition %s", Condition::getConditionTypeString().c_str());
+    }
+    void clearAutonomyCondition(const AutonomyCondition& condition) {
+        AIS_LOG_DEBUG("Clear autonomy condition %s", condition.getConditionType().c_str());
+    }
+
 
     typedef enum
     {
@@ -395,6 +410,8 @@ private:
 
     boost::filesystem::path storageRoot_;
     boost::filesystem::path tempRoot_;
+    TaskParser taskParser_;
+    ConfigSection taskConfig_;
 
     /* SHM and Time Zone */
     uint_least32_t serviceHourMeter_;
@@ -409,9 +426,7 @@ private:
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* LpsSaWeighScsRespOut_ROS2;
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>* LpsSaWeighScsTxOut_ROS2;
 
-    // ROS2/DDS shared node + executor
-    rclcpp::Node::SharedPtr rosNode_;
-    rclcpp::executors::SingleThreadedExecutor executor_;
+    rclcpp::TimerBase::SharedPtr executiveTimer_;
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>* LpsSaJobMgrTxRosIn_;
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>* LpsSaJobMgrReqstRosOut_;
     ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::ReadyToFlashStatus>* ReadyToFlashStatusRosOut_;
@@ -438,9 +453,6 @@ private:
     ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>* shmClockInput_;
 
     bool LinkageCalInProgress;
-
-    // Loads $CAT_CONFIG_DIR/ros2/<yamlFileName>; false if missing (no .rb fallback).
-    static bool buildRosNodeOptionsWithParamsFile(const std::string& yamlFileName, rclcpp::NodeOptions& options);
 
     void cleanupRosInterfaces();
 
