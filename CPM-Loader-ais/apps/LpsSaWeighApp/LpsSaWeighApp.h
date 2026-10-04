@@ -16,10 +16,11 @@ DESCRIPTION:
 
 #include <ais/config/TaskParser.h>
 
-// ---- ROS2/DDS wrapper layer 
+// ---- ROS2/DDS wrapper layer
 #include "rclcpp/rclcpp.hpp"
 #include "RosInputInterface.h"
 #include "RosOutputInterface.h"
+#include "Ros2TaskWrapper.h"
 
 #include "cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp"
 #include <cpm_common_interfaces/msg/lps_sa_job_mgr_reqst_channel.hpp>
@@ -201,7 +202,7 @@ extern "C" {
 /*******************************************************************************
 ** -- #Define, Struct's, Typedef's, Enum's --
 *******************************************************************************/
-class LpsSaWeighApp : public rclcpp::Node
+class LpsSaWeighApp : public ros2_wrapper::Ros2TaskWrapper
 {
 public:
 
@@ -209,10 +210,11 @@ public:
     ~ LpsSaWeighApp( ) override;
 
     bool parseTaskConfiguration( );
-    bool initialize( );
-    bool executive( );
-    void cleanup( );
-    void startExecutiveTimer( );
+    bool beforeInitialize( ) override { return parseTaskConfiguration(); }
+    bool initialize( ) override;
+    bool executive( ) override;
+    void cleanup( ) override;
+    void startExecutiveTimer( ) override;
 
     void UpdtCalNvmTbl(const LpsCalNvmTbl_t* pCalNvmTbl);
 
@@ -326,7 +328,7 @@ private:
         uint16_t warning = 0;
 
         unsigned int FilterSettleDelay = 0;
-        
+
         LpsLeverInfo_t LiftLeverInfo = {};  /* zero initialize */
         bool CalOvrAcknowledge = false;
 
@@ -426,7 +428,6 @@ private:
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* LpsSaWeighScsRespOut_ROS2;
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>* LpsSaWeighScsTxOut_ROS2;
 
-    rclcpp::TimerBase::SharedPtr executiveTimer_;
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>* LpsSaJobMgrTxRosIn_;
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>* LpsSaJobMgrReqstRosOut_;
     ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::ReadyToFlashStatus>* ReadyToFlashStatusRosOut_;

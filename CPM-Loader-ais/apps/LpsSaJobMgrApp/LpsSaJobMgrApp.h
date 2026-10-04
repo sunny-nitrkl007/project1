@@ -39,12 +39,13 @@ DESCRIPTION:
 #include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
 #include <interfaces/EventDiagnosticData/InterfaceTypes.h>
 #include <interfaces/LpsSaWeighReqstChannel/LpsSaWeighAppInf.hpp>
- 
+
 /*Additional ROS2 interfaces*/
 #include <interfaces/LpsSaWeighReqstChannel/DDSWeighAppInf.hpp>
 #include "rclcpp/rclcpp.hpp"
 #include "ros2wrapper/RosInputInterface.h"
 #include "ros2wrapper/RosOutputInterface.h"
+#include "ros2wrapper/Ros2TaskWrapper.h"
 #include "cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp"
 #include <cpm_common_interfaces/msg/shm_clock_input.hpp>
 #include <cpm_common_interfaces/msg/lps_sa_ui_display_state_interface.hpp>
@@ -93,16 +94,16 @@ typedef enum
 } LpsSaJobMgrInitErrorType_t;
 
 
-class LpsSaJobMgrApp: public rclcpp::Node
+class LpsSaJobMgrApp: public ros2_wrapper::Ros2TaskWrapper
 {
 public:
     LpsSaJobMgrApp( const std::string& taskName );
     ~LpsSaJobMgrApp( ) override;
 
-    bool initialize( );
-    bool executive( );
-    void cleanup( );
-    void startExecutiveTimer( );
+    bool initialize( ) override;
+    bool executive( ) override;
+    void cleanup( ) override;
+    void startExecutiveTimer( ) override;
 
 protected:
     inline std::string makeStoragePath(const std::string& fileName) const {
@@ -159,7 +160,6 @@ private:
     bool weighAppTxDataReceived_;
     DDSWeighAppInf weighAppInf_; // WeighApp Interface
 
-    rclcpp::TimerBase::SharedPtr executiveTimer_;
 
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>* LpsSaSwitchInput;
     ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>* LpsSaOutputChannelRosOut_;

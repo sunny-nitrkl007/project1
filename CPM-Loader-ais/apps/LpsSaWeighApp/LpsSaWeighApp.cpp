@@ -59,41 +59,6 @@ DESCRIPTION:
 *******************************************************************************/
 bool CalNVMReinitFlag = false;
 
-namespace {
-
-std::string parseLegacyInstanceName(int argc, char** argv, std::vector<char*>& rosArgv)
-{
-    std::string nodeName = "LpsSaWeighApp";
-    rosArgv.push_back(argv[0]);
-
-    for (int idx = 1; idx < argc; ++idx) {
-        const std::string arg(argv[idx]);
-
-        if ((arg == "--instance") || (arg == "--instanceName")) {
-            if ((idx + 1) < argc) {
-                nodeName = argv[++idx];
-            }
-            continue;
-        }
-
-        const std::string instancePrefix = "--instance=";
-        const std::string instanceNamePrefix = "--instanceName=";
-        if (0 == arg.find(instancePrefix)) {
-            nodeName = arg.substr(instancePrefix.size());
-            continue;
-        }
-        if (0 == arg.find(instanceNamePrefix)) {
-            nodeName = arg.substr(instanceNamePrefix.size());
-            continue;
-        }
-
-        rosArgv.push_back(argv[idx]);
-    }
-
-    return nodeName;
-}
-
-} // namespace
 
 static float extractValFromString(const std::string& str);
 
@@ -104,7 +69,7 @@ PARAMETER DESCRIPTION:
 RETURN VALUE:
 *******************************************************************************/
 LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
-    rclcpp::Node( taskName ),
+    ros2_wrapper::Ros2TaskWrapper( taskName ),
     WeighPidTbl(),
     linkage_table_cnfg(),
     machineProperties(),
@@ -168,8 +133,7 @@ LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
     prevWeighRangeIndicator_(LPS_IN_WEIGH_RANGE_NOT_WEIGHING),
     calLibMtx_(),
     transmitPeriodTime_(0.1f),
-    transmitPeriodCount_(0),
-    executiveTimer_(nullptr)
+    transmitPeriodCount_(0)
 
 {
     OelBootupFlag = FALSE;
@@ -863,14 +827,7 @@ void LpsSaWeighApp::startExecutiveTimer( )
         AIS_LOG_WARN("Invalid cycleRate_hz %f, defaulting to 50 Hz", cycleRateHz);
         cycleRateHz = 50.0;
     }
-
-    const auto period = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::duration<double>(1.0 / cycleRateHz));
-    executiveTimer_ = create_wall_timer(period, [this]() {
-        if (!executive()) {
-            RCLCPP_ERROR(get_logger(), "LpsSaWeighApp executive failed");
-        }
-    });
+    createExecutiveTimer(cycleRateHz);
 }
 
 void LpsSaWeighApp::flashEnablerUpdate() {
@@ -2387,26 +2344,5 @@ LpsSaWeighTxChannel::AudibleAnnunciationPriority_t LpsSaWeighApp::getAudibleComm
 
 int main(int argc, char** argv)
 {
-    std::vector<char*> rosArgv;
-    std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
-    int rosArgc = static_cast<int>(rosArgv.size());
-
-    rclcpp::init(rosArgc, rosArgv.data());
-
-    auto app = std::make_shared<LpsSaWeighApp>(nodeName);
-    bool initialized = app->parseTaskConfiguration() && app->initialize();
-    if (initialized) {
-        app->startExecutiveTimer();
-        rclcpp::spin(app);
-    }
-    else {
-        RCLCPP_ERROR(app->get_logger(), "Failed to initialize LpsSaWeighApp");
-    }
-
-    app->cleanup();
-    if (rclcpp::ok()) {
-        rclcpp::shutdown();
-    }
-
-    return initialized ? 0 : 1;
+    return ros2_wrapper::Ros2TaskWrapper::run<LpsSaWeighApp>(argc, argv);
 }

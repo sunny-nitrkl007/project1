@@ -48,41 +48,6 @@ namespace fs = boost::filesystem;
 /*******************************************************************************
 ** -- Data Declarations --
 *******************************************************************************/
-namespace {
-
-std::string parseLegacyInstanceName(int argc, char** argv, std::vector<char*>& rosArgv)
-{
-    std::string nodeName = "LpsSaJobMgrApp";
-    rosArgv.push_back(argv[0]);
-
-    for (int idx = 1; idx < argc; ++idx) {
-        const std::string arg(argv[idx]);
-
-        if ((arg == "--instance") || (arg == "--instanceName")) {
-            if ((idx + 1) < argc) {
-                nodeName = argv[++idx];
-            }
-            continue;
-        }
-
-        const std::string instancePrefix = "--instance=";
-        const std::string instanceNamePrefix = "--instanceName=";
-        if (0 == arg.find(instancePrefix)) {
-            nodeName = arg.substr(instancePrefix.size());
-            continue;
-        }
-        if (0 == arg.find(instanceNamePrefix)) {
-            nodeName = arg.substr(instanceNamePrefix.size());
-            continue;
-        }
-
-        rosArgv.push_back(argv[idx]);
-    }
-
-    return nodeName;
-}
-
-} // namespace
 
 /******************************************************************************
 FUNCTION NAME:LpsSaJobMgrApp::LpsSaJobMgrApp()
@@ -91,10 +56,9 @@ PARAMETER DESCRIPTION:
 RETURN VALUE:
 *******************************************************************************/
 LpsSaJobMgrApp::LpsSaJobMgrApp(const std::string& taskName):
-    rclcpp::Node(taskName), LpsJobMgrJobTrackerInfoTbl(),
+    ros2_wrapper::Ros2TaskWrapper(taskName), LpsJobMgrJobTrackerInfoTbl(),
     LpsSaJobMgrTxRosOut_(nullptr), LpsSaJobMgrReqstIn(nullptr), LpsSaJobMgrDebugRosOut_(nullptr), LpsSaJobMgrRespChannelOutput_(nullptr),
     weighAppTxDataReceived_(false), weighAppInf_(),
-    executiveTimer_(nullptr),
     LpsSaSwitchInput(nullptr), LpsSaOutputChannelRosOut_(nullptr), AisJhm2TxInput(nullptr), displayStateInputRos_(nullptr),
     ShmClockInputRos(nullptr), dataLinkDataInputRos_(nullptr), loadRecordOutputChannel_(nullptr),
     tasks_(), config_(), stats_(), simpleCal_(), storageRoot_(DEFAULT_STORAGE_ROOT), defaultTargetWeight_(0.0),
@@ -369,7 +333,7 @@ bool LpsSaJobMgrApp::initialize( )
 FUNCTION:                   parseUiConfigurableFeatures
 DESCRIPTION:                move the UI Config JSON file to tempRoot and parse it
 PARAMETER DESCRIPTION:
-RETURN VALUE:               Boolean  
+RETURN VALUE:               Boolean
 *******************************************************************************/
 bool LpsSaJobMgrApp::parseUiConfigurableFeatures() {
     bool ret = false;
@@ -498,18 +462,7 @@ void LpsSaJobMgrApp::startExecutiveTimer( )
     double cycleRateHz = 10.0;
     declare_parameter<double>("cycle_rate_hz", cycleRateHz);
     cycleRateHz = get_parameter("cycle_rate_hz").as_double();
-    if (cycleRateHz <= 0.0) {
-        AIS_LOG_WARN("Invalid cycle_rate_hz parameter %f, defaulting to 10 Hz", cycleRateHz);
-        cycleRateHz = 10.0;
-    }
-
-    const auto period = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::duration<double>(1.0 / cycleRateHz));
-    executiveTimer_ = create_wall_timer(period, [this]() {
-        if (!executive()) {
-            RCLCPP_ERROR(get_logger(), "LpsSaJobMgrApp executive failed");
-        }
-    });
+    createExecutiveTimer(cycleRateHz);
 }
 
 /******************************************************************************
@@ -599,26 +552,5 @@ bool LpsSaJobMgrApp::saveConfig() {
 
 int main(int argc, char** argv)
 {
-    std::vector<char*> rosArgv;
-    std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
-    int rosArgc = static_cast<int>(rosArgv.size());
-
-    rclcpp::init(rosArgc, rosArgv.data());
-
-    auto app = std::make_shared<LpsSaJobMgrApp>(nodeName);
-    bool initialized = app->initialize();
-    if (initialized) {
-        app->startExecutiveTimer();
-        rclcpp::spin(app);
-    }
-    else {
-        RCLCPP_ERROR(app->get_logger(), "Failed to initialize LpsSaJobMgrApp");
-    }
-
-    app->cleanup();
-    if (rclcpp::ok()) {
-        rclcpp::shutdown();
-    }
-
-    return initialized ? 0 : 1;
+    return ros2_wrapper::Ros2TaskWrapper::run<LpsSaJobMgrApp>(argc, argv);
 }
