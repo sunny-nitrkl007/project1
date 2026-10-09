@@ -123,6 +123,16 @@ bool LpsSaJobMgrApp::initialize( )
 
     RCLCPP_INFO(get_logger(), "JobManager::initialize");
 
+    { // Default matches config/LpsSaJobMgrApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 1.
+        declare_parameter<std::string>("scheduler", "SCHED_RR");
+        declare_parameter<int>("scheduler_priority", 1);
+        std::string schedulerPolicy = get_parameter("scheduler").as_string();
+        int schedulerPriority = static_cast<int>(get_parameter("scheduler_priority").as_int());
+        if (!applyRealtimeScheduling(schedulerPolicy, schedulerPriority)) {
+            RCLCPP_WARN(get_logger(), "Continuing without real-time scheduling.");
+        }
+    }
+
     { // Get the configs.
         declare_parameter<std::string>("storage_root", DEFAULT_STORAGE_ROOT);
         declare_parameter<int>("simple_cal_max_trucks_supported", 0);

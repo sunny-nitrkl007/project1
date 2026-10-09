@@ -7,8 +7,16 @@
 #ifndef _Ros2TaskWrapper_h_
 #define _Ros2TaskWrapper_h_
 
+#include <atomic>
 #include <chrono>
+#include <cerrno>
+#include <csignal>
+#include <cstdlib>
+#include <cstring>
+#include <pthread.h>
+#include <sched.h>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
@@ -34,11 +42,11 @@ public:
     // WeighApp's parseTaskConfiguration(). Default: nothing extra needed.
     virtual bool beforeInitialize() { return true; }
 
-    // Constructs AppT, drives it through beforeInitialize()+initialize(),
-    // spins (default rclcpp signal handling) until shutdown, then cleanup().
-    // Signal handling and RT scheduling are parked for now -- see
-    // Ros2TaskWrapper_WITH_signal_and_scheduling.h backup when they're
-    // ready to come back.
+    // Constructs AppT, drives it through the same lifecycle AIS Task used
+    // to drive: signals registered up front, beforeInitialize()+initialize(),
+    // spin until a shutdown signal , cleanup()
+    // with communication still alive, then rclcpp::shutdown() as the last
+    // step. Each app's main() becomes a one-line call to this.
     template<typename AppT>
     static int run(int argc, char** argv)
     {
@@ -50,10 +58,15 @@ public:
 
         auto app = std::make_shared<AppT>(nodeName);
 
+        auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+        executor->add_node(app);
+
+        registerSignalHandling(executor);
+
         bool initialized = app->beforeInitialize() && app->initialize();
         if (initialized) {
             app->startExecutiveTimer();
-            rclcpp::spin(app);
+            executor->spin();
         }
         else {
             RCLCPP_ERROR(app->get_logger(), "Failed to initialize %s", nodeName.c_str());
@@ -85,8 +98,41 @@ protected:
         });
     }
 
-    // applyRealtimeScheduling() parked for now -- see
-    // Ros2TaskWrapper_WITH_signal_and_scheduling.h backup.
+    // Matches AIS TaskCore's sched_setscheduler(policy, priority) call --
+    // same POSIX mechanism, invoked directly instead of through task::Task
+    // reading it from .rb.
+    bool applyRealtimeScheduling(int policy, int priority)
+    {
+        sched_param schedParam{};
+        schedParam.sched_priority = priority;
+        if (0 != pthread_setschedparam(pthread_self(), policy, &schedParam)) {
+            RCLCPP_ERROR(get_logger(), "Failed to set scheduling policy %d / priority %d: %s",
+                    policy, priority, std::strerror(errno));
+            return false;
+        }
+        return true;
+    }
+
+    // Same as above, but takes the policy as a string -- matches the exact
+    // values AIS .rb files use ("scheduler" => "SCHED_RR" etc.)
+    bool applyRealtimeScheduling(const std::string& policyName, int priority)
+    {
+        int policy = SCHED_RR;
+        if (policyName == "SCHED_RR") {
+            policy = SCHED_RR;
+        }
+        else if (policyName == "SCHED_FIFO") {
+            policy = SCHED_FIFO;
+        }
+        else if (policyName == "SCHED_OTHER") {
+            policy = SCHED_OTHER;
+        }
+        else {
+            RCLCPP_WARN(get_logger(), "Unrecognized scheduler policy '%s', defaulting to SCHED_RR",
+                    policyName.c_str());
+        }
+        return applyRealtimeScheduling(policy, priority);
+    }
 
     rclcpp::TimerBase::SharedPtr executiveTimer_;
 
@@ -124,8 +170,42 @@ private:
         return nodeName;
     }
 
-    // registerSignalHandling() parked for now -- see
-    // Ros2TaskWrapper_WITH_signal_and_scheduling.h backup.
+    // Reproduces ais_task/ais/task/sigcatch.cpp exactly: block the exit
+    // signals on every thread, hand them to one dedicated thread via
+    // sigwait(). 1st/2nd signal interrupts the executor; 3rd forces an
+    // immediate exit with no cleanup, matching AIS's documented behavior.
+    static void registerSignalHandling(std::shared_ptr<rclcpp::Executor> executor)
+    {
+        sigset_t signalSet;
+        sigemptyset(&signalSet);
+        sigaddset(&signalSet, SIGINT);
+        sigaddset(&signalSet, SIGTERM);
+        sigaddset(&signalSet, SIGQUIT);
+        pthread_sigmask(SIG_BLOCK, &signalSet, nullptr);
+
+        std::thread signalThread([executor]() {
+            static std::atomic<uint32_t> signalsCaught{0};
+            constexpr uint32_t maxExitSignalsToCatch = 3;
+
+            sigset_t waitSet;
+            int signalNumber = 0;
+            for (;;) {
+                sigemptyset(&waitSet);
+                sigaddset(&waitSet, SIGINT);
+                sigaddset(&waitSet, SIGTERM);
+                sigaddset(&waitSet, SIGQUIT);
+                sigwait(&waitSet, &signalNumber);
+
+                if (signalNumber == SIGINT || signalNumber == SIGTERM || signalNumber == SIGQUIT) {
+                    if (++signalsCaught >= maxExitSignalsToCatch) {
+                        std::exit(1);
+                    }
+                    executor->cancel();
+                }
+            }
+        });
+        signalThread.detach();
+    }
 };
 
 } // namespace ros2_wrapper

@@ -241,6 +241,16 @@ bool LpsSaWeighApp::initialize( )
         return false;
     }
 
+    { // Default matches config/LpsSaWeighApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 19.
+        declare_parameter<std::string>("scheduler", "SCHED_RR");
+        declare_parameter<int>("scheduler_priority", 19);
+        std::string schedulerPolicy = get_parameter("scheduler").as_string();
+        int schedulerPriority = static_cast<int>(get_parameter("scheduler_priority").as_int());
+        if (!applyRealtimeScheduling(schedulerPolicy, schedulerPriority)) {
+            AIS_LOG_WARN("Continuing without real-time scheduling.");
+        }
+    }
+
     { /* Weighing App execution rate in Hz */
         getTaskConfig().get("cycleRate_hz", LpsSaWeighInfoTbl.CycleRate_hz);
         AIS_LOG_INFO("cycleRate_hz %f", LpsSaWeighInfoTbl.CycleRate_hz);

@@ -1,5 +1,7 @@
 LpsSaJobMgrApp:
   ros__parameters:
+    scheduler: "SCHED_RR"
+    scheduler_priority: 1
     cycle_rate_hz: 10.0
     storage_root: "/opt/appdata/CPM/LpsSaJobMgrApp/nvm"
     simple_cal_max_trucks_supported: 15
