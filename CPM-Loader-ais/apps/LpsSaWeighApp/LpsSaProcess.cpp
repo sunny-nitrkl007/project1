@@ -9,6 +9,7 @@ DESCRIPTION:
 *******************************************************************************/
 #ifndef  _LPS_SA_WEIGHAPP_H_
 #include "LpsSaWeighApp.h"
+#include "ROS2Logger.hpp"
 #endif
 
 /*******************************************************************************
@@ -823,7 +824,7 @@ RETURN VALUE:
 
     /* Check if request for Best Bucket Weight reset is received */
     if (LpsSaWeighReqstChannelStorage::Command::RESET_BEST_BUCKET_WEIGHT == request_.command) {
-        AIS_LOG_NOTICE("Reset Best Bucket Weight Request Received.");
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Reset Best Bucket Weight Request Received.");
 
         /* Reset Best Bucket Weight*/
         LpsWeighResetBestAvailableBktWt();
@@ -837,7 +838,7 @@ RETURN VALUE:
     }
     /* Check if request for Zero Weight Adjust is received */
     else if (LpsSaWeighReqstChannelStorage::Command::ZERO == request_.command) {
-        AIS_LOG_NOTICE("Zero Request Received.");
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Zero Request Received.");
 
         // Command Weigh Library for Zero Adjust
         if (LpsWeighZeroAdjust()) {
@@ -858,11 +859,11 @@ RETURN VALUE:
             payloadCalNvmTbl_.data.ZeroWeight = zeroWeight;
             payloadCalNvmTbl_.setSaveNeeded();
 
-            AIS_LOG_NOTICE("Zeroed  Weight = %f", zeroWeight);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Zeroed  Weight = %f", zeroWeight);
 
             // As Zero Adjust was successful send positive response/acknowledgment
             LpsSaScsSendReqstResponse(request_.command, true);
-            AIS_LOG_INFO("Sent Positive response for Zero Adjust request");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Sent Positive response for Zero Adjust request");
         }
         else {
             // Zero was not successful, why?
@@ -875,11 +876,11 @@ RETURN VALUE:
 
             // As Zero Adjust was unsuccessful send negative response/acknowledgment
             LpsSaScsSendReqstResponse(request_.command, false);
-            AIS_LOG_NOTICE("Sent Negative response for Zero Adjust request, status = %d", zeroAdjStatus);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Sent Negative response for Zero Adjust request, status = %d", zeroAdjStatus);
         }
     }
     else if (LpsSaWeighReqstChannelStorage::Command::CAPTURE_CYLINDER_EXTENSION_REFERENCE == request_.command) {
-        AIS_LOG_NOTICE("Capture Tilt Cylinder Extension Request Received.");
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Capture Tilt Cylinder Extension Request Received.");
         LpsWeighSetTiltExtensionThreshold();
         LpsSaScsSendReqstResponse(request_.command, true);
     }
@@ -975,8 +976,8 @@ void LpsSaWeighApp::CheckForFilterSettleTime(void) {
     if (LpsSaWeighInfoTbl.FilterSettleDelay < reqDelay) {
         LpsSaWeighInfoTbl.FilterSettleDelay++;
         weighUpdtTbl.UseFilterDataFlag = FALSE;
-        AIS_LOG_DEBUG("requiredDelay = %i",reqDelay);
-        AIS_LOG_DEBUG("UseFilterDataFlag == FALSE");
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"requiredDelay = %i",reqDelay);
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"UseFilterDataFlag == FALSE");
     }
 }
 
@@ -1078,7 +1079,7 @@ unsigned int LpsSaWeighApp::GetSysMonotonicTime() {
         currentTime = tempTime.tv_sec;
     }
     else {
-        AIS_LOG_DEBUG("FetchingcurrentTime FAILED");
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"FetchingcurrentTime FAILED");
         currentTime = 0;
     }
     return currentTime;

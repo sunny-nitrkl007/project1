@@ -4,7 +4,7 @@
 
 LpsUpdtErrorTypes_t LpsSaWeighApp::ProcessInputs()
 {
-    AIS_LOG_DEBUG("Process Inputs Standalone");
+   RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Process Inputs Standalone");
 
     LpsSaLiftPosition_t  liftPosition;
     LpsSaTiltPosition_t  tiltPosition;

@@ -16,7 +16,7 @@ import glob
  
 Import( 'testEnv' )
 myEnv = testEnv.Clone();
-BASE_PATH = '/home/u_subras91/CPM/ssp-CPM_Loader-ais'
+BASE_PATH = os.path.abspath(os.path.join(Dir('#').abspath, '..'))
 targetAppVariant = myEnv.get('TARGET_APP_VARIANT', None)
  
 # Please people, stop creating so many warnings!
@@ -93,9 +93,6 @@ myEnv.Append(
         )
     ]
 )
- 
- 
- 
 #------------------------------------------------------
  
  
@@ -130,9 +127,9 @@ if targetAppVariant is not None:
     sourceFiles += Glob(targetAppVariant + '/*.cpp')
  
 base_libs = [    'ais_config',
-                 'ais_log',
                  'ais_serialization',
                  'nvm',
+                 'nvm_filesystem',
                  'hal_canv3',
                  'hal_boot',
 #                 'hal_util',
@@ -173,5 +170,9 @@ LpsSaWeighApp = myEnv.Program(
     )
  
 myEnv.InstallBinary( LpsSaWeighApp )
+ros2_cfg_dir = os.path.join(Dir('#').abspath, 'ros2_config')
+myEnv.InstallConfig(ros2_cfg_dir, 'LpsSaWeighApp.yaml')
+for f in glob.glob(os.path.join(ros2_cfg_dir, 'Robot_*.yaml')):
+    myEnv.InstallConfig(ros2_cfg_dir, os.path.basename(f))
  
 myEnv.Alias("LpsSaWeighApp", "#bin/LpsSaWeighApp")

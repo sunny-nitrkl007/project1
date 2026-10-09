@@ -4,7 +4,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/archive_exception.hpp>
 
-#include <ais/log/Logger.h>
+#include "ROS2Logger.hpp"
 
 #include <fileio/sha1_fstream.hpp>
 #include <chrono/print.hpp>
@@ -36,7 +36,7 @@ void LpsSaJobMgrSimpleCal::addEntry(const LpsSaLoadRecordChannelStorage& loadRec
     { // Convert to local time string
         std::string str = tes_common_ais::putLocalTime(lastSubtotal.endTime.utcTime, tes_common_ais::date_time_formats::ISO_DATE_TIME_LOCAL);
         entry.simpleCalData.timeStamp = str;
-        AIS_LOG_DEBUG("Simple Cal Timestamp: %s", str.c_str());
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Simple Cal Timestamp: %s", str.c_str());
     }
 
     entry.loadRecord = loadRecord;
@@ -96,34 +96,34 @@ bool LpsSaJobMgrSimpleCal::load() {
             boost::archive::binary_iarchive ia(ifs);
             ia >> *this;
             saveNeeded_ = false;
-            AIS_LOG_INFO("Loaded job manager simple cal data from storage.");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Loaded job manager simple cal data from storage.");
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not deserialize job manager simple cal data from storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize job manager simple cal data from storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         }
         catch (const std::exception& e) {
-            AIS_LOG_ERROR("Could not deserialize job manager simple cal data from storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize job manager simple cal data from storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         }
         catch (...) {
-            AIS_LOG_ERROR("Could not deserialize job manager simple cal data from storage, unexpected error.");
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize job manager simple cal data from storage, unexpected error.");
         }
 
         ifs.close();
 
         if (ifs.is_corrupt()) {
             if (ifs.fix_it()) {
-                AIS_LOG_WARN("Job manager simple cal data file was corrupt... fixed it.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Job manager simple cal data file was corrupt... fixed it.");
             }
             else {
-                AIS_LOG_ERROR("Job manager simple cal data file was corrupt... could not fix it.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Job manager simple cal data file was corrupt... could not fix it.");
             }
         }
     }
     else {
-        AIS_LOG_ERROR("Job manager simple cal data file could not be opened from storage.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Job manager simple cal data file could not be opened from storage.");
     }
 
     if (success) {
@@ -148,8 +148,8 @@ bool LpsSaJobMgrSimpleCal::reset() {
         success = tes_common_ais::sha1_fstream::remove_files(filePath_);
     }
     catch (const boost::archive::archive_exception& e) {
-        AIS_LOG_ERROR("Could not delete from storage.");
-        AIS_LOG_ERROR(e.what());
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not delete from storage.");
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
     }
 
     // Reinitialize to default values.
@@ -173,18 +173,18 @@ bool LpsSaJobMgrSimpleCal::save(bool force) const {
                 boost::archive::binary_oarchive oa(ofs);
                 oa << *this;
                 saveNeeded_ = false;
-                AIS_LOG_INFO("Saved job manager simple cal data to storage.");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Saved job manager simple cal data to storage.");
                 success = true;
             }
             catch (const boost::archive::archive_exception& e) {
-                AIS_LOG_ERROR("Could not serialize job manager simple cal data to storage.");
-                AIS_LOG_ERROR(e.what());
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not serialize job manager simple cal data to storage.");
+               RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
             }
 
             ofs.close();
         }
         else {
-            AIS_LOG_ERROR("Job manager simple cal data could not be opened from storage.");
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Job manager simple cal data could not be opened from storage.");
         }
     }
     else {

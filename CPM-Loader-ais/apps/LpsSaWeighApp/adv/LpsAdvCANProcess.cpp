@@ -14,7 +14,7 @@
 #include <sys/socket.h>
 #include <chrono>
 #include <oel_pack.h>
-#include <ais/log/Logger.h>
+#include "ROS2Logger.hpp"
 #include <CANBase/SocketCanUtil.h>
 #include <catdllib_fid_def.h>
 
@@ -86,7 +86,7 @@ RETURN VALUE:  Boolean
 bool LpsAdvCANProcess::init( )
 {
     bool success = true;
-	AIS_LOG_INFO( "LpsAdvCANProcess::initialize" );
+	RCLCPP_INFO(ROS2Logger::Instance().GetLogger(), "LpsAdvCANProcess::initialize" );
 
 	// Close if already open.
 	if (socket_ >= 0) {
@@ -122,7 +122,7 @@ bool LpsAdvCANProcess::init( )
         }
 	}
 	else {
-	    AIS_LOG_FATAL("Failed to open socket, error %d (%s)", errno, strerror(errno));
+	    RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"Failed to open socket, error %d (%s)", errno, strerror(errno));
         success = false;
 	}
 
@@ -165,11 +165,11 @@ void LpsAdvCANProcess::sendTX(uint8_t data[8], uint8_t length, uint16_t mesg_id)
 
         int bytesSent = write(socket_, &frame, sizeof(frame));
         if (bytesSent < 0) {
-            AIS_LOG_ERROR("Failed to write CAN message to socket, error %d (%s)", errno, strerror(errno));
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to write CAN message to socket, error %d (%s)", errno, strerror(errno));
         }
     }
     else {
-        AIS_LOG_ERROR("Socket not open for publishing");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Socket not open for publishing");
     }
 }
 
@@ -202,7 +202,7 @@ bool LpsAdvCANProcess::update(bool& allRxd)
         lastMsgId_ = 0;
         CAN734Received_ = false;
         CAN733Received_ = false;
-        AIS_LOG_NOTICE("Number of CAN packets received at startup: %d", count);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Number of CAN packets received at startup: %d", count);
         allRxd = false;
         return false;
     }
@@ -233,7 +233,7 @@ bool LpsAdvCANProcess::update(bool& allRxd)
 
             if (lastMsgId_ == rxPacket.msgId) {
                 // We already had one of these, and we got another one, we must have missed something
-                AIS_LOG_ERROR("Two CAN734 messages received in a row without a CAN733 message.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Two CAN734 messages received in a row without a CAN733 message.");
                 CAN733Missed = true;
                 break; // problem
             }
@@ -247,7 +247,7 @@ bool LpsAdvCANProcess::update(bool& allRxd)
 
             if (lastMsgId_ == rxPacket.msgId) {
                 // We already had one of these, and we got another one, we must have missed something
-                AIS_LOG_ERROR("Two CAN733 messages received in a row without a CAN734 message.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Two CAN733 messages received in a row without a CAN734 message.");
                 CAN734Missed = true;
                 break; // problem
             }
@@ -255,7 +255,7 @@ bool LpsAdvCANProcess::update(bool& allRxd)
             lastMsgId_ = rxPacket.msgId;
         }
         else {
-            AIS_LOG_ERROR("Received an unexpected message 0x%X.", rxPacket.msgId);
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Received an unexpected message 0x%X.", rxPacket.msgId);
             break; // problem
         }
 
@@ -315,10 +315,10 @@ bool LpsAdvCANProcess::getPacket(CanPacket& m, int timeout_ms)
             int nbytes = read(socket_, &frame, sizeof(frame));
 
             if (nbytes <= 0) {
-                AIS_LOG_ERROR("Failed to read from CAN socket, error %d (%s)", errno, strerror(errno));
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to read from CAN socket, error %d (%s)", errno, strerror(errno));
             }
             else if (nbytes < 5) {
-                AIS_LOG_ERROR("Incomplete CAN frame nbytes=%d", nbytes);
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Incomplete CAN frame nbytes=%d", nbytes);
             }
             else {
                 SocketCanUtil::convertFromSocketFormat(m, frame);
@@ -327,7 +327,7 @@ bool LpsAdvCANProcess::getPacket(CanPacket& m, int timeout_ms)
         }
     }
     else {
-        AIS_LOG_ERROR("Socket is not open, cannot read");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Socket is not open, cannot read");
     }
     return success;
 }
@@ -338,7 +338,7 @@ bool LpsAdvCANProcess::getPacket(CanPacket& m, int timeout_ms)
 bool LpsAdvCANProcess::unpack734Data(const CanPacketStorage& packet)
 {
     if (packet.length < 8) {
-        AIS_LOG_ERROR("Wrong size for CAN734 %d", packet.length);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Wrong size for CAN734 %d", packet.length);
         return false; // problem
     }
 
@@ -357,7 +357,7 @@ bool LpsAdvCANProcess::unpack734Data(const CanPacketStorage& packet)
 bool LpsAdvCANProcess::unpack733Data(const CanPacketStorage& packet)
 {
     if (packet.length < 6) {
-        AIS_LOG_ERROR("Wrong size for CAN733 %d", packet.length);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Wrong size for CAN733 %d", packet.length);
         return false; // problem
     }
 

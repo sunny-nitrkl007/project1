@@ -12,6 +12,7 @@ DESCRIPTION:This file provides the update routines for the application software
 
 #ifndef  _LPS_SA_WEIGHAPP_H_
 #include "LpsSaWeighApp.h"
+#include "ROS2Logger.hpp"
 #endif
 
 /*******************************************************************************
@@ -118,7 +119,7 @@ bool LpsSaWeighApp::setLiftLinkageSensorFullLowerCalValue(float fullLowerDutyCyc
         // If the calibration counter is 0, this is just the initial value, not a new calibration
         if (0 != liftCalNvmTbl_.lift_cal_counter) {
             newCalibration = true;
-            AIS_LOG_ALERT("New cal values received. Lift Cal Counter: %d", liftCalNvmTbl_.lift_cal_counter);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New cal values received. Lift Cal Counter: %d", liftCalNvmTbl_.lift_cal_counter);
         }
 
         setLiftLinkageSensorCalibrated(liftCalNvmTbl_.lift_full_lower_dc, liftCalNvmTbl_.lift_full_raise_dc);
@@ -126,7 +127,7 @@ bool LpsSaWeighApp::setLiftLinkageSensorFullLowerCalValue(float fullLowerDutyCyc
     else if ((liftCalNvmTbl_.lift_full_lower_dc != fullLowerDutyCycle) ||
             (0 == (liftCalNvmTbl_.lift_cal_stat & CAL_LIFT_LINKAGE_MASK))) {
         // If this one changed, then mark it.
-        AIS_LOG_ALERT("New lower calibration values detected old = %f, new = %f", liftCalNvmTbl_.lift_full_lower_dc, fullLowerDutyCycle);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New lower calibration values detected old = %f, new = %f", liftCalNvmTbl_.lift_full_lower_dc, fullLowerDutyCycle);
         liftCalNvmTbl_.lift_full_lower_dc_recd = true;
         liftCalNvmTbl_.lift_full_lower_dc = fullLowerDutyCycle;
     }
@@ -146,7 +147,7 @@ bool LpsSaWeighApp::setLiftLinkageSensorFullRaiseCalValue(float fullRaiseDutyCyc
         // If the calibration counter is 0, this is just the initial value, not a new calibration
         if (0 != liftCalNvmTbl_.lift_cal_counter) {
             newCalibration = true;
-            AIS_LOG_ALERT("New cal values received. Lift Cal Counter: %d", liftCalNvmTbl_.lift_cal_counter);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New cal values received. Lift Cal Counter: %d", liftCalNvmTbl_.lift_cal_counter);
         }
 
         setLiftLinkageSensorCalibrated(liftCalNvmTbl_.lift_full_lower_dc, liftCalNvmTbl_.lift_full_raise_dc);
@@ -154,7 +155,7 @@ bool LpsSaWeighApp::setLiftLinkageSensorFullRaiseCalValue(float fullRaiseDutyCyc
     else if ((liftCalNvmTbl_.lift_full_raise_dc != fullRaiseDutyCycle) ||
             (0 == (liftCalNvmTbl_.lift_cal_stat & CAL_LIFT_LINKAGE_MASK))) {
         // If this one changed, then mark it.
-        AIS_LOG_ALERT("New raise calibration values detected old = %f, new = %f", liftCalNvmTbl_.lift_full_raise_dc, fullRaiseDutyCycle);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New raise calibration values detected old = %f, new = %f", liftCalNvmTbl_.lift_full_raise_dc, fullRaiseDutyCycle);
         liftCalNvmTbl_.lift_full_raise_dc_recd = true;
         liftCalNvmTbl_.lift_full_raise_dc = fullRaiseDutyCycle;
     }
@@ -174,7 +175,7 @@ bool LpsSaWeighApp::setTiltLinkageSensorFullDumpCalValue(float fullDumpDutyCycle
         // If the calibration counter is 0, this is just the initial value, not a new calibration
         if (0 != tiltCalNvmTbl_.tilt_cal_counter) {
             newCalibration = true;
-            AIS_LOG_ALERT("New cal values received. Tilt Cal Counter: %d", tiltCalNvmTbl_.tilt_cal_counter);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New cal values received. Tilt Cal Counter: %d", tiltCalNvmTbl_.tilt_cal_counter);
         }
 
         setTiltLinkageSensorCalibrated(tiltCalNvmTbl_.tilt_full_dump_dc, tiltCalNvmTbl_.tilt_full_rack_dc);
@@ -182,7 +183,7 @@ bool LpsSaWeighApp::setTiltLinkageSensorFullDumpCalValue(float fullDumpDutyCycle
     else if ((tiltCalNvmTbl_.tilt_full_dump_dc != fullDumpDutyCycle) ||
             (0 == (tiltCalNvmTbl_.tilt_cal_stat & CAL_TILT_LINKAGE_MASK))) {
         // If this one changed, then mark it.
-        AIS_LOG_ALERT("New dump calibration values detected old = %f, new = %f", tiltCalNvmTbl_.tilt_full_dump_dc, fullDumpDutyCycle);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New dump calibration values detected old = %f, new = %f", tiltCalNvmTbl_.tilt_full_dump_dc, fullDumpDutyCycle);
         tiltCalNvmTbl_.tilt_full_dump_dc_recd = true;
         tiltCalNvmTbl_.tilt_full_dump_dc = fullDumpDutyCycle;
     }
@@ -202,7 +203,7 @@ bool LpsSaWeighApp::setTiltLinkageSensorFullRackCalValue(float fullRackDutyCycle
         // If the calibration counter is 0, this is just the initial value, not a new calibration
         if (0 != tiltCalNvmTbl_.tilt_cal_counter) {
             newCalibration = true;
-            AIS_LOG_ALERT("New cal values received. Tilt Cal Counter: %d", tiltCalNvmTbl_.tilt_cal_counter);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New cal values received. Tilt Cal Counter: %d", tiltCalNvmTbl_.tilt_cal_counter);
         }
 
         setTiltLinkageSensorCalibrated(tiltCalNvmTbl_.tilt_full_dump_dc, tiltCalNvmTbl_.tilt_full_rack_dc);
@@ -210,7 +211,7 @@ bool LpsSaWeighApp::setTiltLinkageSensorFullRackCalValue(float fullRackDutyCycle
     else if ((tiltCalNvmTbl_.tilt_full_rack_dc != fullRackDutyCycle) ||
             (0 == (tiltCalNvmTbl_.tilt_cal_stat & CAL_TILT_LINKAGE_MASK))) {
         // If this one changed, then mark it.
-        AIS_LOG_ALERT("New rack calibration values detected old = %f, new = %f", tiltCalNvmTbl_.tilt_full_rack_dc, fullRackDutyCycle);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"New rack calibration values detected old = %f, new = %f", tiltCalNvmTbl_.tilt_full_rack_dc, fullRackDutyCycle);
         tiltCalNvmTbl_.tilt_full_rack_dc_recd = true;
         tiltCalNvmTbl_.tilt_full_rack_dc = fullRackDutyCycle;
     }
@@ -279,10 +280,10 @@ void LpsSaWeighApp::ReInitWeighLib(void)
 {
     LpsSaInitErrorType_t initRet = LpsSaInit();
     if (LPS_SA_INIT_SUCCESS != initRet) {
-        AIS_LOG_ERROR("Weigh Library Reinit Failed = %d", initRet);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Weigh Library Reinit Failed = %d", initRet);
     }
     else {
-        AIS_LOG_INFO("Weigh Library Reinit Success.");
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Weigh Library Reinit Success.");
     }
 }
 
@@ -414,7 +415,7 @@ void LpsSaWeighApp::CalLibUpdt()
     }
 
     if (LPS_CAL_UPDT_SUCCESS != calRet) {
-        AIS_LOG_ERROR("LpsCalUpdate returned %d.", calRet);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsCalUpdate returned %d.", calRet);
     }
 }
 

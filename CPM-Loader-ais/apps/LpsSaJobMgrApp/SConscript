@@ -30,7 +30,7 @@ myEnv.Append(CPPPATH = [
 ])
 
 #Addon------------------------------
-BASE_PATH = '/home/u_subras91/CPM/ssp-CPM_Loader-ais'
+BASE_PATH = os.path.abspath(os.path.join(Dir('#').abspath, '..'))
 
 
 ros2_libs = []
@@ -80,8 +80,6 @@ myEnv.Append(
         )
     ]
 )
-
-
 #------------------------------------------------------
 
 
@@ -89,8 +87,7 @@ sourceFiles = \
     Glob('*.cpp') + \
     Glob(myEnv[ 'SSP_DIR' ] + '/lps_pass_tracker/src/*.c')
 
-base_libs = [    'ais_log',
-                 'ais_serialization',
+base_libs = [    'ais_serialization',
                  'rclcpp',
                  'rcl',
                  'rcutils',
@@ -117,7 +114,10 @@ LpsSaJobMgrApp = myEnv.Program(
     )
 
 myEnv.InstallBinary( LpsSaJobMgrApp )
-myEnv.InstallConfig(Dir('.').abspath, 'LpsSaJobMgrApp.yaml')
+ros2_cfg_dir = os.path.join(Dir('#').abspath, 'ros2_config')
+myEnv.InstallConfig(ros2_cfg_dir, 'LpsSaJobMgrApp.yaml')
+for f in glob.glob(os.path.join(ros2_cfg_dir, 'Robot_*.yaml')):
+    myEnv.InstallConfig(ros2_cfg_dir, os.path.basename(f))
 myEnv.Alias("JobMgrApp", "#bin/LpsSaJobMgrApp")
 
 

@@ -9,12 +9,12 @@
 #include <algorithm>
 #include <cmath>
 #include <iterator>
-
+#include "ROS2Logger.hpp"
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/filesystem.hpp>
 
-#include <hub/filesystem/extensions/nvm.h>
+#include <filesystem/extensions/nvm.h>
 
 #include <fileio/oflocker.hpp>
 
@@ -41,7 +41,7 @@ public:
     }
 
     bool load() {
-        bool success = ais::filesystem::file::read(path_, fileName_, *this);
+        bool success = ros2_nvm::filesystem::file::read(path_, fileName_, *this);
 
         if (success) {
             saveNeeded_ = false;
@@ -52,14 +52,14 @@ public:
 
     // Remove stored files
     bool remove() {
-        return ais::filesystem::sha1_fstream::remove_files(ais::filesystem::dir::makeFilePath(path_, fileName_));
+        return ros2_nvm::filesystem::sha1_fstream::remove_files(ros2_nvm::filesystem::nvm_dir::makeFilePath(path_, fileName_));
     }
 
     bool save(bool force = false) const {
         bool success = true;
 
         if (force || saveNeeded_) {
-            success = ais::filesystem::file::store(path_, fileName_, *this);
+            success = ros2_nvm::filesystem::file::store(path_, fileName_, *this);
             if (success) {
                 saveNeeded_ = false;
             }
@@ -85,10 +85,10 @@ public:
                 toJson(ofl.ofstream(), filePath.stem().string());
                 ofl.close();
                 success = true;
-                AIS_LOG_INFO("%s: published JSON file.", filePath.filename().c_str());
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%s: published JSON file.", filePath.filename().c_str());
             }
             else {
-                AIS_LOG_ERROR("%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
             }
         }
 
@@ -96,11 +96,11 @@ public:
             try {
                 if (boost::filesystem::is_regular_file(filePath)) {
                     boost::filesystem::remove(filePath);
-                    AIS_LOG_WARN("%s: file removed.", filePath.filename().c_str());
+                    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file removed.", filePath.filename().c_str());
                 }
             }
             catch (const boost::filesystem::filesystem_error& e) {
-                AIS_LOG_WARN("%s: file could not be removed.", filePath.filename().c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file could not be removed.", filePath.filename().c_str());
             }
         }
 

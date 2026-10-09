@@ -8,6 +8,8 @@ DESCRIPTION:
 ** -- #Include's --
 *******************************************************************************/
 #include <chrono>
+#include <pthread.h>
+#include <sched.h>
 #include <string>
 #include <vector>
 
@@ -16,7 +18,7 @@ DESCRIPTION:
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-
+#include "ROS2Logger.hpp"
 #include <fileio/sha1_fstream.hpp>
 #include <scl_prmsw.h>
 #include <lps_sea_defs.h>
@@ -121,7 +123,7 @@ bool LpsSaJobMgrApp::initialize( )
     bool everythingOk = true;
     LpsSaJobMgrCnfg defaultConfig;
 
-    RCLCPP_INFO(get_logger(), "JobManager::initialize");
+   RCLCPP_INFO(get_logger(), "JobManager::initialize");
 
     { // Default matches config/LpsSaJobMgrApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 1.
         declare_parameter<std::string>("scheduler", "SCHED_RR");
@@ -149,7 +151,7 @@ bool LpsSaJobMgrApp::initialize( )
 
         { // Default Horn Store Enable
             defaultConfig.hornStoreEnable = get_parameter("horn_store_enable").as_bool();
-            AIS_LOG_INFO("Default HornStoreEnable is: %d", defaultConfig.hornStoreEnable);
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Default HornStoreEnable is: %d", defaultConfig.hornStoreEnable);
         }
 
         { // Simple Cal Max Trucks
@@ -171,14 +173,14 @@ bool LpsSaJobMgrApp::initialize( )
             }
 
             defaultConfig.autoStorePassCount = static_cast<uint16_t>(autoStorePassCount);
-            AIS_LOG_INFO("Default AutoStorePassCount is: %d", defaultConfig.autoStorePassCount);
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Default AutoStorePassCount is: %d", defaultConfig.autoStorePassCount);
         }
 
         { // MSN
             machineMSN = get_parameter("internal_msn").as_string();
         }
 
-        AIS_LOG_INFO("Storage Root: %s", storageRoot_.c_str());
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Storage Root: %s", storageRoot_.c_str());
     }
 
     /* Initialize time information. */
@@ -208,53 +210,53 @@ bool LpsSaJobMgrApp::initialize( )
 
     if ( !ShmClockInputRos )
     {
-        AIS_LOG_ERROR( "\n  ShmClockInput ROS2 interface not configured." );
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "\n  ShmClockInput ROS2 interface not configured." );
     }
 
     if ( !LpsSaJobMgrTxRosOut_ )
     {
-        AIS_LOG_ERROR( "\n  LpsSaJobMgrTx ROS2 interface not configured." );
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "\n  LpsSaJobMgrTx ROS2 interface not configured." );
     }
 
     if ( !LpsSaJobMgrDebugRosOut_ )
     {
-        AIS_LOG_ERROR( "\n  LpsSaJobMgrDebug ROS2 interface not configured." );
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "\n  LpsSaJobMgrDebug ROS2 interface not configured." );
     }
 
     if (!LpsSaJobMgrRespChannelOutput_) {
-        AIS_LOG_ERROR("LpsSaJobMgrRespChannel ROS2 output not initialized");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaJobMgrRespChannel ROS2 output not initialized");
     }
 
     if (!LpsSaJobMgrReqstIn) {
-        AIS_LOG_ERROR("LpsSaJobMgrReqstChannel ROS2 input not initialized");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaJobMgrReqstChannel ROS2 input not initialized");
     }
 
     if ( !LpsSaSwitchInput )
     {
-        AIS_LOG_ERROR( "\n LpsSaSwitchInput Interface  not configured." );
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "\n LpsSaSwitchInput Interface  not configured." );
     }
 
     if ( !LpsSaOutputChannelRosOut_ )
     {
-        AIS_LOG_ERROR( "\n OutputChannel ROS2 interface not configured." );
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "\n OutputChannel ROS2 interface not configured." );
     }
 
     if (!AisJhm2TxInput) {
-        AIS_LOG_ERROR("AisJhm2TxChannel ROS2 input not initialized");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"AisJhm2TxChannel ROS2 input not initialized");
     }
 
     if (!displayStateInputRos_) {
-        AIS_LOG_ERROR("DisplayStateInput ROS2 input not initialized");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DisplayStateInput ROS2 input not initialized");
         everythingOk = false;
     }
 
     if (nullptr == dataLinkDataInputRos_) {
-        AIS_LOG_ERROR("DataLinkData ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DataLinkData ROS2 input not initialized.");
         everythingOk = false;
     }
 
     if (nullptr == autonomyConditionDiagnosticsTxInputRos_) {
-        AIS_LOG_ERROR("AutonomyConditionDiagnosticsTx ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"AutonomyConditionDiagnosticsTx ROS2 input not initialized.");
         everythingOk = false;
     }
 
@@ -267,7 +269,7 @@ bool LpsSaJobMgrApp::initialize( )
             new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode, "lps_sa_weigh_tx_channel");
 
         if (!weighAppInf_.start(get_name(), requestOutput, responseInput, txInput)) {
-            AIS_LOG_ERROR("Failed to start weigh app interface.");
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to start weigh app interface.");
             everythingOk = false;
         }
 
@@ -277,12 +279,12 @@ bool LpsSaJobMgrApp::initialize( )
     // Get the load record output channel (now ROS2-only, bridge forwards to AIS SCS consumers)
     loadRecordOutputChannel_ = new ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::LpsSaLoadRecordChannel>(rosNode, "lps_sa_load_record_channel");
     if (nullptr == loadRecordOutputChannel_) {
-        AIS_LOG_ERROR("\n Load record ROS2 output channel not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"\n Load record ROS2 output channel not initialized.");
         everythingOk = false;
     }
 
     if (nullptr == eddtInputRos_) {
-        AIS_LOG_ERROR("EventDiagnosticData ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"EventDiagnosticData ROS2 input not initialized.");
         everythingOk = false;
     }
 
@@ -315,7 +317,7 @@ bool LpsSaJobMgrApp::initialize( )
         simpleCal_.load();
     }
     catch (const fs::filesystem_error& e) {
-        AIS_LOG_ERROR(e.what());
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         everythingOk = false;
     }
 
@@ -324,7 +326,7 @@ bool LpsSaJobMgrApp::initialize( )
         tes_common_ais::sha1_fstream::remove_files(makeStoragePath(LOAD_RECORD_FILENAME_BIN));
     }
     catch (const fs::filesystem_error& e) {
-        AIS_LOG_ERROR(e.what());
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
     }
 
     parseUiConfigurableFeatures();		// check if Tip_Off is disabled via Show/Hide
@@ -343,7 +345,7 @@ bool LpsSaJobMgrApp::initialize( )
 FUNCTION:                   parseUiConfigurableFeatures
 DESCRIPTION:                move the UI Config JSON file to tempRoot and parse it
 PARAMETER DESCRIPTION:
-RETURN VALUE:               Boolean
+RETURN VALUE:               Boolean  
 *******************************************************************************/
 bool LpsSaJobMgrApp::parseUiConfigurableFeatures() {
     bool ret = false;
@@ -351,7 +353,7 @@ bool LpsSaJobMgrApp::parseUiConfigurableFeatures() {
     try {
         std::string uiConfigJsonFilePath = get_parameter("ui_show_feature_config_json_file_path").as_string();
         if (!uiConfigJsonFilePath.empty()) {
-                AIS_LOG_INFO("JSON file found: %s", uiConfigJsonFilePath.c_str());
+                RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"JSON file found: %s", uiConfigJsonFilePath.c_str());
 
                 // Load JSON
                 boost::property_tree::ptree tree;
@@ -362,24 +364,24 @@ bool LpsSaJobMgrApp::parseUiConfigurableFeatures() {
                 {
                     config_.tipOffMode = TIP_OFF_MODE_PILE;
                     config_.tipOffTriggerType = TIP_OFF_TRIGGER_DISABLED;
-                    AIS_LOG_ERROR("TipOff Disabled via Show/Hide config file Type:%d  Mode:%d", config_.tipOffTriggerType, config_.tipOffMode);
+                   RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"TipOff Disabled via Show/Hide config file Type:%d  Mode:%d", config_.tipOffTriggerType, config_.tipOffMode);
                 }
 
                 ret = true;
         }
         else {
-            AIS_LOG_ERROR("ui_show_feature_config_json_file_path parameter not set");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"ui_show_feature_config_json_file_path parameter not set");
         }
     }
     catch (const fs::filesystem_error& e) {
-        AIS_LOG_ERROR(e.what());
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
     }
     catch (const std::exception &exception) {
-        AIS_LOG_ERROR(exception.what());
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),exception.what());
     }
     catch (...)
     {
-        AIS_LOG_ERROR("Could not copy JSON.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not copy JSON.");
     }
 
     return ret;
@@ -394,7 +396,7 @@ RETURN VALUE:
 *******************************************************************************/
 bool LpsSaJobMgrApp::executive( )
 {
-    RCLCPP_DEBUG(get_logger(), "Executing JobManager Task");
+   RCLCPP_DEBUG(get_logger(), "Executing JobManager Task");
 
     if (nullptr != autonomyConditionDiagnosticsTxInputRos_) {
         cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel txData;
@@ -421,14 +423,14 @@ bool LpsSaJobMgrApp::executive( )
     ret=LpsSaJobMgrScsRx();
     if(SUCCESS != ret)
     {
-        RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsRx' function return code = %d\n", __LINE__, ret);
+       RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsRx' function return code = %d\n", __LINE__, ret);
     }
 
     ret = LpsSaJobMgrPtUpdate();
 
     if(SUCCESS != ret)
     {
-        RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrPtUpdate' function return code = %d\n", __LINE__, ret);
+       RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrPtUpdate' function return code = %d\n", __LINE__, ret);
 
         return FAIL;
     }
@@ -437,7 +439,7 @@ bool LpsSaJobMgrApp::executive( )
     ret =LpsSaJobMgrScsTx();
     if(SUCCESS != ret)
     {
-        RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsTx' function return code = %d\n", __LINE__, ret);
+       RCLCPP_ERROR(get_logger(), "\n Line no = %d,'LpsSaJobMgrUpdate:LpsSaJobMgrScsTx' function return code = %d\n", __LINE__, ret);
 
         return FAIL;
     }
@@ -482,7 +484,7 @@ PARAMETER DESCRIPTION:
 RETURN VALUE:
 *******************************************************************************/
 void LpsSaJobMgrApp::cleanup( ) {
-    AIS_LOG_INFO("LpsSaJobMgrApp::cleanup");
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LpsSaJobMgrApp::cleanup");
     executiveTimer_.reset();
     cleanupRosInterfaces();
 
@@ -500,7 +502,7 @@ void LpsSaJobMgrApp::cleanup( ) {
                 tes_common_ais::sha1_fstream::remove_files(makeStoragePath(CONFIG_FILENAME_BIN));
             }
             catch (const fs::filesystem_error& e) {
-                AIS_LOG_ERROR(e.what());
+               RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
             }
 
             simpleCal_.reset();
@@ -518,34 +520,34 @@ bool LpsSaJobMgrApp::loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord) {
         try {
             boost::archive::binary_iarchive ia(ifs);
             ia >> loadRecord;
-            AIS_LOG_INFO("Loaded load record from storage.");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Loaded load record from storage.");
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not deserialize load record from storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize load record from storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         }
         catch (const std::exception& e) {
-            AIS_LOG_ERROR("Could not deserialize load record from storage");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize load record from storage");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         }
         catch (...) {
-            AIS_LOG_ERROR("Could not deserialize load record from storage, unexpected error.");
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize load record from storage, unexpected error.");
         }
 
         ifs.close();
 
         if (ifs.is_corrupt()) {
             if (ifs.fix_it()) {
-                AIS_LOG_WARN("Load record file was corrupt... fixed it.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load record file was corrupt... fixed it.");
             }
             else {
-                AIS_LOG_ERROR("Load record file was corrupt... could not fix it.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Load record file was corrupt... could not fix it.");
             }
         }
     }
     else {
-        AIS_LOG_ERROR("Load record could not be opened from storage.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Load record could not be opened from storage.");
     }
 
     if (!success) {

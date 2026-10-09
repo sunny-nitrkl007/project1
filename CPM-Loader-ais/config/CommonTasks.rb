@@ -35,6 +35,7 @@ AuxiliaryProcesses.update({
                       Machines::MachineMap.default,
                     ],
       "executableName" => ENV['CAT_DIR'] + "/bin/LpsSaJobMgrApp",
+      "arguments" => ["--ros-args", "--params-file", ENV['CAT_CONFIG_DIR'] + "/LpsSaJobMgrApp.yaml"],
       "autoRestart" => true,
       "timeBetweenRestarts_s" => 2,
       "alwaysOn" => false,
@@ -45,6 +46,15 @@ AuxiliaryProcesses.update({
                       Machines::MachineMap.default,
                     ],
       "executableName" => ENV['CAT_DIR'] + "/bin/LpsSaWeighApp",
+      "arguments" => ["--ros-args",
+                      "--params-file", ENV['CAT_CONFIG_DIR'] + "/LpsSaWeighApp.yaml",
+                      "--params-file", ENV['CAT_CONFIG_DIR'] + "/" + (
+                        # Fall back to NOT_SET when MSN is unavailable/invalid so that
+                        # ROS2 does not abort on a missing params file.
+                        %w[MSNINVALID MSNUNSUPPORTED MSNNOTAVAIL].include?(Machine_name.strip) || Machine_name.strip.empty? \
+                          ? "Robot_NOT_SET.yaml" \
+                          : "Robot_" + Machine_name.strip + ".yaml"
+                      )],
       "autoRestart" => true,
       "timeBetweenRestarts_s" => 2,
       "alwaysOn" => false,

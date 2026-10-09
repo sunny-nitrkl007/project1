@@ -5,7 +5,7 @@
 // Rapid JSON
 #include <ext/rapidjson/RapidJsonGuarded.h>
 
-#include <ais/log/Logger.h>
+#include "ROS2Logger.hpp"
 
 #include <fileio/oflocker.hpp>
 #include <fileio/sha1_fstream.hpp>
@@ -25,34 +25,34 @@ bool LpsSaWeighAppCnfg::load() {
             boost::archive::binary_iarchive ia(ifs);
             ia >> *this;
             saveNeeded_ = false;
-            AIS_LOG_INFO("Loaded weigh app configuration from storage.");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Loaded weigh app configuration from storage.");
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not deserialize weigh app configuration from storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize weigh app configuration from storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         }
         catch (const std::exception& e) {
-            AIS_LOG_ERROR("Could not deserialize weigh app configuration from storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize weigh app configuration from storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         }
         catch (...) {
-            AIS_LOG_ERROR("Could not deserialize weigh app configuration from storage, unexpected error.");
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize weigh app configuration from storage, unexpected error.");
         }
 
         ifs.close();
 
         if (ifs.is_corrupt()) {
             if (ifs.fix_it()) {
-                AIS_LOG_WARN("Weigh app configuration file was corrupt... fixed it.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Weigh app configuration file was corrupt... fixed it.");
             }
             else {
-                AIS_LOG_ERROR("Weigh app configuration file was corrupt... could not fix it.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Weigh app configuration file was corrupt... could not fix it.");
             }
         }
     }
     else {
-        AIS_LOG_ERROR("Weigh app configuration file could not be opened from storage.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Weigh app configuration file could not be opened from storage.");
     }
 
     return success;
@@ -68,8 +68,8 @@ bool LpsSaWeighAppCnfg::reset() {
         success = tes_common_ais::sha1_fstream::remove_files(filePath_);
     }
     catch (const boost::archive::archive_exception& e) {
-        AIS_LOG_ERROR("Could not delete from storage.");
-        AIS_LOG_ERROR(e.what());
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not delete from storage.");
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
     }
 
     return success;
@@ -90,18 +90,18 @@ bool LpsSaWeighAppCnfg::save(bool force) const {
                 boost::archive::binary_oarchive oa(ofs);
                 oa << *this;
                 saveNeeded_ = false;
-                AIS_LOG_INFO("Saved weigh app configuration to storage.");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Saved weigh app configuration to storage.");
                 success = true;
             }
             catch (const boost::archive::archive_exception& e) {
-                AIS_LOG_ERROR("Could not serialize weigh app configuration to storage.");
-                AIS_LOG_ERROR(e.what());
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not serialize weigh app configuration to storage.");
+               RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
             }
 
             ofs.close();
         }
         else {
-            AIS_LOG_ERROR("Weigh app configuration could not be opened from storage.");
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Weigh app configuration could not be opened from storage.");
         }
     }
     else {
@@ -196,10 +196,10 @@ bool LpsSaWeighAppCnfg::publish(const boost::filesystem::path& filePath) const {
             toJson(ofl.ofstream(), filePath.stem().string());
             ofl.close();
             success = true;
-            AIS_LOG_INFO("%s: published JSON file.", filePath.filename().c_str());
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%s: published JSON file.", filePath.filename().c_str());
         }
         else {
-            AIS_LOG_ERROR("%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
         }
     }
 
@@ -207,11 +207,11 @@ bool LpsSaWeighAppCnfg::publish(const boost::filesystem::path& filePath) const {
         try {
             if (boost::filesystem::is_regular_file(filePath)) {
                 boost::filesystem::remove(filePath);
-                AIS_LOG_WARN("%s: file removed.", filePath.filename().c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file removed.", filePath.filename().c_str());
             }
         }
         catch (const boost::filesystem::filesystem_error& e) {
-            AIS_LOG_WARN("%s: file could not be removed.", filePath.filename().c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file could not be removed.", filePath.filename().c_str());
         }
     }
 

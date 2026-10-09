@@ -10,6 +10,7 @@ DESCRIPTION:This file provides the update routines for the application software
 *******************************************************************************/
 #ifndef  _LPS_SA_WEIGHAPP_H_
 #include "LpsSaWeighApp.h"
+#include "ROS2Logger.hpp"
 #endif
 
 /*
@@ -184,7 +185,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltRotaryLinkageSensorCalibration(
             **  The possible responses are as follows:
             **      OK - Calibration Flow parameters have been initialized.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_INIT_FLOW");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_INIT_FLOW");
             LpsSaWeighInfoTbl.stepNo = CAL_TILT_LINKAGE_FULL_RACK;
             return CAL_MGR_MR_INIT_FLOW_OK;
         }
@@ -350,7 +351,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltRotaryLinkageSensorCalibration(
             **      OK  - Initialization for the sampling process associated with
             **          the current flow step (LpsSaWeighInfoTbl.stepNo) is complete.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_SAMPLE_INIT");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SAMPLE_INIT");
             LpsSaWeighInfoTbl.stepNo = CAL_TILT_LINKAGE_FULL_RACK;
             return CAL_MGR_MR_SAMPLE_INIT_OK;
         }
@@ -370,42 +371,42 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltRotaryLinkageSensorCalibration(
             */
             bool done = false;
 
-            AIS_LOG_INFO("CAL_MGR_MC_SAMPLE");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SAMPLE");
 
             if (CAL_MGR_KEY_CONT) {
-                AIS_LOG_INFO("CAL_MGR_KEY_CONT : STEPNO %d", LpsSaWeighInfoTbl.stepNo);
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_KEY_CONT : STEPNO %d", LpsSaWeighInfoTbl.stepNo);
 
                 switch (LpsSaWeighInfoTbl.stepNo) {
                     case (CAL_TILT_LINKAGE_FULL_RACK): {
-                        AIS_LOG_INFO("CAL_TILT_LINKAGE_FULL_RACK");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_LINKAGE_FULL_RACK");
                         cal_linkage_workspace.tilt_full_rack_dc = WeighPidTbl.TiltLinkageSensorDc;
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_LINKAGE_FULL_LOWER;
                         break;
                     }
 
                     case (CAL_TILT_LINKAGE_FULL_LOWER): {
-                        AIS_LOG_INFO("CAL_TILT_LINKAGE_FULL_LOWER");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_LINKAGE_FULL_LOWER");
                         cal_linkage_workspace.lift_full_lower_dc = WeighPidTbl.LiftLinkageSensorDc; // Not Used
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_LINKAGE_FULL_RAISE;
                         break;
                     }
 
                     case (CAL_TILT_LINKAGE_FULL_RAISE): {
-                        AIS_LOG_INFO("CAL_TILT_LINKAGE_FULL_RAISE");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_LINKAGE_FULL_RAISE");
                         cal_linkage_workspace.lift_full_raise_dc = WeighPidTbl.LiftLinkageSensorDc; // Not Used
                         LpsSaWeighInfoTbl.stepNo =CAL_TILT_LINKAGE_FULL_DUMP;
                         break;
                     }
 
                     case (CAL_TILT_LINKAGE_FULL_DUMP): {
-                        AIS_LOG_INFO("CAL_TILT_LINKAGE_FULL_DUMP");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_LINKAGE_FULL_DUMP");
                         cal_linkage_workspace.tilt_full_dump_dc = WeighPidTbl.TiltLinkageSensorDc;
                         done = true;
                         break;
                     }
 
                     default: {
-                        AIS_LOG_WARN("DEF - CAL_TILT_LINKAGE_FULL_RACK \n");
+                        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"DEF - CAL_TILT_LINKAGE_FULL_RACK \n");
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_LINKAGE_FULL_RACK;
                         break;
                     }
@@ -461,11 +462,11 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltRotaryLinkageSensorCalibration(
             */
             if (cal_linkage_workspace.tilt_full_dump_dc > cal_linkage_workspace.tilt_full_rack_dc) {
                 *CalError = 0x0103;
-                AIS_LOG_INFO("TILT CAL_MGR_MR_VALIDATE_NOT_OK");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"TILT CAL_MGR_MR_VALIDATE_NOT_OK");
                 return( CAL_MGR_MR_VALIDATE_NOT_OK );
             }
             else {
-                AIS_LOG_INFO("TILT CAL_MGR_MR_VALIDATE_OK");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"TILT CAL_MGR_MR_VALIDATE_OK");
                 return CAL_MGR_MR_VALIDATE_OK;
             }
         }
@@ -499,7 +500,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltRotaryLinkageSensorCalibration(
             */
 
             // Set the calibration values (at the same time, save to nvm)
-            AIS_LOG_INFO("CAL_MGR_MC_SUCCESS TILT: %f, %f", cal_linkage_workspace.tilt_full_dump_dc,
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SUCCESS TILT: %f, %f", cal_linkage_workspace.tilt_full_dump_dc,
                     cal_linkage_workspace.tilt_full_rack_dc);
 
             // Set the new values
@@ -527,7 +528,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltRotaryLinkageSensorCalibration(
             **      RESTART - (Advanced Option) another set of Sampled Points
             **          (Data) are to be collected.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_DONE");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_DONE");
             return CAL_MGR_MR_DONE_OK;
         }
 
@@ -541,7 +542,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltRotaryLinkageSensorCalibration(
             **      OK      - Set of Sampled Points (Data) were noted as being
             **          NOT_CALIBRATED
             */
-            AIS_LOG_INFO("CAL_MGR_MC_FAIL");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_FAIL");
             return CAL_MGR_MR_FAIL_OK;
         }
 
@@ -723,7 +724,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
             **  The possible responses are as follows:
             **      OK - Calibration Flow parameters have been initialized.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_INIT_FLOW");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_INIT_FLOW");
             LpsSaWeighInfoTbl.stepNo = CAL_TILT_LINKAGE_FULL_RACK;
             return CAL_MGR_MR_INIT_FLOW_OK;
         }
@@ -890,7 +891,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
             **      OK  - Initialization for the sampling process associated with
             **          the current flow step (LpsSaWeighInfoTbl.stepNo) is complete.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_SAMPLE_INIT");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SAMPLE_INIT");
             LpsSaWeighInfoTbl.stepNo = CAL_TILT_INLINE_LINKAGE_LIFT_INIT;
             return CAL_MGR_MR_SAMPLE_INIT_OK;
         }
@@ -910,26 +911,26 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
             */
             bool done = false;
 
-            AIS_LOG_INFO("CAL_MGR_MC_SAMPLE");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SAMPLE");
 
             if (CAL_MGR_KEY_CONT) {
-                AIS_LOG_INFO("CAL_MGR_KEY_CONT : STEPNO %d", LpsSaWeighInfoTbl.stepNo);
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_KEY_CONT : STEPNO %d", LpsSaWeighInfoTbl.stepNo);
 
                 switch (LpsSaWeighInfoTbl.stepNo) {
                     case (CAL_TILT_INLINE_LINKAGE_LIFT_INIT): {
-                        AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_LIFT_INIT");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_LIFT_INIT");
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_INLINE_LINKAGE_FULL_DUMP;
                         break;
                     }
                     case (CAL_TILT_INLINE_LINKAGE_FULL_DUMP): {
-                        AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_FULL_DUMP");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_FULL_DUMP");
                         cal_linkage_workspace.tilt_full_dump_dc = WeighPidTbl.TiltLinkageSensorDc;
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_INLINE_LINKAGE_FULL_RACK;
                         break;
                     }
 
                     case (CAL_TILT_INLINE_LINKAGE_FULL_RACK): {
-                        AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_FULL_RACK");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_FULL_RACK");
                         cal_linkage_workspace.tilt_full_rack_dc = WeighPidTbl.TiltLinkageSensorDc;
 
                         /*
@@ -942,7 +943,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
                         }
                         else {
                             // Set the calibration values (at the same time, save to nvm)
-                            AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_FULL_RACK TILT: %f, %f",
+                           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_FULL_RACK TILT: %f, %f",
                                     cal_linkage_workspace.tilt_full_dump_dc, cal_linkage_workspace.tilt_full_rack_dc);
 
                             // Set the new values
@@ -957,40 +958,40 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
                     }
 
                     case (CAL_TILT_INLINE_LINKAGE_FULL_RAISE): {
-                        AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_FULL_RAISE");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_FULL_RAISE");
                         cal_linkage_workspace.lift_full_raise_dc = WeighPidTbl.LiftLinkageSensorDc; // Not Used
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_INLINE_LINKAGE_DUMP_STOP;
                         break;
                     }
 
                     case (CAL_TILT_INLINE_LINKAGE_DUMP_STOP): {
-                        AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_DUMP_STOP");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_DUMP_STOP");
 
                         cal_linkage_workspace.tilt_dump_stop_angle = LpsSaWeighInfoTbl.TiltPosition.angle;
-                        AIS_LOG_DEBUG("tilt_dump_stop_angle:%f", cal_linkage_workspace.tilt_dump_stop_angle);
+                       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"tilt_dump_stop_angle:%f", cal_linkage_workspace.tilt_dump_stop_angle);
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_INLINE_LINKAGE_RACK_STOP;
                         break;
                     }
 
                     case (CAL_TILT_INLINE_LINKAGE_RACK_STOP): {
-                        AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_RACK_STOP");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_RACK_STOP");
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_INLINE_LINKAGE_FULL_LOWER;
                         break;
                     }
 
                     case (CAL_TILT_INLINE_LINKAGE_FULL_LOWER): {
-                        AIS_LOG_INFO("CAL_TILT_INLINE_LINKAGE_FULL_LOWER");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_TILT_INLINE_LINKAGE_FULL_LOWER");
                         cal_linkage_workspace.lift_full_lower_dc = WeighPidTbl.LiftLinkageSensorDc; // Not Used
 
                         // Rack stop is met when fully rack AND fully lowered.
                         cal_linkage_workspace.tilt_rack_stop_angle = LpsSaWeighInfoTbl.TiltPosition.angle;
-                        AIS_LOG_DEBUG("tilt_rack_stop_angle:%f", cal_linkage_workspace.tilt_rack_stop_angle);
+                       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"tilt_rack_stop_angle:%f", cal_linkage_workspace.tilt_rack_stop_angle);
                         done = true;
                         break;
                     }
 
                     default: {
-                        AIS_LOG_WARN("DEF - CAL_TILT_INLINE_LINKAGE_FULL_DUMP");
+                        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"DEF - CAL_TILT_INLINE_LINKAGE_FULL_DUMP");
                         LpsSaWeighInfoTbl.stepNo = CAL_TILT_INLINE_LINKAGE_FULL_DUMP;
                         break;
                     }
@@ -1048,11 +1049,11 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
                     (cal_linkage_workspace.tilt_full_dump_dc > cal_linkage_workspace.tilt_full_rack_dc) ||
                     (cal_linkage_workspace.tilt_dump_stop_angle > cal_linkage_workspace.tilt_rack_stop_angle)) {
                 *CalError =0x0103;
-                AIS_LOG_INFO("TILT CAL_MGR_MR_VALIDATE_NOT_OK");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"TILT CAL_MGR_MR_VALIDATE_NOT_OK");
                 return CAL_MGR_MR_VALIDATE_NOT_OK;
             }
             else {
-                AIS_LOG_INFO("TILT CAL_MGR_MR_VALIDATE_OK");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"TILT CAL_MGR_MR_VALIDATE_OK");
                 return CAL_MGR_MR_VALIDATE_OK;
             }
         }
@@ -1085,7 +1086,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
             **          previous, revert to default, save current, etc.)
             */
             // Set the calibration values (at the same time, save to nvm)
-            AIS_LOG_INFO("CAL_MGR_MC_SUCCESS TILT: %f, %f", cal_linkage_workspace.tilt_dump_stop_angle,
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SUCCESS TILT: %f, %f", cal_linkage_workspace.tilt_dump_stop_angle,
                     cal_linkage_workspace.tilt_rack_stop_angle);
 
             // Set the new values
@@ -1110,7 +1111,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
             **      RESTART - (Advanced Option) another set of Sampled Points
             **          (Data) are to be collected.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_DONE");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_DONE");
             return CAL_MGR_MR_DONE_OK;
         }
 
@@ -1124,7 +1125,7 @@ CAL_MGR_MR_E LpsSaWeighApp::LpsSaTiltInlineLinkageSensorCalibration(
             **      OK      - Set of Sampled Points (Data) were noted as being
             **          NOT_CALIBRATED
             */
-            AIS_LOG_INFO("CAL_MGR_MC_FAIL");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_FAIL");
             return CAL_MGR_MR_FAIL_OK;
         }
 
@@ -1297,7 +1298,7 @@ CAL_MGR_MR_E LpsSaWeighApp:: LpsSaLiftLinkageSensorCalibration(
             **  The possible responses are as follows:
             **      OK - Calibration Flow parameters have been initialized.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_INIT_FLOW");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_INIT_FLOW");
             LpsSaWeighInfoTbl.stepNo = CAL_LIFT_LINKAGE_FULL_RAISE;
             return CAL_MGR_MR_INIT_FLOW_OK;
         }
@@ -1464,7 +1465,7 @@ CAL_MGR_MR_E LpsSaWeighApp:: LpsSaLiftLinkageSensorCalibration(
             **      OK  - Initialization for the sampling process associated with
             **          the current flow step (LpsSaWeighInfoTbl.stepNo) is complete.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_SAMPLE_INIT");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SAMPLE_INIT");
             LpsSaWeighInfoTbl.stepNo = CAL_LIFT_LINKAGE_FULL_RAISE;
             return CAL_MGR_MR_SAMPLE_INIT_OK;
         }
@@ -1484,35 +1485,35 @@ CAL_MGR_MR_E LpsSaWeighApp:: LpsSaLiftLinkageSensorCalibration(
             */
             bool done = false;
 
-            AIS_LOG_INFO("CAL_MGR_MC_SAMPLE");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SAMPLE");
 
             if (CAL_MGR_KEY_CONT) {
-                AIS_LOG_INFO("CAL_MGR_KEY_CONT : STEPNO %d", LpsSaWeighInfoTbl.stepNo);
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_KEY_CONT : STEPNO %d", LpsSaWeighInfoTbl.stepNo);
 
                 switch (LpsSaWeighInfoTbl.stepNo) {
                     case (CAL_LIFT_LINKAGE_FULL_RAISE): {
-                        AIS_LOG_INFO("CAL_LIFT_LINKAGE_FULL_RAISE");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_LIFT_LINKAGE_FULL_RAISE");
                         cal_linkage_workspace.lift_full_raise_dc = WeighPidTbl.LiftLinkageSensorDc;
                         LpsSaWeighInfoTbl.stepNo = CAL_LIFT_LINKAGE_FULL_RACK;
                         break;
                     }
 
                     case (CAL_LIFT_LINKAGE_FULL_RACK): {
-                        AIS_LOG_INFO("CAL_LIFT_LINKAGE_FULL_RACK");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_LIFT_LINKAGE_FULL_RACK");
                         cal_linkage_workspace.tilt_full_rack_dc = WeighPidTbl.TiltLinkageSensorDc; // Not Used
                         LpsSaWeighInfoTbl.stepNo = CAL_LIFT_LINKAGE_FULL_LOWER;
                         break;
                     }
 
                     case (CAL_LIFT_LINKAGE_FULL_LOWER): {
-                        AIS_LOG_INFO("CAL_LIFT_LINKAGE_FULL_LOWER");
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_LIFT_LINKAGE_FULL_LOWER");
                         cal_linkage_workspace.lift_full_lower_dc = WeighPidTbl.LiftLinkageSensorDc;
                         done = true;
                         break;
                     }
 
                     default: {
-                        AIS_LOG_WARN("DEF - CAL_LIFT_LINKAGE_FULL_RAISE");
+                        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"DEF - CAL_LIFT_LINKAGE_FULL_RAISE");
                         LpsSaWeighInfoTbl.stepNo = CAL_LIFT_LINKAGE_FULL_RAISE;
                         break;
                     }
@@ -1568,11 +1569,11 @@ CAL_MGR_MR_E LpsSaWeighApp:: LpsSaLiftLinkageSensorCalibration(
             */
             if (cal_linkage_workspace.lift_full_lower_dc > cal_linkage_workspace.lift_full_raise_dc) {
                 *CalError = 0x0103;
-                AIS_LOG_INFO("LIFT CAL_MGR_MR_VALIDATE_NOT_OK");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LIFT CAL_MGR_MR_VALIDATE_NOT_OK");
                 return CAL_MGR_MR_VALIDATE_NOT_OK;
             }
             else {
-                AIS_LOG_INFO("LIFT CAL_MGR_MR_VALIDATE_OK");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LIFT CAL_MGR_MR_VALIDATE_OK");
                 return CAL_MGR_MR_VALIDATE_OK;
             }
         }
@@ -1606,7 +1607,7 @@ CAL_MGR_MR_E LpsSaWeighApp:: LpsSaLiftLinkageSensorCalibration(
             */
 
             // Set the calibration values (at the same time, save to nvm)
-            AIS_LOG_INFO("CAL_MGR_MC_SUCCESS LIFT: %f, %f", cal_linkage_workspace.lift_full_lower_dc,
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_SUCCESS LIFT: %f, %f", cal_linkage_workspace.lift_full_lower_dc,
                     cal_linkage_workspace.lift_full_raise_dc);
 
             // Set the new values
@@ -1639,7 +1640,7 @@ CAL_MGR_MR_E LpsSaWeighApp:: LpsSaLiftLinkageSensorCalibration(
             **      RESTART - (Advanced Option) another set of Sampled Points
             **          (Data) are to be collected.
             */
-            AIS_LOG_INFO("CAL_MGR_MC_DONE");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_DONE");
             return CAL_MGR_MR_DONE_OK;
         }
 
@@ -1653,7 +1654,7 @@ CAL_MGR_MR_E LpsSaWeighApp:: LpsSaLiftLinkageSensorCalibration(
             **      OK      - Set of Sampled Points (Data) were noted as being
             **          NOT_CALIBRATED
             */
-            AIS_LOG_INFO("CAL_MGR_MC_FAIL");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CAL_MGR_MC_FAIL");
             return CAL_MGR_MR_FAIL_OK;
         }
 

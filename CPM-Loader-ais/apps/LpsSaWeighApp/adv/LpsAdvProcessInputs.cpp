@@ -14,7 +14,7 @@ static TipoffAssist LpsTipoffAssist = {};
 
 LpsUpdtErrorTypes_t LpsSaWeighApp::ProcessInputs()
 {
-    AIS_LOG_DEBUG("Process Inputs Adv");
+   RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Process Inputs Adv");
 
     LpsUpdtErrorTypes_t weighRet = LPS_UPDT_SUCCESS;
     float liftLinkageDc = 0.f;
@@ -126,7 +126,7 @@ LpsUpdtErrorTypes_t LpsSaWeighApp::ProcessInputs()
                  */
                 //int count = CANB.purgeRxBuffer();
                 int count =1;
-                AIS_LOG_ERROR("Falling behind, purged CAN Rx buffer of %d packets.", count);
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Falling behind, purged CAN Rx buffer of %d packets.", count);
                 //break;
             }
 
@@ -627,10 +627,10 @@ LpsUpdtErrorTypes_t LpsSaWeighApp::ProcessInputs()
     DebugLpsSaXCPChannels.DebugTiltCylWidth = CANB.dropped;
 
     /* Number of CAN packets processed during this loop */
-    AIS_LOG_DEBUG("Number of CAN packets processed in weigh loop: %d", number_of_packets);
+   RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Number of CAN packets processed in weigh loop: %d", number_of_packets);
     if (number_of_packets == 0) {
         /* This could indicate a potential problem if it is always zero, so logging it */
-        AIS_LOG_DEBUG("number of CAN packets is zero; potential problem if it is always zero");
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"number of CAN packets is zero; potential problem if it is always zero");
     }
 
     return weighRet;

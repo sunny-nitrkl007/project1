@@ -8,7 +8,7 @@ DESCRIPTION:
 ** -- #Include's --
 *******************************************************************************/
 #include "LpsSaJobMgrApp.h"
-
+#include "ROS2Logger.hpp"
 #include <chrono>
 #include <unordered_set>
 
@@ -142,7 +142,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             if (LpsJobMgrJobTrackerInfoTbl.inVerificationMode &&
                     (LpsJobMgrJobTrackerInfoTbl.OperationMode != LPS_SA_JOB_MGR_STANDBY_MODE)) {
                 LpsSaJobMgrWmInput.standby_request_status = TRUE;
-                AIS_LOG_NOTICE("Enter standby when in verification mode.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Enter standby when in verification mode.");
             }
         }
     }
@@ -160,7 +160,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         if (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_TARGET_TYPE == reqIn.command.value) {
             tasks_.setTargetType(reqIn.data_target_type);
             LpsSaJobMgrPtRestoreTruck(); // Make sure the information gets reflected in the pass tracker truck
-            AIS_LOG_NOTICE("Command::WRITE_TARGET_TYPE success: %d", reqIn.data_target_type);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TARGET_TYPE success: %d", reqIn.data_target_type);
             loadRecordChanged = true;
         }
 
@@ -171,61 +171,61 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             switch (r.command) {
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_ID): {
                 tasks_.getCurrentTaskLoad().setMaterialId(r.arg3);
-                AIS_LOG_NOTICE("Load Change - materialId");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - materialId");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_NAME): {
                 tasks_.getCurrentTaskLoad().setMaterialName(r.arg1);
-                AIS_LOG_NOTICE("Load Change - materialName");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - materialName");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_MATERIAL_DENSITY): {
                 tasks_.getCurrentTaskLoad().setMaterialDensity(r.arg2);
-                AIS_LOG_NOTICE("Load Change - materialDensity");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - materialDensity");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_ID): {
                 tasks_.getCurrentTaskLoad().setTruckId(r.arg3);
-                AIS_LOG_NOTICE("Load Change - truckId");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - truckId");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_NAME): {
                 tasks_.getCurrentTaskLoad().setTruckName(r.arg1);
-                AIS_LOG_NOTICE("Load Change - truckName");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - truckName");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TRUCK_TARGET_WEIGHT): {
                 tasks_.getCurrentTaskLoad().setTotalTargetWeight(r.arg2);
-                AIS_LOG_NOTICE("Load Change - truckTargetWeight");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - truckTargetWeight");
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG1): {
                 tasks_.getCurrentTaskLoad().setTag1(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG1 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"WRITE_TAG1 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG2): {
                 tasks_.getCurrentTaskLoad().setTag2(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG2 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"WRITE_TAG2 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG3): {
                 tasks_.getCurrentTaskLoad().setTag3(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG3 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"WRITE_TAG3 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
             case (cpm_common_interfaces::msg::LpsSaJobMgrReqst::WRITE_TAG4): {
                 tasks_.getCurrentTaskLoad().setTag4(r.arg4, r.arg1);
-                AIS_LOG_NOTICE("WRITE_TAG4 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"WRITE_TAG4 = %s (%s)", r.arg4.c_str(), r.arg1.c_str());
                 loadRecordChanged = true;
                 break; // out of switch-case
             }
@@ -241,21 +241,21 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::ZERO): {
             /* Request received for Weighing App,set the request flag */
             LpsSaJobMgrWmInput.zero_request_status = TRUE;
-            AIS_LOG_NOTICE("Command::ZERO");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::ZERO");
             breakOut = true;
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::MINUS_ONE): {
             /* Request received for Weighing App,set the request flag */
             LpsSaJobMgrWmInput.minus_one_request_status = TRUE;
-            AIS_LOG_NOTICE("Command::MINUS_ONE");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::MINUS_ONE");
             breakOut = true;
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::CLEAR): {
             /* Request received for Weighing App,set the request flag */
             LpsSaJobMgrWmInput.clear_request_status = TRUE;
-            AIS_LOG_NOTICE("Command::CLEAR");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::CLEAR");
             breakOut = true;
             break;
         }
@@ -281,7 +281,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
                 LpsSaJobMgrWmInput.store_request_status = true;
             }
 
-            AIS_LOG_NOTICE("Command::STORE");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::STORE");
             breakOut = true;
             break;
         }
@@ -292,7 +292,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             //for lps_tracker, make it look like a store so the subtotal is closed
             LpsSaJobMgrWmInput.store_request_status = TRUE;
 
-            AIS_LOG_NOTICE("Command::WRITE_PAYLOAD_NEXT_SUBTOTAL");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_PAYLOAD_NEXT_SUBTOTAL");
             breakOut = true;
             break;
         }
@@ -303,7 +303,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_TOTAL_TARGET_WEIGHT): {
 
             tasks_.getCurrentTaskLoad().setTotalTargetWeight(reqIn.data_total_target_weight);
-            AIS_LOG_NOTICE("Command::WRITE_TOTAL_TARGET_WEIGHT success: %f", reqIn.data_total_target_weight);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TOTAL_TARGET_WEIGHT success: %f", reqIn.data_total_target_weight);
             loadRecordChanged = true;
             break;
         }
@@ -312,7 +312,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             // ONLY DO THIS IF...
             if (LpsJobMgrJobTrackerInfoTbl.OperationMode != LPS_SA_JOB_MGR_STANDBY_MODE) {
                 LpsSaJobMgrWmInput.standby_request_status = TRUE;
-                AIS_LOG_NOTICE("Command::STANDBY_ACTIVATE");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::STANDBY_ACTIVATE");
                 breakOut = true;
             }
             break;
@@ -323,7 +323,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             if ((LpsJobMgrJobTrackerInfoTbl.OperationMode == LPS_SA_JOB_MGR_STANDBY_MODE) &&
                     (!LpsJobMgrJobTrackerInfoTbl.inVerificationMode)) {
                 LpsSaJobMgrWmInput.change_mode_weigh = TRUE;
-                AIS_LOG_NOTICE("Command::STANDBY_DEACTIVATE");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::STANDBY_DEACTIVATE");
                 breakOut = true;
             }
             break;
@@ -335,14 +335,14 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
                 LpsSaJobMgrWmInput.tipoff_toggle_request_status = TRUE;
                 breakOut = true;
             }
-            AIS_LOG_NOTICE("Command::TIPOFF_MODE_TOGGLE");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::TIPOFF_MODE_TOGGLE");
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::MANUAL_TIPOFF_ACTIVATE): {
             /* set the request flag */
             LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_ACTIVE;
             LpsSaJobMgrWmInput.change_mode_excess = TRUE;
-            AIS_LOG_NOTICE("Command::MANUAL_TIPOFF_ACTIVATE");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::MANUAL_TIPOFF_ACTIVATE");
             breakOut = true;
             break;
         }
@@ -354,13 +354,13 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
                 LpsSaJobMgrWmInput.change_mode_weigh = TRUE;
                 breakOut = true;
             }
-            AIS_LOG_NOTICE("Command::MANUAL_TIPOFF_DEACTIVATE");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::MANUAL_TIPOFF_DEACTIVATE");
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::MANUAL_ADD): {
             /* Set the request flag */
             LpsSaJobMgrWmInput.manual_add_request = TRUE;
-            AIS_LOG_NOTICE("Command::MANUAL_ADD");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::MANUAL_ADD");
             breakOut = true;
             break;
         }
@@ -369,7 +369,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             config_.tipOffTriggerType = reqIn.data_tipoff_trigger_type.value;
             configChanged = true;
 
-            AIS_LOG_NOTICE("Command::WRITE_TIPOFF_TRIGGER_TYPE = %d", reqIn.data_tipoff_trigger_type.value);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TIPOFF_TRIGGER_TYPE = %d", reqIn.data_tipoff_trigger_type.value);
             breakOut = true;
             break;
         }
@@ -381,21 +381,21 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             config_.tipOffMode = reqIn.data_tipoff_mode.value;
             configChanged = true;
 
-            AIS_LOG_NOTICE("Command::WRITE_TIPOFF_MODE = %d", reqIn.data_tipoff_mode.value);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TIPOFF_MODE = %d", reqIn.data_tipoff_mode.value);
             breakOut = true;
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::REWEIGH): {
             /* set the request flag */
             LpsSaJobMgrWmInput.reweigh_request_status = TRUE;
-            AIS_LOG_NOTICE("Command::REWEIGH");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::REWEIGH");
             breakOut = true;
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_HORN_ON_STORE_ENABLED): {
             config_.hornStoreEnable = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_HORN_ON_STORE_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_HORN_ON_STORE_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
@@ -409,28 +409,28 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             }
             config_.autoStorePassCount = reqIn.data_auto_store_pass_count;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_AUTO_STORE_PASS_COUNT = %d", reqIn.data_auto_store_pass_count);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_AUTO_STORE_PASS_COUNT = %d", reqIn.data_auto_store_pass_count);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_AUTO_MATERIAL_ID_ENABLED): {
             config_.autoMaterialIdEnabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_AUTO_MATERIAL_ID_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_AUTO_MATERIAL_ID_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_AUTO_TRUCK_ID_ENABLED): {
             config_.autoTruckIdEnabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_AUTO_TRUCK_ID_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_AUTO_TRUCK_ID_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_MANUAL_ADD_ENABLED): {
             config_.manualAddEnabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_MANUAL_ADD_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_MANUAL_ADD_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
@@ -442,7 +442,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             tasks_.allTasksResetLFTDisableState();
             loadRecordChanged = true;
 
-            AIS_LOG_NOTICE("Command::WRITE_MULTI_TASK_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_MULTI_TASK_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
@@ -450,20 +450,20 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             tasks_.setNumberOfTasks(reqIn.data_task_number);
             loadRecordChanged = true;
 
-            AIS_LOG_NOTICE("Command::WRITE_MULTI_TASK_COUNT = %d", reqIn.data_task_number);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_MULTI_TASK_COUNT = %d", reqIn.data_task_number);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_SPLIT_MODE_ENABLED): {
             config_.splitModeEnabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_SPLIT_MODE_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_SPLIT_MODE_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_LFT_DISABLED): {
             tasks_.currentTaskSetLFTDisable(reqIn.data_enabled);
-            AIS_LOG_NOTICE("Command::WRITE_LFT_DISABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_LFT_DISABLED = %d", reqIn.data_enabled);
             loadRecordChanged = true;
             break; // out of switch-case
         }
@@ -471,11 +471,11 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             if (config_.multiTaskEnabled) {
                 tasks_.setTaskNumber(reqIn.data_task_number);
                 LpsSaJobMgrPtRestoreTruck(); // Make sure the information gets reflected in the pass tracker truck
-                AIS_LOG_NOTICE("Command::SELECT_TASK = %d", reqIn.data_task_number);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::SELECT_TASK = %d", reqIn.data_task_number);
                 loadRecordChanged = true;
             }
             else {
-                AIS_LOG_WARN("Command::SELECT_TASK rejected, multi-task disabled.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::SELECT_TASK rejected, multi-task disabled.");
             }
             break; // out of switch-case
         }
@@ -489,7 +489,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
                 //for lps_tracker, make it look like a store so the subtotal is closed
                 LpsSaJobMgrWmInput.store_request_status = TRUE;
 
-                AIS_LOG_NOTICE("Command::SELECT_SUBTOTAL = %d", reqIn.data_subtotal_index);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::SELECT_SUBTOTAL = %d", reqIn.data_subtotal_index);
                 loadRecordChanged = true;
             }
             break; // out of switch-case
@@ -499,7 +499,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             ofl.open(PAYLOAD_DETAIL_JSON_FILENAME);
             tasks_.getCurrentTaskLoad().payloadDetailsToJson(ofl.ofstream());
             ofl.close();
-            AIS_LOG_NOTICE("Command::PAYLOAD_DETAILS_FILE_REQUEST");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::PAYLOAD_DETAILS_FILE_REQUEST");
             break; // out of switch-case
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_SUBTOTAL_INFO): {
@@ -525,10 +525,10 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
                 LpsSaJobMgrPtRestoreTruck(); // Make sure the information gets reflected in the pass tracker truck
             }
             else {
-                AIS_LOG_ERROR("Invalid command: %s", command.c_str());
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Invalid command: %s", command.c_str());
             }
 
-            AIS_LOG_NOTICE("Command::WRITE_SUBTOTAL_INFO");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_SUBTOTAL_INFO");
             loadRecordChanged = true;
             break;
         }
@@ -536,11 +536,11 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             if (config_.multiTaskEnabled) {
                 tasks_.setTaskNumberNext();
                 LpsSaJobMgrPtRestoreTruck(); // Make sure the information gets reflected in the pass tracker truck
-                AIS_LOG_NOTICE("Command::SELECT_NEXT_TASK = %d", tasks_.getCurrentTaskNumber());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::SELECT_NEXT_TASK = %d", tasks_.getCurrentTaskNumber());
                 loadRecordChanged = true;
             }
             else {
-                AIS_LOG_WARN("Command::SELECT_NEXT_TASK rejected, multi-task disabled.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::SELECT_NEXT_TASK rejected, multi-task disabled.");
             }
             break; // out of switch-case
         }
@@ -548,51 +548,51 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             if (config_.multiTaskEnabled) {
                 tasks_.setTaskNumberPrevious();
                 LpsSaJobMgrPtRestoreTruck(); // Make sure the information gets reflected in the pass tracker truck
-                AIS_LOG_NOTICE("Command::SELECT_PREVIOUS_TASK = %d", tasks_.getCurrentTaskNumber());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::SELECT_PREVIOUS_TASK = %d", tasks_.getCurrentTaskNumber());
                 loadRecordChanged = true;
             }
             else {
-                AIS_LOG_WARN("Command::SELECT_PREVIOUS_TASK rejected, multi-task disabled.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::SELECT_PREVIOUS_TASK rejected, multi-task disabled.");
             }
             break; // out of switch-case
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_TRUCK_LIST_ENABLED): {
             config_.truckListEnabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_TRUCK_LIST_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TRUCK_LIST_ENABLED = %d", reqIn.data_enabled);
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_MATERIAL_LIST_ENABLED): {
             config_.materialListEnabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_MATERIAL_LIST_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_MATERIAL_LIST_ENABLED = %d", reqIn.data_enabled);
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_TAG1_ENABLED): {
             config_.tag1Enabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_TAG1_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TAG1_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_TAG2_ENABLED): {
             config_.tag2Enabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_TAG2_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TAG2_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_TAG3_ENABLED): {
             config_.tag3Enabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_TAG3_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TAG3_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::WRITE_TAG4_ENABLED): {
             config_.tag4Enabled = reqIn.data_enabled;
             configChanged = true;
-            AIS_LOG_NOTICE("Command::WRITE_TAG4_ENABLED = %d", reqIn.data_enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::WRITE_TAG4_ENABLED = %d", reqIn.data_enabled);
             // no need to break out of the while loop for a simple config parameter update
             break;
         }
@@ -637,12 +637,12 @@ bool LpsSaJobMgrApp::sendReqstResponse(const cpm_common_interfaces::msg::LpsSaJo
 
     if (nullptr != LpsSaJobMgrRespChannelOutput_) {
         if (LpsSaJobMgrRespChannelOutput_->publish(response)) {
-            AIS_LOG_INFO("Published ROS2 response, success=%d", success);
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Published ROS2 response, success=%d", success);
             return true;
         }
     }
 
-    AIS_LOG_ERROR("Failed to publish ROS2 response, success=%d", success);
+   RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to publish ROS2 response, success=%d", success);
     return false;
 }
 
@@ -744,11 +744,11 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsSHMRead( )
                 if ((tzInfo_.offset != offset) || (tzInfo_.index != tzone.tzone_id)) {
                     std::string tzStr = tes_common_ais::makeTZString(tzone);
                     if (tes_common_ais::setTZString(tzStr)) {
-                        AIS_LOG_INFO("Set TZ environment variable to '%s'.", tzStr.c_str());
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Set TZ environment variable to '%s'.", tzStr.c_str());
                         tes_common_ais::clearLocalTimeOffsetOverride();
                     }
                     else {
-                        AIS_LOG_ERROR("Could not set TZ environment variable to '%s'.", tzStr.c_str());
+                       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not set TZ environment variable to '%s'.", tzStr.c_str());
                         tes_common_ais::setLocalTimeOffsetOverride(std::chrono::minutes(offset));
                     }
                     tzInfo_.offset = offset;
@@ -756,7 +756,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsSHMRead( )
                 }
             }
             else {
-                AIS_LOG_ERROR("Could not get tzone_tx_comm_struct");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not get tzone_tx_comm_struct");
             }
 
             serviceHourMeter_ = shmClockRos.shm_sec;
@@ -793,7 +793,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsDataLinkDataRead( )
 
                         if ((!LpsJobMgrJobTrackerInfoTbl.StorePIDPreviouslyDepressed) && currentlyDepressed) {
                             LpsJobMgrJobTrackerInfoTbl.StorePIDActive = TRUE;
-                            AIS_LOG_INFO("Store PID Depressed");
+                           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Store PID Depressed");
                         }
 
                         LpsJobMgrJobTrackerInfoTbl.StorePIDPreviouslyDepressed = currentlyDepressed;
@@ -817,7 +817,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsDataLinkDataRead( )
                             /* Tipoff Assist is not Active */
                             LpsJobMgrJobTrackerInfoTbl.TipoffAssistPIDActive = false;
                         }
-                        AIS_LOG_INFO("Rxed Data for PID 0x%X with Val =  %f   stat = %d ", dlParam.param_id, dlParam.last_value_eng, dlParam.last_value_dsi);
+                       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Rxed Data for PID 0x%X with Val =  %f   stat = %d ", dlParam.param_id, dlParam.last_value_eng, dlParam.last_value_dsi);
                     }
                     else {
                         /* Tipoff Assist not Active, if DSI */
@@ -831,7 +831,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsDataLinkDataRead( )
 
                 	    if ((!LpsJobMgrJobTrackerInfoTbl.ManualAddPIDPreviouslyDepressed) && currentlyDepressed) {
                 	        LpsJobMgrJobTrackerInfoTbl.ManualAddPIDActive = TRUE;
-                            AIS_LOG_INFO("Manual Add PID Depressed");
+                           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Manual Add PID Depressed");
                 	    }
 
                 	    LpsJobMgrJobTrackerInfoTbl.ManualAddPIDPreviouslyDepressed = currentlyDepressed;
@@ -864,7 +864,7 @@ void LpsSaJobMgrApp::LpsSaWeighScsTxParamRead( )
         dataReceived = true;
     }
     else {
-        AIS_LOG_ERROR("Timeout waiting for weigh app tx data, continuing...");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Timeout waiting for weigh app tx data, continuing...");
     }
 
     // Detect when the LFT system becomes sealed and clear the truck
@@ -1154,7 +1154,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrScsTx()
 
     if(!scsCmdRet)
     {
-        AIS_LOG_ERROR( "\n Line no = %d,'LpsSaJobMgrScsTx' function return code = %d\n",__LINE__,scsCmdRet);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "\n Line no = %d,'LpsSaJobMgrScsTx' function return code = %d\n",__LINE__,scsCmdRet);
 
         return FAIL;
     }
@@ -1180,15 +1180,15 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command comma
         break;
     }
     default: {
-        AIS_LOG_ERROR("Unsupported weigh app request command.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Unsupported weigh app request command.");
         return;
     }
     }
 
     if (weighAppInf_.sendRequest(request)) {
-        AIS_LOG_ERROR("[ROS2] Published weigh app request, command=%d", static_cast<int>(command));
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"[ROS2] Published weigh app request, command=%d", static_cast<int>(command));
     } else {
-        AIS_LOG_ERROR("[ROS2] Failed to send weigh app request.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"[ROS2] Failed to send weigh app request.");
     }
 }
 

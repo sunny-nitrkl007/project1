@@ -39,7 +39,7 @@ DESCRIPTION:
 #include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
 #include <interfaces/EventDiagnosticData/InterfaceTypes.h>
 #include <interfaces/LpsSaWeighReqstChannel/LpsSaWeighAppInf.hpp>
-
+ 
 /*Additional ROS2 interfaces*/
 #include <interfaces/LpsSaWeighReqstChannel/DDSWeighAppInf.hpp>
 #include "rclcpp/rclcpp.hpp"
@@ -159,7 +159,6 @@ private:
 
     bool weighAppTxDataReceived_;
     DDSWeighAppInf weighAppInf_; // WeighApp Interface
-
 
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>* LpsSaSwitchInput;
     ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>* LpsSaOutputChannelRosOut_;

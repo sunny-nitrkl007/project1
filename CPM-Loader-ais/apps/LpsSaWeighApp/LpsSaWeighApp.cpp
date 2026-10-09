@@ -14,17 +14,19 @@ DESCRIPTION:
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <pthread.h>
+#include <sched.h>
 #include <string>
 #include <vector>
 
 #include <hal_boot_proto.h>
 #include <ecminfolib_public.h>
-
+#include "ROS2Logger.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <hub/filesystem/extensions/file.h>
+#include <filesystem/extensions/file.h>
 #include <fileio/directory.hpp>
 #include <print.hpp>
 
@@ -203,18 +205,18 @@ bool LpsSaWeighApp::parseTaskConfiguration()
 {
     const char* configDir = std::getenv("CAT_CONFIG_DIR");
     if (nullptr == configDir) {
-        AIS_LOG_ERROR("CAT_CONFIG_DIR is not set; cannot parse LpsSaWeighApp config.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"CAT_CONFIG_DIR is not set; cannot parse LpsSaWeighApp config.");
         return false;
     }
 
     taskParser_.setTaskParamDirectory(configDir);
     if (!taskParser_.parseTask(get_name())) {
-        AIS_LOG_ERROR("Error parsing task config file for %s", get_name());
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Error parsing task config file for %s", get_name());
         return false;
     }
 
     if (!taskParser_.getTaskParameters(taskConfig_)) {
-        AIS_LOG_ERROR("Task's Parameters section is not defined for %s", get_name());
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Task's Parameters section is not defined for %s", get_name());
         return false;
     }
 
@@ -229,15 +231,14 @@ RETURN VALUE:
 *******************************************************************************/
 bool LpsSaWeighApp::initialize( )
 {
-
     if (ADVANCED == getApplicationVariant()) {
-        AIS_LOG_INFO("LpsSaWeighApp::initialize for the ADVANCED application variant");
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LpsSaWeighApp::initialize for the ADVANCED application variant");
     }
     else if (STANDALONE == getApplicationVariant()) {
-        AIS_LOG_INFO("LpsSaWeighApp::initialize for the STANDALONE application variant");
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LpsSaWeighApp::initialize for the STANDALONE application variant");
     }
     else {
-        AIS_LOG_ERROR("LpsSaWeighApp::initialize, invalid application variant");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaWeighApp::initialize, invalid application variant");
         return false;
     }
 
@@ -247,13 +248,15 @@ bool LpsSaWeighApp::initialize( )
         std::string schedulerPolicy = get_parameter("scheduler").as_string();
         int schedulerPriority = static_cast<int>(get_parameter("scheduler_priority").as_int());
         if (!applyRealtimeScheduling(schedulerPolicy, schedulerPriority)) {
-            AIS_LOG_WARN("Continuing without real-time scheduling.");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(), "Continuing without real-time scheduling.");
         }
     }
 
     { /* Weighing App execution rate in Hz */
         getTaskConfig().get("cycleRate_hz", LpsSaWeighInfoTbl.CycleRate_hz);
-        AIS_LOG_INFO("cycleRate_hz %f", LpsSaWeighInfoTbl.CycleRate_hz);
+        declare_parameter<double>("cycle_rate_hz", static_cast<double>(LpsSaWeighInfoTbl.CycleRate_hz));
+        LpsSaWeighInfoTbl.CycleRate_hz = static_cast<float_32>(get_parameter("cycle_rate_hz").as_double());
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"cycleRate_hz %f", LpsSaWeighInfoTbl.CycleRate_hz);
     }
 
     /*
@@ -282,6 +285,8 @@ bool LpsSaWeighApp::initialize( )
         else {
             tempRoot_ = DEFAULT_TEMP_ROOT;
         }
+        declare_parameter<std::string>("temp_root", tempRoot_.string());
+        tempRoot_ = get_parameter("temp_root").as_string();
 
         tes_common_ais::directory::create(tempRoot_);
 
@@ -291,6 +296,8 @@ bool LpsSaWeighApp::initialize( )
         else {
             storageRoot_ = DEFAULT_STORAGE_ROOT;
         }
+        declare_parameter<std::string>("storage_root", storageRoot_.string());
+        storageRoot_ = get_parameter("storage_root").as_string();
 
         if (!tes_common_ais::directory::create(storageRoot_)) {
             // If we can't create the storage root, we can't run.
@@ -306,8 +313,10 @@ bool LpsSaWeighApp::initialize( )
         {
             if (!configs.get("CPMExecTxPeriod", transmitPeriodTime_)) {
                 transmitPeriodTime_ = 0.1; // 100 ms
-                AIS_LOG_ERROR("Could not read 'CPMExecTxPeriod'");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not read 'CPMExecTxPeriod'");
             }
+            declare_parameter<double>("cpm_exec_tx_period", static_cast<double>(transmitPeriodTime_));
+            transmitPeriodTime_ = static_cast<decltype(transmitPeriodTime_)>(get_parameter("cpm_exec_tx_period").as_double());
         }
     }
 
@@ -345,10 +354,10 @@ bool LpsSaWeighApp::initialize( )
 
             // Remove old file
             if (app_nvm_file_remove(LPS_WEIGH_MACH_SPECIFIC_CFG_NVID) == TRUE) {
-                AIS_LOG_INFO("Successfully deleted old machine config NVM file");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Successfully deleted old machine config NVM file");
             }
             else {
-                AIS_LOG_WARN("Failed to delete old machine config NVM file");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Failed to delete old machine config NVM file");
             }
         }
     }
@@ -366,10 +375,10 @@ bool LpsSaWeighApp::initialize( )
 
             // Remove old file
             if (app_nvm_file_remove(LPS_WEIGH_NVM_LIFT_CAL_NVID) == TRUE) {
-                AIS_LOG_INFO("Successfully deleted old Lift cal NVM file");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Successfully deleted old Lift cal NVM file");
             }
             else {
-                AIS_LOG_WARN("Failed to delete old Lift cal NVM file");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Failed to delete old Lift cal NVM file");
             }
         }
     }
@@ -387,15 +396,15 @@ bool LpsSaWeighApp::initialize( )
 
             // Remove old file
             if (app_nvm_file_remove(LPS_WEIGH_NVM_TILT_CAL_NVID) == TRUE) {
-                AIS_LOG_INFO("Successfully deleted old Tilt cal NVM file");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Successfully deleted old Tilt cal NVM file");
             }
             else {
-                AIS_LOG_WARN("Failed to delete old Tilt cal NVM file");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Failed to delete old Tilt cal NVM file");
             }
         }
 
         if (tiltCalNvmTbl_.tilt_sensor_type != linkage_table_cnfg.tiltSensorType) {
-            AIS_LOG_NOTICE("tiltSensorType in NVM %u does not match configured value %s, resetting", tiltCalNvmTbl_.tilt_sensor_type, linkage_table_cnfg.tiltSensorType);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"tiltSensorType in NVM %u does not match configured value %d, resetting", tiltCalNvmTbl_.tilt_sensor_type,linkage_table_cnfg.tiltSensorType);
             tiltCalNvmTbl_.tilt_cal_stat = 0;
         }
     }
@@ -415,10 +424,10 @@ bool LpsSaWeighApp::initialize( )
 
             // Remove old file
             if (app_nvm_file_remove(LPS_WEIGH_NVM_CAL_NVID) == TRUE) {
-                AIS_LOG_INFO("Successfully deleted old payload cal NVM file");
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Successfully deleted old payload cal NVM file");
             }
             else {
-                AIS_LOG_WARN("Failed to delete old payload cal NVM file");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Failed to delete old payload cal NVM file");
             }
         }
 
@@ -467,21 +476,21 @@ bool LpsSaWeighApp::initialize( )
     /*
      * Initialize the Chassis IMU
      */
-    if (!chassisImu_.init(getTaskParser())) {
-        AIS_LOG_ERROR("Failed to init chassis imu.");
+    if (!chassisImu_.init(*this)) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to init chassis imu.");
         return false;
     }
 
     /* Initializing dependent libraries */
     LpsSaInitErrorType_t initRet = LpsSaInit();
     if (LPS_SA_INIT_SUCCESS != initRet) {
-        AIS_LOG_ERROR("LpsSaInit failed error code = %d", initRet);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaInit failed error code = %d", initRet);
         return false;
     }
 
     // Initialize cal
     if (!CalLibInit()) {
-        AIS_LOG_ERROR("CalLibInit failed");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"CalLibInit failed");
         return false;
     }
 
@@ -534,10 +543,10 @@ bool LpsSaWeighApp::initialize( )
                 lastServiceToolSerialNumber = tree.get<std::string>("FlashTargetInformation.FlashTargetInformationMessage.LastServiceToolToFlash");
             }
             catch (const boost::property_tree::xml_parser_error& e) {
-                AIS_LOG_ERROR("Unable to parse the xml file.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Unable to parse the xml file.");
             }
             catch (const boost::property_tree::ptree_error& e) {
-                AIS_LOG_ERROR("Unable to get <LastServiceToolToFlash> from xml file.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Unable to get <LastServiceToolToFlash> from xml file.");
             }
 
             // If found Last Service Tool SN and Software PN, update the Flash Info log file
@@ -546,7 +555,7 @@ bool LpsSaWeighApp::initialize( )
             }
         }
         else {
-            AIS_LOG_ERROR("Could not open XML file %s", filePath);
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not open XML file %s", filePath);
         }
     }
 
@@ -564,33 +573,34 @@ bool LpsSaWeighApp::initialize( )
      * Initialising SCS Channels
      */
 
-    ConfigSection cs;
-    if ( !getTaskParser().getSection("ScsRxTimeouts", cs) )
-    {
-        AIS_LOG_FATAL( "Couldn't find ScsRxTimeouts Config Section in rb file" );
-	    return false;
-    }
+    // ScsRxTimeouts: SystemHardwareHealthRequestOutput_txRate_sec was previously
+    // read from ScsRxTimeouts section in the .rb file. Migrated to ROS2 parameter;
+    // the value is declared here so it can be overridden via YAML.
+    declare_parameter<double>("system_hardware_health_request_tx_rate_sec", 0.5);
+    // Note: value consumed by AIS SCS layer internally; retained as a parameter
+    // for config completeness. If ScsRxTimeouts section is still present in the
+    // .rb file it is no longer read here.
 
         auto rosNode = shared_from_this();
 
     displayStateInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface>(
             rosNode, "lps_sa_ui_display_state_interface");
     if (!displayStateInput_) {
-        AIS_LOG_ERROR("DisplayStateInput ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DisplayStateInput ROS2 input not initialized.");
         return false;
     }
 
     printerCnfgInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg>(
             rosNode, "lps_sa_totals_printer_cnfg");
     if (!printerCnfgInput_) {
-        AIS_LOG_ERROR("No PrinterCnfgInput ROS2 interface initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"No PrinterCnfgInput ROS2 interface initialized.");
         return false;
     }
 
     DataLinkDataInput_ = new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::DataLinkData>(
             rosNode, "weigh_app_data_link_data");
     if (!DataLinkDataInput_) {
-        AIS_LOG_ERROR("DataLinkDataInput ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DataLinkDataInput ROS2 input not initialized.");
         return false;
     }
 
@@ -598,7 +608,7 @@ bool LpsSaWeighApp::initialize( )
         new ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::PartNumbers>(
             rosNode, "part_numbers");
     if (!PartNumbersRosIn_) {
-        AIS_LOG_ERROR("PartNumbers ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"PartNumbers ROS2 input not initialized.");
         return false;
     }
 
@@ -607,14 +617,14 @@ bool LpsSaWeighApp::initialize( )
             weigh_app_interfaces::msg::SystemHardwareHealthStorage>(
                 rosNode, "system_hardware_health");
     if (!SystemHardwareHealthRosIn_) {
-        AIS_LOG_ERROR("SystemHardwareHealth ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"SystemHardwareHealth ROS2 input not initialized.");
         return false;
     }
 
     LpsSaJobMgrReqstRosOut_ = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>(
             rosNode, "lps_sa_job_mgr_reqst_channel");
     if (!LpsSaJobMgrReqstRosOut_) {
-        AIS_LOG_ERROR("LpsSaJobMgrReqstChannel ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaJobMgrReqstChannel ROS2 output not initialized.");
         return false;
     }
 
@@ -623,7 +633,7 @@ bool LpsSaWeighApp::initialize( )
             weigh_app_interfaces::msg::SystemHardwareHealthRequest>(
                 rosNode, "system_hardware_health_request");
     if (!SystemHardwareHealthRequestRosOut_) {
-        AIS_LOG_ERROR("SystemHardwareHealthRequest ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"SystemHardwareHealthRequest ROS2 output not initialized.");
         return false;
     }
 
@@ -632,26 +642,26 @@ bool LpsSaWeighApp::initialize( )
             weigh_app_interfaces::msg::ReadyToFlashStatus>(
                 rosNode, "ready_to_flash_status");
     if (!ReadyToFlashStatusRosOut_) {
-        AIS_LOG_ERROR("ReadyToFlashStatus ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"ReadyToFlashStatus ROS2 output not initialized.");
         return false;
     }
 
     LpsSaWeighScsTxOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>(rosNode, "lps_sa_weigh_tx_channel");
     if (!LpsSaWeighScsTxOut_ROS2) {
-         AIS_LOG_ERROR("Interface LpsSaWeighScsTxOut_ROS2 not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Interface LpsSaWeighScsTxOut_ROS2 not configured.");
          return false;
     }
 
     LpsSaWeighScsRespOut_ROS2 = new ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>(rosNode, "lps_sa_weigh_resp_channel");
     if (!LpsSaWeighScsRespOut_ROS2) {
-        AIS_LOG_ERROR("Interface LpsSaWeighRespChannelOutput not configured.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Interface LpsSaWeighRespChannelOutput not configured.");
         return false;
     }
 
     LpsSaWeighInitDebugRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel>(
             rosNode, "lps_sa_weigh_init_debug_channel");
     if (!LpsSaWeighInitDebugRosOut_) {
-        AIS_LOG_ERROR("LpsSaWeighInitDebugChannel ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaWeighInitDebugChannel ROS2 output not initialized.");
         return false;
     }
     LpsSaWeighScsInitDebugTx();
@@ -660,13 +670,13 @@ bool LpsSaWeighApp::initialize( )
     LpsSaWeighDebugRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaWeighDebugChannel>(
             rosNode, "lps_sa_weigh_debug_channel");
     if (!LpsSaWeighDebugRosOut_) {
-        AIS_LOG_ERROR("LpsSaWeighDebugChannel ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaWeighDebugChannel ROS2 output not initialized.");
         return false;
     }
 
     LpsSaWeighScsReqstIn = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>(rosNode, "lps_sa_weigh_reqst_channel");
     if (!LpsSaWeighScsReqstIn) {
-        AIS_LOG_ERROR("Interface LpsSaWeighReqstChannelInput not configured.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Interface LpsSaWeighReqstChannelInput not configured.");
         return false;
     }
 
@@ -674,7 +684,7 @@ bool LpsSaWeighApp::initialize( )
     LpsSaJobMgrTxRosIn_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>(
             rosNode, "lps_sa_job_mgr_tx_channel");
     if (!LpsSaJobMgrTxRosIn_) {
-        AIS_LOG_ERROR("LpsSaJobMgrTxChannel ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaJobMgrTxChannel ROS2 input not initialized.");
         return false;
     }
 
@@ -683,7 +693,7 @@ bool LpsSaWeighApp::initialize( )
             weigh_app_interfaces::msg::DemoAppTxChannel>(
                 rosNode, "demo_app_tx_channel");
     if (!DemoAppTxRosIn_) {
-        AIS_LOG_ERROR("DemoAppTxChannel ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DemoAppTxChannel ROS2 input not initialized.");
         return false;
     }
 
@@ -692,44 +702,44 @@ bool LpsSaWeighApp::initialize( )
             rclcpp::QoS(5),
             std::bind(&LpsSaWeighApp::LpsSaWeighCalReqstCallback, this, std::placeholders::_1));
     if (!calCmdReqstSub_) {
-        AIS_LOG_ERROR("Failed to create CalMgrCmdReqst ROS2 subscription.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to create CalMgrCmdReqst ROS2 subscription.");
         return false;
     }
 
     calCmdRespRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>(
             rosNode, "cal_mgr_cmd_resp");
     if (!calCmdRespRosOut_) {
-        AIS_LOG_ERROR("CalMgrCmdResp ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"CalMgrCmdResp ROS2 output not initialized.");
     }
 
     shmClockInput_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::ShmClockInput>(
             rosNode, "shm_clock_input");
     if (!shmClockInput_) {
-        AIS_LOG_ERROR("ShmClockInput ROS2 input not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"ShmClockInput ROS2 input not initialized.");
         return false;
     }
 
     LpsNvmCalRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalDataChannel>(
             rosNode, "lps_sa_nvm_cal_data_channel");
     if (!LpsNvmCalRosOut_) {
-        AIS_LOG_ERROR("LpsSaNvmCalDataChannel ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaNvmCalDataChannel ROS2 output not initialized.");
     }
 
     LpsNvmCalOnTheFlyRosOut_ = new ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel>(
             rosNode, "lps_sa_nvm_cal_on_the_fly_data_channel");
     if (!LpsNvmCalOnTheFlyRosOut_) {
-        AIS_LOG_ERROR("LpsSaNvmCalOnTheFlyDataChannel ROS2 output not initialized.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaNvmCalOnTheFlyDataChannel ROS2 output not initialized.");
     }
 
     AisJhm2TxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AisJhm2TxChannel>(rosNode, "ais_jhm2_tx_channel");
     if (!AisJhm2TxRosIn_) {
-        AIS_LOG_ERROR("Interface AisJhm2TxRosIn_ not configured.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Interface AisJhm2TxRosIn_ not configured.");
         return false;
     }
 
     AutonomyConditionDiagnosticsTxRosIn_ = new ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel>(rosNode, "autonomy_condition_diagnostics_tx_channel");
     if (!AutonomyConditionDiagnosticsTxRosIn_) {
-         AIS_LOG_ERROR("Interface AutonomyConditionDiagnosticsTxRosIn_ not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Interface AutonomyConditionDiagnosticsTxRosIn_ not configured.");
          return false;
     }
 
@@ -834,7 +844,7 @@ void LpsSaWeighApp::startExecutiveTimer( )
 {
     double cycleRateHz = LpsSaWeighInfoTbl.CycleRate_hz;
     if (cycleRateHz <= 0.0) {
-        AIS_LOG_WARN("Invalid cycleRate_hz %f, defaulting to 50 Hz", cycleRateHz);
+         RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Invalid cycleRate_hz %f, defaulting to 50 Hz", cycleRateHz);
         cycleRateHz = 50.0;
     }
     createExecutiveTimer(cycleRateHz);
@@ -879,12 +889,12 @@ bool LpsSaWeighApp::setHydOilTempEnableStatus(bool enabled) {
              */
             setPayloadNotCalibrated();
         }
-        AIS_LOG_NOTICE("HydOilTempEnabled = %d", cnfg_.hydOilTempEnabled);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"HydOilTempEnabled = %d", cnfg_.hydOilTempEnabled);
         return true;
     }
     else {
         // Cannot set this.
-        AIS_LOG_WARN("HydOilTempEnabled not configurable");
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"HydOilTempEnabled not configurable");
         return false;
     }
 }
@@ -897,7 +907,7 @@ bool LpsSaWeighApp::setIMUCompEnableStatus(bool enabled) {
         //if (enabled && (!machineProperties.imuCompSupported)) {
         if (enabled) {
             // Cannot enable this.
-            AIS_LOG_WARN("IMUCompEnabled not supported");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"IMUCompEnabled not supported");
             return false;
         }
 
@@ -907,7 +917,7 @@ bool LpsSaWeighApp::setIMUCompEnableStatus(bool enabled) {
         // report it to seal tracker
         sealTracker_.reportIMUCompensationEnableStatus(enabled);
     }
-    AIS_LOG_NOTICE("IMUCompEnabled = %d", cnfg_.imuCompEnabled);
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"IMUCompEnabled = %d", cnfg_.imuCompEnabled);
     return true;
 }
 
@@ -924,7 +934,7 @@ bool LpsSaWeighApp::setLoadCheckValveInstallStatus(bool installed) {
          */
         setPayloadNotCalibrated();
     }
-    AIS_LOG_NOTICE("LoadCheckValveInstalled = %d", cnfg_.loadCheckValveInstalled);
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LoadCheckValveInstalled = %d", cnfg_.loadCheckValveInstalled);
     return true;
 }
 
@@ -934,7 +944,7 @@ bool LpsSaWeighApp::setAudibleWeightEnableStatus(bool enabled) {
         cnfg_.audibleWeightEnabled = enabled;
         cnfg_.setSaveNeeded();
     }
-    AIS_LOG_NOTICE("AudibleWeightEnabled = %d", cnfg_.audibleWeightEnabled);
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"AudibleWeightEnabled = %d", cnfg_.audibleWeightEnabled);
     return true;
 }
 
@@ -944,7 +954,7 @@ bool LpsSaWeighApp::setFlashEnableStatus(bool enabled) {
         cnfg_.flashEnabled = enabled;
         cnfg_.setSaveNeeded();
     }
-    AIS_LOG_NOTICE("flashEnabled = %d", cnfg_.flashEnabled);
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"flashEnabled = %d", cnfg_.flashEnabled);
     return true;
 }
 /******************************************************************************
@@ -957,7 +967,7 @@ void LpsSaWeighApp::setIMUPitchCalOffsetNVM(float imu_cal_offset)
 {
     cnfg_.tipoffPitchCalOffset = imu_cal_offset;
     cnfg_.setSaveNeeded();
-    AIS_LOG_NOTICE("tipoffPitchCalOffset = %f", cnfg_.tipoffPitchCalOffset);
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"tipoffPitchCalOffset = %f", cnfg_.tipoffPitchCalOffset);
 }
 
 void LpsSaWeighApp::setWeighRange(float weighRangeBottom, float weighRangeSize)
@@ -987,7 +997,7 @@ void LpsSaWeighApp::setWeighRange(float weighRangeBottom, float weighRangeSize)
         }
     }
 
-    AIS_LOG_NOTICE("Weigh Range = %f - %f", weighRangeBottom, weighRangeTop);
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Weigh Range = %f - %f", weighRangeBottom, weighRangeTop);
 
     cnfg_.weighRangeStart = weighRangeBottom;
     cnfg_.weighRangeSize = weighRangeTop - weighRangeBottom;
@@ -1017,7 +1027,7 @@ void LpsSaWeighApp::resetToaAnchorValues()
     LpsSaWeighInfoTbl.ToaAnchorStatus =
             LpsSaWeighTxChannelStorage::ToaAnchorStatus_t::RESET;
 
-    AIS_LOG_NOTICE("ToaAnchor Reset");
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"ToaAnchor Reset");
 }
 
 /******************************************************************************
@@ -1036,7 +1046,7 @@ void LpsSaWeighApp::LpsSaWeighCalReqstCallback(
             uint16_t calId = msg->calibration_request.cal_id;
             CAL_MGR_MC_E calCmd = static_cast<CAL_MGR_MC_E>(msg->calibration_request.calcmd);
 
-            AIS_LOG_DEBUG("CalibrationRequest - id %d, cmd %d", calId, calCmd);
+           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"CalibrationRequest - id %d, cmd %d", calId, calCmd);
 
             weigh_app_interfaces::msg::CalMgrCmdResp calMgrCmdResp;
             CAL_MGR_MR_E calResp = CAL_MGR_MR_FAIL;
@@ -1187,11 +1197,11 @@ void LpsSaWeighApp::LpsSaWeighCalReqstCallback(
             // Send Response
             if (nullptr != calCmdRespRosOut_) {
                 if (!calCmdRespRosOut_->publish(calMgrCmdResp)) {
-                    AIS_LOG_ERROR("Could not publish calibration response.");
+                   RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not publish calibration response.");
                 }
             }
             else {
-                AIS_LOG_ERROR("calCmdRespRosOut_ is null.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"calCmdRespRosOut_ is null.");
             }
 
             // Send the Cal OTF Data
@@ -1277,7 +1287,7 @@ void LpsSaWeighApp::readIMUCalResultsFromFile(LpsCalIMUResults_t& imu_cal_result
     // Make sure the file is open
 
     if(!myFile.is_open()){
-        AIS_LOG_INFO("Could not open imu cal data results file");
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Could not open imu cal data results file");
         return;
     }
 
@@ -1427,7 +1437,7 @@ void LpsSaWeighApp::LpsJobMgrTxRead( )
         if (storePressCount != jobMgrIn.store_count) {
             sumOfAdjustedTruckWts = 0.0f;
             sumOfZeroedTruckWts = 0.0f;
-            AIS_LOG_NOTICE("Storebutton pressed. Adj = %f & Zeroed = %f", sumOfAdjustedTruckWts, sumOfZeroedTruckWts );
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Storebutton pressed. Adj = %f & Zeroed = %f", sumOfAdjustedTruckWts, sumOfZeroedTruckWts );
             storePressCount = jobMgrIn.store_count;
         }
 
@@ -1492,7 +1502,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                 continue;
             }
 
-            AIS_LOG_INFO("sid %x paramId %x  dsi %x ParamValue raw %d eng %f scaling %f offset %f units %d",
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"sid %x paramId %x  dsi %x ParamValue raw %f eng %f scaling %f offset %f units %d",
                     dlParam.GetSid(),
                     dlParam.GetParamId(), dlParam.GetLastValueDsi(),
                     dlParam.GetLastValue<float>(), dlParam.GetLastValueEng(),
@@ -1512,12 +1522,12 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         if (0 == dlParam.GetLastValueDsi()) {
                             WeighPidTbl.HydOilTemp = (float)dlParam.GetLastValueEng();
                             isBad = false;
-                            AIS_LOG_DEBUG("Hydraulic Oil Temp received: %f", (float)dlParam.GetLastValueEng());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Hydraulic Oil Temp received: %f", (float)dlParam.GetLastValueEng());
                         }
                         else {
                             WeighPidTbl.HydOilTemp = (float)HYDRAULIC_OIL_TEMP_MIN_VALID_DATA;  // which is -32736.0
                             isBad = true;
-                            AIS_LOG_DEBUG("Hydraulic Oil Temp PID DSI reported: %d", dlParam.GetLastValueDsi());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Hydraulic Oil Temp PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
 
                         // Set the diagnostic flag if supported.
@@ -1537,13 +1547,13 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_OK;
                             weighUpdtTbl.RequestedGear.Val = (uint16_t)dlParam.GetLastValueEng();
 
-                            AIS_LOG_DEBUG("Actual/Desired Gear PID received: %d", (uint16_t)dlParam.GetLastValueEng());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Actual/Desired Gear PID received: %d", (uint16_t)dlParam.GetLastValueEng());
                         }
                         else {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_BAD;
                             weighUpdtTbl.RequestedGear.Val = (uint16_t)dlParam.GetLastGoodValueEng();
 
-                            AIS_LOG_DEBUG("Actual/Desired Gear PID DSI reported: %d", dlParam.GetLastValueDsi());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Actual/Desired Gear PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
                         break;
                     }
@@ -1563,12 +1573,12 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 weighUpdtTbl.RequestedGear.Val = 0x0000; /* not forward, not reverse, PID 0xF5D7 */
                             }
 
-                            AIS_LOG_DEBUG("Direction Switch Position PID received: %d", (uint16_t)dlParam.GetLastGoodValueEng());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Direction Switch Position PID received: %d", (uint16_t)dlParam.GetLastGoodValueEng());
                         }
                         else {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_BAD;
 
-                            AIS_LOG_DEBUG("Direction Switch Position PID DSI reported: %d", dlParam.GetLastValueDsi());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Direction Switch Position PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
                         break;
                     }
@@ -1588,12 +1598,12 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 weighUpdtTbl.RequestedGear.Val = 0x0000; /* not forward, not reverse, PID 0xF5D7 */
                             }
 
-                            AIS_LOG_DEBUG("Transmission Gear PID received: %d", (uint8_t)dlParam.GetLastGoodValueEng());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Transmission Gear PID received: %d", (uint8_t)dlParam.GetLastGoodValueEng());
                         }
                         else {
                             weighUpdtTbl.RequestedGear.Stat = LPS_STATUS_BAD;
 
-                            AIS_LOG_DEBUG("Transmission Gear PID DSI reported: %d", dlParam.GetLastValueDsi());
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Transmission Gear PID DSI reported: %d", dlParam.GetLastValueDsi());
                         }
                         break;
                     }
@@ -1605,11 +1615,11 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                             else
                                 LpsSaWeighInfoTbl.TipOffAssistEnable = false;   /* disabled */
 
-                            AIS_LOG_DEBUG("Tip-off Assist Enable val: %d", (uint8_t)dlParam.GetLastGoodValueEng() );
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Tip-off Assist Enable val: %d", (uint8_t)dlParam.GetLastGoodValueEng() );
                         }
                         else {
                             LpsSaWeighInfoTbl.TipOffAssistEnable = 0;   /* disabled */
-                            AIS_LOG_DEBUG("Tip-off Assist Enable PID DSI reported: %d", dlParam.GetLastValueDsi() );
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Tip-off Assist Enable PID DSI reported: %d", dlParam.GetLastValueDsi() );
                         }
                         break;
                     }
@@ -1621,10 +1631,10 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                             else
                                 setLoadCheckValveInstallStatus(false); /* HBCV is not installed */
 
-                            AIS_LOG_DEBUG("Load hold valve check valve installation val: %d", dlParam.GetLastValue<int16_t>() );
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Load hold valve check valve installation val: %d", dlParam.GetLastValue<int16_t>() );
                         }
                         else {
-                            AIS_LOG_DEBUG("Load hold valve check valve installation PID DSI reported: %d", dlParam.GetLastValueDsi() );
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Load hold valve check valve installation PID DSI reported: %d", dlParam.GetLastValueDsi() );
                         }
                         break;
                     }
@@ -1636,7 +1646,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         if (0 == dsi) {
                             // Store ground speed in mm/sec/bit (0.0036 km/hr/bit)
                             weighUpdtTbl.GroundSpeed = value;
-                            AIS_LOG_DEBUG("GroundSpeed: %f", weighUpdtTbl.GroundSpeed );
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"GroundSpeed: %f", weighUpdtTbl.GroundSpeed );
                         }
                         else {
                             weighUpdtTbl.GroundSpeed = 0; // default
@@ -1654,7 +1664,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                         if (0 == dsi) {
                             // Store ground speed in mm/sec/bit (1mph/bit = 447.04mms/bit)
                             weighUpdtTbl.GroundSpeed = value * 447.04;
-                            AIS_LOG_DEBUG("GroundSpeed: %f", weighUpdtTbl.GroundSpeed );
+                           RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"GroundSpeed: %f", weighUpdtTbl.GroundSpeed );
                         }
                         else {
                             weighUpdtTbl.GroundSpeed = 0; // default
@@ -1684,7 +1694,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 /* set cal value if its different */
                                 if (setLiftLinkageSensorFullLowerCalValue(lift_full_lower_dc)) {
                                     setPayloadNotCalibrated();
-                                    AIS_LOG_ALERT("Payload Set to OOC. Lift Full Lower DC: %f", lift_full_lower_dc);
+                                    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Payload Set to OOC. Lift Full Lower DC: %f", lift_full_lower_dc);
                                 }
                             }
                             else {
@@ -1714,7 +1724,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 /* set cal value if its different */
                                 if (setLiftLinkageSensorFullRaiseCalValue(lift_full_raise_dc)) {
                                     setPayloadNotCalibrated();
-                                    AIS_LOG_ALERT("Payload set to OOC. Lift Full Raise DC: %f", lift_full_raise_dc);
+                                    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Payload set to OOC. Lift Full Raise DC: %f", lift_full_raise_dc);
                                 }
                             }
                             else {
@@ -1744,7 +1754,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 /* set cal value if its different */
                                 if (setTiltLinkageSensorFullRackCalValue(tilt_full_rack_dc)) {
                                     setPayloadNotCalibrated();
-                                    AIS_LOG_ALERT("Payload Set to OOC. Tilt Full Rack DC: %f", tilt_full_rack_dc);
+                                    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Payload Set to OOC. Tilt Full Rack DC: %f", tilt_full_rack_dc);
                                 }
                             }
                             else {
@@ -1774,7 +1784,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 /* set cal value if its different */
                                 if (setTiltLinkageSensorFullDumpCalValue(tilt_full_dump_dc)) {
                                     setPayloadNotCalibrated();
-                                    AIS_LOG_ALERT("Payload Set to OOC. Tilt Full Dump DC: %f", tilt_full_dump_dc);
+                                    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Payload Set to OOC. Tilt Full Dump DC: %f", tilt_full_dump_dc);
                                 }
                             }
                             else {
@@ -1977,7 +1987,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                         OEL_UNPACK_LE_8(data, temp); ++dataIdx;
                                     }
                                     imu_id_info[i] = ss.str();
-                                    AIS_LOG_DEBUG("imu_id_info[%d]: %s", i, imu_id_info[i].c_str());
+                                   RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"imu_id_info[%d]: %s", i, imu_id_info[i].c_str());
                                 }
 
                                 /*
@@ -1996,7 +2006,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 }
                             }
                             else {
-                                //AIS_LOG_ERROR("PGN64965 dsi: %d", dsi);
+                                //RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"PGN64965 dsi: %d", dsi);
                             }
                         }
                         break;
@@ -2018,10 +2028,10 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                                 // Report the IMU Software Part Number to the Seal Tracker
                                 sealTracker_.reportIMUSoftwarePartNumber(imu_sw_id_string);
 
-                                AIS_LOG_DEBUG("imu_sw_id_string: %s", imu_sw_id_string.c_str());
+                               RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"imu_sw_id_string: %s", imu_sw_id_string.c_str());
                             }
                             else {
-                                //AIS_LOG_ERROR("PGN65242 dsi: %d", dsi);
+                                //RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"PGN65242 dsi: %d", dsi);
                             }
                         }
                         break;
@@ -2146,7 +2156,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
     if ( cn % 5 == 1)
     {
-        AIS_LOG_INFO("cycle rate is %lf hertz", 1.0 / cr );
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"cycle rate is %lf hertz", 1.0 / cr );
     }
 }
 
@@ -2158,7 +2168,7 @@ RETURN VALUE:
 *******************************************************************************/
 void  LpsSaWeighApp::cleanup( )
 {
-    AIS_LOG_INFO("LpsSaWeighApp::cleanup");
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LpsSaWeighApp::cleanup");
     executiveTimer_.reset();
     cleanupRosInterfaces();
 
@@ -2199,7 +2209,7 @@ void  LpsSaWeighApp::cleanup( )
         }
     }
 
-    AIS_LOG_NOTICE("cleanup nvm_block_write complete");
+    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"cleanup nvm_block_write complete");
 }
 
 void LpsSaWeighApp::UpdateEvents( void )
@@ -2222,12 +2232,12 @@ void LpsSaWeighApp::UpdateEvents( void )
                 setAutonomyCondition(PayLdOverLdLimitExceeded());
             }
             LpsSaWeighInfoTbl.EventState[ACDEventPopUp::OVERLOAD_LIMIT_EXCEEDED] = true;
-            AIS_LOG_NOTICE("%s activated", PayLdOverLdLimitExceeded::getConditionTypeString().c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s activated", PayLdOverLdLimitExceeded::getConditionTypeString().c_str());
         }
         else if ((!eventActive) && (LpsSaWeighInfoTbl.EventState[ACDEventPopUp::OVERLOAD_LIMIT_EXCEEDED])) {
             clearAutonomyCondition<PayLdOverLdLimitExceeded>();
             LpsSaWeighInfoTbl.EventState[ACDEventPopUp::OVERLOAD_LIMIT_EXCEEDED] = false;
-            AIS_LOG_NOTICE("%s deactivated", PayLdOverLdLimitExceeded::getConditionTypeString().c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s deactivated", PayLdOverLdLimitExceeded::getConditionTypeString().c_str());
         }
         else {
             // Do nothing
@@ -2239,14 +2249,14 @@ void LpsSaWeighApp::UpdateEvents( void )
         if (!LpsSaWeighInfoTbl.EventState[ACDEventPopUp::PAYLOAD_LFT_NOT_SEALED]) {
             setAutonomyCondition(PayloadLegalForTradeNotSealed());
             LpsSaWeighInfoTbl.EventState[ACDEventPopUp::PAYLOAD_LFT_NOT_SEALED] = true;
-            AIS_LOG_NOTICE("%s activated", PayloadLegalForTradeNotSealed::getConditionTypeString().c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s activated", PayloadLegalForTradeNotSealed::getConditionTypeString().c_str());
         }
     }
     else {
         if (LpsSaWeighInfoTbl.EventState[ACDEventPopUp::PAYLOAD_LFT_NOT_SEALED]) {
             clearAutonomyCondition<PayloadLegalForTradeNotSealed>();
             LpsSaWeighInfoTbl.EventState[ACDEventPopUp::PAYLOAD_LFT_NOT_SEALED] = false;
-            AIS_LOG_NOTICE("%s deactivated", PayloadLegalForTradeNotSealed::getConditionTypeString().c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s deactivated", PayloadLegalForTradeNotSealed::getConditionTypeString().c_str());
         }
     }
 }

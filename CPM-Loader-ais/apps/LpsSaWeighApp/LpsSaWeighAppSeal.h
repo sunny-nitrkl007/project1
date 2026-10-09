@@ -21,8 +21,8 @@
 // Rapid JSON
 #include <ext/rapidjson/RapidJsonGuarded.h>
 
-#include <ais/log/Logger.h>
-#include <hub/filesystem/extensions/nvm.h>
+#include "ROS2Logger.hpp"
+#include <filesystem/extensions/nvm.h>
 
 #include <chrono/print.hpp>
 #include <fileio/oflocker.hpp>
@@ -83,7 +83,7 @@ public:
 
     // Load data from storage file(s)
     bool load(const boost::filesystem::path& path, const std::string& fileName) {
-        bool success = ais::filesystem::file::read(path, fileName, *this);
+        bool success = ros2_nvm::filesystem::file::read(path, fileName, *this);
 
         if (success) {
             saveNeeded_ = false;
@@ -94,7 +94,7 @@ public:
 
     // Remove stored file(s)
     bool remove(const boost::filesystem::path& path, const std::string& fileName) {
-        return ais::filesystem::sha1_fstream::remove_files(ais::filesystem::dir::makeFilePath(path, fileName));
+        return ros2_nvm::filesystem::sha1_fstream::remove_files(ros2_nvm::filesystem::nvm_dir::makeFilePath(path, fileName));
     }
 
     // Save data to storage file(s)
@@ -102,7 +102,7 @@ public:
         bool success = true;
 
         if (force || saveNeeded_) {
-            success = ais::filesystem::file::store(path, fileName, *this);
+            success = ros2_nvm::filesystem::file::store(path, fileName, *this);
             if (success) {
                 saveNeeded_ = false;
             }
@@ -354,7 +354,7 @@ public:
 
     // Load data from storage file(s)
     bool load(const boost::filesystem::path& path, const std::string& fileName) {
-        bool success = ais::filesystem::file::read(path, fileName, *this);
+        bool success = ros2_nvm::filesystem::file::read(path, fileName, *this);
 
         if (success) {
             saveNeeded_ = false;
@@ -365,7 +365,7 @@ public:
 
     // Remove stored file(s)
     bool remove(const boost::filesystem::path& path, const std::string& fileName) {
-        return ais::filesystem::sha1_fstream::remove_files(ais::filesystem::dir::makeFilePath(path, fileName));
+        return ros2_nvm::filesystem::sha1_fstream::remove_files(ros2_nvm::filesystem::nvm_dir::makeFilePath(path, fileName));
     }
 
     // Save data to storage file(s)
@@ -373,7 +373,7 @@ public:
         bool success = true;
 
         if (force || saveNeeded_) {
-            success = ais::filesystem::file::store(path, fileName, *this);
+            success = ros2_nvm::filesystem::file::store(path, fileName, *this);
             if (success) {
                 saveNeeded_ = false;
             }
@@ -465,7 +465,7 @@ public:
             }
 
             if (!isSealed()) {
-                AIS_LOG_ALERT("Seal Broken!");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Seal Broken!");
             }
         }
         */
@@ -539,7 +539,7 @@ public:
             // Payload Monitoring System - Implement Linkage Configuration
             breakSeal(2183, 0xD10049, code);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Machine Configuration Code Changed.");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Machine Configuration Code Changed.");
         }
     }
 
@@ -549,7 +549,7 @@ public:
         //  ---------                                         ---------------
         breakSeal(2183, 0xD10049, code);
 
-        AIS_LOG_ALERT("LFT Seal Broken - Generic Configuration Changed.");
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Generic Configuration Changed.");
     }
 
     // Returns true if the value changes from a known value to the new value.
@@ -579,7 +579,7 @@ public:
             // Payload Monitoring System - Payload Legal For Trade Measurement Installation Status
             breakSeal(2183, 0xD11E8D, "", enabled ? 0x0010 : 0x0011);
 
-            AIS_LOG_ALERT("LFT Seal Broken - LFT Enable Status Changed (%d).", enabled);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - LFT Enable Status Changed (%d).", enabled);
         }
     }
 
@@ -628,7 +628,7 @@ public:
                 breakSeal(2183, 0xF9C0, version + "." + build);
             }
 
-            AIS_LOG_ALERT("LFT Seal Broken - LFT Software Id Changed (%s).", version.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - LFT Software Id Changed (%s).", version.c_str());
         }
         else if (build != seal_.lftSoftwareIdBuild) {
             seal_.lftSoftwareIdBuild = build;
@@ -653,7 +653,7 @@ public:
             // Analysis Module - Electronic Control Module Serial Number
             breakSeal(5495, 0xF811, sn);
 
-            AIS_LOG_ALERT("LFT Seal Broken - ECM Serial Number Changed (%s).", sn.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - ECM Serial Number Changed (%s).", sn.c_str());
         }
     }
 
@@ -696,7 +696,7 @@ public:
                 //breakSeal(2183, 0xF81A, id);
                 breakSeal(2183, 0xD10049, "Equipment ID: " + id);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Equipment ID Changed.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Equipment ID Changed.");
             }
         }
     }
@@ -710,7 +710,7 @@ public:
             // Implement Control - Payload Legal For Trade Measurement Software Identifier
             breakSeal(596, 0xF9C0, version + "." + build);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Input Module LFT Software Id Changed (%s).", version.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Input Module LFT Software Id Changed (%s).", version.c_str());
         }
         else if (build != seal_.inputModuleLftSoftwareIdBuild) {
             seal_.inputModuleLftSoftwareIdBuild = build;
@@ -736,7 +736,7 @@ public:
             // Implement Control - Electronic Control Module Serial Number
             breakSeal(596, 0xF811, sn);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Input Module ECM Serial Number Changed (%s).", sn.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Input Module ECM Serial Number Changed (%s).", sn.c_str());
 
             return wasEmpty ? false : true;
         }
@@ -766,7 +766,7 @@ public:
             // Lift Linkage Position Sensor - Electronic Control Module Serial Number
             breakSeal(350, 0xF811 /* Seal Identifier */, id);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Lift Position Sensor Id Changed (%s).", id.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Lift Position Sensor Id Changed (%s).", id.c_str());
         }
     }
 
@@ -778,7 +778,7 @@ public:
             // Tilt Linkage Position Sensor - Electronic Control Module Serial Number
             breakSeal(351, 0xF811 /* Seal Identifier */, id);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Tilt Position Sensor Id Changed (%s).", id.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Tilt Position Sensor Id Changed (%s).", id.c_str());
         }
     }
 
@@ -793,7 +793,7 @@ public:
             // Lift Cylinder Head End Pressure Sensor - Electronic Control Module Serial Number
             breakSeal(364, 0xF811 /* Seal Identifier */, id);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Lift Head End Pressure Sensor Id Changed (%s).", id.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Lift Head End Pressure Sensor Id Changed (%s).", id.c_str());
         }
     }
 
@@ -805,7 +805,7 @@ public:
             // Lift Cylinder Rod End Pressure Sensor - Electronic Control Module Serial Number
             breakSeal(769, 0xF811 /* Seal Identifier */, id);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Lift Rod End Pressure Sensor Id Changed (%s).", id.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Lift Rod End Pressure Sensor Id Changed (%s).", id.c_str());
         }
     }
 
@@ -820,7 +820,7 @@ public:
             // Hydraulic Oil Temperature Sensor - Electronic Control Module Serial Number
             breakSeal(600, 0xF811 /* Seal Identifier */, id);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Hydraulic Oil Temperature Sensor Id Changed (%s).", id.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Hydraulic Oil Temperature Sensor Id Changed (%s).", id.c_str());
         }
     }
 
@@ -840,7 +840,7 @@ public:
                 // Payload Monitoring System - Payload Hydraulic Oil Temperature Compensation Enabled Status
                 breakSeal(2183, 0xD11B9A, "", enabled ? 0x000C : 0x000D);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Hydraulic Oil Temperature Enable Status Changed (%d).", enabled);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Hydraulic Oil Temperature Enable Status Changed (%d).", enabled);
             }
         }
     }
@@ -867,7 +867,7 @@ public:
                     breakSeal(2183, 0xD10049, "PitchRollComp: Disabled");
                 }
 
-                AIS_LOG_ALERT("LFT Seal Broken - IMU Compensation Enable Status Changed (%d).", enabled);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - IMU Compensation Enable Status Changed (%d).", enabled);
             }
         }
     }
@@ -883,7 +883,7 @@ public:
             // Inertial Measurement Sensor - Software Group Part Number
             breakSeal(1893, 0xF849, pn);
 
-            AIS_LOG_ALERT("LFT Seal Broken - IMU Software Part Number Changed (%s).", pn.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - IMU Software Part Number Changed (%s).", pn.c_str());
         }
     }
 
@@ -898,7 +898,7 @@ public:
             // Inertial Measurement Sensor - Electronic Control Module Serial Number
             breakSeal(1893, 0xF811, sn);
 
-            AIS_LOG_ALERT("LFT Seal Broken - IMU Serial Number Changed (%s).", sn.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - IMU Serial Number Changed (%s).", sn.c_str());
 
             return wasEmpty ? false : true;
         }
@@ -917,7 +917,7 @@ public:
             // Payload Monitoring System - Tool Program Part Number (used as Work Tool Identifier)
             breakSeal(2183, 0xF878, id);
 
-            AIS_LOG_ALERT("LFT Seal Broken - Work Tool Id Changed (%s).", id.c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Work Tool Id Changed (%s).", id.c_str());
         }
     }
 
@@ -937,13 +937,13 @@ public:
                 // Lift Linkage Position Sensor - Last Successful Calibration Operating Hours
                 breakSeal(350, 0xF856, "", 0x04D5 /* Calibrated */);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Lift Sensor Calibrated (%d).", counter);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Lift Sensor Calibrated (%d).", counter);
             }
             else {
                 // Lift Linkage Position Sensor - Out of Calibration
                 breakSeal(350, 0xF856, "", 0x0346 /* Not Calibrated */);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Lift Sensor Not Calibrated.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Lift Sensor Not Calibrated.");
             }
         }
     }
@@ -959,13 +959,13 @@ public:
                 // Tilt Linkage Position Sensor - Last Successful Calibration Operating Hours
                 breakSeal(351, 0xF856, "", 0x04D5 /* Calibrated */);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Tilt Sensor Calibrated (%d).", counter);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Tilt Sensor Calibrated (%d).", counter);
             }
             else {
                 // Tilt Linkage Position Sensor - Out of Calibration
                 breakSeal(351, 0xF856, "", 0x0346 /* Not Calibrated */);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Tilt Sensor Not Calibrated.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Tilt Sensor Not Calibrated.");
             }
         }
     }
@@ -981,13 +981,13 @@ public:
                 // Payload Monitoring System - Last Successful Calibration Operating Hours
                 breakSeal(2183, 0xF856, "", 0x04D5 /* Calibrated */);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Payload Calibrated (%d).", counter);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Payload Calibrated (%d).", counter);
             }
             else {
                 // Payload Monitoring System - Out of Calibration
                 breakSeal(2183, 0xF856, "", 0x0346 /* Not Calibrated */);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Payload Not Calibrated.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Payload Not Calibrated.");
             }
         }
     }
@@ -1016,7 +1016,7 @@ public:
             // Payload Monitoring System - Payload Control System Calibration Weight
             breakSeal(2183, 0xD009A7, ss.str(), LpsCommonWeightUnits_Base_t(seal_.weightUnits));
 
-            AIS_LOG_ALERT("LFT Seal Broken - Calibration Weight Changed (%f).", weight);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Calibration Weight Changed (%f).", weight);
         }
     }
 
@@ -1036,7 +1036,7 @@ public:
             // Payload Monitoring System -  Payload Correction Factor
             breakSeal(2183, 0xD023EA, ss.str());
 
-            AIS_LOG_ALERT("LFT Seal Broken - Span Adjust Changed (%f).", factor);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Span Adjust Changed (%f).", factor);
         }
     }
 
@@ -1056,7 +1056,7 @@ public:
             // Payload Monitoring System - Payload Weigh Activate Lift Position
             breakSeal(2183, 0xD00C9F, ss.str());
 
-            AIS_LOG_ALERT("LFT Seal Broken - Weigh Range Start Changed (%f).", weighRangeStart);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Weigh Range Start Changed (%f).", weighRangeStart);
         }
 
         if (weighRangeSize != seal_.weighRangeSize) {
@@ -1070,7 +1070,7 @@ public:
             // Payload Monitoring System - Payload Weigh Range Configuration
             breakSeal(2183, 0xD0102D, ss.str());
 
-            AIS_LOG_ALERT("LFT Seal Broken - Weight Range Size Changed (%f).", weighRangeSize);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Weight Range Size Changed (%f).", weighRangeSize);
         }
     }
 
@@ -1086,7 +1086,7 @@ public:
             // Payload Monitoring System - Display Weight Precision Configuration
             breakSeal(2183, 0xD11B8D, lps_common_weight_to_string(interval, decimalPrecision, interval), LpsCommonWeightUnits_Base_t(uom));
 
-            AIS_LOG_ALERT("LFT Seal Broken - Display Weight Precision Configuration Changed (%f).", interval);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Display Weight Precision Configuration Changed (%f).", interval);
         }
 
         if (uom != seal_.weightUnits) {
@@ -1096,7 +1096,7 @@ public:
             // Payload Monitoring System - Display Weight Units Configuration
             breakSeal(2183, 0xD10938, "", LpsCommonWeightUnits_Base_t(uom));
 
-            AIS_LOG_ALERT("LFT Seal Broken - Display Weight Units Configuration Changed (%d).", uom);
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Display Weight Units Configuration Changed (%d).", static_cast<int>(uom));
         }
     }
 
@@ -1110,7 +1110,7 @@ public:
         // Payload Monitoring System - Onboard Payload Printer Truck Ticket Number
         breakSeal(2183, 0xD01D2C, std::to_string(ticketNumber));
 
-        AIS_LOG_ALERT("LFT Seal Broken - Ticket Number Written (%u).", ticketNumber);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Ticket Number Written (%u).", ticketNumber);
     }
 
     /*
@@ -1132,7 +1132,7 @@ public:
                 // Payload Monitoring System - Payload Memory Ticket Retention Period
                 breakSeal(2183, 0xD03093, std::to_string(retentionPeriod), 0x0658 /* Days */);
 
-                AIS_LOG_ALERT("LFT Seal Broken - Ticket Retention Period (%u).", retentionPeriod);
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LFT Seal Broken - Ticket Retention Period (%u).", retentionPeriod);
             }
         }
     }
@@ -1192,10 +1192,10 @@ public:
                 toJson(ofl.ofstream(), filePath.stem().string());
                 ofl.close();
                 success = true;
-                AIS_LOG_INFO("%s: published JSON file.", filePath.filename().c_str());
+               RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%s: published JSON file.", filePath.filename().c_str());
             }
             else {
-                AIS_LOG_ERROR("%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
             }
         }
 
@@ -1203,11 +1203,11 @@ public:
             try {
                 if (boost::filesystem::is_regular_file(filePath)) {
                     boost::filesystem::remove(filePath);
-                    AIS_LOG_WARN("%s: file removed.", filePath.filename().c_str());
+                    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file removed.", filePath.filename().c_str());
                 }
             }
             catch (const boost::filesystem::filesystem_error& e) {
-                AIS_LOG_WARN("%s: file could not be removed.", filePath.filename().c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file could not be removed.", filePath.filename().c_str());
             }
         }
 

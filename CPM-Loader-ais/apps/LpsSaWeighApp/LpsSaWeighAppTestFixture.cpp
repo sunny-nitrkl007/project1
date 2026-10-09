@@ -11,7 +11,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <ais/log/Logger.h>
+#include "ROS2Logger.hpp"
 
 #include <fileio/directory.hpp>
 
@@ -89,16 +89,16 @@ bool LpsSaWeighAppTestFixture::recordTestPlan(const boost::filesystem::path& fil
             }
             fs_ << "\n";
 
-            AIS_LOG_FATAL("Recording started...");
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"Recording started...");
             testStatus_ = TestStatus_t::RECORDING;
             recording_ = true;
         }
         else {
-            AIS_LOG_FATAL("Could not open %s", filePath.string().c_str());
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"Could not open %s", filePath.string().c_str());
         }
     }
     catch (const boost::filesystem::filesystem_error& e) {
-        AIS_LOG_ERROR(e.what());
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
     }
 
     if (!recording_) {
@@ -139,7 +139,7 @@ bool LpsSaWeighAppTestFixture::runTestPlan(const boost::filesystem::path& filePa
                     // the beginning of each string.
                     //if (*line.rbegin() == '\r') { line.pop_back(); }
 
-                    AIS_LOG_FATAL("Test Plan Found: %s", line.c_str());
+                    RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"Test Plan Found: %s", line.c_str());
 
                     // Parse the columns.
                     parseHeader(line);
@@ -158,7 +158,7 @@ bool LpsSaWeighAppTestFixture::runTestPlan(const boost::filesystem::path& filePa
         }
     }
     catch (const boost::filesystem::filesystem_error& e) {
-        AIS_LOG_ERROR(e.what());
+       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
     }
 
     if (!active_) {
@@ -210,7 +210,7 @@ bool LpsSaWeighAppTestFixture::updateTestStep(float weight) {
     if (active_) {
         if (std::isfinite(thisStep_.expectedWeight)) {
             if (std::fabs(weight - thisStep_.expectedWeight) > 0.01) {
-                AIS_LOG_FATAL("Weight of %f doesn't match expected weight of %f.", weight, thisStep_.expectedWeight);
+                RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"Weight of %f doesn't match expected weight of %f.", weight, thisStep_.expectedWeight);
                 thisStep_.expectedWeight = NAN; // Don't warn again!
                 pass = false;
             }
@@ -493,7 +493,7 @@ void LpsSaWeighAppTestFixture::parseHeader(const std::string& line) {
 
     int numFields = fields.size();
 
-    AIS_LOG_FATAL("Number of header fields: %d", numFields);
+    RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"Number of header fields: %d", numFields);
 
     int fieldIdx = 0;
     for (int colIdx = 0; colIdx < COLUMN_IDX::MAX; ++colIdx) {
@@ -503,11 +503,11 @@ void LpsSaWeighAppTestFixture::parseHeader(const std::string& line) {
         if ((fieldIdx < numFields) && (0 == fields[fieldIdx].compare(0, colName.size(), colName))) {
             COLUMN_IDX_MAP[colIdx] = fieldIdx;
             ++fieldIdx;
-            AIS_LOG_FATAL("%s column found.", colName.c_str());
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"%s column found.", colName.c_str());
         }
         else {
             COLUMN_IDX_MAP[colIdx] = -1;
-            AIS_LOG_FATAL("%s column not found.", colName.c_str());
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(),"%s column not found.", colName.c_str());
         }
     }
 }
@@ -641,7 +641,7 @@ void LpsSaWeighAppTestFixture::parseNextStep(const std::string& line) {
         }
     }
     catch (const std::invalid_argument& e) {
-        AIS_LOG_FATAL(e.what());
+        RCLCPP_FATAL_STREAM(ROS2Logger::Instance().GetLogger(), e.what());
     }
 }
 

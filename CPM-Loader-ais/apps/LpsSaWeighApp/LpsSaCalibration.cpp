@@ -37,152 +37,171 @@ void LpsSaWeighApp::LpsSaLoadDefaultCalibrationTbl(void)
      */
     payloadCalNvmTbl_.data.CalStatus = 0;
 
-    {
-        ConfigSection cfg;
-        if (!getTaskParser().getSection("DefaultCalConfig", cfg)) {
-            AIS_LOG_ERROR("DefaultCalConfig section not found");
+    // --- WM-01: DefaultCalConfig ---
+    // No current robot sets this section (0/122 variants). Guard matches original
+    // getSection() failure path: log error, leave structs at constructor defaults.
+    declare_parameter<bool>("default_cal_config.config_present", false);
+    if (!get_parameter("default_cal_config.config_present").as_bool()) {
+        AIS_LOG_ERROR("DefaultCalConfig section not found");
+    }
+    else {
+        // Helper: declare double param, read, cast to float. Sentinel: 0.0 = not provided.
+        auto getDccFloat = [&](const std::string& key) -> float {
+            declare_parameter<double>(key, 0.0);
+            return static_cast<float>(get_parameter(key).as_double());
+        };
+        // Helper: declare double_array param, read into float vector. Returns false if absent.
+        auto getDccArray = [&](const std::string& key, std::vector<float>& dst) -> bool {
+            declare_parameter<std::vector<double>>(key, std::vector<double>{});
+            const auto v = get_parameter(key).as_double_array();
+            if (v.size() < static_cast<size_t>(LPS_CAL_CURVE_FIT_NUM_POINTS)) {
+                return false;
+            }
+            dst.assign(v.begin(), v.end());
+            return true;
+        };
+
+        bool calibratedByDefault = false;
+        { // Read cal status: sentinel -1; LPS_WEIGH_SYSTEM_CALIBRATED=0 enables cal flags
+            declare_parameter<int>("default_cal_config.cal_stat", -1);
+            const int raw = get_parameter("default_cal_config.cal_stat").as_int();
+            if (LPS_WEIGH_SYSTEM_CALIBRATED == static_cast<LpsWeighCalStatus_t>(raw)) {
+                calibratedByDefault = true;
+            }
         }
-        else {
-            bool calibratedByDefault = false;
-            { // Read cal status
-                int temp;
-                if (cfg.get("CalStat", temp)) {
-                    auto calStat = static_cast<LpsWeighCalStatus_t>(temp);
-                    if (LPS_WEIGH_SYSTEM_CALIBRATED == calStat) {
-                        calibratedByDefault = true;
-                    }
-                }
+
+        { // Load lift sensor default calibration
+            // Original writes the value unconditionally (cfg.get side-effect) but only
+            // sets lift_cal_stat if both keys present. Mirror that: write each independently,
+            // track allThere for the cal-stat gate.
+            const float raise = getDccFloat("default_cal_config.lift_cyl_max_dc");
+            const float lower = getDccFloat("default_cal_config.lift_cyl_min_dc");
+            const bool raisePresent = (raise != 0.f);
+            const bool lowerPresent = (lower != 0.f);
+            if (raisePresent) { liftCalNvmTbl_.lift_full_raise_dc = raise; }
+            if (lowerPresent) { liftCalNvmTbl_.lift_full_lower_dc = lower; }
+            if (raisePresent && lowerPresent && calibratedByDefault) {
+                liftCalNvmTbl_.lift_cal_stat = CAL_LIFT_LINKAGE_MASK;
+            }
+        }
+
+        if (TILT_SENSOR_TYPE_ROTARY == linkage_table_cnfg.tiltSensorType)
+        { // Load tilt sensor default calibration (rotary robots only)
+            const float rack = getDccFloat("default_cal_config.tilt_cyl_max_dc");
+            const float dump = getDccFloat("default_cal_config.tilt_cyl_min_dc");
+            const bool rackPresent = (rack != 0.f);
+            const bool dumpPresent = (dump != 0.f);
+            if (rackPresent) { tiltCalNvmTbl_.tilt_full_rack_dc = rack; }
+            if (dumpPresent) { tiltCalNvmTbl_.tilt_full_dump_dc = dump; }
+            if (rackPresent && dumpPresent && calibratedByDefault) {
+                tiltCalNvmTbl_.tilt_sensor_type = TILT_SENSOR_TYPE_ROTARY;
+                tiltCalNvmTbl_.tilt_cal_stat = CAL_TILT_LINKAGE_MASK;
+            }
+        }
+
+        { // Load empty bucket payload calibration tables
+            bool allThere = true;
+            std::vector<float> arr;
+
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_raise_empty_bkt_lift_ht", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftHt);
             }
 
-            { // Load lift sensor default calibration
-                bool allThere = true;
-                allThere &= !cfg.get("LiftCylMaxDc", liftCalNvmTbl_.lift_full_raise_dc);
-                allThere &= !cfg.get("LiftCylMinDc", liftCalNvmTbl_.lift_full_lower_dc);
-                if (allThere && calibratedByDefault) {
-                    liftCalNvmTbl_.lift_cal_stat = CAL_LIFT_LINKAGE_MASK;
-                }
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_raise_empty_bkt_lift_pres", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftPres);
             }
 
-            if (TILT_SENSOR_TYPE_ROTARY == linkage_table_cnfg.tiltSensorType)
-            { // Load tilt sensor default calibration
-                bool allThere = true;
-                allThere &= !cfg.get("TiltCylMaxDc", tiltCalNvmTbl_.tilt_full_rack_dc);
-                allThere &= !cfg.get("TiltCylMinDc", tiltCalNvmTbl_.tilt_full_dump_dc);
-                if (allThere && calibratedByDefault) {
-                    tiltCalNvmTbl_.tilt_sensor_type = TILT_SENSOR_TYPE_ROTARY;
-                    tiltCalNvmTbl_.tilt_cal_stat = CAL_TILT_LINKAGE_MASK;
-                }
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_lower_empty_bkt_lift_ht", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftHt);
             }
 
-            { // Load empty bucket payload calibration tables
-                bool allThere = true;
-                vector<float> tempArr;
-
-                if (cfg.get("SlowRaiseEmptyBktLiftHt", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftHt);
-                }
-                else {
-                    allThere = false;
-                }
-
-                tempArr.clear();
-                if (cfg.get("SlowRaiseEmptyBktLiftPres", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowRaiseEmptyBktLiftPres);
-                }
-                else {
-                    allThere = false;
-                }
-
-                tempArr.clear();
-                if (cfg.get("SlowLowerEmptyBktLiftHt", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftHt);
-                }
-                else {
-                    allThere = false;
-                }
-
-                tempArr.clear();
-                if (cfg.get("SlowLowerEmptyBktLiftPres", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftPres);
-                }
-                else {
-                    allThere = false;
-                }
-
-                allThere &= !cfg.get("FastRaiseEmptyBktDeltaPres", payloadCalNvmTbl_.data.FastRaiseEmptyBktDeltaPres);
-                allThere &= !cfg.get("EmptyBktSlowRaiseSpd", payloadCalNvmTbl_.data.EmptyBktSlowRaiseSpd);
-                allThere &= !cfg.get("EmptyBktFastRaiseSpd", payloadCalNvmTbl_.data.EmptyBktFastRaiseSpd);
-
-                if (allThere && calibratedByDefault) {
-                    payloadCalNvmTbl_.data.CalStatus |= CAL_EMPTY_BKT_CURVE_MASK;
-                }
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_lower_empty_bkt_lift_pres", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowLowerEmptyBktLiftPres);
             }
 
-            { // Load full bucket payload calibration tables
-                bool allThere = true;
-                vector<float> tempArr;
+            const float fastRaiseEmpty = getDccFloat("default_cal_config.fast_raise_empty_bkt_delta_pres");
+            const float emptySlowSpd   = getDccFloat("default_cal_config.empty_bkt_slow_raise_spd");
+            const float emptyFastSpd   = getDccFloat("default_cal_config.empty_bkt_fast_raise_spd");
+            if (fastRaiseEmpty != 0.f) { payloadCalNvmTbl_.data.FastRaiseEmptyBktDeltaPres = fastRaiseEmpty; } else { allThere = false; }
+            if (emptySlowSpd   != 0.f) { payloadCalNvmTbl_.data.EmptyBktSlowRaiseSpd       = emptySlowSpd;   } else { allThere = false; }
+            if (emptyFastSpd   != 0.f) { payloadCalNvmTbl_.data.EmptyBktFastRaiseSpd       = emptyFastSpd;   } else { allThere = false; }
 
-                if (cfg.get("SlowRaiseFullBktLiftHt", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowRaiseFullBktLiftHt);
-                }
-                else {
-                    allThere = false;
-                }
+            if (allThere && calibratedByDefault) {
+                payloadCalNvmTbl_.data.CalStatus |= CAL_EMPTY_BKT_CURVE_MASK;
+            }
+        }
 
-                tempArr.clear();
-                if (cfg.get("SlowRaiseFullBktLiftPres", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowRaiseFullBktLiftPres);
-                }
-                else {
-                    allThere = false;
-                }
+        { // Load full bucket payload calibration tables
+            bool allThere = true;
+            std::vector<float> arr;
 
-                tempArr.clear();
-                if (cfg.get("SlowLowerFullBktLiftHt", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowLowerFullBktLiftHt);
-                }
-                else {
-                    allThere = false;
-                }
-
-                tempArr.clear();
-                if (cfg.get("SlowLowerFullBktLiftPres", tempArr)) {
-                    tempArr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
-                    std::copy(tempArr.begin(), tempArr.end(), payloadCalNvmTbl_.data.SlowLowerFullBktLiftPres);
-                }
-                else {
-                    allThere = false;
-                }
-
-                allThere &= !cfg.get("FastRaiseFullBktDeltaPres", payloadCalNvmTbl_.data.FastRaiseFullBktDeltaPres);
-                allThere &= !cfg.get("FullBktSlowRaiseSpd", payloadCalNvmTbl_.data.FullBktSlowRaiseSpd);
-                allThere &= !cfg.get("FullBktFastRaiseSpd", payloadCalNvmTbl_.data.FullBktFastRaiseSpd);
-
-                if (allThere && calibratedByDefault) {
-                    payloadCalNvmTbl_.data.CalStatus |= CAL_FULL_BKT_CURVE_MASK;
-                }
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_raise_full_bkt_lift_ht", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowRaiseFullBktLiftHt);
             }
 
-            // Load default calibration weight.
-            if (cfg.get("Calwt", payloadCalNvmTbl_.data.CalWeight)) {
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_raise_full_bkt_lift_pres", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowRaiseFullBktLiftPres);
+            }
+
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_lower_full_bkt_lift_ht", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowLowerFullBktLiftHt);
+            }
+
+            arr.clear();
+            allThere &= getDccArray("default_cal_config.slow_lower_full_bkt_lift_pres", arr);
+            if (!arr.empty()) {
+                arr.resize(LPS_CAL_CURVE_FIT_NUM_POINTS);
+                std::copy(arr.begin(), arr.end(), payloadCalNvmTbl_.data.SlowLowerFullBktLiftPres);
+            }
+
+            const float fastRaiseFull = getDccFloat("default_cal_config.fast_raise_full_bkt_delta_pres");
+            const float fullSlowSpd   = getDccFloat("default_cal_config.full_bkt_slow_raise_spd");
+            const float fullFastSpd   = getDccFloat("default_cal_config.full_bkt_fast_raise_spd");
+            if (fastRaiseFull != 0.f) { payloadCalNvmTbl_.data.FastRaiseFullBktDeltaPres = fastRaiseFull; } else { allThere = false; }
+            if (fullSlowSpd   != 0.f) { payloadCalNvmTbl_.data.FullBktSlowRaiseSpd       = fullSlowSpd;   } else { allThere = false; }
+            if (fullFastSpd   != 0.f) { payloadCalNvmTbl_.data.FullBktFastRaiseSpd       = fullFastSpd;   } else { allThere = false; }
+
+            if (allThere && calibratedByDefault) {
+                payloadCalNvmTbl_.data.CalStatus |= CAL_FULL_BKT_CURVE_MASK;
+            }
+        }
+
+        { // Load default calibration weight
+            const float calwt = getDccFloat("default_cal_config.calwt");
+            if (calwt != 0.f) {
+                payloadCalNvmTbl_.data.CalWeight = calwt;
                 if (calibratedByDefault) {
                     payloadCalNvmTbl_.data.CalStatus |= CAL_BKT_WT_MASK;
                 }
             }
         }
+    }
 
-        // If empty and full curves are done, then velocity compensation is done.
-        if ((0 != (payloadCalNvmTbl_.data.CalStatus & CAL_EMPTY_BKT_CURVE_MASK)) &&
-                (0 != (payloadCalNvmTbl_.data.CalStatus & CAL_FULL_BKT_CURVE_MASK))) {
-            payloadCalNvmTbl_.data.CalStatus |= CAL_VELCAL;
-        }
+    // If empty and full curves are done, then velocity compensation is done.
+    if ((0 != (payloadCalNvmTbl_.data.CalStatus & CAL_EMPTY_BKT_CURVE_MASK)) &&
+            (0 != (payloadCalNvmTbl_.data.CalStatus & CAL_FULL_BKT_CURVE_MASK))) {
+        payloadCalNvmTbl_.data.CalStatus |= CAL_VELCAL;
     }
 
     AIS_LOG_INFO("Default calibration status %X", payloadCalNvmTbl_.data.CalStatus);
@@ -207,6 +226,8 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
 
     // Weighing library set to 20 msec execution rate
     getTaskConfig().get("CPMExecRate", weighInitTbl.ExecRate);
+    declare_parameter<double>("cpm_exec_rate", static_cast<double>(weighInitTbl.ExecRate));
+    weighInitTbl.ExecRate = static_cast<decltype(weighInitTbl.ExecRate)>(get_parameter("cpm_exec_rate").as_double());
     AIS_LOG_INFO("CPMExecRate %f", weighInitTbl.ExecRate);
 
     // Load the default calibration table from the ruby file
@@ -215,207 +236,205 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
     // Copying default calibration table into the weigh init table.
     copyCalNVMToWeighInitTable(machSpecificCfg.CalibTbl);
 
-    { // Read machine spec config
-        ConfigSection rubyCfg;
-        if (!getTaskParser().getSection("MachineSpecificConfig",rubyCfg)) {
-            AIS_LOG_ERROR("MachineSpecificConfig section not found");
-            everythingOk = false;
+    // --- WM-02: MachineSpecificConfig (weighing params) ---
+    // Guard: if the robot YAML was not loaded, weighing.config_present will be absent/false.
+    // This matches the original behaviour where a missing MachineSpecificConfig section
+    // caused everythingOk=false and skipped all subsequent reads.
+    declare_parameter<bool>("weighing.config_present", false);
+    if (!get_parameter("weighing.config_present").as_bool()) {
+        AIS_LOG_ERROR("MachineSpecificConfig (weighing params) not found — Robot YAML not loaded?");
+        everythingOk = false;
+        return everythingOk;
+    }
+
+    // Helper: declare double param, read, cast to float
+    auto getFloatParam = [&](const std::string& key, double def) -> float {
+        declare_parameter<double>(key, def);
+        return static_cast<float>(get_parameter(key).as_double());
+    };
+    // Helper: declare int param, read, return int
+    auto getIntParam = [&](const std::string& key, int def) -> int {
+        declare_parameter<int>(key, def);
+        return get_parameter(key).as_int();
+    };
+    // Helper for float arrays (double_array → float vector)
+    auto getFloatArrayWm02 = [&](const std::string& key, std::vector<float>& dst) -> bool {
+        declare_parameter<std::vector<double>>(key, std::vector<double>{});
+        const auto v = get_parameter(key).as_double_array();
+        dst.assign(v.begin(), v.end());
+        return !dst.empty();
+    };
+
+    // Group 1: Hydraulic oil type (optional, default LPS_OIL_TYPE_SAE_10W=0)
+    {
+        const int raw = getIntParam("weighing.hyd_oil_type",
+                                    static_cast<int>(LPS_OIL_TYPE_SAE_10W));
+        machSpecificCfg.HydOilType = static_cast<LpsHydOilType_t>(raw);
+    }
+
+    // Group 2: Hydraulic line loss coefficients (optional, default 0 = no temp compensation)
+    machSpecificCfg.HydPressLossCoeff.LiftCylHeLineLoss2ndOrdrCoeff =
+        getFloatParam("weighing.lift_cyl_he_line_loss_2nd_ordr_coeff", 0.0);
+    machSpecificCfg.HydPressLossCoeff.LiftCylHeLineLoss1stOrdrCoeff =
+        getFloatParam("weighing.lift_cyl_he_line_loss_1st_ordr_coeff", 0.0);
+    machSpecificCfg.HydPressLossCoeff.LiftCylReLineLoss2ndOrdrCoeff =
+        getFloatParam("weighing.lift_cyl_re_line_loss_2nd_ordr_coeff", 0.0);
+    machSpecificCfg.HydPressLossCoeff.LiftCylReLineLoss1stOrdrCoeff =
+        getFloatParam("weighing.lift_cyl_re_line_loss_1st_ordr_coeff", 0.0);
+
+    // Group 3: Weigh range config (optional, struct already default-initialised in header)
+    WeighRangeConfig.defaultStartOfWeighRange =
+        getFloatParam("weighing.start_of_weigh", static_cast<double>(DEFAULT_WEIGH_RANGE_START));
+    WeighRangeConfig.defaultEndOfWeighRange =
+        getFloatParam("weighing.end_of_weigh", static_cast<double>(DEFAULT_WEIGH_RANGE_END));
+    WeighRangeConfig.minimumWeighRangeSize =
+        getFloatParam("weighing.weigh_range_min", static_cast<double>(DEFAULT_MIN_WEIGH_RANGE_SIZE));
+    WeighRangeConfig.minimumWeighRangeStart =
+        getFloatParam("weighing.min_weigh_range_start", static_cast<double>(DEFAULT_MIN_WEIGH_RANGE_START));
+    WeighRangeConfig.maximumWeighRangeEnd =
+        getFloatParam("weighing.max_weigh_range_end", static_cast<double>(DEFAULT_MAX_WEIGH_RANGE_END));
+
+    // Group 4: LLW (Low-Lift-Weigh) config (all optional)
+    machSpecificCfg.LlwTbl.FilterFactorMean      = getFloatParam("weighing.filter_factor_mean",      0.0);
+    machSpecificCfg.LlwTbl.FilterFactorVariance   = getFloatParam("weighing.filter_factor_variance",  0.0);
+    machSpecificCfg.LlwTbl.ErrorBand              = getFloatParam("weighing.error_band",              0.0);
+    machSpecificCfg.LlwTbl.MinimumConfidenceTime  = getFloatParam("weighing.minimum_confidence_time", 0.0);
+    machSpecificCfg.LlwTbl.AutoWeighRangeConfThr  = getFloatParam("weighing.auto_weigh_range_conf_thr",0.0);
+    machSpecificCfg.LlwTbl.AutoWeighMinLiftHt     = getFloatParam("weighing.auto_weigh_min_lift_ht",  0.0);
+    machSpecificCfg.LlwTbl.WtCf                  = getFloatParam("weighing.wt_cf",                   0.0);
+    machSpecificCfg.LlwTbl.StageOneCf             = getFloatParam("weighing.stage_one_cf",            0.0);
+    machSpecificCfg.LlwTbl.StageTwoCf             = getFloatParam("weighing.stage_two_cf",            0.0);
+    machSpecificCfg.LlwTbl.StageThreeCf           = getFloatParam("weighing.stage_three_cf",          0.0);
+    machSpecificCfg.LlwTbl.DampingRate            = getFloatParam("weighing.damping_rate",            0.0);
+
+    { // WtLpsOptional + WtLpsOptionalCf — both must be present to apply (paired)
+        // Default false for WtLpsOptional; 0.0 is sentinel for "not provided" for WtLpsOptionalCf.
+        declare_parameter<bool>("weighing.wt_lps_optional", false);
+        declare_parameter<double>("weighing.wt_lps_optional_cf", 0.0);
+        const bool wtLpsOpt  = get_parameter("weighing.wt_lps_optional").as_bool();
+        const float wtLpsCf  = static_cast<float>(get_parameter("weighing.wt_lps_optional_cf").as_double());
+        if (wtLpsOpt && wtLpsCf != 0.f) {
+            // Both present — apply the pair (mirrors original: both rubyCfg.get() must succeed)
+            machSpecificCfg.LlwTbl.WtLpsOptional  = wtLpsOpt;
+            machSpecificCfg.LlwTbl.WtLpsOptionalCf = wtLpsCf;
         }
         else {
-            { // Get hydraulic oil type
-                int temp;
-                if (rubyCfg.get("HydOilType", temp)) {
-                    machSpecificCfg.HydOilType = static_cast<LpsHydOilType_t>(temp);
-                }
-                else {
-                    machSpecificCfg.HydOilType = LPS_OIL_TYPE_SAE_10W;
-                }
-            }
-
-            /*Note :-
-               Temperature compensation coefficients are defaulted to zeros to provide no
-               hydraulic oil temperature compensation
-            */
-            rubyCfg.get("LiftCylHeLineLoss2ndOrdrCoeff", machSpecificCfg.HydPressLossCoeff.LiftCylHeLineLoss2ndOrdrCoeff);
-            rubyCfg.get("LiftCylHeLineLoss1stOrdrCoeff", machSpecificCfg.HydPressLossCoeff.LiftCylHeLineLoss1stOrdrCoeff);
-            rubyCfg.get("LiftCylReLineLoss2ndOrdrCoeff", machSpecificCfg.HydPressLossCoeff.LiftCylReLineLoss2ndOrdrCoeff);
-            rubyCfg.get("LiftCylReLineLoss1stOrdrCoeff", machSpecificCfg.HydPressLossCoeff.LiftCylReLineLoss1stOrdrCoeff);
-
-            { // Read start of weigh configuration from ruby file.
-                float startOfWeigh = DEFAULT_WEIGH_RANGE_START;
-                if (rubyCfg.get("StartOfWeigh", startOfWeigh)) {
-                    WeighRangeConfig.defaultStartOfWeighRange = startOfWeigh;
-                }
-                else {
-                    WeighRangeConfig.defaultStartOfWeighRange = DEFAULT_WEIGH_RANGE_START;
-                }
-            }
-
-            { // Read end of weigh configuration from ruby file
-                float endOfWeigh;
-                if (rubyCfg.get("EndOfWeigh", endOfWeigh)) {
-                    WeighRangeConfig.defaultEndOfWeighRange = endOfWeigh;
-                }
-                else {
-                    WeighRangeConfig.defaultEndOfWeighRange = DEFAULT_WEIGH_RANGE_END;
-                }
-            }
-
-            { //Read minimum weigh range size from ruby file
-                float minimumWeighRangeSize;
-                if (rubyCfg.get("WeighRangeMin", minimumWeighRangeSize)) {
-                    WeighRangeConfig.minimumWeighRangeSize = minimumWeighRangeSize;
-                }
-                else {
-                    WeighRangeConfig.minimumWeighRangeSize = DEFAULT_MIN_WEIGH_RANGE_SIZE;
-                }
-            }
-
-            { //Read minimum weigh range start configuration from ruby file
-                float minimumWeighRangeStart;
-                if (rubyCfg.get("MinWeighRangeStart", minimumWeighRangeStart)) {
-                    WeighRangeConfig.minimumWeighRangeStart = minimumWeighRangeStart;
-                }
-                else {
-                    WeighRangeConfig.minimumWeighRangeStart = DEFAULT_MIN_WEIGH_RANGE_START;
-                }
-            }
-
-            { //Read Maximum weigh range end configuration from ruby file
-                float maximumWeighRangeEnd;
-                if (rubyCfg.get("MaxWeighRangeEnd", maximumWeighRangeEnd)) {
-                    WeighRangeConfig.maximumWeighRangeEnd = maximumWeighRangeEnd;
-                }
-                else {
-                    WeighRangeConfig.maximumWeighRangeEnd = DEFAULT_MAX_WEIGH_RANGE_END;
-                }
-            }
-
-            /* Low Lift Weigh Configuration */
-            rubyCfg.get("FilterFactorMean", machSpecificCfg.LlwTbl.FilterFactorMean);
-            rubyCfg.get("FilterFactorVariance", machSpecificCfg.LlwTbl.FilterFactorVariance);
-            rubyCfg.get("ErrorBand", machSpecificCfg.LlwTbl.ErrorBand);
-            rubyCfg.get("MinimumConfidenceTime", machSpecificCfg.LlwTbl.MinimumConfidenceTime);
-            rubyCfg.get("AutoWeighRangeConfThr", machSpecificCfg.LlwTbl.AutoWeighRangeConfThr);
-            rubyCfg.get("AutoWeighMinLiftHt", machSpecificCfg.LlwTbl.AutoWeighMinLiftHt);
-            rubyCfg.get("WtCf", machSpecificCfg.LlwTbl.WtCf);
-            rubyCfg.get("StageOneCf", machSpecificCfg.LlwTbl.StageOneCf);
-            rubyCfg.get("StageTwoCf", machSpecificCfg.LlwTbl.StageTwoCf);
-            rubyCfg.get("StageThreeCf", machSpecificCfg.LlwTbl.StageThreeCf);
-            rubyCfg.get("DampingRate", machSpecificCfg.LlwTbl.DampingRate);
-
-            { // Read Optional Low Pass Weight Filter Configuration
-                bool WtLpsOptional;
-                float WtLpsOptionalCf;
-                if (rubyCfg.get("WtLpsOptional", WtLpsOptional) &&
-                        rubyCfg.get("WtLpsOptionalCf", WtLpsOptionalCf)) {
-                    machSpecificCfg.LlwTbl.WtLpsOptional = WtLpsOptional;
-                    machSpecificCfg.LlwTbl.WtLpsOptionalCf = WtLpsOptionalCf;
-                }
-                else {
-                    machSpecificCfg.LlwTbl.WtLpsOptional = false;
-                }
-            }
-
-            /* Angular velocity Low Pass Filter Corner Frequency (rad/s) */
-            if (!rubyCfg.get("LiftAngVelFilterCf", machSpecificCfg.LiftVelFilterCf)) {
-                machSpecificCfg.LiftVelFilterCf = std::max(machSpecificCfg.LlwTbl.StageOneCf,
-                        std::max(machSpecificCfg.LlwTbl.StageTwoCf, machSpecificCfg.LlwTbl.StageThreeCf));
-            }
-
-            /* Zero weight configuration */
-            {
-                int temp = LPS_WEIGH_BUCKET_WEIGHT_ACCURACY_HIGH;
-                rubyCfg.get("ZeroBktWtAccuracyLimit", temp);
-                machSpecificCfg.ZeroBktWtAccuracyLimit = static_cast<LpsWeighBktWtAccuracy_t>(temp);
-            }
-
-            rubyCfg.get("ZeroRangeLimit", machSpecificCfg.ZeroRangeLimit);
-            rubyCfg.get("ZeroAdjInitTimeInterval", machSpecificCfg.ZeroAdjInitTimeInterval);
-            rubyCfg.get("ZeroAdjAutoTimeInterval", machSpecificCfg.ZeroAdjAutoTimeInterval);
-            if (!rubyCfg.get("ZeroAdjAutoTimeIntervalFast", machSpecificCfg.ZeroAdjAutoTimeIntervalFast)) {
-                machSpecificCfg.ZeroAdjAutoTimeIntervalFast = machSpecificCfg.ZeroAdjAutoTimeInterval;
-            }
-            rubyCfg.get("ZeroAdjOilTempWarnThreshold", machSpecificCfg.ZeroAdjOilTempWarnThreshold);
-            if (!rubyCfg.get("ZeroAdjOilTempDelta", machSpecificCfg.ZeroAdjOilTempDelta)) {
-                machSpecificCfg.ZeroAdjOilTempDelta = LPS_OIL_TEMP_DELTA;
-            }
-
-            /* Tilt Compensation Config */
-            rubyCfg.get("TiltCompGainScalar", machSpecificCfg.TiltComp.TiltCompGainScalar);
-            rubyCfg.get("TiltCompEmptyBktWtGain", machSpecificCfg.TiltComp.TiltCompEmptyBktWtGain);
-            rubyCfg.get("TiltCompMaxGain", machSpecificCfg.TiltComp.TiltCompMaxGain);
-
-            if (!rubyCfg.get("LiftCylExtPctAxis", CalibTblRuby.lift_cyl_ext_pct_axis)) {
-                AIS_LOG_ERROR("LiftCylExtPctAxis read fail.");
-            }
-
-            if (!rubyCfg.get("TiltCompGainData", CalibTblRuby.tilt_comp_gain_data)) {
-                AIS_LOG_ERROR("TiltCompGainData read fail.");
-            }
-
-            if (!rubyCfg.get("TiltCylExtPctAxis", CalibTblRuby.tilt_cyl_ext_pct_axis)) {
-                AIS_LOG_ERROR("TiltCylExtPctAxis read fail.");
-            }
-
-            machSpecificCfg.TiltMap.NumColumns = CalibTblRuby.lift_cyl_ext_pct_axis.size();
-            machSpecificCfg.TiltMap.ColumnAxis = CalibTblRuby.lift_cyl_ext_pct_axis.data();
-            machSpecificCfg.TiltMap.NumRows = CalibTblRuby.tilt_cyl_ext_pct_axis.size();
-            machSpecificCfg.TiltMap.RowAxis = CalibTblRuby.tilt_cyl_ext_pct_axis.data();
-            machSpecificCfg.TiltMap.Data = CalibTblRuby.tilt_comp_gain_data.data();
-
-            rubyCfg.get("DigTargetWt", machSpecificCfg.DigConfig.DigTargetWt);
-            rubyCfg.get("DigDurationMaxLimit", machSpecificCfg.DigConfig.DigDurationMaxLimit);
-            rubyCfg.get("DigDurationMinLimit", machSpecificCfg.DigConfig.DigDurationMinLimit);
-            rubyCfg.get("DigStartLimit", machSpecificCfg.DigConfig.DigStartLimit);
-            rubyCfg.get("DigEndLimit", machSpecificCfg.DigConfig.DigEndLimit);
-            rubyCfg.get("LiftLowerVelocityLimit", machSpecificCfg.DigConfig.LiftLowerVelocityLimit);
-
-            rubyCfg.get("TiltCylExtThreshold", machSpecificCfg.DumpConfig.TiltCylExtThreshold);
-            rubyCfg.get("TiltCylExtThresholdStrict", machSpecificCfg.DumpConfig.TiltCylExtThresholdStrict);
-            rubyCfg.get("FullDumpBktAngleThreshold", machSpecificCfg.DumpConfig.FullDumpBktAngleThreshold);
-            rubyCfg.get("PartDumpBktAngleThreshold", machSpecificCfg.DumpConfig.PartDumpBktAngleThreshold);
-            rubyCfg.get("FullRackBktAngleThreshold", machSpecificCfg.DumpConfig.FullRackBktAngleThreshold);
-            rubyCfg.get("TiltAngleABCThreshold", machSpecificCfg.DumpConfig.TiltAngleABCThreshold);
-
-            rubyCfg.get("FastFiltWtCf", machSpecificCfg.LiveWeighConfig.FastFiltWtCf);
-            rubyCfg.get("SlowFiltWtCf", machSpecificCfg.LiveWeighConfig.SlowFiltWtCf);
-
-            { /* Read Default Machine Pitch Cal Offset */
-                float tipoffPitchCalOffset = 0.f;
-                rubyCfg.get("TipoffPitchCalOffset", tipoffPitchCalOffset);
-                cnfg_.tipoffPitchCalOffset = tipoffPitchCalOffset;
-            }
-
-            /* Calibration Information used to calculate empty bucket weight and full calibration weight */
-            if (rubyCfg.get("QR_Min_HydOilTemp_celsius", WeighPidTbl.QR_HydOilTempMin_C)) {
-                AIS_LOG_INFO("HydOilTempMin: %d", WeighPidTbl.QR_HydOilTempMin_C);
-            }
-            else {
-                WeighPidTbl.QR_HydOilTempMin_C = 40;    // default if not defined in .rb
-                AIS_LOG_INFO("HydOilTempMin(default): %d", WeighPidTbl.QR_HydOilTempMin_C);
-            }
-
-            if (rubyCfg.get("QR_Min_LiftCylVelocity_mm_sec", WeighPidTbl.QR_LiftCylVelMin_mm_sec)) {
-                AIS_LOG_INFO("LiftCylVelMin: %d", WeighPidTbl.QR_LiftCylVelMin_mm_sec);
-            }
-            else {
-                WeighPidTbl.QR_LiftCylVelMin_mm_sec = -25;    // default if not defined in .rb
-                AIS_LOG_INFO("LiftCylVelMin(default): %d", WeighPidTbl.QR_LiftCylVelMin_mm_sec);
-            }
-
-            if (rubyCfg.get("QR_Max_LiftCylVelocity_mm_sec", WeighPidTbl.QR_LiftCylVelMax_mm_sec)) {
-                AIS_LOG_INFO("LiftCylVelCalValue: %d", WeighPidTbl.QR_LiftCylVelMax_mm_sec);
-            }
-            else {
-                WeighPidTbl.QR_LiftCylVelMax_mm_sec = 25;    // default if not defined in .rb
-                AIS_LOG_INFO("LiftCylVelCalValue(default): %d", WeighPidTbl.QR_LiftCylVelMax_mm_sec);
-            }
-
-            rubyCfg.get("FilterTauDelay", LpsSaWeighInfoTbl.FilterTauDelay);
-            rubyCfg.get("PwmcycleRate_hz", LpsSaWeighInfoTbl.PwmcycleRate);
+            machSpecificCfg.LlwTbl.WtLpsOptional = false;
         }
     }
+
+    { // LiftAngVelFilterCf — computed default: max(StageOneCf, StageTwoCf, StageThreeCf)
+        // 0.0 sentinel means "not provided" — safe as no robot has filter CF of exactly 0.
+        declare_parameter<double>("weighing.lift_ang_vel_filter_cf", 0.0);
+        const float cf = static_cast<float>(get_parameter("weighing.lift_ang_vel_filter_cf").as_double());
+        if (cf == 0.f) {
+            machSpecificCfg.LiftVelFilterCf = std::max(machSpecificCfg.LlwTbl.StageOneCf,
+                std::max(machSpecificCfg.LlwTbl.StageTwoCf, machSpecificCfg.LlwTbl.StageThreeCf));
+        }
+        else {
+            machSpecificCfg.LiftVelFilterCf = cf;
+        }
+    }
+
+    // Group 5: Zero weight config
+    {
+        // ZeroBktWtAccuracyLimit (optional, default LPS_WEIGH_BUCKET_WEIGHT_ACCURACY_HIGH=3)
+        const int raw = getIntParam("weighing.zero_bkt_wt_accuracy_limit",
+                                    static_cast<int>(LPS_WEIGH_BUCKET_WEIGHT_ACCURACY_HIGH));
+        machSpecificCfg.ZeroBktWtAccuracyLimit = static_cast<LpsWeighBktWtAccuracy_t>(raw);
+    }
+    machSpecificCfg.ZeroRangeLimit              = getFloatParam("weighing.zero_range_limit",                0.0);
+    machSpecificCfg.ZeroAdjInitTimeInterval     = static_cast<unsigned_32>(
+        getIntParam("weighing.zero_adj_init_time_interval",  0));
+    machSpecificCfg.ZeroAdjAutoTimeInterval     = static_cast<unsigned_32>(
+        getIntParam("weighing.zero_adj_auto_time_interval",  0));
+    { // ZeroAdjAutoTimeIntervalFast — computed default: = ZeroAdjAutoTimeInterval when absent
+        // 0 sentinel: safe since no robot configures a 0-second fast interval.
+        const unsigned_32 fast = static_cast<unsigned_32>(
+            getIntParam("weighing.zero_adj_auto_time_interval_fast", 0));
+        machSpecificCfg.ZeroAdjAutoTimeIntervalFast = (fast == 0u)
+            ? machSpecificCfg.ZeroAdjAutoTimeInterval
+            : fast;
+    }
+    machSpecificCfg.ZeroAdjOilTempWarnThreshold = getFloatParam("weighing.zero_adj_oil_temp_warn_threshold", 0.0);
+    { // ZeroAdjOilTempDelta (optional, default LPS_OIL_TEMP_DELTA=10.0)
+        declare_parameter<double>("weighing.zero_adj_oil_temp_delta", 10.0); // LPS_OIL_TEMP_DELTA
+        machSpecificCfg.ZeroAdjOilTempDelta = static_cast<float>(
+            get_parameter("weighing.zero_adj_oil_temp_delta").as_double());
+    }
+
+    // Group 6: Tilt compensation (optional)
+    machSpecificCfg.TiltComp.TiltCompGainScalar     = getFloatParam("weighing.tilt_comp_gain_scalar",      0.0);
+    machSpecificCfg.TiltComp.TiltCompEmptyBktWtGain = getFloatParam("weighing.tilt_comp_empty_bkt_wt_gain",0.0);
+    machSpecificCfg.TiltComp.TiltCompMaxGain         = getFloatParam("weighing.tilt_comp_max_gain",         0.0);
+
+    if (!getFloatArrayWm02("weighing.lift_cyl_ext_pct_axis", CalibTblRuby.lift_cyl_ext_pct_axis)) {
+        AIS_LOG_ERROR("LiftCylExtPctAxis read fail.");
+    }
+    if (!getFloatArrayWm02("weighing.tilt_comp_gain_data", CalibTblRuby.tilt_comp_gain_data)) {
+        AIS_LOG_ERROR("TiltCompGainData read fail.");
+    }
+    if (!getFloatArrayWm02("weighing.tilt_cyl_ext_pct_axis", CalibTblRuby.tilt_cyl_ext_pct_axis)) {
+        AIS_LOG_ERROR("TiltCylExtPctAxis read fail.");
+    }
+
+    // TiltMap pointers — CalibTblRuby is a class member so .data() lifetime = node lifetime
+    machSpecificCfg.TiltMap.NumColumns = CalibTblRuby.lift_cyl_ext_pct_axis.size();
+    machSpecificCfg.TiltMap.ColumnAxis = CalibTblRuby.lift_cyl_ext_pct_axis.data();
+    machSpecificCfg.TiltMap.NumRows    = CalibTblRuby.tilt_cyl_ext_pct_axis.size();
+    machSpecificCfg.TiltMap.RowAxis    = CalibTblRuby.tilt_cyl_ext_pct_axis.data();
+    machSpecificCfg.TiltMap.Data       = CalibTblRuby.tilt_comp_gain_data.data();
+
+    // TipoffPitchCalOffset (optional, default 0)
+    cnfg_.tipoffPitchCalOffset = getFloatParam("weighing.tipoff_pitch_cal_offset", 0.0);
+
+    // Group 7: Dig / Dump / LiveWeigh config (all optional)
+    machSpecificCfg.DigConfig.DigTargetWt           = getFloatParam("weighing.dig_target_wt",            0.0);
+    machSpecificCfg.DigConfig.DigDurationMaxLimit    = getFloatParam("weighing.dig_duration_max_limit",   0.0);
+    machSpecificCfg.DigConfig.DigDurationMinLimit    = getFloatParam("weighing.dig_duration_min_limit",   0.0);
+    machSpecificCfg.DigConfig.DigStartLimit          = getFloatParam("weighing.dig_start_limit",          0.0);
+    machSpecificCfg.DigConfig.DigEndLimit            = getFloatParam("weighing.dig_end_limit",            0.0);
+    machSpecificCfg.DigConfig.LiftLowerVelocityLimit = getFloatParam("weighing.lift_lower_velocity_limit",0.0);
+
+    machSpecificCfg.DumpConfig.TiltCylExtThreshold       = getFloatParam("weighing.tilt_cyl_ext_threshold",        0.0);
+    machSpecificCfg.DumpConfig.TiltCylExtThresholdStrict  = getFloatParam("weighing.tilt_cyl_ext_threshold_strict", 0.0);
+    machSpecificCfg.DumpConfig.FullDumpBktAngleThreshold  = getFloatParam("weighing.full_dump_bkt_angle_threshold",  0.0);
+    machSpecificCfg.DumpConfig.PartDumpBktAngleThreshold  = getFloatParam("weighing.part_dump_bkt_angle_threshold",  0.0);
+    machSpecificCfg.DumpConfig.FullRackBktAngleThreshold  = getFloatParam("weighing.full_rack_bkt_angle_threshold",  0.0);
+    machSpecificCfg.DumpConfig.TiltAngleABCThreshold      = getFloatParam("weighing.tilt_angle_abc_threshold",       0.0);
+
+    machSpecificCfg.LiveWeighConfig.FastFiltWtCf = getFloatParam("weighing.fast_filt_wt_cf", 0.0);
+    machSpecificCfg.LiveWeighConfig.SlowFiltWtCf = getFloatParam("weighing.slow_filt_wt_cf", 0.0);
+
+    // Group 8: QR calibration thresholds (optional, explicit defaults)
+    {
+        declare_parameter<int>("weighing.qr_min_hyd_oil_temp_celsius", 40);
+        WeighPidTbl.QR_HydOilTempMin_C = static_cast<int16_t>(
+            get_parameter("weighing.qr_min_hyd_oil_temp_celsius").as_int());
+        AIS_LOG_INFO("HydOilTempMin: %d", WeighPidTbl.QR_HydOilTempMin_C);
+    }
+    {
+        declare_parameter<int>("weighing.qr_min_lift_cyl_velocity_mm_sec", -25);
+        WeighPidTbl.QR_LiftCylVelMin_mm_sec = static_cast<int16_t>(
+            get_parameter("weighing.qr_min_lift_cyl_velocity_mm_sec").as_int());
+        AIS_LOG_INFO("LiftCylVelMin: %d", WeighPidTbl.QR_LiftCylVelMin_mm_sec);
+    }
+    {
+        declare_parameter<int>("weighing.qr_max_lift_cyl_velocity_mm_sec", 25);
+        WeighPidTbl.QR_LiftCylVelMax_mm_sec = static_cast<int16_t>(
+            get_parameter("weighing.qr_max_lift_cyl_velocity_mm_sec").as_int());
+        AIS_LOG_INFO("LiftCylVelCalValue: %d", WeighPidTbl.QR_LiftCylVelMax_mm_sec);
+    }
+
+    // FilterTauDelay (optional, uint8_t, default 0)
+    {
+        declare_parameter<int>("weighing.filter_tau_delay", 0);
+        LpsSaWeighInfoTbl.FilterTauDelay = static_cast<unsigned char>(
+            get_parameter("weighing.filter_tau_delay").as_int());
+    }
+
+    // PwmcycleRate_hz (optional, float, default 0)
+    LpsSaWeighInfoTbl.PwmcycleRate = getFloatParam("weighing.pwm_cycle_rate_hz", 0.0);
 
     weighInitTbl.DumpWtBuffer.PtrDumpWtBuffer = LpsWeighPtrDumpWtBuffer;
     weighInitTbl.DumpWtBuffer.bufferSize = WEIGH_LIB_DUMP_BUFF_SIZE;
@@ -425,28 +444,25 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
         everythingOk = false;
     }
 
-    { // Read the Machine Type
-        ConfigSection machineType;
-        if (!getTaskParser().getSection("MachineType", machineType)) {
-            AIS_LOG_ERROR("MachineType section not found");
+    { // Read the Machine Type — WM-05
+        declare_parameter<std::string>("machine_type.internal_msn", "NOT00000");
+        machineMSN = get_parameter("machine_type.internal_msn").as_string();
+
+        // raise diagnostic if machine model is NOT_SET (default)
+        // Also set everythingOk=false to match original behaviour where a missing
+        // MachineType section caused an explicit everythingOk=false.
+        if ("NOT00000" == machineMSN) {
+            MachineModelNotSetOut setDiag;
+            setAutonomyCondition(setDiag);
+            LpsSaWeighInfoTbl.DiagState[ACDDiagPopUp::MACHINE_MODEL_NOT_SET] = true;
+            LpsSaWeighInfoTbl.MachineModelNotSet = TRUE;
             everythingOk = false;
         }
         else {
-            machineType.get("InternalMsn", machineMSN);
-
-            // raise diagnostic if machine model is NOT_SET (default)
-            if ("NOT00000" == machineMSN) {
-                MachineModelNotSetOut setDiag;
-                setAutonomyCondition(setDiag);
-                LpsSaWeighInfoTbl.DiagState[ACDDiagPopUp::MACHINE_MODEL_NOT_SET] = true;
-                LpsSaWeighInfoTbl.MachineModelNotSet = TRUE;
-            }
-            else {
-                // Machine model has been selected
-                clearAutonomyCondition<MachineModelNotSetOut>();
-                LpsSaWeighInfoTbl.DiagState[ACDDiagPopUp::MACHINE_MODEL_NOT_SET] = false;
-                LpsSaWeighInfoTbl.MachineModelNotSet = FALSE;
-            }
+            // Machine model has been selected
+            clearAutonomyCondition<MachineModelNotSetOut>();
+            LpsSaWeighInfoTbl.DiagState[ACDDiagPopUp::MACHINE_MODEL_NOT_SET] = false;
+            LpsSaWeighInfoTbl.MachineModelNotSet = FALSE;
         }
     }
 

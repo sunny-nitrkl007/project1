@@ -82,14 +82,12 @@ myEnv.Append(
         )
     ]
 )
-
 #------------------------------------------------------
 
 sourceFiles = Glob('*.cpp')
 
 base_libs = [    'ais_task',
                  'ais_config',
-                 'ais_log',
                  'rclcpp',
                  'rcl',
                  'rcutils',

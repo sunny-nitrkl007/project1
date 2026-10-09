@@ -5,7 +5,7 @@ FILE NAME: ScsToRos2Bridge.cpp
 DESCRIPTION: See ScsToRos2Bridge.h for the design rationale.
 *******************************************************************************/
 #include "ScsToRos2Bridge.h"
-
+#include "ROS2Logger.hpp"
 #include <bitset>
 
 #include <interfaces/LpsSaWeighReqstChannel/InterfaceTypes.h>
@@ -174,8 +174,17 @@ FUNCTION NAME:task::getTaskImplementation
 *******************************************************************************/
 AbstractTaskCore* task::getTaskImplementation(void)
 {
-    rclcpp::init(0, nullptr);
-    std::cout << "[ROS2][Initialized][JOB_MGR_SCS_ROS2_BRIDGE]";
+    std::string const rosLogDir = "/tmp/appdata/CPM/log";
+    std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
+
+    setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
+    setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
+
+    if (!rclcpp::ok())
+    {
+        rclcpp::init(0, nullptr);
+    }
+    ROS2Logger::Instance().SetFeatureName("ScsToRos2Bridge");
     static ScsToRos2Bridge thisTask("ScsToRos2Bridge");
     return dynamic_cast<Task *>(&thisTask);
 }
@@ -265,7 +274,6 @@ DESCRIPTION: Binds the AIS SCS side (same interface names LpsSaJobMgrApp used
 bool ScsToRos2Bridge::initialize()
 {
     bool everythingOk = true;
-
     getLogger().log_info("ScsToRos2Bridge::initialize");
 
     rosNode_ = std::make_shared<rclcpp::Node>("job_mgr_scs_ros2_bridge_node");
@@ -273,79 +281,79 @@ bool ScsToRos2Bridge::initialize()
 
     /* AIS SCS side */
     if (!task::InterfaceDb::bind("LpsSaJobMgrReqstChannelInput", jobMgrReqstScsIn_)) {
-        AIS_LOG_ERROR("LpsSaJobMgrReqstChannelInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaJobMgrReqstChannelInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("LpsSaJobMgrRespChannelOutput", jobMgrRespScsOut_)) {
-        AIS_LOG_ERROR("LpsSaJobMgrRespChannelOutput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaJobMgrRespChannelOutput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("AisJhm2TxChannelInput", aisJhm2TxScsIn_)) {
-        AIS_LOG_ERROR("AisJhm2TxChannelInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"AisJhm2TxChannelInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("SwitchInputScsInput", switchInputScsIn_)) {
-        AIS_LOG_ERROR("SwitchInputScsInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"SwitchInputScsInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("LoadRecordOutput", loadRecordScsOut_)) {
-        AIS_LOG_ERROR("LoadRecordOutput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LoadRecordOutput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("LpsSaWeighReqstChannelInput", weighReqstScsIn_)) {
-        AIS_LOG_ERROR("LpsSaWeighReqstChannelInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaWeighReqstChannelInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("LpsSaWeighRespChannelOutput", weighRespScsOut_)) {
-        AIS_LOG_ERROR("LpsSaWeighRespChannelOutput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaWeighRespChannelOutput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("LpsSaWeighTxChannelOutput", weighTxScsOut_)) {
-        AIS_LOG_ERROR("LpsSaWeighTxChannelOutput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LpsSaWeighTxChannelOutput Interface not configured.");
         everythingOk = false;
     }
 
     /* ShmClockInput remains on the bridge's AIS SCS side; WeighApp consumes the ROS2 topic. */
     if (!task::InterfaceDb::bind("ShmClockInput", shmClockScsIn_)) {
-        AIS_LOG_ERROR("ShmClockInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"ShmClockInput Interface not configured.");
         everythingOk = false;
     }
 
     /* DisplayStateInput remains on the bridge's AIS SCS side; WeighApp consumes the ROS2 topic. */
     if (!task::InterfaceDb::bind("DisplayStateInput", displayStateScsIn_)) {
-        AIS_LOG_ERROR("DisplayStateInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DisplayStateInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("DataLinkDataInput", dataLinkDataScsIn_)) {
-        AIS_LOG_ERROR("DataLinkDataInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DataLinkDataInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("AutonomyConditionDiagnosticsTxChannelInput", autonomyConditionDiagnosticsTxScsIn_)) {
-        AIS_LOG_ERROR("AutonomyConditionDiagnosticsTxChannelInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"AutonomyConditionDiagnosticsTxChannelInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("EventDiagnosticDataInput", eventDiagnosticDataScsIn_)) {
-        AIS_LOG_ERROR("EventDiagnosticDataInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"EventDiagnosticDataInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("CalMgrCmdReqstInput", calMgrCmdReqstScsIn_)) {
-        AIS_LOG_ERROR("CalMgrCmdReqstInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"CalMgrCmdReqstInput Interface not configured.");
         everythingOk = false;
     }
 
     if (!task::InterfaceDb::bind("PrinterCnfgInput", printerCnfgScsIn_)) {
-        AIS_LOG_ERROR("PrinterCnfgInput Interface not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"PrinterCnfgInput Interface not configured.");
         everythingOk = false;
     }
 
@@ -358,7 +366,7 @@ bool ScsToRos2Bridge::initialize()
             !task::InterfaceDb::bind("LpsSaNvmCalOnTheFlyDataChannelOutput", nvmCalOnTheFlyDataScsOut_) ||
             !task::InterfaceDb::bind("CalMgrCmdRespOutput", calMgrCmdRespScsOut_) ||
             !task::InterfaceDb::bind("TipoffModelTestPointsOutput", tipoffTestPointsScsOut_)) {
-        AIS_LOG_ERROR("One or more SCS output interfaces are not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"One or more SCS output interfaces are not configured.");
         everythingOk = false;
     }
 
@@ -367,7 +375,7 @@ bool ScsToRos2Bridge::initialize()
             !task::InterfaceDb::bind("SystemHardwareHealthInput", systemHardwareHealthScsIn_) ||
             !task::InterfaceDb::bind("SystemHardwareHealthRequestOutput", systemHardwareHealthRequestScsIn_) ||
             !task::InterfaceDb::bind("ReadyToFlashStatusOutput", readyToFlashScsOut_)) {
-        AIS_LOG_ERROR("One or more weigh-app migration SCS interfaces are not configured.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"One or more weigh-app migration SCS interfaces are not configured.");
         everythingOk = false;
     }
 
@@ -435,22 +443,22 @@ bool ScsToRos2Bridge::initialize()
 
     if (!jobMgrReqstRosOut_ || !jobMgrRespRosIn_ || !aisJhm2TxRosOut_ || !switchInputRosOut_ || !loadRecordRosIn_ ||
             !weighReqstRosOut_ || !weighRespRosIn_ || !weighTxRosIn_) {
-        AIS_LOG_ERROR("Failed to initialize one or more ROS2 wrapper interfaces.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize one or more ROS2 wrapper interfaces.");
         everythingOk = false;
     }
 
     if (!shmClockRosOut_) {
-        AIS_LOG_ERROR("Failed to initialize ShmClock ROS2 wrapper interface.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize ShmClock ROS2 wrapper interface.");
         everythingOk = false;
     }
 
     if (!displayStateRosOut_) {
-        AIS_LOG_ERROR("Failed to initialize DisplayState ROS2 wrapper interface.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize DisplayState ROS2 wrapper interface.");
         everythingOk = false;
     }
 
     if (!dataLinkDataRosOut_ || !weighAppDataLinkDataRosOut_ || !autonomyConditionDiagnosticsTxRosOut_ || !eventDiagnosticDataRosOut_) {
-        AIS_LOG_ERROR("Failed to initialize one or more ROS2 diagnostic input bridge interfaces.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize one or more ROS2 diagnostic input bridge interfaces.");
         everythingOk = false;
     }
 
@@ -458,13 +466,13 @@ bool ScsToRos2Bridge::initialize()
             !weighDebugRosIn_ || !nvmCalDataRosIn_ || !nvmCalOnTheFlyDataRosIn_ ||
             !calMgrCmdReqstRosOut_ || !calMgrCmdRespRosIn_ ||
             !tipoffTestPointsRosIn_ || !printerCnfgRosOut_) {
-        AIS_LOG_ERROR("Failed to initialize one or more ROS2 output bridge interfaces.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize one or more ROS2 output bridge interfaces.");
         everythingOk = false;
     }
 
     if (!demoAppTxRosOut_ || !partNumbersRosOut_ || !systemHardwareHealthRosOut_ ||
             !systemHardwareHealthRequestRosIn_ || !readyToFlashRosIn_) {
-        AIS_LOG_ERROR("Failed to initialize one or more weigh-app migration ROS2 interfaces.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize one or more weigh-app migration ROS2 interfaces.");
         everythingOk = false;
     }
 
@@ -489,7 +497,7 @@ bool ScsToRos2Bridge::executive()
         while (jobMgrReqstScsIn_->get(reqScs)) {
             cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel reqRos = convertJobMgrReqstToRos(reqScs);
             if (!jobMgrReqstRosOut_->publish(reqRos)) {
-                AIS_LOG_ERROR("Failed to forward LpsSaJobMgrReqstChannel SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaJobMgrReqstChannel SCS->ROS2");
             }
         }
     }
@@ -501,7 +509,7 @@ bool ScsToRos2Bridge::executive()
             LpsSaJobMgrRespChannel respScs = convertJobMgrRespToScs(respRos);
             if (nullptr != jobMgrRespScsOut_) {
                 if (!jobMgrRespScsOut_->publish(respScs)) {
-                    AIS_LOG_ERROR("Failed to forward LpsSaJobMgrRespChannel ROS2->SCS");
+                    RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaJobMgrRespChannel ROS2->SCS");
                 }
             }
         }
@@ -513,7 +521,7 @@ bool ScsToRos2Bridge::executive()
         while (aisJhm2TxScsIn_->get(jhmScs)) {
             cpm_common_interfaces::msg::AisJhm2TxChannel jhmRos = convertAisJhm2TxToRos(jhmScs);
             if (!aisJhm2TxRosOut_->publish(jhmRos)) {
-                AIS_LOG_ERROR("Failed to forward AisJhm2TxChannel SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward AisJhm2TxChannel SCS->ROS2");
             }
         }
     }
@@ -524,7 +532,7 @@ bool ScsToRos2Bridge::executive()
         while (switchInputScsIn_->get(swScs)) {
             job_mgr_interfaces::msg::SwitchInputScs swRos = convertSwitchInputToRos(swScs);
             if (!switchInputRosOut_->publish(swRos)) {
-                AIS_LOG_ERROR("Failed to forward SwitchInputScs SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward SwitchInputScs SCS->ROS2");
             }
         }
     }
@@ -536,7 +544,7 @@ bool ScsToRos2Bridge::executive()
             LpsSaLoadRecordChannel lrScs = convertLoadRecordToScs(lrRos);
             if (nullptr != loadRecordScsOut_) {
                 if (!loadRecordScsOut_->publish(lrScs)) {
-                    AIS_LOG_ERROR("Failed to forward LpsSaLoadRecordChannel ROS2->SCS");
+                    RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaLoadRecordChannel ROS2->SCS");
                 }
             }
         }
@@ -548,7 +556,7 @@ bool ScsToRos2Bridge::executive()
         while (weighReqstScsIn_->get(reqScs)) {
             cpm_common_interfaces::msg::LpsSaWeighReqstChannel reqRos = convertWeighReqstToRos(reqScs);
             if (nullptr != weighReqstRosOut_ && !weighReqstRosOut_->publish(reqRos)) {
-                AIS_LOG_ERROR("Failed to forward LpsSaWeighReqstChannel SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaWeighReqstChannel SCS->ROS2");
             }
         }
     }
@@ -559,7 +567,7 @@ bool ScsToRos2Bridge::executive()
         while (weighRespRosIn_->get(respRos)) {
             LpsSaWeighRespChannel respScs = convertWeighRespToScs(respRos);
             if (nullptr != weighRespScsOut_ && !weighRespScsOut_->publish(respScs)) {
-                AIS_LOG_ERROR("Failed to forward LpsSaWeighRespChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaWeighRespChannel ROS2->SCS");
             }
         }
     }
@@ -570,7 +578,7 @@ bool ScsToRos2Bridge::executive()
         while (weighTxRosIn_->get(txRos)) {
             LpsSaWeighTxChannel txScs = convertWeighTxToScs(txRos);
             if (nullptr != weighTxScsOut_ && !weighTxScsOut_->publish(txScs)) {
-                AIS_LOG_ERROR("Failed to forward LpsSaWeighTxChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaWeighTxChannel ROS2->SCS");
             }
         }
     }
@@ -581,7 +589,7 @@ bool ScsToRos2Bridge::executive()
         while (shmClockScsIn_->get(shmClockScs)) {
             cpm_common_interfaces::msg::ShmClockInput shmClockRos = convertShmClockToRos(shmClockScs);
             if (nullptr != shmClockRosOut_ && !shmClockRosOut_->publish(shmClockRos)) {
-                AIS_LOG_ERROR("Failed to forward ShmClock SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward ShmClock SCS->ROS2");
             }
         }
     }
@@ -592,7 +600,7 @@ bool ScsToRos2Bridge::executive()
         while (displayStateScsIn_->get(displayStateScs)) {
             cpm_common_interfaces::msg::LpsSaUIDisplayStateInterface displayStateRos = convertDisplayStateToRos(displayStateScs);
             if (nullptr != displayStateRosOut_ && !displayStateRosOut_->publish(displayStateRos)) {
-                AIS_LOG_ERROR("Failed to forward DisplayStateInput SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward DisplayStateInput SCS->ROS2");
             }
         }
     }
@@ -603,12 +611,12 @@ bool ScsToRos2Bridge::executive()
         while (dataLinkDataScsIn_->get(dataLinkDataScs)) {
             job_mgr_interfaces::msg::DataLinkData dataLinkDataRos = convertDataLinkDataToRos(dataLinkDataScs);
             if (nullptr != dataLinkDataRosOut_ && !dataLinkDataRosOut_->publish(dataLinkDataRos)) {
-                AIS_LOG_ERROR("Failed to forward DataLinkData SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward DataLinkData SCS->ROS2");
             }
 
             weigh_app_interfaces::msg::DataLinkData weighAppDataLinkDataRos = convertWeighAppDataLinkDataToRos(dataLinkDataScs);
             if (nullptr != weighAppDataLinkDataRosOut_ && !weighAppDataLinkDataRosOut_->publish(weighAppDataLinkDataRos)) {
-                AIS_LOG_ERROR("Failed to forward WeighApp DataLinkData SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward WeighApp DataLinkData SCS->ROS2");
             }
         }
     }
@@ -620,7 +628,7 @@ bool ScsToRos2Bridge::executive()
             cpm_common_interfaces::msg::AutonomyConditionDiagnosticsTxChannel acdTxRos =
                     convertAutonomyConditionDiagnosticsTxToRos(acdTxScs);
             if (nullptr != autonomyConditionDiagnosticsTxRosOut_ && !autonomyConditionDiagnosticsTxRosOut_->publish(acdTxRos)) {
-                AIS_LOG_ERROR("Failed to forward AutonomyConditionDiagnosticsTx SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward AutonomyConditionDiagnosticsTx SCS->ROS2");
             }
         }
     }
@@ -631,7 +639,7 @@ bool ScsToRos2Bridge::executive()
         while (eventDiagnosticDataScsIn_->get(eventDiagnosticDataScs)) {
             job_mgr_interfaces::msg::EventDiagnosticData eventDiagnosticDataRos = convertEventDiagnosticDataToRos(eventDiagnosticDataScs);
             if (nullptr != eventDiagnosticDataRosOut_ && !eventDiagnosticDataRosOut_->publish(eventDiagnosticDataRos)) {
-                AIS_LOG_ERROR("Failed to forward EventDiagnosticData SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward EventDiagnosticData SCS->ROS2");
             }
         }
     }
@@ -640,7 +648,7 @@ bool ScsToRos2Bridge::executive()
         job_mgr_interfaces::msg::LpsSaJobMgrTxChannel txRos;
         while (jobMgrTxRosIn_->get(txRos)) {
             if (!jobMgrTxScsOut_->publish(convertJobMgrTxToScs(txRos))) {
-                AIS_LOG_ERROR("Failed to forward LpsSaJobMgrTxChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaJobMgrTxChannel ROS2->SCS");
             }
         }
     }
@@ -652,7 +660,7 @@ bool ScsToRos2Bridge::executive()
             debugScs.currentState = debugRos.current_state;
             debugScs.tipoffAssistActivationCount = debugRos.tipoff_assist_activation_count;
             if (!jobMgrDebugScsOut_->publish(debugScs)) {
-                AIS_LOG_ERROR("Failed to forward LpsSaJobMgrDebugChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaJobMgrDebugChannel ROS2->SCS");
             }
         }
     }
@@ -661,7 +669,7 @@ bool ScsToRos2Bridge::executive()
         job_mgr_interfaces::msg::OutputChannel outputRos;
         while (outputChannelRosIn_->get(outputRos)) {
             if (!outputChannelScsOut_->publish(convertOutputChannelToScs(outputRos))) {
-                AIS_LOG_ERROR("Failed to forward OutputChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward OutputChannel ROS2->SCS");
             }
         }
     }
@@ -670,7 +678,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::LpsSaWeighInitDebugChannel debugRos;
         while (weighInitDebugRosIn_->get(debugRos)) {
             if (!weighInitDebugScsOut_->publish(convertWeighInitDebugToScs(debugRos))) {
-                AIS_LOG_ERROR("Failed to forward LpsSaWeighInitDebugChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaWeighInitDebugChannel ROS2->SCS");
             }
         }
     }
@@ -680,7 +688,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::LpsSaWeighDebugChannel debugRos;
         while (weighDebugRosIn_->get(debugRos)) {
             if (!weighDebugScsOut_->publish(convertWeighDebugToScs(debugRos))) {
-                AIS_LOG_ERROR("Failed to forward LpsSaWeighDebugChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaWeighDebugChannel ROS2->SCS");
             }
         }
     }
@@ -690,7 +698,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::LpsSaNvmCalDataChannel nvmCalRos;
         while (nvmCalDataRosIn_->get(nvmCalRos)) {
             if (!nvmCalDataScsOut_->publish(convertNvmCalDataToScs(nvmCalRos))) {
-                AIS_LOG_ERROR("Failed to forward LpsSaNvmCalDataChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaNvmCalDataChannel ROS2->SCS");
             }
         }
     }
@@ -700,7 +708,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel nvmCalOtfRos;
         while (nvmCalOnTheFlyDataRosIn_->get(nvmCalOtfRos)) {
             if (!nvmCalOnTheFlyDataScsOut_->publish(convertNvmCalOnTheFlyDataToScs(nvmCalOtfRos))) {
-                AIS_LOG_ERROR("Failed to forward LpsSaNvmCalOnTheFlyDataChannel ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward LpsSaNvmCalOnTheFlyDataChannel ROS2->SCS");
             }
         }
     }
@@ -710,7 +718,7 @@ bool ScsToRos2Bridge::executive()
         CalMgrCmdReqst reqstScs;
         while (calMgrCmdReqstScsIn_->get(reqstScs)) {
             if (!calMgrCmdReqstRosOut_->publish(convertCalMgrCmdReqstToRos(reqstScs))) {
-                AIS_LOG_ERROR("Failed to forward CalMgrCmdReqst SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward CalMgrCmdReqst SCS->ROS2");
             }
         }
     }
@@ -720,7 +728,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::CalMgrCmdResp respRos;
         while (calMgrCmdRespRosIn_->get(respRos)) {
             if (!calMgrCmdRespScsOut_->publish(convertCalMgrCmdRespToScs(respRos))) {
-                AIS_LOG_ERROR("Failed to forward CalMgrCmdResp ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward CalMgrCmdResp ROS2->SCS");
             }
         }
     }
@@ -729,7 +737,7 @@ bool ScsToRos2Bridge::executive()
         DemoAppTxChannel demoScs;
         while (demoAppTxScsIn_->get(demoScs)) {
             if (!demoAppTxRosOut_->publish(convertDemoAppTxToRos(demoScs))) {
-                AIS_LOG_ERROR("Failed to forward DemoAppTxChannel SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward DemoAppTxChannel SCS->ROS2");
             }
         }
     }
@@ -738,7 +746,7 @@ bool ScsToRos2Bridge::executive()
         PartNumbers partNumbersScs;
         while (partNumbersScsIn_->get(partNumbersScs)) {
             if (!partNumbersRosOut_->publish(convertPartNumbersToRos(partNumbersScs))) {
-                AIS_LOG_ERROR("Failed to forward PartNumbers SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward PartNumbers SCS->ROS2");
             }
         }
     }
@@ -747,7 +755,7 @@ bool ScsToRos2Bridge::executive()
         SystemHardwareHealth healthScs;
         while (systemHardwareHealthScsIn_->get(healthScs)) {
             if (!systemHardwareHealthRosOut_->publish(convertSystemHardwareHealthToRos(healthScs))) {
-                AIS_LOG_ERROR("Failed to forward SystemHardwareHealth SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward SystemHardwareHealth SCS->ROS2");
             }
         }
     }
@@ -756,7 +764,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::SystemHardwareHealthRequest requestRos;
         while (systemHardwareHealthRequestRosIn_->get(requestRos)) {
             if (!systemHardwareHealthRequestScsIn_->publish(convertSystemHardwareHealthRequestToScs(requestRos))) {
-                AIS_LOG_ERROR("Failed to forward SystemHardwareHealthRequest ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward SystemHardwareHealthRequest ROS2->SCS");
             }
         }
     }
@@ -765,7 +773,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::ReadyToFlashStatus readyRos;
         while (readyToFlashRosIn_->get(readyRos)) {
             if (!readyToFlashScsOut_->publish(convertReadyToFlashToScs(readyRos))) {
-                AIS_LOG_ERROR("Failed to forward ReadyToFlashStatus ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward ReadyToFlashStatus ROS2->SCS");
             }
         }
     }
@@ -775,7 +783,7 @@ bool ScsToRos2Bridge::executive()
         weigh_app_interfaces::msg::TipoffModelTestPoints tipoffRos;
         while (tipoffTestPointsRosIn_->get(tipoffRos)) {
             if (!tipoffTestPointsScsOut_->publish(convertTipoffTestPointsToScs(tipoffRos))) {
-                AIS_LOG_ERROR("Failed to forward TipoffModelTestPoints ROS2->SCS");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward TipoffModelTestPoints ROS2->SCS");
             }
         }
     }
@@ -785,7 +793,7 @@ bool ScsToRos2Bridge::executive()
         LpsSaTotalsPrinterCnfgInterface printerCnfg;
         while (printerCnfgScsIn_->get(printerCnfg)) {
             if (!printerCnfgRosOut_->publish(convertPrinterCnfgToRos(printerCnfg))) {
-                AIS_LOG_ERROR("Failed to forward PrinterCnfg SCS->ROS2");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward PrinterCnfg SCS->ROS2");
             }
         }
     }
@@ -798,7 +806,7 @@ FUNCTION NAME:ScsToRos2Bridge::cleanup
 *******************************************************************************/
 void ScsToRos2Bridge::cleanup()
 {
-    AIS_LOG_INFO("ScsToRos2Bridge::cleanup");
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"ScsToRos2Bridge::cleanup");
     jobMgrReqstRosOut_.reset();
     jobMgrRespRosIn_.reset();
     aisJhm2TxRosOut_.reset();
@@ -1832,26 +1840,26 @@ weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg ScsToRos2Bridge::convertPrinte
 
 void ScsToRos2Bridge::printGraphInfo()
 {
-   AIS_LOG_ERROR("================ ROS2 Nodes =======================");
+   RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"================ ROS2 Nodes =======================");
  
     auto node_names = rosNode_->get_node_names();
  
     for (const auto & node : node_names)
     {
-       AIS_LOG_ERROR("%s ", node.c_str());
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"%s ", node.c_str());
     }
  
-   AIS_LOG_ERROR("============= ROS2 Topics ===========================");
+   RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"============= ROS2 Topics ===========================");
  
     auto topics = rosNode_->get_topic_names_and_types();
  
     for (const auto & topic : topics)
     {
-       AIS_LOG_ERROR("  %s ", topic.first.c_str());
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"  %s ", topic.first.c_str());
  
         for (const auto & type : topic.second)
         {
-           AIS_LOG_ERROR("      Type: %s ", type.c_str());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"      Type: %s ", type.c_str());
         }
     }
  

@@ -17,7 +17,6 @@ DESCRIPTION:
 #include <string>
 
 #include <ais/task/Task.h>
-#include <ais/log/AisLogger.h>
 
 #include <interfaces/LpsSaJobMgrReqstChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaJobMgrRespChannel/InterfaceTypes.h>

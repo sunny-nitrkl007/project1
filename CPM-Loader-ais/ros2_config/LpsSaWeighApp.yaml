@@ -1,0 +1,38 @@
+LpsSaWeighApp:
+  ros__parameters:
+    # Parameters section (LpsSaWeighApp.rb)
+    scheduler: "SCHED_RR"
+    scheduler_priority: 19
+
+    # Weighing App execution rate — 20 msec / 50 Hz
+    cycle_rate_hz: 50.0
+
+    # NVM storage and temp paths
+    storage_root: "/opt/appdata/CPM/LpsSaWeighApp/nvm"
+    temp_root: "/tmp/appdata/CPM/LpsSaWeighApp"
+
+    # Weighing App transmit optimised execution period in seconds (100 msec)
+    cpm_exec_tx_period: 0.1
+
+    # Weighing library execution rate in seconds (20 msec)
+    cpm_exec_rate: 0.02
+
+    # ScsRxTimeouts section (LpsSaWeighApp.rb)
+    system_hardware_health_request_tx_rate_sec: 0.5
+
+    # ChassisIMU section (LpsSaWeighApp.rb)
+    # All values are filter/bias tuning constants for the chassis IMU.
+    chassis_imu.bias_jerk_filter_factor: 0.013245         # Jerk Filter Factor (1.5 s time constant)
+    chassis_imu.bias_ang_accel_filter_factor: 0.013245    # Angular Accel Filter Factor (1.5 s time constant)
+    chassis_imu.bias_filter_factor: 0.006263              # Low-pass filter factor for bias estimation (0.05 Hz, ~3 s time constant)
+    chassis_imu.bias_speed_threshold: 0.1                 # Linear speed threshold to enable bias estimation (m/s)
+    chassis_imu.bias_jerk_threshold: 10.0                 # Jerk threshold to enable bias estimation (m/s^3)
+    chassis_imu.bias_ang_accel_threshold: 2.0             # Angular acceleration threshold (rad/s^2)
+    chassis_imu.bias_ang_vel_threshold: 0.07              # Angular velocity threshold (rad/s)
+    chassis_imu.bias_debounce_time_seconds: 0.3           # Time conditions must be true before updating bias (s)
+    chassis_imu.ang_fusion_filter_factor: 0.99            # Angle Fusion filter factor (0.5 rad/s)
+    chassis_imu.roll_filter_factor: 0.672621              # Roll Filter (10 Hz)
+    chassis_imu.pitch_notch_frequency: 7.5                # Pitch Notch Filter (rad/s, ~1.2 Hz)
+    chassis_imu.pitch_notch_damping: 0.75                 # Pitch Notch Damping Ratio
+    chassis_imu.pitch_filter_factor: 0.672621             # Pitch Filter (10 Hz)
+    chassis_imu.vel_fusion_filter_factor: 0.941781        # Velocity Fusion filter factor (3 rad/s)

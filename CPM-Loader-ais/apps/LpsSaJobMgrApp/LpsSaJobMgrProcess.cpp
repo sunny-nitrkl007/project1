@@ -8,7 +8,7 @@ DESCRIPTION:
 ** -- #Include's --
 *******************************************************************************/
 #include <stdio.h>
-
+#include "ROS2Logger.hpp"
 #include "LpsSaJobMgrApp.h"
 #include <clock_tm_zone_proto.h>
 #include <chrono>
@@ -99,7 +99,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
         if (LpsSaJobMgrWmOutput.loadUpdate.addPass) {
             tasks_.currentTaskLoadAddPass(LpsSaJobMgrWmOutput.loadUpdate.addPassWeight,
                     LpsSaJobMgrWmOutput.loadUpdate.addPassAccuracy, serviceHourMeter_);
-	        AIS_LOG_NOTICE("Load Change - addPass");
+	        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - addPass");
             changed = true;
         }
 
@@ -117,13 +117,13 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
                 LpsSaJobMgrPtRestoreTruck(); // Make sure the information gets reflected in the pass tracker truck
             }
 
-            AIS_LOG_NOTICE("Load Change - removePass");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - removePass");
             changed = true;
         }
 
         if (LpsSaJobMgrWmOutput.loadUpdate.clear) {
             tasks_.currentTaskLoadClearCurrentSubtotal();
-            AIS_LOG_NOTICE("Load Change - clear");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - clear");
             changed = true;
         }
 
@@ -226,7 +226,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
                 }
             }
 
-            AIS_LOG_NOTICE("Load Change - store");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - store");
             changed = true;
         }
 
@@ -246,7 +246,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
             //reset command
             LpsJobMgrJobTrackerInfoTbl.splitModeNextPayloadCmd = false;
 
-            AIS_LOG_NOTICE("Load Change - next payload subtotal");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - next payload subtotal");
             changed = true;
         }
 
@@ -266,7 +266,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
             //reset command
             LpsJobMgrJobTrackerInfoTbl.selectSubtotalCmd = false;
 
-            AIS_LOG_NOTICE("Load Change - select subtotal");
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Load Change - select subtotal");
             changed = true;
         }
 
@@ -333,11 +333,11 @@ RETURN VALUE:void
 void LpsSaJobMgrApp::LpsSaJobMgrScsChkHornAction()
 {
     if (config_.hornStoreEnable) {
-        AIS_LOG_INFO("Horn: ACTIVACTED");
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Horn: ACTIVACTED");
         LpsSaJobMgrHornOnStoreAction(); // send scs object to OutputApp to drive Output Pin
     }
     else {
-        AIS_LOG_INFO("Horn: NOT ACTIVATED");
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Horn: NOT ACTIVATED");
     }
 }
 

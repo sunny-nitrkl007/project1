@@ -229,14 +229,14 @@ private:
     TaskParser& getTaskParser() { return taskParser_; }
     const TaskParser& getTaskParser() const { return taskParser_; }
     void setAutonomyCondition(const AutonomyCondition& condition) {
-        AIS_LOG_DEBUG("Set autonomy condition %s", condition.getConditionType().c_str());
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Set autonomy condition %s", condition.getConditionType().c_str());
     }
     template<typename Condition>
     void clearAutonomyCondition() {
-        AIS_LOG_DEBUG("Clear autonomy condition %s", Condition::getConditionTypeString().c_str());
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Clear autonomy condition %s", Condition::getConditionTypeString().c_str());
     }
     void clearAutonomyCondition(const AutonomyCondition& condition) {
-        AIS_LOG_DEBUG("Clear autonomy condition %s", condition.getConditionType().c_str());
+       RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Clear autonomy condition %s", condition.getConditionType().c_str());
     }
 
 
@@ -328,7 +328,7 @@ private:
         uint16_t warning = 0;
 
         unsigned int FilterSettleDelay = 0;
-
+        
         LpsLeverInfo_t LiftLeverInfo = {};  /* zero initialize */
         bool CalOvrAcknowledge = false;
 

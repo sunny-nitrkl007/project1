@@ -4,7 +4,8 @@
 #include <oel_pack.h>
 #include <catdllib_fid_def.h>
 
-#include <ais/log/Logger.h>
+#include <ais/task/Task.h>
+#include "ROS2Logger.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "ros2wrapper/RosOutputInterface.h"
@@ -56,17 +57,17 @@ TipoffAssist::~TipoffAssist() {
 
 bool TipoffAssist::initialize(LpsSaMachineProperties_t const& machine_properties, std::shared_ptr<rclcpp::Node> rosNode) {
     uint32_t appNumber = machine_properties.internalMsn;
-    AIS_LOG_INFO("TipoffAssist::initialize");
+   RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"TipoffAssist::initialize");
 
     // If we don't have an application number, we won't run.
     if (0 == appNumber) {
-        AIS_LOG_WARN("Tip-off Assist not supported for this machine configuration.");
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Tip-off Assist not supported for this machine configuration.");
     }
 
     TipoffModelTestPointsRosOut_ = new TipoffModelTestPointsPublisher(
             rosNode, "tipoff_model_test_points");
     if (!TipoffModelTestPointsRosOut_) {
-        AIS_LOG_WARN("TipoffModelTestPointsRosOut_ failed to initialize.");
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"TipoffModelTestPointsRosOut_ failed to initialize.");
     }
 
     initTipoffAssistModelData(machine_properties);
@@ -85,7 +86,7 @@ TipoffAssistOutputs* TipoffAssist::update(TipoffAssistInputs& tipoff_inputs) {
     /* unit test with data from ppg */
     if (TIPOFF_ASSIST_RUN_UNIT_TEST) {
         readCSV(tipoff_inputs);
-        AIS_LOG_INFO("Tipoff Assist in Unit Test Mode");
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Tipoff Assist in Unit Test Mode");
     }
 
     /* Update inputs */
@@ -261,7 +262,7 @@ static void readCSV(TipoffAssistInputs& tipoff_inputs) {
 
     if (total_rows == 0)
     {
-        AIS_LOG_ERROR("Attempt to run tipoff assist unit test with no data file records");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Attempt to run tipoff assist unit test with no data file records");
     }
 
     /* get row */

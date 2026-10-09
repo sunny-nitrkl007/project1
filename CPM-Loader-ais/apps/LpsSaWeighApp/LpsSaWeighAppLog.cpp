@@ -7,7 +7,7 @@
 // Rapid JSON
 #include <ext/rapidjson/RapidJsonGuarded.h>
 
-#include <ais/log/Logger.h>
+#include "ROS2Logger.hpp"
 
 #include <fileio/oflocker.hpp>
 #include <fileio/sha1_fstream.hpp>
@@ -54,7 +54,7 @@ static void makeAppLogRoot()
     fs::create_directories(WEIGH_APP_LOG_ROOT, ec);
 
     if (ec) {
-        AIS_LOG_ERROR("Cannot create %s directory for logging.", WEIGH_APP_LOG_ROOT);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Cannot create %s directory for logging.", WEIGH_APP_LOG_ROOT);
     }
 }
 
@@ -78,7 +78,7 @@ void LpsSaWeighApp::logWeighProductIdFile(const std::string& newProductId) const
         myFile.close();
     }
     else {
-        AIS_LOG_INFO("Cannot create %s file for logging.", WEIGH_PRODUCT_ID_LOG_PATH);
+       RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Cannot create %s file for logging.", WEIGH_PRODUCT_ID_LOG_PATH);
     }
 }
 
@@ -93,7 +93,7 @@ void LpsSaWeighApp::logWeighRangeWeighInit() const
         ofs.close();
     }
     else {
-        AIS_LOG_ERROR("Cannot create %s file for logging.", WEIGH_RANGE_WEIGH_LOG_PATH);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Cannot create %s file for logging.", WEIGH_RANGE_WEIGH_LOG_PATH);
     }
 }
 
@@ -217,10 +217,10 @@ bool LpsSaWeighApp::publishRecentWeighResults(const boost::filesystem::path& fil
 
             ofl.close();
             success = true;
-            AIS_LOG_INFO("%s: published JSON file.", filePath.filename().c_str());
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%s: published JSON file.", filePath.filename().c_str());
         }
         else {
-            AIS_LOG_ERROR("%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"%s: file could not be opened and locked for publishing.", filePath.filename().c_str());
         }
     }
 
@@ -228,11 +228,11 @@ bool LpsSaWeighApp::publishRecentWeighResults(const boost::filesystem::path& fil
         try {
             if (boost::filesystem::is_regular_file(filePath)) {
                 boost::filesystem::remove(filePath);
-                AIS_LOG_WARN("%s: file removed.", filePath.filename().c_str());
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file removed.", filePath.filename().c_str());
             }
         }
         catch (const boost::filesystem::filesystem_error& e) {
-            AIS_LOG_WARN("%s: file could not be removed.", filePath.filename().c_str());
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"%s: file could not be removed.", filePath.filename().c_str());
         }
     }
 

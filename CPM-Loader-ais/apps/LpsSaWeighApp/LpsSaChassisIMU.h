@@ -9,8 +9,10 @@
 #include <ais/config/TaskParser.h>
 #include <ais/config/ConfigSection.h>
 
-#include <interfaces/DataLinkData/DataLinkParam.h>
+#include <rclcpp/rclcpp.hpp>
 
+#include <interfaces/DataLinkData/DataLinkParam.h>
+#include "ROS2Logger.hpp"
 #include <imu/imu.hpp>
 
 #include "LpsSaIncludes.h"
@@ -81,96 +83,50 @@ public:
         imu(),
         imuOk(false) {}
 
-    bool init(const TaskParser& taskParser) {
+    bool init(rclcpp::Node& node) {
         imu::IMU::Config config = defaultIMUConfig();
 
-        { // Get update period
-            ConfigSection cs;
-            if (taskParser.getSection("Parameters", cs)) {
-                float cycleRate_hz;
-                if (cs.get("cycleRate_hz", cycleRate_hz)) {
-                    config.updatePeriodSeconds = 1.f / cycleRate_hz;
-                    AIS_LOG_DEBUG("Chassis IMU config.updatePeriodSeconds = %f", config.updatePeriodSeconds);
-                }
+        // All ChassisIMU and cycle-rate parameters are declared with defaults
+        // matching LpsSaWeighApp.rb values. YAML overrides take effect here.
+        // cycle_rate_hz is already declared in LpsSaWeighApp.cpp initialize();
+        // read it directly without re-declaring.
+        {
+            double cycleRate_hz = node.get_parameter("cycle_rate_hz").as_double();
+            if (cycleRate_hz > 0.0) {
+                config.updatePeriodSeconds = static_cast<float>(1.0 / cycleRate_hz);
             }
         }
 
-        { // Get IMU config
-            ConfigSection cs;
-            if (taskParser.getSection("ChassisIMU", cs)) {
-                float parameter;
+        // Declare ChassisIMU params with .rb defaults; YAML can override any of them.
+        node.declare_parameter<double>("chassis_imu.bias_jerk_filter_factor",       0.013245);
+        node.declare_parameter<double>("chassis_imu.bias_ang_accel_filter_factor",  0.013245);
+        node.declare_parameter<double>("chassis_imu.bias_filter_factor",            0.006263);
+        node.declare_parameter<double>("chassis_imu.bias_speed_threshold",          0.1);
+        node.declare_parameter<double>("chassis_imu.bias_jerk_threshold",           10.0);
+        node.declare_parameter<double>("chassis_imu.bias_ang_accel_threshold",      2.0);
+        node.declare_parameter<double>("chassis_imu.bias_ang_vel_threshold",        0.07);
+        node.declare_parameter<double>("chassis_imu.bias_debounce_time_seconds",    0.3);
+        node.declare_parameter<double>("chassis_imu.ang_fusion_filter_factor",      1.0 - 0.01);
+        node.declare_parameter<double>("chassis_imu.roll_filter_factor",            0.672621);
+        node.declare_parameter<double>("chassis_imu.pitch_notch_frequency",         7.5);
+        node.declare_parameter<double>("chassis_imu.pitch_notch_damping",           0.75);
+        node.declare_parameter<double>("chassis_imu.pitch_filter_factor",           0.672621);
+        node.declare_parameter<double>("chassis_imu.vel_fusion_filter_factor",      1.0 - 0.058219);
 
-                if (cs.get("BiasJerkFilterFactor", parameter)) {
-                    config.bias.jerkFilterFactor = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.jerkFilterFactor = %f", config.bias.jerkFilterFactor);
-                }
-
-                if (cs.get("BiasAngAccelFilterFactor", parameter)) {
-                    config.bias.angAccelFilterFactor = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.angAccelFilterFactor = %f", config.bias.angAccelFilterFactor);
-                }
-
-                if (cs.get("BiasFilterFactor", parameter)) {
-                    config.bias.biasFilterFactor = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.biasFilterFactor = %f", config.bias.biasFilterFactor);
-                }
-
-                if (cs.get("BiasSpeedThreshold", parameter)) {
-                    config.bias.speedThreshold = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.speedThreshold = %f", config.bias.speedThreshold);
-                }
-
-                if (cs.get("BiasJerkThreshold", parameter)) {
-                    config.bias.jerkThreshold = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.jerkThreshold = %f", config.bias.jerkThreshold);
-                }
-
-                if (cs.get("BiasAngAccelThreshold", parameter)) {
-                    config.bias.angAccelThreshold = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.angAccelThreshold = %f", config.bias.angAccelThreshold);
-                }
-
-                if (cs.get("BiasAngVelThreshold", parameter)) {
-                    config.bias.angVelThreshold = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.angVelThreshold = %f", config.bias.angVelThreshold);
-                }
-
-                if (cs.get("BiasDebounceTimeSeconds", parameter)) {
-                    config.bias.debounceTimeSeconds = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.bias.debounceTimeSeconds = %f", config.bias.debounceTimeSeconds);
-                }
-
-                if (cs.get("AngFusionFilterFactor", parameter)) {
-                    config.angFusionFilterFactor = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.angFusionFilterFactor = %f", config.angFusionFilterFactor);
-                }
-
-                if (cs.get("RollFilterFactor", parameter)) {
-                    config.rollFilterFactor = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.rollFilterFactor = %f", config.rollFilterFactor);
-                }
-
-                if (cs.get("PitchNotchFrequency", parameter)) {
-                    config.pitchNotchFrequency = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.pitchNotchFrequency = %f", config.pitchNotchFrequency);
-                }
-
-                if (cs.get("PitchNotchDamping", parameter)) {
-                    config.pitchNotchDamping = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.pitchNotchDamping = %f", config.pitchNotchDamping);
-                }
-
-                if (cs.get("PitchFilterFactor", parameter)) {
-                    config.pitchFilterFactor = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.pitchFilterFactor = %f", config.pitchFilterFactor);
-                }
-
-                if (cs.get("VelFusionFilterFactor", parameter)) {
-                    config.velFusionFilterFactor = parameter;
-                    AIS_LOG_DEBUG("Chassis IMU config.velFusionFilterFactor = %f", config.velFusionFilterFactor);
-                }
-            }
-        }
+        config.bias.jerkFilterFactor      = static_cast<float>(node.get_parameter("chassis_imu.bias_jerk_filter_factor").as_double());
+        config.bias.angAccelFilterFactor  = static_cast<float>(node.get_parameter("chassis_imu.bias_ang_accel_filter_factor").as_double());
+        config.bias.biasFilterFactor      = static_cast<float>(node.get_parameter("chassis_imu.bias_filter_factor").as_double());
+        config.bias.speedThreshold        = static_cast<float>(node.get_parameter("chassis_imu.bias_speed_threshold").as_double());
+        config.bias.jerkThreshold         = static_cast<float>(node.get_parameter("chassis_imu.bias_jerk_threshold").as_double());
+        config.bias.angAccelThreshold     = static_cast<float>(node.get_parameter("chassis_imu.bias_ang_accel_threshold").as_double());
+        config.bias.angVelThreshold       = static_cast<float>(node.get_parameter("chassis_imu.bias_ang_vel_threshold").as_double());
+        config.bias.debounceTimeSeconds   = static_cast<float>(node.get_parameter("chassis_imu.bias_debounce_time_seconds").as_double());
+        config.angFusionFilterFactor      = static_cast<float>(node.get_parameter("chassis_imu.ang_fusion_filter_factor").as_double());
+        config.rollFilterFactor           = static_cast<float>(node.get_parameter("chassis_imu.roll_filter_factor").as_double());
+        config.pitchNotchFrequency        = static_cast<float>(node.get_parameter("chassis_imu.pitch_notch_frequency").as_double());
+        config.pitchNotchDamping          = static_cast<float>(node.get_parameter("chassis_imu.pitch_notch_damping").as_double());
+        config.pitchFilterFactor          = static_cast<float>(node.get_parameter("chassis_imu.pitch_filter_factor").as_double());
+        config.velFusionFilterFactor      = static_cast<float>(node.get_parameter("chassis_imu.vel_fusion_filter_factor").as_double());
 
         /*
          * Default calibration rotation matrix

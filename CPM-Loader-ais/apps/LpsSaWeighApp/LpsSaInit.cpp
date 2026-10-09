@@ -10,7 +10,7 @@ DESCRIPTION:This file provides the initialization routines for the application s
 *******************************************************************************/
 #include <thread>
 #include <chrono>
- 
+#include "ROS2Logger.hpp"
 #include <cpm_filter.h>
  
 #include "LpsSaWeighApp.h"
@@ -67,14 +67,14 @@ LpsSaInitErrorType_t LpsSaWeighApp::LpsSaInit()
     /* Copy the nvm values into weigh init table */
     copyCalNVMToWeighInitTable(LpsSaInitTbl.WeighInitTbl.MachSpecificCfg.CalibTbl);
  
-    AIS_LOG_INFO("MachSpecificCfg.CalibTbl.Calwt %f", LpsSaInitTbl.WeighInitTbl.MachSpecificCfg.CalibTbl.CalWeight);
-    AIS_LOG_INFO("MachSpecificCfg.CalibTbl.ZeroWeight %f", LpsSaInitTbl.WeighInitTbl.MachSpecificCfg.CalibTbl.ZeroWeight);
+   RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"MachSpecificCfg.CalibTbl.Calwt %f", LpsSaInitTbl.WeighInitTbl.MachSpecificCfg.CalibTbl.CalWeight);
+   RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"MachSpecificCfg.CalibTbl.ZeroWeight %f", LpsSaInitTbl.WeighInitTbl.MachSpecificCfg.CalibTbl.ZeroWeight);
  
     /* Initializing the LPS Weighing library */
     lpsWeighRet = LpsInit(&LpsSaInitTbl.WeighInitTbl);
  
     if (LPS_INIT_SUCCESS != lpsWeighRet) {
-        AIS_LOG_WARN("LpsInit return code = %d", lpsWeighRet);
+        RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"LpsInit return code = %d", lpsWeighRet);
         return LPS_SA_INIT_DEPENDENT_LIBRARY_INIT_FAIL;
     }
  
@@ -112,7 +112,7 @@ LpsSaInitErrorType_t LpsSaWeighApp::LpsSaInit()
         WeighPidTbl.PloadSysCalWtEntryReqStat = CAL_ENTRY_NOT_REQUIRED;
     }
  
-    AIS_LOG_INFO("CalStatus %x", payloadCalNvmTbl_.data.CalStatus);
+   RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CalStatus %x", payloadCalNvmTbl_.data.CalStatus);
  
     return LPS_SA_INIT_SUCCESS;
 }
@@ -173,7 +173,7 @@ boolean LpsSaWeighApp::CalLibInit(void)
  
     LpsCalInitErrorTypes_t calRet = LpsCalInit(&calCfg, &payloadCalNvmTbl_.data);
  
-    AIS_LOG_INFO("*************** LpsCalInit %d", calRet);
+   RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"*************** LpsCalInit %d", calRet);
  
     if (LPS_CAL_INIT_SUCCESS != calRet) {
         return false;
@@ -239,6 +239,6 @@ void LpsSaWeighApp::NvmInitialize(void)
             (FALSE == LpsSaLiftNvmWeighAppCalReadFlag)) {
         static constexpr auto sleepTime = std::chrono::milliseconds(250);
         std::this_thread::sleep_for(sleepTime);
-        AIS_LOG_ERROR("%d, %d, %d, %d", LpsSaNvmWeighAppMachSpecificCfgReadFlag, LpsSaNvmWeighAppCalReadFlag, LpsSaTiltNvmWeighAppCalReadFlag, LpsSaLiftNvmWeighAppCalReadFlag);
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"%d, %d, %d, %d", LpsSaNvmWeighAppMachSpecificCfgReadFlag, LpsSaNvmWeighAppCalReadFlag, LpsSaTiltNvmWeighAppCalReadFlag, LpsSaLiftNvmWeighAppCalReadFlag);
     }
 }

@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
+#include "ROS2Logger.hpp"
 
 namespace ros2_wrapper
 {
@@ -53,6 +54,8 @@ public:
         std::vector<char*> rosArgv;
         std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
         int rosArgc = static_cast<int>(rosArgv.size());
+
+        ROS2Logger::Instance().SetFeatureName(nodeName);
 
         rclcpp::init(rosArgc, rosArgv.data());
 

@@ -3,7 +3,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/archive_exception.hpp>
 
-#include <ais/log/Logger.h>
+#include "ROS2Logger.hpp"
 
 #include <fileio/sha1_fstream.hpp>
 
@@ -23,21 +23,21 @@ bool LpsSaJobMgrCnfg::load(const fs::path& filePath) {
         try {
             boost::archive::binary_iarchive ia(ifs);
             ia >> *this;
-            AIS_LOG_INFO("Loaded job manager configuration from storage.");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Loaded job manager configuration from storage.");
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not deserialize job manager configuration from storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize job manager configuration from storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
             reset();
         }
         catch (const std::exception& e) {
-            AIS_LOG_ERROR("Could not deserialize job manager configuration from storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize job manager configuration from storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
             reset();
         }
         catch (...) {
-            AIS_LOG_ERROR("Could not deserialize job manager configuration from storage, unexpected error.");
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not deserialize job manager configuration from storage, unexpected error.");
             reset();
         }
 
@@ -45,15 +45,15 @@ bool LpsSaJobMgrCnfg::load(const fs::path& filePath) {
 
         if (ifs.is_corrupt()) {
             if (ifs.fix_it()) {
-                AIS_LOG_WARN("Job manager configuration file was corrupt... fixed it.");
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Job manager configuration file was corrupt... fixed it.");
             }
             else {
-                AIS_LOG_ERROR("Job manager configuration file was corrupt... could not fix it.");
+               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Job manager configuration file was corrupt... could not fix it.");
             }
         }
     }
     else {
-        AIS_LOG_ERROR("Job manager configuration file could not be opened from storage.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Job manager configuration file could not be opened from storage.");
     }
 
     return success;
@@ -71,18 +71,18 @@ bool LpsSaJobMgrCnfg::save(const fs::path& filePath) const {
         try {
             boost::archive::binary_oarchive oa(ofs);
             oa << *this;
-            AIS_LOG_INFO("Saved job manager configuration to storage.");
+           RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Saved job manager configuration to storage.");
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not serialize job manager configuration to storage.");
-            AIS_LOG_ERROR(e.what());
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not serialize job manager configuration to storage.");
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
         }
 
         ofs.close();
     }
     else {
-        AIS_LOG_ERROR("Job manager configuration could not be opened from storage.");
+       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Job manager configuration could not be opened from storage.");
     }
 
     return success;
