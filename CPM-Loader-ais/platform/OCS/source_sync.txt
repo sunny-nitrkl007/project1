@@ -1,5 +1,6 @@
 apps
 config
+ros2_config
 platform/OCS
 platform/common
 prod

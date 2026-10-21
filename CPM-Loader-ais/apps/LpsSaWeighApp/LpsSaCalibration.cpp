@@ -42,7 +42,7 @@ void LpsSaWeighApp::LpsSaLoadDefaultCalibrationTbl(void)
     // getSection() failure path: log error, leave structs at constructor defaults.
     declare_parameter<bool>("default_cal_config.config_present", false);
     if (!get_parameter("default_cal_config.config_present").as_bool()) {
-        AIS_LOG_ERROR("DefaultCalConfig section not found");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DefaultCalConfig section not found");
     }
     else {
         // Helper: declare double param, read, cast to float. Sentinel: 0.0 = not provided.
@@ -204,7 +204,7 @@ void LpsSaWeighApp::LpsSaLoadDefaultCalibrationTbl(void)
         payloadCalNvmTbl_.data.CalStatus |= CAL_VELCAL;
     }
 
-    AIS_LOG_INFO("Default calibration status %X", payloadCalNvmTbl_.data.CalStatus);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Default calibration status %X", payloadCalNvmTbl_.data.CalStatus);
 
     // Simple Cal Factor is always defaulted to 0
     payloadCalNvmTbl_.data.CalAdjust = 0.f;
@@ -225,10 +225,9 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
     LpsMachSpecificCfg_t& machSpecificCfg = weighInitTbl.MachSpecificCfg;
 
     // Weighing library set to 20 msec execution rate
-    getTaskConfig().get("CPMExecRate", weighInitTbl.ExecRate);
-    declare_parameter<double>("cpm_exec_rate", static_cast<double>(weighInitTbl.ExecRate));
+    declare_parameter<double>("cpm_exec_rate", 0.05);
     weighInitTbl.ExecRate = static_cast<decltype(weighInitTbl.ExecRate)>(get_parameter("cpm_exec_rate").as_double());
-    AIS_LOG_INFO("CPMExecRate %f", weighInitTbl.ExecRate);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"CPMExecRate %f", weighInitTbl.ExecRate);
 
     // Load the default calibration table from the ruby file
     LpsSaLoadDefaultCalibrationTbl();
@@ -242,7 +241,7 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
     // caused everythingOk=false and skipped all subsequent reads.
     declare_parameter<bool>("weighing.config_present", false);
     if (!get_parameter("weighing.config_present").as_bool()) {
-        AIS_LOG_ERROR("MachineSpecificConfig (weighing params) not found — Robot YAML not loaded?");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"MachineSpecificConfig (weighing params) not found — Robot YAML not loaded?");
         everythingOk = false;
         return everythingOk;
     }
@@ -369,13 +368,13 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
     machSpecificCfg.TiltComp.TiltCompMaxGain         = getFloatParam("weighing.tilt_comp_max_gain",         0.0);
 
     if (!getFloatArrayWm02("weighing.lift_cyl_ext_pct_axis", CalibTblRuby.lift_cyl_ext_pct_axis)) {
-        AIS_LOG_ERROR("LiftCylExtPctAxis read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LiftCylExtPctAxis read fail.");
     }
     if (!getFloatArrayWm02("weighing.tilt_comp_gain_data", CalibTblRuby.tilt_comp_gain_data)) {
-        AIS_LOG_ERROR("TiltCompGainData read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"TiltCompGainData read fail.");
     }
     if (!getFloatArrayWm02("weighing.tilt_cyl_ext_pct_axis", CalibTblRuby.tilt_cyl_ext_pct_axis)) {
-        AIS_LOG_ERROR("TiltCylExtPctAxis read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"TiltCylExtPctAxis read fail.");
     }
 
     // TiltMap pointers — CalibTblRuby is a class member so .data() lifetime = node lifetime
@@ -411,19 +410,19 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
         declare_parameter<int>("weighing.qr_min_hyd_oil_temp_celsius", 40);
         WeighPidTbl.QR_HydOilTempMin_C = static_cast<int16_t>(
             get_parameter("weighing.qr_min_hyd_oil_temp_celsius").as_int());
-        AIS_LOG_INFO("HydOilTempMin: %d", WeighPidTbl.QR_HydOilTempMin_C);
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"HydOilTempMin: %d", WeighPidTbl.QR_HydOilTempMin_C);
     }
     {
         declare_parameter<int>("weighing.qr_min_lift_cyl_velocity_mm_sec", -25);
         WeighPidTbl.QR_LiftCylVelMin_mm_sec = static_cast<int16_t>(
             get_parameter("weighing.qr_min_lift_cyl_velocity_mm_sec").as_int());
-        AIS_LOG_INFO("LiftCylVelMin: %d", WeighPidTbl.QR_LiftCylVelMin_mm_sec);
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LiftCylVelMin: %d", WeighPidTbl.QR_LiftCylVelMin_mm_sec);
     }
     {
         declare_parameter<int>("weighing.qr_max_lift_cyl_velocity_mm_sec", 25);
         WeighPidTbl.QR_LiftCylVelMax_mm_sec = static_cast<int16_t>(
             get_parameter("weighing.qr_max_lift_cyl_velocity_mm_sec").as_int());
-        AIS_LOG_INFO("LiftCylVelCalValue: %d", WeighPidTbl.QR_LiftCylVelMax_mm_sec);
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LiftCylVelCalValue: %d", WeighPidTbl.QR_LiftCylVelMax_mm_sec);
     }
 
     // FilterTauDelay (optional, uint8_t, default 0)
@@ -440,7 +439,7 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
     weighInitTbl.DumpWtBuffer.bufferSize = WEIGH_LIB_DUMP_BUFF_SIZE;
 
     if (!LpsSaLoadKinematicsTbl()) {
-        AIS_LOG_ERROR("Failed to load Kinematics.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to load Kinematics.");
         everythingOk = false;
     }
 
@@ -467,7 +466,7 @@ bool LpsSaWeighApp::LpsSaInitWeighTbl()
     }
 
     if (!LpsSaLoadMachineProperties()) {
-        AIS_LOG_ERROR("Failed to load Machine Properties.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to load Machine Properties.");
         everythingOk = false;
     }
 

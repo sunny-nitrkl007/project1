@@ -75,7 +75,12 @@ void app_nvm_file_init(void)
     LpsSaLiftNvmWeighAppCalReadFlag  = FALSE;
     LpsSaTiltNvmWeighAppCalReadFlag  = FALSE;
 
-    strcpy(NvmFilepath, getenv("HOME"));
+    const char* home = getenv("HOME");
+    if (NULL == home || '\0' == home[0]) {
+        strcpy(NvmFilepath, "/tmp/appdata/CPM/LpsSaWeighApp/nvm");
+    } else {
+        strcpy(NvmFilepath, home);
+    }
     strcat(NvmFilepath, "/appdata/CPM/LpsSaWeighApp/nvm");
     strcpy(id_char,"/NvmWeighAppMachSpecificCfg.txt");
     strcpy(NvmFileName, NvmFilepath);

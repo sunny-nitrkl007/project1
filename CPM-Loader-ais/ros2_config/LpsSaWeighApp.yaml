@@ -1,11 +1,15 @@
 LpsSaWeighApp:
   ros__parameters:
-    # Parameters section (LpsSaWeighApp.rb)
+    # Matches config/LpsSaWeighApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 19.
     scheduler: "SCHED_RR"
     scheduler_priority: 19
 
+    # Parameters section (LpsSaWeighApp.rb)
     # Weighing App execution rate — 20 msec / 50 Hz
     cycle_rate_hz: 50.0
+
+    # Logging threshold — one of: emerg, fatal, alert, crit, error, warn, notice, info, debug
+    logger_threshold: "error"
 
     # NVM storage and temp paths
     storage_root: "/opt/appdata/CPM/LpsSaWeighApp/nvm"

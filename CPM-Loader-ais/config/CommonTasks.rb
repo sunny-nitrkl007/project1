@@ -35,7 +35,17 @@ AuxiliaryProcesses.update({
                       Machines::MachineMap.default,
                     ],
       "executableName" => ENV['CAT_DIR'] + "/bin/LpsSaJobMgrApp",
-      "arguments" => ["--ros-args", "--params-file", ENV['CAT_CONFIG_DIR'] + "/LpsSaJobMgrApp.yaml"],
+      "arguments" => ["--ros-args",
+                      "--params-file", ENV['CAT_CONFIG_DIR'] + "/LpsSaJobMgrApp.yaml",
+                      "--params-file", ENV['CAT_CONFIG_DIR'] + "/" + (
+                        %w[MSNINVALID MSNUNSUPPORTED MSNNOTAVAIL].include?(Machine_name.strip) || Machine_name.strip.empty? \
+                          ? "Robot_NOT_SET.yaml" \
+                          : "Robot_" + Machine_name.strip + ".yaml"
+                      )] + (
+                        MachineSpecificConfig["UI_SHOW_FEATURE_CONFIG_JSON_FILE_PATH"] ?
+                          ["--param", "ui_show_feature_config_json_file_path:=" + MachineSpecificConfig["UI_SHOW_FEATURE_CONFIG_JSON_FILE_PATH"]] :
+                          []
+                      ),
       "autoRestart" => true,
       "timeBetweenRestarts_s" => 2,
       "alwaysOn" => false,

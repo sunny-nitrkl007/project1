@@ -1,5 +1,6 @@
 apps
 config
+ros2_config
 platform/A6N1
 platform/common
 prod

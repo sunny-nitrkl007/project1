@@ -84,130 +84,130 @@ bool LpsSaWeighApp::LpsSaLoadKinematicsTbl(void)
                                     : static_cast<uint8_t>(TILT_SENSOR_TYPE_ROTARY);
         linkage_table_cnfg.tiltSensorType = static_cast<LpsSaTiltSensorType_t>(clamped);
     }
-    AIS_LOG_INFO("tiltSensorType %u", linkage_table_cnfg.tiltSensorType);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"tiltSensorType %u", linkage_table_cnfg.tiltSensorType);
 
     // hydPresSensorSlope (optional, default HYD_PRES_SENSOR_SLOPE = 0.0018)
     declare_parameter<double>("kinematics.hyd_pres_sensor_slope",
                               static_cast<double>(HYD_PRES_SENSOR_SLOPE));
     linkage_table_cnfg.hydPresSensorSlope = static_cast<float>(
         get_parameter("kinematics.hyd_pres_sensor_slope").as_double());
-    AIS_LOG_INFO("hydPresSensorSlope %f", linkage_table_cnfg.hydPresSensorSlope);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"hydPresSensorSlope %f", linkage_table_cnfg.hydPresSensorSlope);
 
     // hydPresSensorIntercept (optional, default HYD_PRES_SENSOR_INTERCEPT = 5.0)
     declare_parameter<double>("kinematics.hyd_pres_sensor_intercept",
                               static_cast<double>(HYD_PRES_SENSOR_INTERCEPT));
     linkage_table_cnfg.hydPresSensorIntercept = static_cast<float>(
         get_parameter("kinematics.hyd_pres_sensor_intercept").as_double());
-    AIS_LOG_INFO("hydPresSensorIntercept %f", linkage_table_cnfg.hydPresSensorIntercept);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"hydPresSensorIntercept %f", linkage_table_cnfg.hydPresSensorIntercept);
 
     // invertLiftDc (optional, default 0 = no invert)
     declare_parameter<int>("kinematics.invert_lift_dc", 0);
     linkage_table_cnfg.invertLiftDc = static_cast<uint16_t>(
         get_parameter("kinematics.invert_lift_dc").as_int());
-    AIS_LOG_INFO("invertLiftDc %d", linkage_table_cnfg.invertLiftDc);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"invertLiftDc %d", linkage_table_cnfg.invertLiftDc);
 
     // invertTiltDc (optional, default 0 = no invert)
     declare_parameter<int>("kinematics.invert_tilt_dc", 0);
     linkage_table_cnfg.invertTiltDc = static_cast<uint16_t>(
         get_parameter("kinematics.invert_tilt_dc").as_int());
-    AIS_LOG_INFO("invertTiltDc %d", linkage_table_cnfg.invertTiltDc);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"invertTiltDc %d", linkage_table_cnfg.invertTiltDc);
 
     // liftRefVel (optional, default 0)
     declare_parameter<double>("kinematics.lift_ref_vel", 0.0);
     linkage_table_cnfg.liftRefVel = static_cast<float>(
         get_parameter("kinematics.lift_ref_vel").as_double());
-    AIS_LOG_INFO("liftRefVel %f", linkage_table_cnfg.liftRefVel);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"liftRefVel %f", linkage_table_cnfg.liftRefVel);
 
     // --- WM-03: lift sensor array params (required) ---
 
     if (!getFloatArray("kinematics.in_lift_dc", linkage_table_cnfg.inLiftDc)) {
-        AIS_LOG_ERROR("inLiftDc read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inLiftDc read fail.");
         everythingOk = false;
     }
     else {
-        AIS_LOG_INFO("\n inLiftDc \n");
-        for (const auto& value : linkage_table_cnfg.inLiftDc) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n inLiftDc \n");
+        for (const auto& value : linkage_table_cnfg.inLiftDc) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     if (!getFloatArray("kinematics.out_lift_angle", linkage_table_cnfg.outLiftAngle)) {
-        AIS_LOG_ERROR("outLiftAngle read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"outLiftAngle read fail.");
         everythingOk = false;
     }
     else {
         if (linkage_table_cnfg.outLiftAngle.size() != linkage_table_cnfg.inLiftDc.size()) {
-            AIS_LOG_ERROR("inLiftDc and outLiftAngle size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inLiftDc and outLiftAngle size mismatch.");
             everythingOk = false;
         }
-        AIS_LOG_INFO("\n outLiftAngle \n");
-        for (const auto& value : linkage_table_cnfg.outLiftAngle) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n outLiftAngle \n");
+        for (const auto& value : linkage_table_cnfg.outLiftAngle) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     if (!getFloatArray("kinematics.in_tilt_dc", linkage_table_cnfg.inTiltDc)) {
-        AIS_LOG_ERROR("inTiltDc read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inTiltDc read fail.");
         everythingOk = false;
     }
     else {
-        AIS_LOG_INFO("\n inTiltDc \n");
-        for (const auto& value : linkage_table_cnfg.inTiltDc) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n inTiltDc \n");
+        for (const auto& value : linkage_table_cnfg.inTiltDc) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     if (!getFloatArray("kinematics.in_lift_angle", linkage_table_cnfg.inLiftAngle)) {
-        AIS_LOG_ERROR("inLiftAngle read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inLiftAngle read fail.");
         everythingOk = false;
     }
     else {
-        AIS_LOG_INFO("\n inLiftAngle \n");
-        for (const auto& value : linkage_table_cnfg.inLiftAngle) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n inLiftAngle \n");
+        for (const auto& value : linkage_table_cnfg.inLiftAngle) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     if (!getFloatArray("kinematics.out_lift_cyl_len", linkage_table_cnfg.outLiftCylLen)) {
-        AIS_LOG_ERROR("outLiftCylLen read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"outLiftCylLen read fail.");
         everythingOk = false;
     }
     else {
         if (linkage_table_cnfg.outLiftCylLen.size() != linkage_table_cnfg.inLiftAngle.size()) {
-            AIS_LOG_ERROR("inLiftAngle and outLiftCylLen size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inLiftAngle and outLiftCylLen size mismatch.");
             everythingOk = false;
         }
-        AIS_LOG_INFO("\n outLiftCylLen \n");
-        for (const auto& value : linkage_table_cnfg.outLiftCylLen) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n outLiftCylLen \n");
+        for (const auto& value : linkage_table_cnfg.outLiftCylLen) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     // --- WM-03: optional lift array params ---
 
     if (getFloatArray("kinematics.out_lift_angle_gain", linkage_table_cnfg.outLiftAngleGain)) {
         if (linkage_table_cnfg.outLiftAngleGain.size() != linkage_table_cnfg.inLiftAngle.size()) {
-            AIS_LOG_ERROR("inLiftAngle and outLiftAngleGain size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inLiftAngle and outLiftAngleGain size mismatch.");
             everythingOk = false;
         }
     }
     else {
         // Not an error — may not be provided.
-        AIS_LOG_INFO("outLiftAngleGain read error.");
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"outLiftAngleGain read error.");
         linkage_table_cnfg.outLiftAngleGain.clear();
     }
 
     if (getFloatArray("kinematics.out_lift_pres_no_bucket", linkage_table_cnfg.outLiftPresNoBucket)) {
         if (linkage_table_cnfg.outLiftPresNoBucket.size() != linkage_table_cnfg.inLiftAngle.size()) {
-            AIS_LOG_ERROR("inLiftAngle and outLiftPresNoBucket size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inLiftAngle and outLiftPresNoBucket size mismatch.");
             everythingOk = false;
         }
     }
     else {
         // Not an error — may not be provided.
-        AIS_LOG_INFO("outLiftPresNoBucket read error.");
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"outLiftPresNoBucket read error.");
         linkage_table_cnfg.outLiftPresNoBucket.clear();
     }
 
     if (getFloatArray("kinematics.out_lift_angle_accel", linkage_table_cnfg.outLiftAngleAccel)) {
         if (linkage_table_cnfg.outLiftAngleAccel.size() != linkage_table_cnfg.inLiftAngle.size()) {
-            AIS_LOG_ERROR("inLiftAngle and outLiftAngleAccel size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inLiftAngle and outLiftAngleAccel size mismatch.");
             everythingOk = false;
         }
     }
     else {
         // Not an error — may not be provided.
-        AIS_LOG_INFO("outLiftAngleAccel read error.");
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"outLiftAngleAccel read error.");
         linkage_table_cnfg.outLiftAngleAccel.clear();
     }
 
@@ -220,7 +220,7 @@ bool LpsSaWeighApp::LpsSaLoadKinematicsTbl(void)
                                          linkage_table_cnfg.outTiltCylLen);
 
     if (!outTiltAngleOk || !outTiltCylLenOk) {
-        AIS_LOG_ERROR("outTiltAngle and/or outTiltCylLen read failed");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"outTiltAngle and/or outTiltCylLen read failed");
         return false;
     }
 
@@ -235,13 +235,13 @@ bool LpsSaWeighApp::LpsSaLoadKinematicsTbl(void)
             bool yOk = getFloatArray("kinematics.y_lift_angle",
                                      linkage_table_cnfg.yLiftAngle);
             if (!xOk || !yOk) {
-                AIS_LOG_ERROR("xTiltAngle and/or yLiftAngle read failed");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"xTiltAngle and/or yLiftAngle read failed");
                 return false;
             }
-            AIS_LOG_INFO("\n xTiltAngle \n");
-            for (const auto& value : linkage_table_cnfg.xTiltAngle) { AIS_LOG_INFO("%f", value); }
-            AIS_LOG_INFO("\n yLiftAngle \n");
-            for (const auto& value : linkage_table_cnfg.yLiftAngle) { AIS_LOG_INFO("%f", value); }
+            RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n xTiltAngle \n");
+            for (const auto& value : linkage_table_cnfg.xTiltAngle) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
+            RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n yLiftAngle \n");
+            for (const auto& value : linkage_table_cnfg.yLiftAngle) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
 
             outTiltAngleSizeExpected  = linkage_table_cnfg.inTiltDc.size();
             outTiltCylLenSizeExpected = linkage_table_cnfg.xTiltAngle.size()
@@ -254,13 +254,13 @@ bool LpsSaWeighApp::LpsSaLoadKinematicsTbl(void)
             bool yOk = getFloatArray("kinematics.y_lift_cyl_len",
                                      linkage_table_cnfg.yLiftCylLen);
             if (!xOk || !yOk) {
-                AIS_LOG_ERROR("xTiltCylLen and/or yLiftCylLen read failed");
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"xTiltCylLen and/or yLiftCylLen read failed");
                 return false;
             }
-            AIS_LOG_INFO("\n xTiltCylLen \n");
-            for (const auto& value : linkage_table_cnfg.xTiltCylLen) { AIS_LOG_INFO("%f", value); }
-            AIS_LOG_INFO("\n yLiftCylLen \n");
-            for (const auto& value : linkage_table_cnfg.yLiftCylLen) { AIS_LOG_INFO("%f", value); }
+            RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n xTiltCylLen \n");
+            for (const auto& value : linkage_table_cnfg.xTiltCylLen) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
+            RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n yLiftCylLen \n");
+            for (const auto& value : linkage_table_cnfg.yLiftCylLen) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
 
             outTiltAngleSizeExpected  = linkage_table_cnfg.xTiltCylLen.size()
                                         * linkage_table_cnfg.yLiftCylLen.size();
@@ -269,88 +269,88 @@ bool LpsSaWeighApp::LpsSaLoadKinematicsTbl(void)
 
         // Confirm outTiltAngle size matches expected
         if (linkage_table_cnfg.outTiltAngle.size() != outTiltAngleSizeExpected) {
-            AIS_LOG_ERROR("outTiltAngle size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"outTiltAngle size mismatch.");
             return false;
         }
-        AIS_LOG_INFO("\n outTiltAngle \n");
-        for (const auto& value : linkage_table_cnfg.outTiltAngle) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n outTiltAngle \n");
+        for (const auto& value : linkage_table_cnfg.outTiltAngle) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
 
         // Confirm outTiltCylLen size matches expected
         if (linkage_table_cnfg.outTiltCylLen.size() != outTiltCylLenSizeExpected) {
-            AIS_LOG_ERROR("outTiltCylLen size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"outTiltCylLen size mismatch.");
             return false;
         }
-        AIS_LOG_INFO("\n outTiltCylLen \n");
-        for (const auto& value : linkage_table_cnfg.outTiltCylLen) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n outTiltCylLen \n");
+        for (const auto& value : linkage_table_cnfg.outTiltCylLen) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     // inTiltAngle (required)
     if (!getFloatArray("kinematics.in_tilt_angle", linkage_table_cnfg.inTiltAngle)) {
-        AIS_LOG_ERROR("inTiltAngle read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inTiltAngle read fail.");
         everythingOk = false;
     }
     else {
-        AIS_LOG_INFO("\n inTiltAngle \n");
-        for (const auto& value : linkage_table_cnfg.inTiltAngle) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n inTiltAngle \n");
+        for (const auto& value : linkage_table_cnfg.inTiltAngle) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     // outBktAngle (required, must match inTiltAngle size)
     if (!getFloatArray("kinematics.out_bkt_angle", linkage_table_cnfg.outBktAngle)) {
-        AIS_LOG_ERROR("outBktAngle read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"outBktAngle read fail.");
         everythingOk = false;
     }
     else {
         if (linkage_table_cnfg.outBktAngle.size() != linkage_table_cnfg.inTiltAngle.size()) {
-            AIS_LOG_ERROR("inTiltAngle and outBktAngle size mismatch.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"inTiltAngle and outBktAngle size mismatch.");
             everythingOk = false;
         }
-        AIS_LOG_INFO("\n outBktAngle \n");
-        for (const auto& value : linkage_table_cnfg.outBktAngle) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n outBktAngle \n");
+        for (const auto& value : linkage_table_cnfg.outBktAngle) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     // KnmaticsTiltCylLenMinMax (required, must be size 2)
     if (!getFloatArray("kinematics.knmatics_tilt_cyl_len_min_max",
                        linkage_table_cnfg.KnmaticsTiltCylExtMinMax)) {
-        AIS_LOG_ERROR("KnmaticsTiltCylLenMinMax read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"KnmaticsTiltCylLenMinMax read fail.");
         everythingOk = false;
     }
     else {
         if (2 != linkage_table_cnfg.KnmaticsTiltCylExtMinMax.size()) {
-            AIS_LOG_ERROR("KnmaticsTiltCylLenMinMax size != 2.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"KnmaticsTiltCylLenMinMax size != 2.");
             everythingOk = false;
         }
-        AIS_LOG_INFO("\n KnmaticsTiltCylLenMinMax \n");
-        for (const auto& value : linkage_table_cnfg.KnmaticsTiltCylExtMinMax) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n KnmaticsTiltCylLenMinMax \n");
+        for (const auto& value : linkage_table_cnfg.KnmaticsTiltCylExtMinMax) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     // KnmaticsTiltAngleMinMax (required, must be size 2)
     if (!getFloatArray("kinematics.knmatics_tilt_angle_min_max",
                        linkage_table_cnfg.KnmaticsTiltAngleMinMax)) {
-        AIS_LOG_ERROR("KnmaticsTiltAngleMinMax read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"KnmaticsTiltAngleMinMax read fail.");
         everythingOk = false;
     }
     else {
         if (2 != linkage_table_cnfg.KnmaticsTiltAngleMinMax.size()) {
-            AIS_LOG_ERROR("KnmaticsTiltAngleMinMax size != 2.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"KnmaticsTiltAngleMinMax size != 2.");
             everythingOk = false;
         }
-        AIS_LOG_INFO("\n KnmaticsTiltAngleMinMax \n");
-        for (const auto& value : linkage_table_cnfg.KnmaticsTiltAngleMinMax) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n KnmaticsTiltAngleMinMax \n");
+        for (const auto& value : linkage_table_cnfg.KnmaticsTiltAngleMinMax) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     // KnmaticsLiftCylLenMinMax (required, must be size 2)
     if (!getFloatArray("kinematics.knmatics_lift_cyl_len_min_max",
                        linkage_table_cnfg.KnmaticsLiftCylExtMinMax)) {
-        AIS_LOG_ERROR("KnmaticsLiftCylLenMinMax read fail.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"KnmaticsLiftCylLenMinMax read fail.");
         everythingOk = false;
     }
     else {
         if (2 != linkage_table_cnfg.KnmaticsLiftCylExtMinMax.size()) {
-            AIS_LOG_ERROR("KnmaticsLiftCylLenMinMax size != 2.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"KnmaticsLiftCylLenMinMax size != 2.");
             everythingOk = false;
         }
-        AIS_LOG_INFO("\n KnmaticsLiftCylLenMinMax \n");
-        for (const auto& value : linkage_table_cnfg.KnmaticsLiftCylExtMinMax) { AIS_LOG_INFO("%f", value); }
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"\n KnmaticsLiftCylLenMinMax \n");
+        for (const auto& value : linkage_table_cnfg.KnmaticsLiftCylExtMinMax) { RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"%f", value); }
     }
 
     return everythingOk;
@@ -362,17 +362,17 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     bool everythingOk = true;
     bool isAdvVariant = (ADVANCED == getApplicationVariant());
 
-    AIS_LOG_INFO("MachineMSN: %s", machineMSN.c_str());
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"MachineMSN: %s", machineMSN.c_str());
 
     // Internal Msn — derived by parsing machineMSN already read in WM-05
     try {
         std::string internal_msn_str = machineMSN.substr(3,5);
         machineProperties.internalMsn = std::stoi(internal_msn_str, 0, 10);
-        AIS_LOG_INFO("InternalMsn: %d", machineProperties.internalMsn);
+        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"InternalMsn: %d", machineProperties.internalMsn);
     }
     catch (...) {
         if (isAdvVariant) {
-            AIS_LOG_ERROR("Error while parsing for internal msn");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Error while parsing for internal msn");
             everythingOk = false;
         }
     }
@@ -390,10 +390,10 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.toolBcLength = static_cast<float>(
         get_parameter("machine_specific_config.tool_bc_len").as_double());
     if (machineProperties.toolBcLength == 0.f && isAdvVariant) {
-        AIS_LOG_ERROR("ToolBcLen not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"ToolBcLen not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("ToolBcLen: %f", machineProperties.toolBcLength);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"ToolBcLen: %f", machineProperties.toolBcLength);
 
     // ToolBcAngle (ADV required)
     // NOTE: 0.0 sentinel — no production robot has ToolBcAngle=0.
@@ -401,10 +401,10 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.toolBcAngle = static_cast<float>(
         get_parameter("machine_specific_config.tool_bc_angle").as_double());
     if (machineProperties.toolBcAngle == 0.f && isAdvVariant) {
-        AIS_LOG_ERROR("ToolBcAngle not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"ToolBcAngle not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("ToolBcAngle: %f", machineProperties.toolBcAngle);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"ToolBcAngle: %f", machineProperties.toolBcAngle);
 
     // NoOfTiltCyls (ADV required)
     // NOTE: 0 sentinel — no ADV production robot has 0 tilt cylinders.
@@ -412,10 +412,10 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.numOfTiltCylinders = static_cast<uint8_t>(
         get_parameter("machine_specific_config.no_of_tilt_cyls").as_int());
     if (machineProperties.numOfTiltCylinders == 0 && isAdvVariant) {
-        AIS_LOG_ERROR("NoOfTiltCyls not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"NoOfTiltCyls not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("NoOfTiltCyls: %d", machineProperties.numOfTiltCylinders);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"NoOfTiltCyls: %d", machineProperties.numOfTiltCylinders);
 
     // TiltCylBoreDia (ADV required)
     // NOTE: 0.0 sentinel — no production robot has a tilt cylinder bore of 0 mm.
@@ -423,10 +423,10 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.tiltBoreDiameter = static_cast<float>(
         get_parameter("machine_specific_config.tilt_cyl_bore_dia").as_double());
     if (machineProperties.tiltBoreDiameter == 0.f && isAdvVariant) {
-        AIS_LOG_ERROR("TiltCylBoreDia not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"TiltCylBoreDia not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("TiltCylBoreDia: %f", machineProperties.tiltBoreDiameter);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"TiltCylBoreDia: %f", machineProperties.tiltBoreDiameter);
 
     // TiltCylRodDia (ADV required)
     // NOTE: 0.0 sentinel — no production robot has a tilt cylinder rod of 0 mm.
@@ -434,10 +434,10 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.tiltRodDiameter = static_cast<float>(
         get_parameter("machine_specific_config.tilt_cyl_rod_dia").as_double());
     if (machineProperties.tiltRodDiameter == 0.f && isAdvVariant) {
-        AIS_LOG_ERROR("TiltCylRodDia not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"TiltCylRodDia not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("TiltCylRodDia: %f", machineProperties.tiltRodDiameter);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"TiltCylRodDia: %f", machineProperties.tiltRodDiameter);
 
     // NoOfLiftCyls (always required)
     // NOTE: 0 sentinel — every production robot has at least 1 lift cylinder.
@@ -445,10 +445,10 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.numOfLiftCylinders = static_cast<uint8_t>(
         get_parameter("machine_specific_config.no_of_lift_cyls").as_int());
     if (machineProperties.numOfLiftCylinders == 0) {
-        AIS_LOG_ERROR("NoOfLiftCyls not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"NoOfLiftCyls not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("NoOfLiftCyls: %d", machineProperties.numOfLiftCylinders);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"NoOfLiftCyls: %d", machineProperties.numOfLiftCylinders);
 
     // LiftCylBoreDia (always required)
     // NOTE: 0.0 sentinel — no production robot has a lift cylinder bore of 0 mm.
@@ -456,10 +456,10 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.liftBoreDiameter = static_cast<float>(
         get_parameter("machine_specific_config.lift_cyl_bore_dia").as_double());
     if (machineProperties.liftBoreDiameter == 0.f) {
-        AIS_LOG_ERROR("LiftCylBoreDia not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LiftCylBoreDia not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("LiftCylBoreDia: %f", machineProperties.liftBoreDiameter);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LiftCylBoreDia: %f", machineProperties.liftBoreDiameter);
 
     // LiftCylRodDia (always required)
     // NOTE: 0.0 sentinel — no production robot has a lift cylinder rod of 0 mm.
@@ -467,50 +467,50 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     machineProperties.liftRodDiameter = static_cast<float>(
         get_parameter("machine_specific_config.lift_cyl_rod_dia").as_double());
     if (machineProperties.liftRodDiameter == 0.f) {
-        AIS_LOG_ERROR("LiftCylRodDia not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"LiftCylRodDia not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("LiftCylRodDia: %f", machineProperties.liftRodDiameter);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LiftCylRodDia: %f", machineProperties.liftRodDiameter);
 
     // DigTargetWt (ADV required)
     declare_parameter<double>("machine_specific_config.dig_target_wt", 0.0);
     machineProperties.ratedPayload = static_cast<float>(
         get_parameter("machine_specific_config.dig_target_wt").as_double());
     if (machineProperties.ratedPayload == 0.f && isAdvVariant) {
-        AIS_LOG_ERROR("DigTargetWt not available in Cfg file");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"DigTargetWt not available in Cfg file");
         everythingOk = false;
     }
-    AIS_LOG_INFO("DigTargetWt: %f", machineProperties.ratedPayload);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"DigTargetWt: %f", machineProperties.ratedPayload);
 
     // LoaderBktPayldTrgtWt (optional, default 0)
     declare_parameter<double>("machine_specific_config.loader_bkt_payld_trgt_wt", 0.0);
     machineProperties.bucketPayloadTargetWeightDefault = static_cast<float>(
         get_parameter("machine_specific_config.loader_bkt_payld_trgt_wt").as_double());
-    AIS_LOG_INFO("LoaderBktPayldTrgtWt: %f", machineProperties.bucketPayloadTargetWeightDefault);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LoaderBktPayldTrgtWt: %f", machineProperties.bucketPayloadTargetWeightDefault);
 
     // LiftArmAbLength (optional, default 0)
     declare_parameter<double>("machine_specific_config.lift_arm_ab_length", 0.0);
     machineProperties.liftArmAbLength = static_cast<float>(
         get_parameter("machine_specific_config.lift_arm_ab_length").as_double());
-    AIS_LOG_INFO("LiftArmAbLength: %f", machineProperties.liftArmAbLength);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LiftArmAbLength: %f", machineProperties.liftArmAbLength);
 
     // KgPerLiftKpaAtMidExtension (optional, default 0)
     declare_parameter<double>("machine_specific_config.kg_per_lift_kpa_at_mid_ext", 0.0);
     machineProperties.kgPerLiftKpaAtMidExtension = static_cast<float>(
         get_parameter("machine_specific_config.kg_per_lift_kpa_at_mid_ext").as_double());
-    AIS_LOG_INFO("KgPerLiftKpaAtMidExtension: %f", machineProperties.kgPerLiftKpaAtMidExtension);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"KgPerLiftKpaAtMidExtension: %f", machineProperties.kgPerLiftKpaAtMidExtension);
 
     // LiftKpaNoBucketMidExtension (optional, default 0)
     declare_parameter<double>("machine_specific_config.lift_kpa_no_bucket_mid_ext", 0.0);
     machineProperties.liftKpaNoBucketMidExtension = static_cast<float>(
         get_parameter("machine_specific_config.lift_kpa_no_bucket_mid_ext").as_double());
-    AIS_LOG_INFO("LiftKpaNoBucketMidExtension: %f", machineProperties.liftKpaNoBucketMidExtension);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LiftKpaNoBucketMidExtension: %f", machineProperties.liftKpaNoBucketMidExtension);
 
     // HydOilTempOptional (optional, default false)
     declare_parameter<bool>("machine_specific_config.hyd_oil_temp_optional", false);
     machineProperties.hydOilTempOptional =
         get_parameter("machine_specific_config.hyd_oil_temp_optional").as_bool();
-    AIS_LOG_INFO("HydOilTempOptional: %d", machineProperties.hydOilTempOptional);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"HydOilTempOptional: %d", machineProperties.hydOilTempOptional);
 
     // HydOilTempEnabledDefault (optional, default true)
     // If HydOilTemp is not optional, force enabled regardless of config value.
@@ -520,19 +520,19 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     if (false == machineProperties.hydOilTempOptional) {
         machineProperties.hydOilTempEnabledDefault = true;
     }
-    AIS_LOG_INFO("HydOilTempEnabledDefault is set to: %d", machineProperties.hydOilTempEnabledDefault);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"HydOilTempEnabledDefault is set to: %d", machineProperties.hydOilTempEnabledDefault);
 
     // AccelCompSupported (optional, default false)
     declare_parameter<bool>("machine_specific_config.accel_comp_supported", false);
     machineProperties.accelCompSupported =
         get_parameter("machine_specific_config.accel_comp_supported").as_bool();
-    AIS_LOG_INFO("AccelCompSupported: %d", machineProperties.accelCompSupported);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"AccelCompSupported: %d", machineProperties.accelCompSupported);
 
     // LegalForTradeSupported (optional, default false) — also drives imuCompSupported
     declare_parameter<bool>("machine_specific_config.legal_for_trade_supported", false);
     machineProperties.legalForTradeSupported =
         get_parameter("machine_specific_config.legal_for_trade_supported").as_bool();
-    AIS_LOG_INFO("LegalForTradeSupported: %d", machineProperties.legalForTradeSupported);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LegalForTradeSupported: %d", machineProperties.legalForTradeSupported);
 
     // If LFT is supported, then IMU-based compensation is supported
     // In the future, this could be different where IMU-based compensation is supported
@@ -543,7 +543,7 @@ bool LpsSaWeighApp::LpsSaLoadMachineProperties(void)
     declare_parameter<double>("machine_specific_config.imu_comp_load_cg_angle_offset", 2.0);
     machineProperties.imuCompLoadCGAngleOffset = static_cast<float>(
         get_parameter("machine_specific_config.imu_comp_load_cg_angle_offset").as_double());
-    AIS_LOG_INFO("IMUCompLoadCGAngleOffset: %f", machineProperties.imuCompLoadCGAngleOffset);
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"IMUCompLoadCGAngleOffset: %f", machineProperties.imuCompLoadCGAngleOffset);
 
     return everythingOk;
 }

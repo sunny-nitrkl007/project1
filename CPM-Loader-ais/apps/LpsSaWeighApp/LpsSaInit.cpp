@@ -226,19 +226,45 @@ RETURN VALUE:
 *******************************************************************************/
 void LpsSaWeighApp::NvmInitialize(void)
 {
-    /* Wait till OEL layer boot up*/
-    while (FALSE == OelBootupFlag) {
-        static constexpr auto sleepTime = std::chrono::milliseconds(250);
-        std::this_thread::sleep_for(sleepTime);
+    static constexpr auto sleepTime = std::chrono::milliseconds(250);
+    static constexpr int maxRetries = 40;  // 10 second timeout
+
+    /* Wait till OEL layer boot up (bounded) */
+    {
+        int retries = 0;
+        while (FALSE == OelBootupFlag && retries < maxRetries) {
+            std::this_thread::sleep_for(sleepTime);
+            ++retries;
+        }
+        if (FALSE == OelBootupFlag) {
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),
+                "OelBootupFlag not set after %d retries; proceeding without OEL boot confirmation.",
+                maxRetries);
+        }
     }
- 
-    /* Wait till NVM is read */
-    while ((FALSE == LpsSaNvmWeighAppMachSpecificCfgReadFlag) ||
-            (FALSE == LpsSaNvmWeighAppCalReadFlag) ||
-            (FALSE == LpsSaTiltNvmWeighAppCalReadFlag) ||
-            (FALSE == LpsSaLiftNvmWeighAppCalReadFlag)) {
-        static constexpr auto sleepTime = std::chrono::milliseconds(250);
-        std::this_thread::sleep_for(sleepTime);
-       RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"%d, %d, %d, %d", LpsSaNvmWeighAppMachSpecificCfgReadFlag, LpsSaNvmWeighAppCalReadFlag, LpsSaTiltNvmWeighAppCalReadFlag, LpsSaLiftNvmWeighAppCalReadFlag);
+
+    /* Wait till NVM is read (bounded) */
+    {
+        int retries = 0;
+        while ((FALSE == LpsSaNvmWeighAppMachSpecificCfgReadFlag ||
+                FALSE == LpsSaNvmWeighAppCalReadFlag ||
+                FALSE == LpsSaTiltNvmWeighAppCalReadFlag ||
+                FALSE == LpsSaLiftNvmWeighAppCalReadFlag) && retries < maxRetries) {
+            std::this_thread::sleep_for(sleepTime);
+            ++retries;
+        }
+        if (FALSE == LpsSaNvmWeighAppMachSpecificCfgReadFlag ||
+            FALSE == LpsSaNvmWeighAppCalReadFlag ||
+            FALSE == LpsSaTiltNvmWeighAppCalReadFlag ||
+            FALSE == LpsSaLiftNvmWeighAppCalReadFlag) {
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),
+                "NVM read flags not all set after %d retries (M:%d C:%d T:%d L:%d); relying on FileExists flags.",
+                maxRetries,
+                LpsSaNvmWeighAppMachSpecificCfgReadFlag,
+                LpsSaNvmWeighAppCalReadFlag,
+                LpsSaTiltNvmWeighAppCalReadFlag,
+                LpsSaLiftNvmWeighAppCalReadFlag);
+        }
     }
 }
+

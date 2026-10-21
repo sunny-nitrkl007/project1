@@ -159,6 +159,11 @@ private:
 
     bool weighAppTxDataReceived_;
     DDSWeighAppInf weighAppInf_; // WeighApp Interface
+    ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighReqstChannel>* weighReqstOut_;
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* weighRespIn_;
+    ros2_wrapper::RosInputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>* weighTxIn_;
+
+    // executiveTimer_ now lives in Ros2TaskWrapper (base class).
 
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::SwitchInputScs>* LpsSaSwitchInput;
     ros2_wrapper::RosOutputInterface<job_mgr_interfaces::msg::OutputChannel>* LpsSaOutputChannelRosOut_;

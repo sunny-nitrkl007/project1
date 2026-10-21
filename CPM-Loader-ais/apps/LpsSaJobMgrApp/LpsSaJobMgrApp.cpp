@@ -50,6 +50,8 @@ namespace fs = boost::filesystem;
 /*******************************************************************************
 ** -- Data Declarations --
 *******************************************************************************/
+// parseLegacyInstanceName() and the ROS2Logger::SetFeatureName() call now
+// live in Ros2TaskWrapper::run() (base class), shared across apps.
 
 /******************************************************************************
 FUNCTION NAME:LpsSaJobMgrApp::LpsSaJobMgrApp()
@@ -61,6 +63,7 @@ LpsSaJobMgrApp::LpsSaJobMgrApp(const std::string& taskName):
     ros2_wrapper::Ros2TaskWrapper(taskName), LpsJobMgrJobTrackerInfoTbl(),
     LpsSaJobMgrTxRosOut_(nullptr), LpsSaJobMgrReqstIn(nullptr), LpsSaJobMgrDebugRosOut_(nullptr), LpsSaJobMgrRespChannelOutput_(nullptr),
     weighAppTxDataReceived_(false), weighAppInf_(),
+    weighReqstOut_(nullptr), weighRespIn_(nullptr), weighTxIn_(nullptr),
     LpsSaSwitchInput(nullptr), LpsSaOutputChannelRosOut_(nullptr), AisJhm2TxInput(nullptr), displayStateInputRos_(nullptr),
     ShmClockInputRos(nullptr), dataLinkDataInputRos_(nullptr), loadRecordOutputChannel_(nullptr),
     tasks_(), config_(), stats_(), simpleCal_(), storageRoot_(DEFAULT_STORAGE_ROOT), defaultTargetWeight_(0.0),
@@ -84,6 +87,9 @@ LpsSaJobMgrApp::~LpsSaJobMgrApp( )
 void LpsSaJobMgrApp::cleanupRosInterfaces()
 {
     weighAppInf_.stop();
+    delete weighReqstOut_;
+    delete weighRespIn_;
+    delete weighTxIn_;
 
     delete LpsSaJobMgrTxRosOut_;
     LpsSaJobMgrTxRosOut_ = nullptr;
@@ -145,9 +151,7 @@ bool LpsSaJobMgrApp::initialize( )
 
         storageRoot_ = get_parameter("storage_root").as_string();
 
-        stats_.setFilePath(storageRoot_ / STATS_FILENAME_BIN);
 
-        simpleCal_.setFilePath(storageRoot_ / SIMPLE_CAL_FILENAME_BIN);
 
         { // Default Horn Store Enable
             defaultConfig.hornStoreEnable = get_parameter("horn_store_enable").as_bool();
@@ -273,6 +277,9 @@ bool LpsSaJobMgrApp::initialize( )
             everythingOk = false;
         }
 
+        weighReqstOut_ = requestOutput;
+        weighRespIn_ = responseInput;
+        weighTxIn_ = txInput;
         weighAppTxDataReceived_ = false;
     }
 
@@ -289,36 +296,56 @@ bool LpsSaJobMgrApp::initialize( )
     }
 
     // Initialize tasks
-    tasks_.setFilePath(makeStoragePath(TASKS_FILENAME_BIN));
     tasks_.setDefaultTargetWeight(defaultTargetWeight_);
 
     // Load stuff from storage
     try {
-        fs::create_directories(storageRoot_);
         fs::create_directories(TEMP_STORAGE_ROOT);
-
-        if (!tasks_.load()) {
-            LpsSaLoadRecordChannel loadRecord;
-            if (loadOldLoadRecord(loadRecord)) {
-                // Initialize from existing load record.
-                tasks_.currentTaskLoadInit(loadRecord);
-                tasks_.save();
-            }
+        fs::create_directories(storageRoot_);
+    } catch (const fs::filesystem_error& e) {
+        RCLCPP_WARN_STREAM(ROS2Logger::Instance().GetLogger(),
+            "Failed to create storage_root " << storageRoot_ << ": " << e.what()
+            << "; falling back to " << TEMP_STORAGE_ROOT);
+        storageRoot_ = TEMP_STORAGE_ROOT;
+        try {
+            fs::create_directories(storageRoot_);
+        } catch (const fs::filesystem_error& e2) {
+            RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),
+                "Failed to create fallback storage_root " << storageRoot_ << ": " << e2.what());
+            everythingOk = false;
         }
-
-        if (!config_.load(makeStoragePath(CONFIG_FILENAME_BIN))) {
-            config_ = defaultConfig;
-        }
-
-        // Load statistics from file.
-        stats_.load();
-
-        // Load simple cal data from file.
-        simpleCal_.load();
     }
-    catch (const fs::filesystem_error& e) {
-       RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
-        everythingOk = false;
+
+    stats_.setFilePath(storageRoot_ / STATS_FILENAME_BIN);
+    simpleCal_.setFilePath(storageRoot_ / SIMPLE_CAL_FILENAME_BIN);
+    tasks_.setFilePath(makeStoragePath(TASKS_FILENAME_BIN));
+
+    if (everythingOk) {
+        try {
+            if (!tasks_.load()) {
+                LpsSaLoadRecordChannel loadRecord;
+                if (loadOldLoadRecord(loadRecord)) {
+                    // Initialize from existing load record.
+                    tasks_.currentTaskLoadInit(loadRecord);
+                    tasks_.save();
+                }
+            }
+
+            if (!config_.load(makeStoragePath(CONFIG_FILENAME_BIN))) {
+                config_ = defaultConfig;
+            }
+
+            // Load statistics from file.
+            stats_.load();
+
+            // Load simple cal data from file.
+            simpleCal_.load();
+        }
+        catch (const fs::filesystem_error& e) {
+           RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(),e.what());
+            everythingOk = false;
+        }
+
     }
 
     // Delete old load record file that is no longer needed
@@ -471,9 +498,8 @@ bool LpsSaJobMgrApp::executive( )
 
 void LpsSaJobMgrApp::startExecutiveTimer( )
 {
-    double cycleRateHz = 10.0;
-    declare_parameter<double>("cycle_rate_hz", cycleRateHz);
-    cycleRateHz = get_parameter("cycle_rate_hz").as_double();
+    declare_parameter<double>("cycle_rate_hz", 10.0);
+    double cycleRateHz = get_parameter("cycle_rate_hz").as_double();
     createExecutiveTimer(cycleRateHz);
 }
 
@@ -564,5 +590,14 @@ bool LpsSaJobMgrApp::saveConfig() {
 
 int main(int argc, char** argv)
 {
+    // Configure ROS2 log output path and format (rcl_logging_interface env).
+    // Pattern replicated from ScsToRos2Bridge (commit 9972fa8f).
+    {
+        std::string const rosLogDir = "/tmp/appdata/CPM/log";
+        std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
+        setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
+        setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
+    }
+
     return ros2_wrapper::Ros2TaskWrapper::run<LpsSaJobMgrApp>(argc, argv);
 }

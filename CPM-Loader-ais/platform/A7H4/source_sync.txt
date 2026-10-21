@@ -1,5 +1,6 @@
 apps
 config
+ros2_config
 platform/A7H4
 platform/A7H4-adv
 platform/common

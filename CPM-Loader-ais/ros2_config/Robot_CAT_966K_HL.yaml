@@ -139,3 +139,7 @@ LpsSaWeighApp:
     # default_cal_config.full_bkt_slow_raise_spd: 0.0
     # default_cal_config.full_bkt_fast_raise_spd: 0.0
     # default_cal_config.calwt: 0.0
+
+LpsSaJobMgrApp:
+  ros__parameters:
+    internal_msn: "CAT66201"

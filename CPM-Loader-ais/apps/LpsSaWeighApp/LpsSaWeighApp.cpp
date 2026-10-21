@@ -61,6 +61,8 @@ DESCRIPTION:
 *******************************************************************************/
 bool CalNVMReinitFlag = false;
 
+// parseLegacyInstanceName() and the ROS2Logger::SetFeatureName() call now
+// live in Ros2TaskWrapper::run() (base class), shared across apps.
 
 static float extractValFromString(const std::string& str);
 
@@ -103,8 +105,6 @@ LpsSaWeighApp::LpsSaWeighApp( const std::string& taskName ):
     testFixture_(),
     storageRoot_(DEFAULT_STORAGE_ROOT),
     tempRoot_(DEFAULT_TEMP_ROOT),
-    taskParser_(),
-    taskConfig_("Parameters"),
     serviceHourMeter_(0),
     tzInfo_{0, -1},
     demoInputs_(),
@@ -201,26 +201,6 @@ void LpsSaWeighApp::cleanupRosInterfaces()
     shmClockInput_ = nullptr;
 }
 
-bool LpsSaWeighApp::parseTaskConfiguration()
-{
-    const char* configDir = std::getenv("CAT_CONFIG_DIR");
-    if (nullptr == configDir) {
-        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"CAT_CONFIG_DIR is not set; cannot parse LpsSaWeighApp config.");
-        return false;
-    }
-
-    taskParser_.setTaskParamDirectory(configDir);
-    if (!taskParser_.parseTask(get_name())) {
-        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Error parsing task config file for %s", get_name());
-        return false;
-    }
-
-    if (!taskParser_.getTaskParameters(taskConfig_)) {
-        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Task's Parameters section is not defined for %s", get_name());
-        return false;
-    }
-
-    return true;
 }
 
 /******************************************************************************
@@ -231,6 +211,16 @@ RETURN VALUE:
 *******************************************************************************/
 bool LpsSaWeighApp::initialize( )
 {
+    { // Default matches config/LpsSaWeighApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 19.
+        declare_parameter<std::string>("scheduler", "SCHED_RR");
+        declare_parameter<int>("scheduler_priority", 19);
+        std::string schedulerPolicy = get_parameter("scheduler").as_string();
+        int schedulerPriority = static_cast<int>(get_parameter("scheduler_priority").as_int());
+        if (!applyRealtimeScheduling(schedulerPolicy, schedulerPriority)) {
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(), "Continuing without real-time scheduling.");
+        }
+    }
+
     if (ADVANCED == getApplicationVariant()) {
        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"LpsSaWeighApp::initialize for the ADVANCED application variant");
     }
@@ -242,18 +232,7 @@ bool LpsSaWeighApp::initialize( )
         return false;
     }
 
-    { // Default matches config/LpsSaWeighApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 19.
-        declare_parameter<std::string>("scheduler", "SCHED_RR");
-        declare_parameter<int>("scheduler_priority", 19);
-        std::string schedulerPolicy = get_parameter("scheduler").as_string();
-        int schedulerPriority = static_cast<int>(get_parameter("scheduler_priority").as_int());
-        if (!applyRealtimeScheduling(schedulerPolicy, schedulerPriority)) {
-            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(), "Continuing without real-time scheduling.");
-        }
-    }
-
     { /* Weighing App execution rate in Hz */
-        getTaskConfig().get("cycleRate_hz", LpsSaWeighInfoTbl.CycleRate_hz);
         declare_parameter<double>("cycle_rate_hz", static_cast<double>(LpsSaWeighInfoTbl.CycleRate_hz));
         LpsSaWeighInfoTbl.CycleRate_hz = static_cast<float_32>(get_parameter("cycle_rate_hz").as_double());
         RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"cycleRate_hz %f", LpsSaWeighInfoTbl.CycleRate_hz);
@@ -275,27 +254,13 @@ bool LpsSaWeighApp::initialize( )
     NvmInitialize();
 
     { // Set up storage root
-        ConfigSection& configs = getTaskConfig();
-
-        std::string configStr;
-
-        if (configs.get("tempRoot", configStr)) {
-            tempRoot_ = configStr;
-        }
-        else {
-            tempRoot_ = DEFAULT_TEMP_ROOT;
-        }
+        tempRoot_ = DEFAULT_TEMP_ROOT;
         declare_parameter<std::string>("temp_root", tempRoot_.string());
         tempRoot_ = get_parameter("temp_root").as_string();
 
         tes_common_ais::directory::create(tempRoot_);
 
-        if (configs.get("storageRoot", configStr)) {
-            storageRoot_ = configStr;
-        }
-        else {
-            storageRoot_ = DEFAULT_STORAGE_ROOT;
-        }
+        storageRoot_ = DEFAULT_STORAGE_ROOT;
         declare_parameter<std::string>("storage_root", storageRoot_.string());
         storageRoot_ = get_parameter("storage_root").as_string();
 
@@ -310,14 +275,8 @@ bool LpsSaWeighApp::initialize( )
         payloadCalNvmTbl_.setFilePath(storageRoot_, PAYLOAD_CAL_FILENAME_BIN);
 
         // Get App Tx Period in Seconds
-        {
-            if (!configs.get("CPMExecTxPeriod", transmitPeriodTime_)) {
-                transmitPeriodTime_ = 0.1; // 100 ms
-               RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Could not read 'CPMExecTxPeriod'");
-            }
-            declare_parameter<double>("cpm_exec_tx_period", static_cast<double>(transmitPeriodTime_));
-            transmitPeriodTime_ = static_cast<decltype(transmitPeriodTime_)>(get_parameter("cpm_exec_tx_period").as_double());
-        }
+        declare_parameter<double>("cpm_exec_tx_period", 0.1);
+        transmitPeriodTime_ = static_cast<decltype(transmitPeriodTime_)>(get_parameter("cpm_exec_tx_period").as_double());
     }
 
     // Initialize the hydOilTempEnabled default status
@@ -842,12 +801,7 @@ bool LpsSaWeighApp::executive( )
 
 void LpsSaWeighApp::startExecutiveTimer( )
 {
-    double cycleRateHz = LpsSaWeighInfoTbl.CycleRate_hz;
-    if (cycleRateHz <= 0.0) {
-         RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Invalid cycleRate_hz %f, defaulting to 50 Hz", cycleRateHz);
-        cycleRateHz = 50.0;
-    }
-    createExecutiveTimer(cycleRateHz);
+    createExecutiveTimer(LpsSaWeighInfoTbl.CycleRate_hz);
 }
 
 void LpsSaWeighApp::flashEnablerUpdate() {
@@ -2364,5 +2318,14 @@ LpsSaWeighTxChannel::AudibleAnnunciationPriority_t LpsSaWeighApp::getAudibleComm
 
 int main(int argc, char** argv)
 {
+    // Configure ROS2 log output path and format (rcl_logging_interface env).
+    // Pattern replicated from ScsToRos2Bridge (commit 9972fa8f).
+    {
+        std::string const rosLogDir = "/tmp/appdata/CPM/log";
+        std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
+        setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
+        setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
+    }
+
     return ros2_wrapper::Ros2TaskWrapper::run<LpsSaWeighApp>(argc, argv);
 }

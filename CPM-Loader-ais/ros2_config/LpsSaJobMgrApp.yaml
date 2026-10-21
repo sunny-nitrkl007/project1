@@ -1,8 +1,13 @@
 LpsSaJobMgrApp:
   ros__parameters:
+    # Matches config/LpsSaJobMgrApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 1.
     scheduler: "SCHED_RR"
     scheduler_priority: 1
+
     cycle_rate_hz: 10.0
+
+    # Logging threshold — one of: emerg, fatal, alert, crit, error, warn, notice, info, debug
+    logger_threshold: "error"
     storage_root: "/opt/appdata/CPM/LpsSaJobMgrApp/nvm"
     simple_cal_max_trucks_supported: 15
     horn_store_enable: false

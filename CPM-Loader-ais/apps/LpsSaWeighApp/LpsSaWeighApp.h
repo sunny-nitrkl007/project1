@@ -14,7 +14,6 @@ DESCRIPTION:
 
 #include <boost/filesystem.hpp>
 
-#include <ais/config/TaskParser.h>
 
 // ---- ROS2/DDS wrapper layer
 #include "rclcpp/rclcpp.hpp"
@@ -89,7 +88,6 @@ DESCRIPTION:
 
 #include <mlComms/scsIo/ScsOutputs.h>
 #include <scsIOContainer/SCSOutData.h>
-#include <ais/config/ConfigSection.h>
 
 #include <catdllib_fid_def.h>
 
@@ -209,8 +207,6 @@ public:
     LpsSaWeighApp( const std::string& taskName );
     ~ LpsSaWeighApp( ) override;
 
-    bool parseTaskConfiguration( );
-    bool beforeInitialize( ) override { return parseTaskConfiguration(); }
     bool initialize( ) override;
     bool executive( ) override;
     void cleanup( ) override;
@@ -224,10 +220,6 @@ protected:
     }
 
 private:
-    ConfigSection& getTaskConfig() { return taskConfig_; }
-    const ConfigSection& getTaskConfig() const { return taskConfig_; }
-    TaskParser& getTaskParser() { return taskParser_; }
-    const TaskParser& getTaskParser() const { return taskParser_; }
     void setAutonomyCondition(const AutonomyCondition& condition) {
        RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(),"Set autonomy condition %s", condition.getConditionType().c_str());
     }
@@ -412,8 +404,6 @@ private:
 
     boost::filesystem::path storageRoot_;
     boost::filesystem::path tempRoot_;
-    TaskParser taskParser_;
-    ConfigSection taskConfig_;
 
     /* SHM and Time Zone */
     uint_least32_t serviceHourMeter_;
@@ -428,6 +418,7 @@ private:
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighRespChannel>* LpsSaWeighScsRespOut_ROS2;
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaWeighTxChannel>* LpsSaWeighScsTxOut_ROS2;
 
+    // executiveTimer_ now lives in Ros2TaskWrapper (base class).
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::LpsSaJobMgrTxChannel>* LpsSaJobMgrTxRosIn_;
     ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>* LpsSaJobMgrReqstRosOut_;
     ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::ReadyToFlashStatus>* ReadyToFlashStatusRosOut_;
