@@ -57,7 +57,17 @@ public:
 
         ROS2Logger::Instance().SetFeatureName(nodeName);
 
-        rclcpp::init(rosArgc, rosArgv.data());
+        // Block SIGINT/SIGTERM/SIGQUIT on this thread before anything else runs,
+        // so every thread rclcpp::init()/the DDS layer spawns inherits the block
+        // too (POSIX threads inherit the creating thread's signal mask at
+        // pthread_create() time). Without this, a signal can still land on one
+        // of those internal threads instead of our sigwait() thread below.
+        blockExitSignals();
+
+        // SignalHandlerOptions::None stops rclcpp from installing its own
+        // competing SIGINT/SIGTERM handler -- our registerSignalHandling()
+        // below is the only thing that reacts to these signals now.
+        rclcpp::init(rosArgc, rosArgv.data(), rclcpp::InitOptions(), rclcpp::SignalHandlerOptions::None);
 
         auto app = std::make_shared<AppT>(nodeName);
 
@@ -173,11 +183,7 @@ private:
         return nodeName;
     }
 
-    // Reproduces ais_task/ais/task/sigcatch.cpp exactly: block the exit
-    // signals on every thread, hand them to one dedicated thread via
-    // sigwait(). 1st/2nd signal interrupts the executor; 3rd forces an
-    // immediate exit with no cleanup, matching AIS's documented behavior.
-    static void registerSignalHandling(std::shared_ptr<rclcpp::Executor> executor)
+    static void blockExitSignals()
     {
         sigset_t signalSet;
         sigemptyset(&signalSet);
@@ -185,7 +191,14 @@ private:
         sigaddset(&signalSet, SIGTERM);
         sigaddset(&signalSet, SIGQUIT);
         pthread_sigmask(SIG_BLOCK, &signalSet, nullptr);
+    }
 
+    // Reproduces ais_task/ais/task/sigcatch.cpp exactly: hand the (already
+    // blocked -- see blockExitSignals() above) exit signals to one dedicated
+    // thread via sigwait(). 1st/2nd signal interrupts the executor; 3rd forces
+    // an immediate exit with no cleanup, matching AIS's documented behavior.
+    static void registerSignalHandling(std::shared_ptr<rclcpp::Executor> executor)
+    {
         std::thread signalThread([executor]() {
             static std::atomic<uint32_t> signalsCaught{0};
             constexpr uint32_t maxExitSignalsToCatch = 3;
