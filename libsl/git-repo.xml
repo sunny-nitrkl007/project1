@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<git-info version="0.0">
+	<info module="cat/dt/libsl" organization="com.cat.e"/>
+	<location-server path="git@git1.corp.cat.com:/cat/dt/libsl"/>
+	<location-local path="lib_autocode_release/lib_simulink"/>
+	<tag-info type="prefix" value="LIB_SIMULINK_"/>
+	<branch-info type="match"/>
+</git-info>

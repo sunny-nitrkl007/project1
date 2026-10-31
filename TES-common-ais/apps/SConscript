@@ -1,0 +1,50 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the test/ directory.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'baseEnv' )
+testEnv = baseEnv.Clone();
+
+testEnv.Append(CCFLAGS = ['-Werror'])
+
+Export( 'testEnv' )
+
+appEnv = testEnv.Clone()
+Export ( 'appEnv' )
+
+if appEnv[ 'PLATFORM' ] in ['A6N1', 'A6N2']:
+    appEnv.buildit( 'FileTransferBridgeApp', ['suse'] )
+
+appEnv.buildit( 'VP3FileCreatorApp', ['suse'] )
+appEnv.buildit( 'SwitchInputApp', ['suse'] )
+appEnv.buildit( 'SerialPrinterApp', ['suse'] )
+appEnv.buildit( 'xcp_server', ['suse'] )
+
+# Target only apps
+if (not appEnv[ 'PLATFORM' ] in [ 'x86_64-linux-gnu', 'OCS' ]):
+    appEnv.buildit( 'bmiJ1939', ['suse'] )
+    appEnv.buildit( 'bmiCdl', ['suse'] )
+    # appEnv.buildit( 'BmiEthernet', ['suse'] ) # TODO: Update for platformCommon
+    appEnv.buildit( 'PwmInputApp', ['suse'] )
+    appEnv.buildit( 'OutputApp', ['suse'] )
+    appEnv.buildit( 'RemotePrinterApp', ['suse'] )
+    # appEnv.buildit( 'bmiJ1939Test', ['suse'] ) # TODO: Update for platformCommon
+
+
+# Test apps
+#appEnv.buildit( 'AppRegTest', ['suse'] )
+#appEnv.buildit( 'bmiCdlTest', ['suse'] )
+#appEnv.buildit( 'OutputAppTest', ['suse'])
+#appEnv.buildit( 'testJhmTask', ['suse'] )
+#appEnv.buildit( 'VP3FileCreatorSimulatorApp', ['suse'] )
+#appEnv.buildit( 'vp3Sim', ['suse'] )
+

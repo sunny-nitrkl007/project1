@@ -1,0 +1,5 @@
+This version of sss depends on A4_AFSW_2006_Q2.1_ALPHA_3, but it will most likely work with later versions as well.
+It uses content from the ClearCase vobs lib_a4 and lib_oel, which will be mirrored into the following git repos:
+/cat/ess-csf/hal
+/cat/ess-csf/scl
+/cat/ess-csf/oel

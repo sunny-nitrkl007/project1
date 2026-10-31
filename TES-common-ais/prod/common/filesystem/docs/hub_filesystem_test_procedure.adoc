@@ -1,0 +1,89 @@
+= Hub Filesystem Test Procedure Document
+:toc:
+:numbered:
+
+************************************
+[halign="center", grid="none", frame="none"]
+|===========================================
+|*CATERPILLAR CONFIDENTIAL: YELLOW*
+|*The information contained within this manual is classified as Caterpillar Confidential Information. +
+Any reproduction, dissemination or use of this information is forbidden without the prior express written consent of an
+authorized Caterpillar representative. +
+All rights are reserved by Caterpillar, Inc.*
+|===========================================
+************************************
+
+== Document History ==
+[width="100%",cols="10,10,15,40",options="header"]
+|=======
+|Document Version |Date Revised |Revised By              |Description of Change
+|1.0              |12/23/2022   |Adrian Cojocari         |Initial document
+|=======
+
+
+== Overview
+The purpose of this document is to provide the instructions on how to run the tests that evaluate the requirements written for the Hub Filesystem Library.
+
+
+== Definitions
+
+[width="100%",cols="1,2",options="header"]
+|=======
+|Term               |Definition
+|AIS                |Autonomy Infrastructure Software
+|MPLr               |Machine Performance Level Required from ISO 19014-1 [EXT1].
+|=======
+
+== Document References
+
+=== Internal
+
+[width="100%",cols="1,2",options="header"]
+|=======
+|Ref #              |Document
+|[INT1]             |Autonomy Infrastructure Software Development Process.
+|=======
+
+=== External
+
+[width="100%",cols="1,2",options="header"]
+|=======
+|Ref #              |Document
+|[EXT1]             |ISO 19014-1:2018.
+|=======
+
+
+== Test Platforms
+
+The tests were written using the Boost Test Library.
+
+
+== Test Setup
+
+=== Build Instructions
+
+1.  Clone the project repo:
+
+  cd $GITHOME
+  git clone git@arlgitgisp03.ecorp.cat.com:CATE_AIS/ais_app_template.git
+  cd ais_app_template
+  git checkout <TBD>
+
+2.  Build the project. This is accomplished by executing the following command at the repository head folder:
+
+  make project JOBS=12
+
+3.  Set the environmental variables to the correct folder. After building the project, change the directory to the build-x86_64-linux-gnu and run changeCatEnvToHere.sh:
+
+  cd build-x86_64-linux-gnu
+  . ../changeCatEnvToHere.sh
+
+
+== Test Execution
+
+=== Boost “Unit Test” Scripts
+
+Execute the unit tests by running the following commands:
+
+  cd $CAT_DIR
+  sudo -E bin/unit_test/hub_filesystem_unit_test --catch_system_errors=no 

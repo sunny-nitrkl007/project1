@@ -1,0 +1,288 @@
+{
+"PGN":
+{
+	"PROPRIETARY A (PROPA)": {
+		"PGN":               61184,		
+		"Source Address":    255,		
+		"Timeout(ms)":       0,
+		"Priority":          6,
+		"Control Bitfield":  1,
+		"Handler Index":     1
+	},
+	
+	"ELECTRONIC ENGINE CONTROLLER 1 (EEC1)": {
+
+		"PGN":               61444,
+		"Source Address":    "0x05",		
+		"Timeout(ms)":       100,
+		"Priority":          3,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+
+ 	},
+	
+	"ELECTRONIC ENGINE CONTROLLER 2 (EEC2)": {
+
+		"PGN":               61443,
+		"Source Address":    "0x01",
+		"Timeout(ms)":       100,
+		"Priority":          3,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+ 	},
+
+	"ELECTRONIC TRANSMISSION CONTROLLER 1 (ETC1) ": {
+
+		"PGN":               61442,
+		"Source Address":    "0x02",
+		"Timeout(ms)":       100,
+		"Priority":          3,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+
+ 	},
+
+	"ELECTRONIC TRANSMISSION CONTROLLER 2 (ETC2) ": {
+
+		"PGN":               61445,
+		"Source Address":    "0x04",
+		"Timeout(ms)":       100,
+		"Priority":          6,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+ 	},
+
+	"ELECTRONIC BRAKE CONTROLLER 1 (EBC1)  ": {
+
+		"PGN":               61441,
+		"Source Address":    "0x06",
+		"Timeout(ms)":       100,
+		"Priority":          6,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+ 	}
+
+	
+},
+
+"CDL_PID":
+{	
+	"Actual Engine RPM": {
+
+		"CDL PID":              "0x40",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.5,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			590
+
+	},
+	
+	"Fuel Consumption Rate": {
+
+		"CDL PID":              "0xF525",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.05,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	2,
+		"Cid": 			590
+
+	},
+	
+	
+	"Total Fuel Used": {
+
+		"CDL PID":              "0xC8",
+		"Data Size(bytes)":     4,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.125,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	10,
+		"Cid": 			590
+
+	},
+	
+	"Actual Gear": {
+
+		"CDL PID":              "0xF5D9",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x03",
+		"Request Rate(ms)":     100,
+		"Scaling":              1.0,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   2,
+		"ParameterType" :	2,
+		"Cid": 			296			
+
+	},
+
+	"Ground Speed/Direction": {
+ 		"CDL PID":              "0xF4FD",
+ 		"Data Size(bytes)":     2,
+ 		"Source J1939 Address": "0x03",
+ 		"Request Rate(ms)":     100,
+ 		"Scaling":              0.0036,
+ 		"Offset":               0,
+ 		"Units":                4,
+ 		"Timeout(ms)":          450,
+ 		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			296
+ 	}, 	
+	
+
+	"Total Distance Traveled (Odometer)": {
+
+		"CDL PID":              "0xFC2E",
+		"Data Size(bytes)":     4,
+		"Source J1939 Address": "0x03",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.1,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	10,
+		"Cid": 			296
+
+	},		
+	
+	"Machine Yaw Rate": {
+
+		"CDL PID":              "0xD01373",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x0B",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.01,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			533
+
+	},
+
+	"Machine Longitudinal Acceleration": {
+
+		"CDL PID":              "0xD01375",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x0B",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.01,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			533
+
+	},
+
+		
+	"Machine Slope": {
+
+		"CDL PID":              "0xF533",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x0B",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.1,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			533
+
+	},
+
+	"Body Up Status": {
+
+		"CDL PID":              "0xF604",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x47",
+		"Request Rate(ms)":     100,
+		"Scaling":              1.0,
+		"Offset":               0,
+		"Units":                0,		
+		"Timeout(ms)":          450,
+		"Attributes":           "swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	8,
+		"Cid": 			1273
+
+	},	
+
+	"Ambient Air Temperature": {
+
+		"CDL PID":              "0xF477",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x47",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.1,
+		"Offset":               0,
+		"Units":                1,		
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			1273
+
+	},
+
+	"Tall Tank Fuel Level": {
+
+		"CDL PID":              "0xF428",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x47",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.005,
+		"Offset":               0,
+		"Units":                1,		
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			1273
+
+	}
+	
+ }
+}

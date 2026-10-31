@@ -1,0 +1,34 @@
+#lps_weighing Release Script
+
+#Register Release Entries Which Make Up Entire Release Unit
+#     Define each Ivy Module which makes up release.
+#     Define in dependency order: lowest to highest.
+release entry ivy  source_inf    	../../lps_weighing_interface/deps/ivy.xml;
+release entry ivy  source    		../deps/ivy.xml;
+release entry ivy  lib_x5    		"../../lps_weighing-a/tgt_diab_5.8.0.0_PPCVLEEF/deps/ivy.xml";
+
+#Set Desired Version Number For Release
+#     Must be done after all of the release entries have been registered.
+release entry version ${version} ${comment};
+
+#Configure Release Commit Mode
+#     source:     	Ensure that repository is clean.
+#     source_inf:   Ensure that repository is clean.
+#     lib_x5:     	Commit all files.
+release mode commit ${source_inf}  	none;
+release mode commit ${source}    	none;
+release mode commit ${lib_x5}    	all;
+
+#Configure Release Tree Mode
+#     source:     	Content will be added on current branch.
+#     source_inf:   Content will be added on current branch.
+#     lib_x5:     	Content will be a parentless commit.
+release mode tree   ${source} 		yes;
+release mode tree   ${source_inf} 	yes;
+release mode tree   ${lib_x5} 		no;
+
+#Work Flow:  Local (Version 00)
+include ../../../../../dt/release/girt/scripts/wf_local_00.girt
+
+#For testing purposes, look at the dump of all of the variables.
+variable dump;

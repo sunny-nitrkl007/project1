@@ -1,0 +1,47 @@
+# Install in eta-ais build-
+--installDir=../../eta-ais/${BUILD_DIR}
+
+# Uncomment to perform library search debug
+#--debug=findlibs
+
+# Uncomment to add build time info to the log
+#--debug=time
+
+# Disable Position Independent Executables (PIE) for compatiblity with platformCommon content
+--noPie
+
+# Comment out if OS version is earlier than OS_BLUE_2019.6.0
+--useThreadSafeKswMgr
+
+# Comment out to disable Ethernet PGT Server
+--enableEthernetPgtServer
+
+# Comment out to disable CDA in Acd2/DatalinkManager. If set, the CDA verity must be included in the fl2. 
+--cdaSupported
+
+# Uncomment to allow tuning of #defines. Replace path with app specific file.
+# Format should be comma separated variable (csv) with module,param,value
+# e.g. DATALINKMANAGER,CSF_PGT_CLIENT_MAX_GRP_UDP_RX_BYTES,512
+# File location should be relative to the build-PLATFORM folder
+# See SConsAppIncludeV2.py::setTuningParameter for information on the modules/params
+#######
+#--tuningParametersFile=prod/machineCommon/content/doc/acd2/default_tuning_parameters.csv
+
+# Uncomment to enable build of ROS Bridge
+#
+# You can also specify this at the command line like the following:
+#
+# make SCONS_BUILD_XTRA_ARGS="--buildROSBridge" project_a6n2
+#
+#--buildROSBridge
+
+# Uncomment to enable build of AHS specific parts of aisToRosLib
+#--buildROSAHSSupport
+
+# Uncomment to install configs directly from the subsystems/subrepos (coretech/machineCommon/etc). Symbolic links to configs should no longer be installed.
+--installSubsystemConfigs
+
+# Disable use of boost::archive for serialization
+--boostArchive=false
+
+--installScripts

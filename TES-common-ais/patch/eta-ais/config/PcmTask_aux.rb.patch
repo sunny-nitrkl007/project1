@@ -1,0 +1,23 @@
+diff --git a/config/PcmTask_aux.rb b/config/PcmTask_aux.rb
+index 10dbed4..4ac3db4 100644
+--- a/config/PcmTask_aux.rb
++++ b/config/PcmTask_aux.rb
+@@ -1,7 +1,13 @@
+-### App specific settings, loaded after common PcmTaskBase.rb, PcmTask.rb
++Parameters.update( {
++    "loggerThreshold" => "error",
+ 
+-# Load run-time version metadata
+-# require "Version.rb"
++    # maximum time for waiting before sending request to stop child processs
++    # This allows the operator to toggle the keyswitch (ring) off and back on
++    # without causing a restart of all apps.
++    "ShutdownRequestUnknownTimeOut_sec" => 3,
++
++    # maximum time that pcm will wait for its child processes to nicely shutdown
++    # before sending signal to kill them
++    "waitBeforeKill_s" => 2000,
++} )
+ 
+-# Update Run time configurable AutonomyConditions settings
+-# GenericAutonomyConditions["LoggerStatusTimeout"].update({ "activationDebounce_ms" => 5000 })

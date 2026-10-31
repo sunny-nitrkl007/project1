@@ -1,0 +1,12 @@
+#prodcore Initialize Script
+#     This script contains various setup information which is included
+#     automatically when girt is invoked from this directory.
+
+#Register Release Entries Which Make Up Entire Release Unit
+#     Define each Ivy Module which makes up release.
+#     Define in dependency order: lowest to highest.
+release entry ivy  source    ../deps/ivy.xml;
+
+#Configure Release Commit Mode
+#     source:     Ensure that repository is clean.
+release mode commit ${source}    none;

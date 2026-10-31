@@ -1,0 +1,17 @@
+#ifndef BMI_CDL_PID_COACHING_H_
+#define BMI_CDL_PID_COACHING_H_
+
+#define BMI_CDL_DATA_STATUS_OK 0
+
+constexpr uint32_t BMI_CDL_PID_OPERATOR_COACHING_TIP_PROGRESS_INDICATOR_PERCENTAGE      = 0xD027DC;
+constexpr uint32_t BMI_CDL_PID_OPERATOR_COACHING_TIP_SUMMARY_DISPLAY_REQUIREMENT_STATUS = 0xD1199D;
+constexpr uint32_t BMI_CDL_PID_OPERATOR_COACHING_TIP_SNOOZE_TIMER                       = 0xD027DB;
+constexpr uint32_t BMI_CDL_PID_OPERATOR_COACHING_TIP_INFO_CHANGE_COUNT_SINCE_LAST_VIEW  = 0xD02922;
+
+constexpr uint16_t BMI_CDL_OPERATOR_COACHING_TIP_SUMMARY_DISPLAY_REQUIRED               = 0x001A;
+constexpr uint16_t BMI_CDL_OPERATOR_COACHING_TIP_SUMMARY_DISPLAY_NOT_REQUIRED           = 0x001B;
+
+inline double HoursToSeconds(double hours) { return hours * 3600; }
+inline double SecondsToHours(double seconds) { return seconds / 3600; }
+
+#endif

@@ -1,0 +1,127 @@
+:copyright: Copyright (C) 2021 Caterpillar Inc. All Rights Reserved.
+:toc:
+:toclevels: 1
+:summary_latest: Added A5Mx target and updated deps version.
+= tire_rev_wl00 Software History
+
+
+//****************************************************************************
+== tire_rev_wl00 (0.1.0.rc09)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2021-10-25
+| Release Label/Tag | 0.1.0.rc09
+| Released By       | Emelia Malek
+|====================================
+
+=== Release Summary Information
+
+1. Tire Rev Distance Requirement Change
+   
+2. Changes implemented in this release were built for the following targets:   
+   diab 5.8.0
+   diab 5.9.4   
+   sim win64
+
+//****************************************************************************
+
+//****************************************************************************
+== tire_rev_wl00 (0.1.0.rc08)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2020-05-23
+| Release Label/Tag | 0.1.0.rc08
+| Released By       | Subba Gundala
+|====================================
+
+=== Release Summary Information
+
+1. Update deps/ivy.xml to pick up pcs-interface tag 4.0.0.rc24.
+
+2. Updated Machine cluster to pick up mach_lib_core_cluster.
+
+3. Added A5Mx binary target.
+
+4. Updated mach_tools_cluster version to 12.0.0.rc44.
+   
+5. Changes implemented in this release were built for the following targets:   
+   diab 5.8.0
+   diab 5.9.4   
+   sim win64
+
+//****************************************************************************
+
+//****************************************************************************
+== tire_rev_wl00 (0.1.0.rc07)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2020-01-21
+| Release Label/Tag | 0.1.0.rc07
+| Released By       | Emelia Malek
+|====================================
+
+=== Release Summary Information
+
+1. Update deps/ivy.xml to pick up pcs-interface tag 4.0.0.rc20 to resolve
+   dependencies conflict for mwl cluster
+
+2. Changes implemented in this release were built for the following targets:
+   diab 5.9.4
+   sim win64
+
+//****************************************************************************
+
+
+//****************************************************************************
+== tire_rev_wl00 (0.1.0.rc06)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2019-05-29
+| Release Label/Tag | 0.1.0.rc06
+| Released By       | Subba Gundala
+|====================================
+
+=== Release Summary Information
+
+1. TP782014 - Add gcc win64 sim target.
+
+2. TP783547 - dig timer compiled with incorrect make file settings.
+
+3. TP783551 - Non-standard diab 5.9 target path.
+
+4. Changes implemented in this release were built for the following targets:
+   diab 5.9.4
+   sim win64
+
+//****************************************************************************
+ 
+ 
+//****************************************************************************
+== tire_rev_wl00 (0.1.0.rc05)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2019-04-17
+| Release Label/Tag | 0.1.0.rc05
+| Released By       | Emelia Malek
+|====================================
+
+=== Release Summary Information
+
+1. TP745670, Added tire rev
+
+      
+2. Changes implemented in this release were built for the following targets:
+   diab 5.9.4
+
+
+//****************************************************************************

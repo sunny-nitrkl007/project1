@@ -1,0 +1,85 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0302 
+header_name {.h} 
+code_name {.cpp}
+Function {make_PWMInputTab()} {open
+} {
+  Fl_Window {} {
+    label {PWM Input Report} open
+    xywh {1509 52 410 900} type Double visible
+  } {
+    Fl_Group g_pwm_input {
+      label {PWM Input App} open
+      xywh {5 6 400 210} box PLASTIC_DOWN_BOX color 100 labelfont 1 labelsize 18 align 17
+    } {
+      Fl_Input g_actualTimeUs {
+        label {Actual TimeUs :}
+        xywh {205 42 186 28}
+      }
+      Fl_Input g_ExecTime {
+        label {Exec Time :}
+        xywh {206 78 186 28}
+      }
+      Fl_Input g_DiffTime {
+        label {Diff Time :}
+        xywh {205 112 186 28}
+      }
+      Fl_Input g_Exp {
+        label {Exp :}
+        xywh {205 150 186 28}
+      }
+    }
+    Fl_Group g_pwm1_input {
+      label {PWM 1} open
+      xywh {15 255 400 85} box PLASTIC_DOWN_BOX color 29
+    } {
+      Fl_Input g_pwm1_width {
+        label {Width [0]}
+        xywh {290 280 90 25}
+      }
+      Fl_Input g_pwm1_period {
+        label {Period [0]}
+        xywh {114 280 90 25}
+      }
+    }
+    Fl_Group g_pwm2_input {
+      label {PWM 2} open
+      xywh {10 375 400 85} box PLASTIC_THIN_DOWN_BOX color 29
+    } {
+      Fl_Input g_pwm2_period {
+        label {Period [1]}
+        xywh {114 405 90 25}
+      }
+      Fl_Input g_pwm2_width {
+        label {Width [1]} selected
+        xywh {300 405 90 25}
+      }
+    }
+    Fl_Group g_pwm3_input {
+      label {PWM 3} open
+      xywh {15 485 400 85} box PLASTIC_THIN_DOWN_BOX color 29
+    } {
+      Fl_Input g_pwm3_period {
+        label {Period [2]}
+        xywh {115 515 90 25}
+      }
+      Fl_Input g_pwm3_width {
+        label {Width [2]}
+        xywh {305 515 90 25}
+      }
+    }
+    Fl_Group g_pwm4_input {
+      label {PWM 4} open
+      xywh {20 595 400 85} box PLASTIC_THIN_DOWN_BOX color 29
+    } {
+      Fl_Input g_pwm4_period {
+        label {Period [3]}
+        xywh {115 620 90 25}
+      }
+      Fl_Input g_pwm4_width {
+        label {Width [3]}
+        xywh {300 620 90 25}
+      }
+    }
+  }
+} 

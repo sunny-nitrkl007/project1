@@ -1,0 +1,56 @@
+---------------------make begin x64-----------------------
+Clean rebuild: Deleting compiled objects and libs
+rm -rf *.o  liblps_pass_tracker.a liblps_pass_trackerdebug.a	
+/home/pf/git/a6n2/ais/ais-sdk-a/x86_64-linux/1.0-5/amd64/host/usr/bin/x86_64-linux-gcc ../src/LpsPtBucket.c ../src/LpsPtInit.c ../src/LpsPtTruck.c ../src/LpsPtUpdate.c -I ./ -I../include/ -I../../lps_pass_tracker_interface/include -I../../lps_common/include -I../../lps_app_common/include -g -fPIC -Wall -Wmissing-declarations -Wredundant-decls -Wundef -Wshadow -Wlogical-op -Wcast-align -s -c
+../src/LpsPtUpdate.c:64:16: warning: no previous declaration for ‘weigh_mode’ [-Wmissing-declarations]
+ LpsPtOutputs_t weigh_mode(void)
+                ^
+../src/LpsPtUpdate.c: In function ‘weigh_mode’:
+../src/LpsPtUpdate.c:67:17: warning: variable ‘newstate’ set but not used [-Wunused-but-set-variable]
+     unsigned_32 newstate;
+                 ^
+../src/LpsPtUpdate.c: In function ‘minus_one_func’:
+../src/LpsPtUpdate.c:263:15: warning: unused variable ‘payload_removed’ [-Wunused-variable]
+       boolean payload_removed;
+               ^
+../src/LpsPtUpdate.c:262:18: warning: unused variable ‘index’ [-Wunused-variable]
+       unsigned_8 index;
+                  ^
+../src/LpsPtUpdate.c: In function ‘store_func’:
+../src/LpsPtUpdate.c:292:20: warning: unused variable ‘result’ [-Wunused-variable]
+         unsigned_8 result;
+                    ^
+../src/LpsPtUpdate.c: In function ‘clear_func’:
+../src/LpsPtUpdate.c:396:9: warning: implicit declaration of function ‘Clear_Cycle_Counter’ [-Wimplicit-function-declaration]
+         Clear_Cycle_Counter();
+         ^
+../src/LpsPtUpdate.c:398:9: warning: implicit declaration of function ‘pcs_clr_travel_loaded_time’ [-Wimplicit-function-declaration]
+         pcs_clr_travel_loaded_time();
+         ^
+../src/LpsPtUpdate.c:392:20: warning: unused variable ‘index’ [-Wunused-variable]
+         unsigned_8 index;
+                    ^
+../src/LpsPtUpdate.c: In function ‘check_requests’:
+../src/LpsPtUpdate.c:465:23: warning: unused variable ‘count’ [-Wunused-variable]
+     static unsigned_8 count = 0;
+                       ^
+../src/LpsPtUpdate.c: In function ‘tip_off_iri_state’:
+../src/LpsPtUpdate.c:683:5: warning: implicit declaration of function ‘get_tip_off_trigger’ [-Wimplicit-function-declaration]
+     else if (get_tip_off_trigger() == TIP_OFF_TRIGGER_DISABLED)
+     ^
+../src/LpsPtUpdate.c: In function ‘pcs_cycle_close’:
+../src/LpsPtUpdate.c:795:16: warning: unused variable ‘index’ [-Wunused-variable]
+     unsigned_8 index;
+                ^
+../src/LpsPtUpdate.c: In function ‘pcs_lifetime_totals_store_truck’:
+../src/LpsPtUpdate.c:904:18: warning: unused variable ‘i’ [-Wunused-variable]
+      unsigned_16 i;
+                  ^
+../src/LpsPtUpdate.c: At top level:
+../src/LpsPtUpdate.c:24:20: warning: ‘fuel_cumulative’ defined but not used [-Wunused-variable]
+ static unsigned_32 fuel_cumulative = 0;
+                    ^
+ar rcs liblps_pass_tracker.a *.o
+cp liblps_pass_tracker.a ../../lps_pass_tracker-tgt_gcc_4.8.3_a6n2-a/liblps_pass_tracker.a
+rm liblps_pass_tracker.a
+-------------------------make end------------------------------

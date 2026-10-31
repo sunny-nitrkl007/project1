@@ -1,0 +1,611 @@
+Description: This document helps to understand the BmiJ1939 json config file
+
+******************BMIJ1939PGNCfg  Template format****************************
+
+"PGN":
+{
+	"Template: minimum fields": {
+		"PGN":               52480
+	},
+
+	"Template: all fields, address specified": {
+		"PGN":               52481,
+		"Source Address":    "0xF1",
+		"Timeout(ms)":       5000,
+		"Priority":          4,
+		"Control Bitfield":  3,
+		"Handler Index":     3,
+		"Cid":               123,
+		"SPN List":          "1,2,3"
+	},
+
+	"Template: all fields, address by name": {
+		"PGN":               "0xCD02",
+		"Source Address":    241,
+		"Source Name":       " Bug",
+		"Timeout(ms)":       0,
+		"Priority":          8,
+		"Control Bitfield":  1,
+		"Handler Index":     2,
+		"Cid":               456,
+		"SPN List":          "4,5,6"
+	},
+	
+}
+
+**********************PID config Template***************************
+"CDL_PID":
+{
+	"Template: minimum fields": {
+		"CDL PID":              "0xFF40",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x07",
+		"Request Rate(ms)":     200
+	},
+
+	"Template: all fields": {
+		"CDL PID":              "0x40",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.5,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			590
+	},
+
+}
+**********************CAT EXT ID config Template***************************
+"CAT_EXT_ID":
+{
+	"Template: minimum fields": {
+		"CAT EXTID":            "0xF01A",		
+		"Source Address": 	"0x03",
+		"Priority":     	6,		
+		"Request Rate(ms)":     100
+	}
+
+	"Template: all fields": {
+		"CAT EXTID":            "0xF01B",		
+		"Source Address": 	"0x03",
+		"Priority":     	6,		
+		"Request Rate(ms)":     100
+		"RestrAdtReadParam": 	"0xD01F89" -->Restricts CAT EXT ID Based on ADT Param(0xD01F89) Data
+	}
+}
+**********************************************************************************
+Attributes : when DSI is avail - add ( dsi / dsi used / DSI ) in attributes
+             when DSI is unavail - not to add (non dsi/dsi unvail) in attributes 
+	     when data is LSB - add swap bytes in attributes
+             when data is MSB -  not to add (unswap/swap) in attributes
+	     when data is signed - add signed in attributes
+             when data is unsigned - not to add (signed/unsigned) in attributes
+
+ex  Attributes  : "" // It means dsi unavail, MSB, unsigned
+
+RequestType  :  typedef enum
+		{
+		   J1939_SPB_REQUEST = 0,
+		   J1939_PGB_REQUEST,
+		   J1939_ADT_REQUEST,
+		   J1939_READ_POLL,
+		   J1939_MAP_REQUEST,
+		   J1939_INVALID_REQ_TYPE
+		} J1939ParamReqType_t;
+
+VarLengthDataType :
+
+ //VarLengthParamType values are used to reference entries in the m_VarLengthPool.  Always add new
+      //enum values to the end of the list because the integer values of the enum appear in a json
+      //data initialization file for BmiCdlAppCfgTbl.
+      enum VarLengthParamType
+      {
+         NOT_APPLICABLE,
+         GPS,
+         SPL_PID_REV_DATA_BYTE_ORDER, // use this for speacial pid's to reverse data (ex pid:F5D9)
+         TIME_ZONE,
+         PRODUCT_ID,
+         PGN, // Use for Public PGN Data
+         UNSUPPORTED
+      };
+
+ParameterType  : 
+// From file  cdl2_struct.h
+typedef enum
+{
+  CDL2_U8_DSI = 0,         /* Unsigned Byte + Data Status ID */
+  CDL2_I8_DSI,             /* Signed Byte + Data Status ID */
+  CDL2_U16_DSI,            /* Unsigned Word + Data Status ID */
+  CDL2_I16_DSI,            /* Signed Word + Data Status ID */
+  CDL2_U32_DSI,            /* Unsigned Long + Data Status ID */
+  CDL2_I32_DSI,            /* Signed Long + Data Status ID */
+  CDL2_U8_NO_DSI,          /* Unsigned Byte + ** NO ** Data Status ID */
+  CDL2_I8_NO_DSI,          /* Signed Byte + ** NO ** Data Status ID */
+  CDL2_U16_NO_DSI,         /* Unsigned Word + ** NO ** Data Status ID */
+  CDL2_I16_NO_DSI,         /* Signed Word + ** NO ** Data Status ID */
+  CDL2_U32_NO_DSI,         /* Unsigned Long + ** NO ** Data Status ID */
+  CDL2_I32_NO_DSI,         /* Signed Long + ** NO ** Data Status ID */
+  CDL2_VAR_NO_DSI          /* Variable length, NO Data Status Checking Defined */
+} cdl2_parameter_type_e;
+
+
+Cid : Component ID  for ECM
+
+
+*******************************************************************************
+
+** PGN       J1939 PGN identifying this message.
+**
+** Handler Index 	The index of each item in the following array must match "Handler Index" in the JSON file
+**			const scl_j1939_rx_mpfn_parser_t* BmiJ1939DataHandlers::m_pgnHandlers[] = {
+**     			BmiJ1939PGNDefault,                 // Index 0 - User defined handler 
+**      		scl_j1939_cat_ppgn_hdlr             // Index 1 - CSNS Handler
+**			};
+**
+** Priority      The priority of the mesage when requesting this PGN.
+**
+**
+** Source Address The source address (the network address of the ECM
+**                from where the PGN came) of this PGN.
+**
+** Source Name       The J1939 SHORTHAND NAME of the device that originated this PGN.
+**                   The name field consists of Arbitrary Address Capable,Industry Group,
+**                   Vehicle System Instance,Vehicle System,Reserved,Function,
+**                   Function Instance,ECU Instance.                      
+**
+** Control Bitfield    Initial value that indicates how the message is received,
+**                	e.g., if the lost timer is applicable.
+**    Allowed values:
+**    00 - Inactive (SCL_J1939_RX_MSG_CBF)
+**    01 - Enabled (SCL_J1939_RX_MSG_CBF_ENABLED)
+**    02 - Use time out value (SCL_J1939_RX_MSG_CBF_LOST_TIMER_APPLICABLE)
+**
+** Timeout(ms)        The amount of time before a message is assumed lost.
+**
+** Cid           Component ID for ECM, needed for health monitoring
+**
+** SPN List      Comma separated string of SPNs, used for health monitoring
+
+
+********************** PGN JSON file Example configuration ***************************
+
+"PGN":
+{
+	"PROPRIETARY A (PROPA)": {
+
+		"PGN":               61184,		
+
+		"Source Address":    255,		
+
+		"Timeout(ms)":       0,
+
+		"Priority":          6,
+
+		"Control Bitfield":  1,
+
+		"Handler Index":     1,
+
+		"PGN List":          "7,8"
+
+	},
+
+	"ELECTRONIC ENGINE CONTROLLER 1 (EEC1)": {
+
+
+		"PGN":               61444,
+
+		"Source Address":    "0x00",		
+
+		"Timeout(ms)":       100,
+
+		"Priority":          3,
+
+		"Control Bitfield":  1,
+
+		"Handler Index":     0,
+
+		"PGN List":          "9,10"
+
+
+ 	},
+
+	"ELECTRONIC ENGINE CONTROLLER 2 (EEC2)": {
+
+
+		"PGN":               61443,
+
+		"Source Address":    "0x01",		
+
+		"Timeout(ms)":       100,
+
+		"Priority":          3,
+
+		"Control Bitfield":  1,
+
+		"Handler Index":     0,
+
+		"PGN List":          "11,12,13"
+
+ 	},
+
+	"ELECTRONIC TRANSMISSION CONTROLLER 1 (ETC1) ": {
+
+
+		"PGN":               61442,
+
+		"Source Address":    "0x03",		
+
+		"Timeout(ms)":       100,
+
+		"Priority":          3,
+
+		"Control Bitfield":  1,
+
+		"Handler Index":     0,
+
+		"PGN List":          "14,15"
+
+ 	},
+
+	"ELECTRONIC TRANSMISSION CONTROLLER 2 (ETC2) ": {
+
+		"PGN":               61445,
+
+		"Source Address":    "0x04",		
+
+		"Timeout(ms)":       100,
+
+		"Priority":          6,
+
+		"Control Bitfield":  1,
+
+		"Handler Index":     0,
+
+		"PGN List":          "16"
+
+ 	},
+
+	"ELECTRONIC BRAKE CONTROLLER 1 (EBC1)  ": {
+
+		"PGN":               61441,
+
+		"Source Address":    "0x0B",		
+
+		"Timeout(ms)":       100,
+
+		"Priority":          6,
+
+		"Control Bitfield":  1,
+
+		"Handler Index":     0,
+
+		"PGN List":          "17,18,19"
+ 	}
+
+}
+***********PID config Example*************************
+{
+
+"CDL_PID":
+{
+	
+	"Actual Engine RPM": {
+
+		"CDL PID":              "0x40",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.5,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			590
+
+	},
+	
+	
+	"Product Link Module GPS Position Status": {
+
+		"CDL PID":              "0xF84D",
+		"Data Size(bytes)":     15,
+		"Source J1939 Address": "0x25",
+		"Request Rate(ms)":     1000,
+		"Scaling":              1.0,
+		"Offset":               0,
+		"Units":                0,		
+		"Timeout(ms)":          2000,
+		"Attributes":           "swap bytes",  
+		"RequestType": 		4,
+		"VarLengthDataType" :   1,
+		"ParameterType" :	12,
+		"Cid": 			1273
+
+	}
+
+	
+	"Product Identification Number": {
+
+		"CDL PID":              "0xF82D",
+		"Data Size(bytes)":     9,
+		"Source J1939 Address": "0x47",
+		"Request Rate(ms)":     1000,
+		"Scaling":              1.0,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          2000,
+		"Attributes":           "swap bytes",
+		"RequestType": 		3,
+		"VarLengthDataType" :   4,
+		"ParameterType" :	12,
+		"Cid": 			1273
+
+	}
+	
+}
+
+}
+
+****************************** PID JSON File Configuration for ADT***************************
+
+Note: The Client API will return false if the total data length of the PIDs in a group is greater than 5bytes in ADT 
+
+{
+
+"CDL_PID":
+{
+	
+	"Actual Engine RPM": {
+
+		"CDL PID":              "0x40",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.5,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		2,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			590
+
+	},
+	
+	"Fuel Consumption Rate": {
+
+		"CDL PID":              "0xF525",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.05,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	2,
+		"Cid": 			590
+
+	},
+	
+	
+	"Total Fuel Used": {
+
+		"CDL PID":              "0xC8",
+		"Data Size(bytes)":     4,
+		"Source J1939 Address": "0x00",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.125,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	10,
+		"Cid": 			590
+
+	},
+	
+	"Actual Gear": {
+
+		"CDL PID":              "0xF5D9",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x03",
+		"Request Rate(ms)":     100,
+		"Scaling":              1.0,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "dsi used, swap bytes",
+		"RequestType": 		2,
+		"VarLengthDataType" :   2,
+		"ParameterType" :	2,
+		"Cid": 			296			
+
+	},
+
+	"Ground Speed/Direction": {
+ 		"CDL PID":              "0xF4FD",
+ 		"Data Size(bytes)":     2,
+ 		"Source J1939 Address": "0x03",
+ 		"Request Rate(ms)":     100,
+ 		"Scaling":              0.0036,
+ 		"Offset":               0,
+ 		"Units":                4,
+ 		"Timeout(ms)":          450,
+ 		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			296
+ 	}, 	
+	
+
+	"Total Distance Traveled (Odometer)": {
+
+		"CDL PID":              "0xFC2E",
+		"Data Size(bytes)":     4,
+		"Source J1939 Address": "0x03",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.1,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	10,
+		"Cid": 			296
+
+	},		
+	
+	"Machine Yaw Rate": {
+
+		"CDL PID":              "0xD01373",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x0B",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.01,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		3,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			533
+
+	},
+
+	"Machine Longitudinal Acceleration": {
+
+		"CDL PID":              "0xD01375",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x0B",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.01,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			533
+
+	},
+
+		
+	"Machine Slope": {
+
+		"CDL PID":              "0xF533",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x0B",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.1,
+		"Offset":               0,
+		"Units":                0,
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		2,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			533
+
+	},
+
+	"Body Up Status": {
+
+		"CDL PID":              "0xF604",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x47",
+		"Request Rate(ms)":     100,
+		"Scaling":              1.0,
+		"Offset":               0,
+		"Units":                0,		
+		"Timeout(ms)":          450,
+		"Attributes":           "swap bytes",
+		"RequestType": 		2,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	8,
+		"Cid": 			1273
+
+	},	
+
+	"Ambient Air Temperature": {
+
+		"CDL PID":              "0xF477",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x47",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.1,
+		"Offset":               0,
+		"Units":                1,		
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			1273
+
+	},
+
+	"Tall Tank Fuel Level": {
+
+		"CDL PID":              "0xF428",
+		"Data Size(bytes)":     2,
+		"Source J1939 Address": "0x47",
+		"Request Rate(ms)":     100,
+		"Scaling":              0.005,
+		"Offset":               0,
+		"Units":                1,		
+		"Timeout(ms)":          450,
+		"Attributes":           "signed type, dsi used, swap bytes",
+		"RequestType": 		1,
+		"VarLengthDataType" :   0,
+		"ParameterType" :	3,
+		"Cid": 			1273
+
+	}
+
+	
+ }
+}
+***************************** CAT EXT ID JSON File Configuration Example***************************
+{
+"CAT_EXT_IDS":
+{
+	"SECURITY SYSTEM CURRENT SECURITY ID INFORMATION": {		
+				
+		"CAT EXTID":            "0xF0B2",		
+		"Source Address": 	"0x03",
+		"Priority":     	6,		
+		"Request Rate(ms)":     100,
+		"RestrAdtReadParam": 	"0xD01F89"
+	},
+
+	"ECM BASIC INFORMATION": {		
+				
+		"CAT EXTID":            "0xF01A",		
+		"Source Address": 	"0x03",
+		"Priority":     	6,		
+		"Request Rate(ms)":     100
+		
+	}
+	
+}
+
+}
+

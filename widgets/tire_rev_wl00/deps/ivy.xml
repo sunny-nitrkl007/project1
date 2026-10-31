@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
+>
+  <info module="es-ms-mach-prod/ss/tire_rev_wl00"
+        e:ivydom="ivy-mach_productivity"
+        e:vpath="lib_info_products/tire_rev_wl00"
+        organisation="com.cat.e"
+        revision="#!RevReplace!#"
+        status="integration"
+				
+  />
+  <configurations>
+    <conf description="retrieve only artifacts necessary to use the module"   name="rel"/>
+	<conf description="retrieve only artifacts necessary to debug the module" name="rel_debug"/>
+    <conf description="retrieve artifacts that are part of this release unit" name="nodep"/>
+    <conf description="retrieve artifacts needed to build this release unit"  name="dev"/>
+  </configurations>
+  
+  <publications>
+    <artifact conf="dev,nodep,rel_debug" ext="xml" name="git-repo" type="git"/>
+  </publications>
+  
+  <dependencies defaultconfmapping="*->@">
+	
+      
+    <!--Machine Cluster for lib_oel, lib_a4 and lib_scl-->
+	<dependency conf="dev->rel_scl" 
+										name="cat/ess-mach/mach_lib_core_cluster" 							rev="13.1.0"     				e:ivydom="ivy-mach"         							org="com.cat.e"/>
+										
+	<!--Tools Cluster -->
+    <dependency conf="dev->rel_lib_a4,rel_lib_x5,rel_lib_x6,rel_libdiff,rel_girt_win32,rel_lib_sim"
+										name="cat/dt/mach_tools_cluster"                  					rev="12.0.0.rc44"               e:ivydom="ivy-ms_makefiles" 							org="com.cat.e"/>
+    
+	<!--PCS-Interface Headers -->
+    <dependency conf="dev->rel"  e:ivydom="ivy-mach_productivity" name="cat/ess-info/mach_prod_pcs-interface" org="com.cat.e" rev="4.0.0.rc24" ></dependency>
+	
+   </dependencies>
+</ivy-module>

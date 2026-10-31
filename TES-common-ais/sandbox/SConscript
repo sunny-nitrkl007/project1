@@ -1,0 +1,25 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the test/ directory.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'baseEnv' )
+testEnv = baseEnv.Clone();
+Export( 'testEnv' )
+
+#testEnv.buildit('PWMInputReader', ['suse'])
+#testEnv.buildit( 'VP3Test', ['suse'] )
+testEnv.buildit( 'csvToDldApp', ['suse'] )
+#testEnv.buildit( 'CoachingTaskExample', ['suse'] )
+#testEnv.buildit( 'CoachingTaskTest', ['suse'] )
+testEnv.buildit( 'CoachingTipHistoryTest', ['suse'] )
+#testEnv.buildit( 'EthernetPgtServerTest', ['suse'] ) # Temporarily disabled
+#testEnv.buildit('FTBTest', ['suse'])

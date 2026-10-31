@@ -1,0 +1,57 @@
+diff --git a/prod/machineCommon/content/scripts/vehDataDir b/prod/machineCommon/content/scripts/vehDataDir
+index 3fd2ac72d3..4542ad00f1 100644
+--- a/prod/machineCommon/content/scripts/vehDataDir
++++ b/prod/machineCommon/content/scripts/vehDataDir
+@@ -7,37 +7,37 @@
+ vehDataHome=/opt
+ 
+ # Location of main application verity
+-CAT_DIR=/opt/appSoftware
++CAT_DIR=/opt/CPM
+ 
+ # Set to CAT_DIR for backwards compatibility with verity and sync scripts
+-vehDataDir=/opt/appSoftware
++vehDataDir=/opt/CPM
+ 
+ # Location of application data for Container compatible configuration
+-#APP_DATA_DIR=/opt/appdata/appSoftware
++APP_DATA_DIR=/opt/appdata/CPM
+ 
+ # Location of robot, site, platformConfig files
+-APP_ETC_DIR=/opt/etc
+-#APP_ETC_DIR=/opt/appdata/appSoftware/etc
++# APP_ETC_DIR=/opt/etc
++APP_ETC_DIR=/opt/appdata/CPM/etc
+ 
+ # Location of temporary config (pre-stage) and stage folders
+-APP_TMP_DIR=/opt/tmp/outputFiles
+-#APP_TMP_DIR=/opt/appdata/appSoftware/tmp
++# APP_TMP_DIR=/opt/tmp/outputFiles
++APP_TMP_DIR=/opt/appdata/CPM/tmp
+ 
+ # Location of task output files
+-APP_LOG_DIR=/opt/tmp/outputFiles
+-#APP_LOG_DIR=/opt/appdata/appSoftware/log
++# APP_LOG_DIR=/opt/tmp/outputFiles
++APP_LOG_DIR=/tmp/appdata/CPM/log
+ 
+ # Base directory for hlog storage (ProductionLogger stores in APP_HLOG_BASE_DIR/productionLogs)
+-APP_HLOG_BASE_DIR=/opt/log
+-#APP_HLOG_BASE_DIR=/opt/appdata/appSoftware/log
++# APP_HLOG_BASE_DIR=/opt/log
++APP_HLOG_BASE_DIR=/opt/appdata/CPM/log
+ 
+ # Base folder for nvm data
+-APP_NVM_DIR=/opt/tmp/outputFiles/nvm
+-#APP_NVM_DIR=/opt/appdata/appSoftware/nvm
++# APP_NVM_DIR=/opt/tmp/outputFiles/nvm
++APP_NVM_DIR=/opt/appdata/CPM/nvm
+ 
+ # Location of the hostname file
+-APP_HOSTNAME_FILE=/opt/appdata/DefaultConfig/config/hostname
+-#APP_HOSTNAME_FILE=/opt/appdata/appSoftware/etc/hostname
++# APP_HOSTNAME_FILE=/opt/appdata/DefaultConfig/config/hostname
++APP_HOSTNAME_FILE=/opt/appdata/CPM/etc/hostname
+ 
+ # Location of the shared file for setting LD_LIBRARY_PATH and SUBSYSTEM variables
+ APP_ETC_PROFILE=/etc/profile

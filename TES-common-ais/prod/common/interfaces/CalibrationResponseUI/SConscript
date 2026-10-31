@@ -1,0 +1,60 @@
+###############################################################################
+## @file      SConscript
+## @author    autogen
+##
+## @attention COPYRIGHT (C) 2021 CATERPILLAR INC. ALL RIGHTS RESERVED.
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+
+
+# Build Channel.Input.so
+#ifaceChannelInput = baseEnv.SharedLibraryWrapper(
+#    target='CalibrationResponseUI.Channel.Input.so',
+#    source='Channel/Input/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel', baseEnv['BOOST_SIGNALS'] ],
+#)
+
+# Build Channel.Output.so
+#ifaceChannelOutput = baseEnv.SharedLibraryWrapper(
+#    target='CalibrationResponseUI.Channel.Output.so',
+#    source='Channel/Output/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel' ],
+#)
+
+# Build Channel.Output.so
+ifaceChannel = baseEnv.SharedLibraryWrapper(
+    target='CalibrationResponseUI.Channel.so',
+    source='Channel/channels.cpp',
+    LIBS = ['ais_serialization', 'ais_channel' ],
+)
+
+
+# Build Restorable
+ifaceRestorable = baseEnv.SharedLibraryWrapper(
+    target='CalibrationResponseUI.Restorable.so',
+    source='Restorable/Restorable.cpp',
+    LIBS = ['ais_serialization'],
+)
+    
+# Build TypeTraits    
+ifaceTypeTraits = baseEnv.SharedLibraryWrapper(
+  target='CalibrationResponseUI.TypeTraits.so',
+  source=[
+       'TypeTraits/csvable.cpp',
+        'TypeTraits/textWritable.cpp',
+   ],
+   LIBS = ['ais_serialization'],
+)
+
+#baseEnv.InstallLibrary( ifaceChannelInput )
+#baseEnv.InstallLibrary( ifaceChannelOutput )
+baseEnv.InstallLibrary( ifaceChannel )
+baseEnv.InstallLibrary( ifaceRestorable )
+baseEnv.InstallLibrary( ifaceTypeTraits )
+
+#baseEnv.Alias("CalibrationResponseUI", "#lib/libCalibrationResponseUI.Channel.Input.so")
+#baseEnv.Alias("CalibrationResponseUI", "#lib/libCalibrationResponseUI.Channel.Output.so")
+baseEnv.Alias("CalibrationResponseUI", "#lib/libCalibrationResponseUI.Channel.so")
+baseEnv.Alias("CalibrationResponseUI", "#lib/libCalibrationResponseUI.Restorable.so")
+baseEnv.Alias("CalibrationResponseUI", "#lib/libCalibrationResponseUI.TypeTraits.so")

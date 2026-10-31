@@ -1,0 +1,15 @@
+diff --git a/prod/coretech/scripts/launchSystem b/prod/coretech/scripts/launchSystem
+index 885ee2e..4cb1a11 100755
+--- a/prod/coretech/scripts/launchSystem
++++ b/prod/coretech/scripts/launchSystem
+@@ -197,4 +197,10 @@ if  [[ -f "${CAT_CONFIG_DIR}/configure_tmac" ]]; then
+     echo "Finished configuring TMAC"
+ fi
+ 
++# Start app_log_capture which queues up application log files for
++# sending offboard.
++if [ -f ${CAT_DIR}/bin/app_log_capture ]; then
++    ${CAT_DIR}/bin/app_log_capture &
++fi
++
+ exit 0 # success

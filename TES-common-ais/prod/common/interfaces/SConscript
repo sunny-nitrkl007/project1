@@ -1,0 +1,39 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for interfaces.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'baseEnv' )
+
+baseEnv.buildit('AppReg', ['suse'])
+# baseEnv.buildit('CreateFileRequest', ['suse'])
+baseEnv.buildit('PwmInputChannels', ['suse'])
+# baseEnv.buildit('FileTransferBridgeReadParamResponse', ['suse'])
+# baseEnv.buildit('FileTransferBridgeRequest', ['suse'])
+# baseEnv.buildit('FileTransferBridgeResponse', ['suse'])
+# baseEnv.buildit('FileTransferBridgeIndication', ['suse'])
+# baseEnv.buildit('VP3Record', ['suse'])
+baseEnv.buildit('SwitchInputScs', ['suse'])
+baseEnv.buildit('PartNumbers', ['suse'])
+baseEnv.buildit('DataLinkData', ['suse'])
+baseEnv.buildit('SerialPrinter', ['suse'])
+baseEnv.buildit('OutputChannel', ['suse'])
+# baseEnv.buildit('IoTHubComms', ['suse'])
+baseEnv.buildit('CalibrationRequestUI', ['suse'])
+baseEnv.buildit('CalibrationResponseUI', ['suse'])
+baseEnv.buildit('CalMgrCmdReqst', ['suse'])
+baseEnv.buildit('CalMgrCmdResp', ['suse'])
+baseEnv.buildit('CoachingShowHideStatus', ['suse'])
+baseEnv.buildit('CoachingSummaryData', ['suse'])
+baseEnv.buildit('CoachingTipHistory', ['suse'])
+baseEnv.buildit('Coaching3x3Data', ['suse'])
+baseEnv.buildit('BreadcrumbLog', ['suse'])
+baseEnv.buildit('DataLinkDataWrapper', ['suse'])

@@ -1,0 +1,25 @@
+#*****************************************************************************
+# @file      SConscript for Jhm2Ipc interface
+# @author    Josh Struble
+# @date      3/19/2013
+#
+# @attention Copyright (C) 2013 Caterpillar Inc. All rights reserved.
+#*****************************************************************************
+#!/usr/bin/python
+Import( 'jhm2CommonEnv' )
+
+jhm2IpcServer = jhm2CommonEnv.SharedLibraryWrapper(
+        target = 'jhm2IpcServer',
+        source = ['Jhm2IpcServer.cpp'],
+        LIBS = ['ais_log']
+    )
+
+jhm2IpcClient = jhm2CommonEnv.SharedLibraryWrapper(
+        target = 'jhm2IpcClient',
+        source = ['Jhm2IpcClient.cpp'],
+        LIBS = ['ais_log']
+    )
+
+jhm2CommonEnv.InstallLibrary( jhm2IpcServer )
+jhm2CommonEnv.InstallLibrary( jhm2IpcClient )
+

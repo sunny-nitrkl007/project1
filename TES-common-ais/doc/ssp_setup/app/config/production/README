@@ -1,0 +1,10 @@
+This file will be loaded by PCM when the production scenario is selected; it should load TES-common-ais's config/production/ActiveTasks_Common.rb.rb.  It will launch the following tasks by default:
+
+### A6N2 - SystemTasks
+   ProductionLogger
+
+### A6N2 - AuxiliaryProcesses
+   AllProcessMonitor, SysLogBridgeAggregator, MachSerialNumTask
+
+### OCS - SystemTasks
+   MachineOCS, LogSnapshotBridge

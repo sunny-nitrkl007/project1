@@ -1,0 +1,59 @@
+diff --git a/prod/machineCommon/content/platform/verity-ext-tags.mk b/prod/machineCommon/content/platform/verity-ext-tags.mk
+index 050be1a9..95554017 100755
+--- a/prod/machineCommon/content/platform/verity-ext-tags.mk
++++ b/prod/machineCommon/content/platform/verity-ext-tags.mk
+@@ -3,22 +3,22 @@
+ # To support wildcard (*), VERITY_FN_SUFFIX should not include the last two digits (typically 01 or 02)
+ 
+ export CDA_VERITY_FN_PREFIX=CDA
+-export CDA_REPO_TAG=CDA_2024.1.0
+-export CDA_VERITY_FN_SUFFIX=020240227
++export CDA_REPO_TAG=CDA_2025.2.0
++export CDA_VERITY_FN_SUFFIX=02025062001
+ 
+ export CDA_LITE_VERITY_FN_PREFIX=CDA_LITE
+ export CDA_LITE_REPO_TAG=$(CDA_REPO_TAG)
+ export CDA_LITE_VERITY_FN_SUFFIX=$(CDA_VERITY_FN_SUFFIX)
+ 
+-export CORE_TELEMATICS_TAG=CoreTelematics_2024.6.0
++export CORE_TELEMATICS_TAG=CoreTelematics_2025.9.0
+ 
+ export CI_REPO_TAG=$(CORE_TELEMATICS_TAG)
+ export CI_VERITY_FN_PREFIX=CoreInfrastructure
+-export CI_VERITY_FN_SUFFIX=020240322
++export CI_VERITY_FN_SUFFIX=02025050201
+ 
+ export CT_REPO_TAG=$(CORE_TELEMATICS_TAG)
+ export CT_VERITY_FN_PREFIX=CoreTelematics
+-export CT_VERITY_FN_SUFFIX=020240322
++export CT_VERITY_FN_SUFFIX=02025050201
+ 
+ export DEV_TOOLS_REPO_TAG=zzDevTools_2023.1.0
+ export DEV_TOOLS_VERITY_FN_PREFIX=zzDevTools
+@@ -26,20 +26,20 @@ export DEV_TOOLS_VERITY_FN_SUFFIX=020230518
+ 
+ export SDB_REPO_TAG=$(CORE_TELEMATICS_TAG)
+ export SDB_VERITY_FN_PREFIX=ServiceDashboard
+-export SDB_VERITY_FN_SUFFIX=020240322
++export SDB_VERITY_FN_SUFFIX=02025050201
+ 
+ export SDB_LITE_VERITY_FN_PREFIX=ServiceDashboard_Lite
+ export SDB_LITE_REPO_TAG=$(SDB_REPO_TAG)
+ export SDB_LITE_VERITY_FN_SUFFIX=$(SDB_VERITY_FN_SUFFIX)
+ 
+-export AVENA_REPO_TAG=AVENA_2023.2.0.rc3
++export AVENA_REPO_TAG=AVENA_2025.1.0
+ export AVENA_VERITY_FN_PREFIX=AppAvena
+-export AVENA_VERITY_FN_SUFFIX=020230920
++export AVENA_VERITY_FN_SUFFIX=02025041101
+ 
+-export ACOMMONOSS_REPO_TAG=ACommonOSS_2023.3.0
++export ACOMMONOSS_REPO_TAG=ACommonOSS_2025.1.0
+ export ACOMMONOSS_VERITY_FN_PREFIX=ACommonOSS
+-export ACOMMONOSS_VERITY_FN_SUFFIX=020230725
++export ACOMMONOSS_VERITY_FN_SUFFIX=02025061001
+ 
+ export SERIAL_PORT_MANAGER_REPO_TAG=$(CORE_TELEMATICS_TAG)
+ export SERIAL_PORT_MANAGER_VERITY_FN_PREFIX=SerialPortManager
+-export SERIAL_PORT_MANAGER_VERITY_FN_SUFFIX=020240322
++export SERIAL_PORT_MANAGER_VERITY_FN_SUFFIX=02025050201

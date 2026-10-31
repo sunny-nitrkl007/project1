@@ -1,0 +1,74 @@
+{
+	"PROPRIETARY A (PROPA)": {
+		"PGN":               61184,		
+		"Source Address":    255,		
+		"Timeout(ms)":       0,
+		"Priority":          6,
+		"Control Bitfield":  1,
+		"Handler Index":     1
+	},
+
+	"ELECTRONIC ENGINE CONTROLLER 1 (EEC1)": {
+
+		"PGN":               61444,
+		"Source Address":    "0x00",		
+		"Timeout(ms)":       100,
+		"Priority":          3,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+
+ 	},
+	
+	"ELECTRONIC ENGINE CONTROLLER 2 (EEC2)": {
+
+		"PGN":               61443,
+		"Source Address":    "0x00",
+		"Timeout(ms)":       100,
+		"Priority":          3,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+ 	},
+
+	"ACTIVE DIAGNOSTIC TROUBLE CODES (DM1)": {
+
+		"PGN":               65226,
+		"Source Address":    "0x00",
+		"Timeout(ms)":       100,
+		"Priority":          6,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+ 	},
+
+
+	"ELECTRONIC TRANSMISSION CONTROLLER 1 (ETC1) ": {
+
+		"PGN":               61442,
+		"Source Address":    "0x03",
+		"Timeout(ms)":       100,
+		"Priority":          3,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+
+ 	},
+
+	"ELECTRONIC TRANSMISSION CONTROLLER 2 (ETC2) ": {
+
+		"PGN":               61445,
+		"Source Address":    "0x3",
+		"Timeout(ms)":       100,
+		"Priority":          6,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+ 	},
+
+	"ELECTRONIC BRAKE CONTROLLER 1 (EBC1)  ": {
+
+		"PGN":               61441,
+		"Source Address":    "0x0B",
+		"Timeout(ms)":       100,
+		"Priority":          6,
+		"Control Bitfield":  1,
+		"Handler Index":     0
+ 	}
+	
+}

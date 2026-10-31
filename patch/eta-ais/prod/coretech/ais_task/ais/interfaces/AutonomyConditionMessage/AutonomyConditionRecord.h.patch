@@ -1,0 +1,56 @@
+diff --git a/prod/coretech/ais_task/ais/interfaces/AutonomyConditionMessage/AutonomyConditionRecord.h b/prod/coretech/ais_task/ais/interfaces/AutonomyConditionMessage/AutonomyConditionRecord.h
+index e081b4a..af888b7 100644
+--- a/prod/coretech/ais_task/ais/interfaces/AutonomyConditionMessage/AutonomyConditionRecord.h
++++ b/prod/coretech/ais_task/ais/interfaces/AutonomyConditionMessage/AutonomyConditionRecord.h
+@@ -106,10 +106,9 @@ public:
+   /// @brief Capture the condition cleared time, and update the condition set/cleared flags
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   void clearCondition() {
+-    TimeStamp now = localhostNow();
+     if(m_hasBeenSet)
+     {
+-        m_clearTime = now;
++        m_clearTime = localhostNow();
+     }
+     m_hasBeenCleared = true;
+     m_hasBeenSet = false;
+@@ -154,15 +153,17 @@ public:
+   /// @return TimeStamp timestamp of the deactivation event
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   TimeStamp getDeactivationTime() const {
+-    TimeStamp expirationTime = m_mostRecentSetTime + m_thisCondition.getTimeToLiveDuration() + 
+-      m_thisCondition.getDeactivationDebounceDuration();
+-    if(m_hasBeenCleared)
+-    {
+-      expirationTime = std::min(expirationTime, m_clearTime + m_thisCondition.getDeactivationDebounceDuration());
++    TimeStamp expirationTime; // default constructed to 0
++    if (0 == m_thisCondition.m_timeToLiveDuration_ms) {
++      if (m_hasBeenCleared) {
++        expirationTime = m_clearTime + m_thisCondition.getDeactivationDebounceDuration();
++      }
+     }
+-    if (m_thisCondition.getTimeToLiveDuration().isZero())
+-    {
+-      expirationTime = std::max(expirationTime, m_clearTime + m_thisCondition.getDeactivationDebounceDuration());
++    else {
++      expirationTime = m_mostRecentSetTime + m_thisCondition.getTimeToLiveDuration() + m_thisCondition.getDeactivationDebounceDuration();
++      if (m_hasBeenCleared) {
++        expirationTime = std::min(expirationTime, m_clearTime + m_thisCondition.getDeactivationDebounceDuration());
++      }
+     }
+     return expirationTime;
+   }
+@@ -185,7 +186,12 @@ public:
+   /// @return bool True when query time is greater than the defined expiration time; False otherwise.
+   //////////////////////////////////////////////////////////////////////////////////////////////////////
+   bool hasExpired(const TimeStamp& localQueryTime) const {
+-    return localQueryTime >= getDeactivationTime();
++    bool expired = false;
++    TimeStamp deactivationTime = getDeactivationTime();
++    if ((deactivationTime.isPositive()) && (localQueryTime >= deactivationTime)) {
++        expired = true;
++    }
++    return expired;
+   }
+ 
+   //////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<ivy-module version="2.0" 
+            xmlns:e="http://ant.apache.org/ivy/extra" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+            
+  <info module="es-ms-mach-prod/ss/cyc_seg_wl_00_x86_64-b"
+        e:ivydom="ivy-mach_productivity" 
+        e:vpath="lib_info_products\cyc_seg_wl\wl_00_x86_64-b" 
+        organisation="com.cat.e" 
+        revision="#!RevReplace!#" 
+        status="integration"
+  />
+  
+  <configurations defaultconf="rel">
+    <conf name="dev" description="replicate the source and documentation plus dependencies"/>
+    <conf name="rel" description="retrieve only artifacts necessary to use the module"/>
+    <conf name="rel_debug" description="retrieve only artifacts necessary to use the module, and the source repo for debugging"/>
+    <conf name="sim" description="retrieve only artifacts necessary for simulation"/>
+    <conf name="nodep" description="do not include the dependencies of the module"/>
+  </configurations>
+  
+  <publications>
+    <artifact ext="xml" name="git-repo" type="git"/>
+  </publications>
+  <dependencies defaultconf="*->@">
+     <dependency conf="dev->dev" e:ivydom="ivy-mach_productivity"  name="es-ms-mach-prod/ss/cyc_seg_wl_00"    org="com.cat.e" rev="#!RevReplace!#"/>
+  </dependencies>
+</ivy-module>

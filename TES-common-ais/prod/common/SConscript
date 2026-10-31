@@ -1,0 +1,23 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for common/
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'baseEnv' )
+commonEnv = baseEnv.Clone();
+Export( 'commonEnv' )
+
+commonEnv.buildit( 'interfaces', ['suse'] )
+commonEnv.buildit( 'jhm2', ['suse'] )
+commonEnv.buildit( 'jhm2WsServer', ['suse'] )
+commonEnv.buildit( 'bdt', ['suse'] )
+commonEnv.buildit( 'bmi', ['suse'] )
+commonEnv.buildit( 'filesystem/extensions', ['suse'])

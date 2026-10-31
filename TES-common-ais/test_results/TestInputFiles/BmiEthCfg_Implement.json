@@ -1,0 +1,71 @@
+{
+
+"Ethernet_ECM_Source_Config":
+ {
+
+	"ecm_2": {
+		"ecm_name"  : "BMI_ETH_DSE_ADDRESS_IMPLEMENT",
+		"ecm_fid"   : "0x00040000",
+		"ip_address": "0xA51A4F1A",
+		"cid"       : 490
+	}
+ },
+
+"CDL_PID":
+ {
+	
+	"Implement Lockout Switch Position": {
+
+		"CDL PID"		:   "0xF0B8",
+		"Data Size(bytes)"	:   1,
+		"Data Byte Order"	:   "MSB",
+		"Request Period(mu)"	:   100000,
+		"Source FID"		:   "0x00040000",
+		"Data Type"		:   "unsigned_8",
+		"VarLengthDataType" 	:   0,
+		"Dsi Support"		:   "Enable",
+		"Diag Support"		:   "Enable",
+		"Scaling"		:   1,
+		"Offset"		:   0,
+		"Units"			:   0
+	},
+
+	"Bucket Payload Data Status": {
+
+		"CDL PID"		:   "0xF2C6",
+		"Data Size(bytes)"	:   1,
+		"Data Byte Order"	:   "MSB",
+		"Request Period(mu)"	:   100000,
+		"Source FID"		:   "0x00040000",
+		"Data Type"		:   "unsigned_8",
+		"VarLengthDataType" 	:   0,
+		"Dsi Support"		:   "Enable",
+		"Diag Support"		:   "Enable",
+		"Scaling"		:   1,
+		"Offset"		:   0,
+		"Units"			:   0
+	},
+
+	"Total Machine Operation Cycle Count": {
+
+		"CDL PID"		:   "0xFE22",
+		"Data Size(bytes)"	:   4,
+		"Data Byte Order"	:   "LSB",
+		"Request Period(mu)"	:   100000,
+		"Source FID"		:   "0x00040000",
+		"Data Type"		:   "unsigned_32",
+		"VarLengthDataType" 	:   0,
+		"Dsi Support"		:   "Enable",
+		"Diag Support"		:   "Enable",
+		"Scaling"		:   1,
+		"Offset"		:   0,
+		"Units"			:   0
+	}
+	
+
+ }
+
+
+}
+
+

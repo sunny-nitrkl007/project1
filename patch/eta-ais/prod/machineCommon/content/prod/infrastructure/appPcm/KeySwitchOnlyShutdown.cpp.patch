@@ -1,0 +1,73 @@
+diff --git a/prod/machineCommon/content/prod/infrastructure/appPcm/KeySwitchOnlyShutdown.cpp b/prod/machineCommon/content/prod/infrastructure/appPcm/KeySwitchOnlyShutdown.cpp
+index 9fe0147..b9251ad 100644
+--- a/prod/machineCommon/content/prod/infrastructure/appPcm/KeySwitchOnlyShutdown.cpp
++++ b/prod/machineCommon/content/prod/infrastructure/appPcm/KeySwitchOnlyShutdown.cpp
+@@ -406,6 +406,15 @@ void KeySwitchOnlyShutdown::ShutdownAllProcesses()
+     // too long to shutdown
+     ProcessStopTimer.enableTimer();
+ 
++    // Patch: Add 60 secs to allow apps to shutdown incase keyswitch comes back on.
++    // 60secs is required for FileTransferBridgeApp to finish its cleanup. This fixes
++    // a known issue with a quick keycycle causing FTB App to be killed and triggering
++    // a crash event (E10012).
++    ShutdownRequestUnknownTimer.setTimeoutMs( 60 * 1000 );
++
++    // Reset the timer to debounce the keyswitch status
++    ShutdownRequestUnknownTimer.disableTimer();
++
+     // Call user provided function pointer to request
+     // processes be stopped.
+     if (RequestToStopAllProcesses)
+@@ -420,15 +429,44 @@ void KeySwitchOnlyShutdown::ShutdownAllProcesses()
+     }
+   }
+ 
+-  if (m_allProcessesAreStopped)
+-  {
+-    m_FsmState = PrePowerdown_FsmState;
+-    AIS_LOG_INFO("All processes have been stopped. Changing the state to pre-powerdown.");
++  bool powerDown = false;
++
++  { // Check if the keyswitch came back on
++      if (KSW_KEYSWITCH_ASSERTED == m_currentKwState) {
++          if (ShutdownRequestUnknownTimer.isEnabled()) {
++              if (ShutdownRequestUnknownTimer.hasTimerExpired()) {
++                  powerDown = true;
++                  AIS_LOG_DEBUG("The key-switch came back on.");
++              }
++          }
++          else {
++              ShutdownRequestUnknownTimer.enableTimer();
++          }
++      }
++      else {
++          ShutdownRequestUnknownTimer.disableTimer();
++      }
+   }
+-  else if (ProcessStopTimer.hasTimerExpired())
+-  {
+-    m_FsmState = PrePowerdown_FsmState;
+-    AIS_LOG_INFO("It took more than expected to stop all the processes. Changing the state to pre-powerdown.");
++
++  { // Check to see if all processes have stopped
++      if (m_allProcessesAreStopped) {
++          powerDown = true;
++          AIS_LOG_DEBUG("All processes have been stopped.");
++      }
++  }
++
++  { // Check to see if it has been too long
++      if (ProcessStopTimer.hasTimerExpired()) {
++          powerDown = true;
++          AIS_LOG_DEBUG("It took more than expected to stop all the processes.");
++      }
++  }
++
++  if (powerDown) {
++      // All processes have been stopped
++      // or it took too long for processes to gracefully shutdown
++      m_FsmState = PrePowerdown_FsmState;
++      AIS_LOG_DEBUG("Changing the state to pre-powerdown.");
+   }
+ }
+ 

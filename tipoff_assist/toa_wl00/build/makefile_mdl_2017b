@@ -1,0 +1,22 @@
+#==============================================================================
+# COPYRIGHT (C) 2019 CATERPILLAR INC.   ALL RIGHTS RESERVED.
+#
+# FILE:
+#   makefile_mdl_2017b
+#
+# DESCRIPTION:
+#   Makefile for a given target.
+#==============================================================================
+
+#############################################################################
+# Build Targets
+
+# Specifies the name of the .a32, .x, .csa, and .fls file.
+
+APP_NAME_SHORT       = toa_wl00
+APP_NAME             = lib$(APP_NAME_SHORT)
+#SYSARCH_CAL_SRC_FILE = $(APP_NAME_SHORT)_cal.c
+
+#############################################################################
+include makefile_mdl_2017b_sim_win64.mk
+#############################################################################

@@ -1,0 +1,21 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the infrastructure directory.
+##
+## @attention COPYRIGHT (C) 2008 CATERPILLAR INC. ALL RIGHTS RESERVED.
+## @attention
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'infEnv' )
+
+# Target only plugins
+if ( not infEnv[ 'PLATFORM' ] in [ 'x86_64-linux-gnu' , 'OCS'] ):
+    infEnv.buildit( 'EthernetPgtServer', ['suse'])
+

@@ -60,11 +60,8 @@ public:
     }
 
     bool stop() {
-        delete requestOutput_;
         requestOutput_ = nullptr;
-        delete responseInput_;
         responseInput_ = nullptr;
-        delete txInput_;
         txInput_ = nullptr;
         return true;
     }

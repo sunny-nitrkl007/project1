@@ -1,0 +1,4396 @@
+Model {
+  Name			  "toa_wl00"
+  Version		  9.0
+  SavedCharacterEncoding  "windows-1252"
+  GraphicalInterface {
+    NumRootInports	    33
+    Inport {
+      Name		      "Invalidate_Outputs"
+      BusObject		      ""
+      SignalName	      "Invalidate_Outputs"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Lift_Valve_Command"
+      BusObject		      ""
+      SignalName	      "Lift_Valve_Command"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Tilt_Valve_Command"
+      BusObject		      ""
+      SignalName	      "Tilt_Valve_Command"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Tilt_Extension"
+      BusObject		      ""
+      SignalName	      "Tilt_Extension"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Lift_Angle"
+      BusObject		      ""
+      SignalName	      "Lift_Angle"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Lift_HE_Pressure"
+      BusObject		      ""
+      SignalName	      "Lift_HE_Pressure"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Lift_RE_Pressure"
+      BusObject		      ""
+      SignalName	      "Lift_RE_Pressure"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Tilt_HE_Pressure"
+      BusObject		      ""
+      SignalName	      "Tilt_HE_Pressure"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Tilt_RE_Pressure"
+      BusObject		      ""
+      SignalName	      "Tilt_RE_Pressure"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Steering_Angle"
+      BusObject		      ""
+      SignalName	      "Steering_Angle"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Tool_Mass"
+      BusObject		      ""
+      SignalName	      "Tool_Mass"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "PCS_Truck_Target"
+      BusObject		      ""
+      SignalName	      "PCS_Truck_Target"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "PCS_Truck_Start_Weight"
+      BusObject		      ""
+      SignalName	      "PCS_Truck_Start_Weight"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "PCS_Bucket_Current_Weight_Accuracy"
+      BusObject		      ""
+      SignalName	      "PCS_Bucket_Current_Weight_Accuracy"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "PCS_Bucket_Current_Weight"
+      BusObject		      ""
+      SignalName	      "PCS_Bucket_Current_Weight"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "PCS_Tipoff_Mode"
+      BusObject		      ""
+      SignalName	      "PCS_Tipoff_Mode"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "EEF_IMU_AccelX"
+      BusObject		      ""
+      SignalName	      "EEF_IMU_AccelX"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "EEF_IMU_AccelY"
+      BusObject		      ""
+      SignalName	      "EEF_IMU_AccelY"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "EEF_IMU_AccelZ"
+      BusObject		      ""
+      SignalName	      "EEF_IMU_AccelZ"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Zero_Offset"
+      BusObject		      ""
+      SignalName	      "Zero_Offset"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Simple_Cal_Factor"
+      BusObject		      ""
+      SignalName	      "Simple_Cal_Factor"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "IMU_Pitch_Cal"
+      BusObject		      ""
+      SignalName	      "IMU_Pitch_Cal"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Bucket_Angle"
+      BusObject		      ""
+      SignalName	      "Bucket_Angle"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Unlatch_Trigger"
+      BusObject		      ""
+      SignalName	      "Unlatch_Trigger"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Anchor_Zero_Offset"
+      BusObject		      ""
+      SignalName	      "Anchor_Zero_Offset"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Anchor_Factor"
+      BusObject		      ""
+      SignalName	      "Anchor_Factor"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "CPM_Pass_Count"
+      BusObject		      ""
+      SignalName	      "CPM_Pass_Count"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Lift_Norm_Angle"
+      BusObject		      ""
+      SignalName	      "Lift_Norm_Angle"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Lift_Norm_Length"
+      BusObject		      ""
+      SignalName	      "Lift_Norm_Length"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Tilt_Norm_Angle"
+      BusObject		      ""
+      SignalName	      "Tilt_Norm_Angle"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Tilt_Norm_Length"
+      BusObject		      ""
+      SignalName	      "Tilt_Norm_Length"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Friction_Mu"
+      BusObject		      ""
+      SignalName	      "Friction_Mu"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    Inport {
+      Name		      "Friction_Offset"
+      BusObject		      ""
+      SignalName	      "Friction_Offset"
+      OutputFunctionCall      "off"
+      SampleTime	      "-1"
+      UnitExpr		      "inherit"
+    }
+    NumRootOutports	    16
+    Outport {
+      Name		      "Tilt_Sensitivity"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Tilt_Sensitivity"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Tilt_HE_Pressure_Out"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Tilt_HE_Pressure_Out"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Arbitrated_Payload_Norm_Error"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Arbitrated_Payload_Norm_Error"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Weigh_Status"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Weigh_Status"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Payload_Norm_Stdev"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Payload_Norm_Stdev"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "PCS_Bucket_Current_Weight_Accuracy_Out"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "PCS_Bucket_Current_Weight_Accuracy_Out"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "PCS_Bucket_Current_Weight_Norm_Error_Out"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "PCS_Bucket_Current_Weight_Norm_Error_Out"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Tipoff_Assist_Adv_Error_Code"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Tipoff_Assist_Adv_Error_Code"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Spill_Rate_Norm"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Spill_Rate_Norm"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Bucket_Payload_Target"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Bucket_Payload_Target"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Payload_Send_To_CPM"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Payload_Send_To_CPM"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Payload_Status_Send_To_CPM"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Payload_Status_Send_To_CPM"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Unsecured_Payload_Upper_Bound_Norm"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Unsecured_Payload_Upper_Bound_Norm"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Unsecured_Payload_Lower_Bound_Norm"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Unsecured_Payload_Lower_Bound_Norm"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Unsecured_PFW_Status"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Unsecured_PFW_Status"
+      UnitExpr		      "inherit"
+    }
+    Outport {
+      Name		      "Min_Secure_Bucket_Angle"
+      BusObject		      ""
+      BusOutputAsStruct	      "off"
+      SignalName	      "Min_Secure_Bucket_Angle"
+      UnitExpr		      "inherit"
+    }
+    ParameterArgumentNames  ""
+    ComputedModelVersion    "1.44"
+    NumModelReferences	    0
+    NumTestPointedSignals   131
+    TestPointedSignal {
+      SignalName	      "toa_inImuAcclX"
+      FullBlockPath	      "toa_wl00/Apply Name/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_inImuAcclY"
+      FullBlockPath	      "toa_wl00/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_inImuAcclZ"
+      FullBlockPath	      "toa_wl00/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outSendCpmPayload"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outUnsecPayloadNormLow"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name10/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outTiltHePress"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name11/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outUnsecPayloadStatus"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name12/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outSpillRateNorm"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name13/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outCpmAccu"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name14/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outCpmPayloadNormError"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name15/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outMinSecBucketAng"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name16/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outPayloadArbNormError"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name19/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_tiltSensitivity"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outPfwStat"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name20/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outPfwPayloadNormStdev"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name21/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_tiltForce"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_liftForce"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outSendCpmStatus"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name5/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outAdvErrorCode"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name6/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outTiltSensToBucket"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name7/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outBucketPayloadTarget"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name8/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_outUnsecPayloadNormUp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Apply Name9/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sendCpmPfwIsPrecise"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/CPM Payload Send/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sendCpmPfwSecSize"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/CPM Payload Send/Apply Name9/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imu_neef_accl_vec"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/EEF vector to NEEF vector"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_grav_angles"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/euler angles from rot ma"
+      "trix"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imu_eef_accl_vec_post_lpf"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/imu lpf x1"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_grav_rotMatrix"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/rotation matrix calc fro"
+      "m two vectors"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_grav_rotAxis"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/rotation matrix calc fro"
+      "m two vectors"
+      PortIndex		      2
+    }
+    TestPointedSignal {
+      SignalName	      "toa_grav_angle"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/rotation matrix calc fro"
+      "m two vectors"
+      PortIndex		      3
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imuRawEefAcclX"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imuRawEefAcclY"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imuRawEefAcclZ"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imuNeefGravX"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/Apply Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imuNeefGravY"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/Apply Name5/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imuNeefGravZ"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/EEF IMU to NEEF gravity vector/Apply Name6/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_grav_neef_xy_mag"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Gravity Relevant Components/Magnitude"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_imuNeefPitch"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Gravity Relevant Components/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_fcLiftForceComp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Lift Friction Compensation/Apply Name/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_fcLiftForceRaw"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Lift Friction Compensation/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncOutRawDist"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInTiltExt"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncOutRawMassTonne"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name10/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_rawDist"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name11/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInRawTiltForce"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name12/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInRawLiftForce"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name13/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInRawTiltExt"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name14/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInRawLiftAng"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name15/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInRawBcLength"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name16/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_payloadAncZeroed"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name17/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_payloadAncAdjusted"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name18/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInTiltForce"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name19/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncOutRawMass"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInLiftForce"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name20/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInGravX"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name21/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInGravY"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name23/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInRawGravX"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInRawGravY"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInBcLength"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name5/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_rawPayload"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name6/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_payloadAdjusted"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name7/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sfuncInLiftAng"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name8/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_payloadZeroed"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Non Bucket Payload/Apply Name9/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sendPayloadType"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Send to Implement/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sendPayloadArb"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Send to Implement/Apply Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_targetPayloadFinal"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Send to Implement/Bucket Target Payload/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_targetPayloadStatus"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Send to Implement/Bucket Target Payload/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_targetPayloadPreComp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Send to Implement/Bucket Target Payload/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_targetPayloadPostComp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Send to Implement/Bucket Target Payload/Bucket Target C"
+      "ompensation/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_targetCompMargin"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Send to Implement/Bucket Target Payload/Bucket Target C"
+      "ompensation/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_inTsLiftAngle"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tilt Sensitivity to Bucket Angle/Apply Name/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_inTsBc"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tilt Sensitivity to Bucket Angle/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_inTsTiltExt"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tilt Sensitivity to Bucket Angle/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_inTsHookAng"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tilt Sensitivity to Bucket Angle/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecStatus"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecPayload"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecStDev"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecLatch"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Apply Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwUnsecStatus"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Apply Name5/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwUnsecBoundLower"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Apply Name6/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwUnsecBoundUpper"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Apply Name7/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_lwStatus"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Live Weigh/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_sendCpmLivePayload"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Live Weigh/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_lwLpfPost"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Live Weigh/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_lwSpillRate"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Live Weigh/Apply Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadSecureTwoLower"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwNlNotchMeanEst"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name10/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlNotchOneUp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name11/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlNotchOneSize"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name12/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlNotchTwoUp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name13/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlNotchTwoSize"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name14/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlNotchTwoLow"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name15/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlOneUp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name16/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlOneSize"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name17/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlTwoUp"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name18/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlTwoSize"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name19/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadSecureTwoSize"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlTwoLow"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name20/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlOneLow"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name21/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwNlMeanEst"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name22/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwNlStDevEst"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name23/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecIsSecure"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name24/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecIsNoSliding"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name25/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadSecureOneUpper"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name26/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadSecureOneLower"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name27/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadSecureOneSize"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name28/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadSecureTwoUpper"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name29/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwIsWarm"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_isTiltValveCmd"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name30/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_isLiftValveCmd"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name31/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecIsNoCollapsing"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name32/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecMinBucketAng"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name33/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwSecIsRacked"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name34/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwCgDistNlNotchMeanEst"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwCgDistNotchFiltFinal"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name40/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwCgDistNotchPost"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name41/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_lwCgDist"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name44/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwPayloadNotchFiltFinal"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name5/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwPayloadNotchPost"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name6/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwPayloadFiltFinal"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name7/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_statPayloadNlNotchOneLow"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name8/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwNlNotchStDevEst"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Apply "
+      "Name9/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwMcMaybeRackStall"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Pseudo"
+      "-Frictionless Weigh Common Measurement Conditions/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwMcMaybeStalled"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Pseudo"
+      "-Frictionless Weigh Common Measurement Conditions/Apply Name2/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwMcMaybeGrounded"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Pseudo"
+      "-Frictionless Weigh Common Measurement Conditions/Apply Name3/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwMcOk"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Pseudo"
+      "-Frictionless Weigh Common Measurement Conditions/Apply Name4/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_tilt_timer_not_expired"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Pseudo"
+      "-Frictionless Weigh Common Measurement Conditions/Valve commands recently became zero/Logical Operator4"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_is_not_tilt_valve_cmd"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Pseudo"
+      "-Frictionless Weigh Common Measurement Conditions/Valve commands recently became zero/Logical Operator5"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_tilt_timer_expired"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Pseudo"
+      "-Frictionless Weigh Common Measurement Conditions/Valve commands recently became zero/Tilt expired?"
+    }
+    TestPointedSignal {
+      SignalName	      "toa_pfwLatchInvalidate"
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Secure"
+      " Payload Unlatch Logic/Apply Name1/Copy"
+    }
+    TestPointedSignal {
+      SignalName	      ""
+      FullBlockPath	      "toa_wl00/Tip-Off Assist Support Lib/Tip-Off Assist Payload/Pseudo-Frictionless Weigh/Statis"
+      "tics Estimation2/Math Function"
+      LogSignal		      1
+      MaxPoints		      5000
+      Decimation	      2
+    }
+    NumProvidedFunctions    0
+    NumRequiredFunctions    0
+    NumResetEvents	    0
+    HasInitializeEvent	    0
+    HasTerminateEvent	    0
+    IsExportFunctionModel   0
+    NumParameterArguments   0
+    NumExternalFileReferences 5
+    ExternalFileReference {
+      Reference		      "lib_CATutils_Utilities_ApplyName_v2/Apply Name"
+      Path		      "toa_wl00/Apply Name"
+      SID		      "597"
+      Type		      "LIBRARY_BLOCK"
+    }
+    ExternalFileReference {
+      Reference		      "lib_CATutils_Utilities_ApplyName_v2/Apply Name"
+      Path		      "toa_wl00/Apply Name2"
+      SID		      "598"
+      Type		      "LIBRARY_BLOCK"
+    }
+    ExternalFileReference {
+      Reference		      "lib_CATutils_Utilities_ApplyName_v2/Apply Name"
+      Path		      "toa_wl00/Apply Name3"
+      SID		      "599"
+      Type		      "LIBRARY_BLOCK"
+    }
+    ExternalFileReference {
+      Reference		      "package_instance/PkgInstance"
+      Path		      "toa_wl00/Package Instance"
+      SID		      "593"
+      Type		      "LIBRARY_BLOCK"
+    }
+    ExternalFileReference {
+      Reference		      "tip_assist_lib_support/Tip-Off Assist Support Lib"
+      Path		      "toa_wl00/Tip-Off Assist Support Lib"
+      SID		      "1"
+      Type		      "LIBRARY_BLOCK"
+    }
+    OrderedModelArguments   1
+  }
+  LogicAnalyzerGraphicalSettings ""
+  LogicAnalyzerPlugin	  "on"
+  LogicAnalyzerSignalOrdering "5984164a-15a1-47b0-834b-00decfb9521f"
+  DiagnosticSuppressor	  "on"
+  SuppressorTable	  "22 serialization::archive 11 0 6 0 0 0 8 0"
+  CustomCodeFunctionData  ""
+  SLCCPlugin		  "on"
+  PreLoadFcn		  "makefile_build_callback(bdroot,'toa_wl00.buildescription'); "
+  ScopeRefreshTime	  0.035000
+  OverrideScopeRefreshTime on
+  DisableAllScopes	  off
+  DataTypeOverride	  "UseLocalSettings"
+  DataTypeOverrideAppliesTo "AllNumericTypes"
+  MinMaxOverflowLogging	  "MinMaxAndOverflow"
+  MinMaxOverflowArchiveMode "Overwrite"
+  FPTRunName		  "Run 1"
+  MaxMDLFileLineLength	  120
+  LastSavedArchitecture	  "win64"
+  Object {
+    $PropName		    "BdWindowsInfo"
+    $ObjectID		    1
+    $ClassName		    "Simulink.BDWindowsInfo"
+    Object {
+      $PropName		      "WindowsInfo"
+      $ObjectID		      2
+      $ClassName	      "Simulink.WindowInfo"
+      IsActive		      [1]
+      Location		      [-1287.0, -7.0, 1295.0, 695.0]
+      Object {
+	$PropName		"ModelBrowserInfo"
+	$ObjectID		3
+	$ClassName		"Simulink.ModelBrowserInfo"
+	Visible			[0]
+	DockPosition		"Left"
+	Width			[50]
+	Height			[50]
+	Filter			[59]
+      }
+      Object {
+	$PropName		"ExplorerBarInfo"
+	$ObjectID		4
+	$ClassName		"Simulink.ExplorerBarInfo"
+	Visible			[1]
+      }
+      Array {
+	Type			"Simulink.EditorInfo"
+	Dimension		3
+	Object {
+	  $ObjectID		  5
+	  IsActive		  [1]
+	  ViewObjType		  "SimulinkTopLevel"
+	  LoadSaveID		  "0"
+	  Extents		  [1864.0, 789.0]
+	  ZoomFactor		  [1.0000000000000002]
+	  Offset		  [-71.175781250000682, 453.38888888888852]
+	}
+	Object {
+	  $ObjectID		  6
+	  IsActive		  [0]
+	  ViewObjType		  "SimulinkSubsys"
+	  LoadSaveID		  "1:684"
+	  Extents		  [2880.0, 1080.0]
+	  ZoomFactor		  [0.80000000000000016]
+	  Offset		  [-284.0833333333336, -424.00000000000023]
+	}
+	Object {
+	  $ObjectID		  7
+	  IsActive		  [0]
+	  ViewObjType		  "SimulinkSubsys"
+	  LoadSaveID		  "1:260"
+	  Extents		  [2823.0, 1080.0]
+	  ZoomFactor		  [0.8]
+	  Offset		  [-235.25000000000045, -109.00000000000006]
+	}
+	PropName		"EditorsInfo"
+      }
+      Object {
+	$PropName		"DockComponentsInfo"
+	$ObjectID		8
+	$ClassName		"Simulink.DockComponentInfo"
+	Type			"GLUE2:PropertyInspector"
+	ID			"Property Inspector"
+	Visible			[0]
+	CreateCallback		""
+	UserData		""
+	Floating		[0]
+	DockPosition		"Right"
+	Width			[426]
+	Height			[320]
+      }
+      WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAEUAAADm/wCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
+      "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
+      "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAQAAAA5sAAACSAP///wAAAAEAAAAAAAAAAPwCA"
+      "AAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvAFAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZ"
+      "QBjAHQAbwByAAAAAAD/////AAAAPQD///8AAAeAAAADaAAAAAEAAAACAAAAAQAAAAL8AAAAAQAAAAIAAAAP/////wAAAAAA/////wAAAAAAAAAA/"
+      "////wEAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/"
+      "////wEAAACp/////wAAAAAAAAAA/////wEAAAEu/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAHX/////wAAAAAAAAAA/"
+      "////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA/////wEAAAR7/////wAAAAAAAAAA/"
+      "////wEAAAS8/////wAAAAAAAAAA/////wAAAAAA/////wAAAAAAAAAA"
+    }
+  }
+  HideAutomaticNames	  on
+  Created		  "Mon Jun 17 10:39:56 2019"
+  Creator		  "gulamhs"
+  UpdateHistory		  "UpdateHistoryNever"
+  ModifiedByFormat	  "%<Auto>"
+  LastModifiedBy	  "CurriSD"
+  ModifiedDateFormat	  "%<Auto>"
+  LastModifiedDate	  "Thu Oct 01 12:23:39 2020"
+  RTWModifiedTimeStamp	  523455047
+  ModelVersionFormat	  "1.%<AutoIncrement:44>"
+  SampleTimeColors	  on
+  SampleTimeAnnotations	  off
+  LibraryLinkDisplay	  "all"
+  WideLines		  on
+  ShowLineDimensions	  off
+  ShowPortDataTypes	  on
+  PortDataTypeDisplayFormat "AliasTypeOnly"
+  ShowEditTimeErrors	  on
+  ShowEditTimeWarnings	  on
+  ShowEditTimeAdvisorChecks off
+  ShowPortUnits		  off
+  ShowDesignRanges	  off
+  ShowLoopsOnError	  on
+  IgnoreBidirectionalLines off
+  ShowStorageClass	  off
+  ShowTestPointIcons	  on
+  ShowSignalResolutionIcons on
+  ShowViewerIcons	  on
+  SortedOrder		  off
+  VariantCondition	  off
+  ExecutionContextIcon	  off
+  ShowLinearizationAnnotations on
+  ShowVisualizeInsertedRTB on
+  ShowMarkup		  on
+  BlockNameDataTip	  off
+  BlockParametersDataTip  off
+  BlockDescriptionStringDataTip	off
+  BlockVariantConditionDataTip off
+  ToolBar		  on
+  StatusBar		  on
+  BrowserShowLibraryLinks on
+  FunctionConnectors	  off
+  BrowserLookUnderMasks	  on
+  SimulationMode	  "normal"
+  VisualizeLoggedSignalsWhenLoggingToFile off
+  PauseTimes		  "5"
+  NumberOfSteps		  1
+  SnapshotBufferSize	  10
+  SnapshotInterval	  10
+  NumberOfLastSnapshots	  0
+  LinearizationMsg	  "none"
+  Profile		  off
+  ParamWorkspaceSource	  "MATLABWorkspace"
+  AccelSystemTargetFile	  "accel.tlc"
+  AccelTemplateMakefile	  "accel_default_tmf"
+  AccelMakeCommand	  "make_rtw"
+  TryForcingSFcnDF	  off
+  Object {
+    $PropName		    "DataLoggingOverride"
+    $ObjectID		    9
+    $ClassName		    "Simulink.SimulationData.ModelLoggingInfo"
+    model_		    "toa_wl00"
+    overrideMode_	    [0.0]
+    Array {
+      Type		      "Cell"
+      Dimension		      1
+      Cell		      "toa_wl00"
+      PropName		      "logAsSpecifiedByModels_"
+    }
+    Array {
+      Type		      "Cell"
+      Dimension		      1
+      Cell		      []
+      PropName		      "logAsSpecifiedByModelsSSIDs_"
+    }
+  }
+  Object {
+    $PropName		    "InstrumentedSignals"
+    $ObjectID		    10
+    $ClassName		    "Simulink.HMI.InstrumentedSignals"
+    Persistence		    []
+  }
+  ExtModeBatchMode	  off
+  ExtModeEnableFloating	  on
+  ExtModeTrigType	  "manual"
+  ExtModeTrigMode	  "normal"
+  ExtModeTrigPort	  "1"
+  ExtModeTrigElement	  "any"
+  ExtModeTrigDuration	  1000
+  ExtModeTrigDurationFloating "auto"
+  ExtModeTrigHoldOff	  0
+  ExtModeTrigDelay	  0
+  ExtModeTrigDirection	  "rising"
+  ExtModeTrigLevel	  0
+  ExtModeArchiveMode	  "off"
+  ExtModeAutoIncOneShot	  off
+  ExtModeIncDirWhenArm	  off
+  ExtModeAddSuffixToVar	  off
+  ExtModeWriteAllDataToWs off
+  ExtModeArmWhenConnect	  on
+  ExtModeSkipDownloadWhenConnect off
+  ExtModeLogAll		  on
+  ExtModeAutoUpdateStatusClock on
+  ShowModelReferenceBlockVersion off
+  ShowModelReferenceBlockIO off
+  OrderedModelArguments	  on
+  Array {
+    Type		    "Handle"
+    Dimension		    1
+    Simulink.ConfigSet {
+      $ObjectID		      11
+      Version		      "1.17.1"
+      DisabledProps	      []
+      Description	      ""
+      Array {
+	Type			"Handle"
+	Dimension		9
+	Simulink.SolverCC {
+	  $ObjectID		  12
+	  Version		  "1.17.1"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    4
+	    Cell		    "SolverType"
+	    Cell		    "SolverName"
+	    Cell		    "Solver"
+	    Cell		    "EnableConcurrentExecution"
+	    PropName		    "DisabledProps"
+	  }
+	  Description		  ""
+	  StartTime		  "0.0"
+	  StopTime		  "inf"
+	  AbsTol		  "auto"
+	  FixedStep		  "0.02"
+	  InitialStep		  "auto"
+	  MaxOrder		  5
+	  ZcThreshold		  "auto"
+	  ConsecutiveZCsStepRelTol "10*128*eps"
+	  MaxConsecutiveZCs	  "1000"
+	  ExtrapolationOrder	  4
+	  NumberNewtonIterations  1
+	  MaxStep		  "auto"
+	  MinStep		  "auto"
+	  MaxConsecutiveMinStep	  "1"
+	  RelTol		  "1e-3"
+	  EnableMultiTasking	  on
+	  ConcurrentTasks	  off
+	  Solver		  "FixedStepDiscrete"
+	  SolverName		  "FixedStepDiscrete"
+	  SolverJacobianMethodControl "auto"
+	  ShapePreserveControl	  "DisableAll"
+	  ZeroCrossControl	  "UseLocalSettings"
+	  ZeroCrossAlgorithm	  "Nonadaptive"
+	  AlgebraicLoopSolver	  "TrustRegion"
+	  SolverInfoToggleStatus  off
+	  IsAutoAppliedInSIP	  off
+	  SolverResetMethod	  "Fast"
+	  PositivePriorityOrder	  off
+	  AutoInsertRateTranBlk	  off
+	  SampleTimeConstraint	  "Unconstrained"
+	  InsertRTBMode		  "Whenever possible"
+	  SampleTimeProperty	  []
+	  DecoupledContinuousIntegration off
+	}
+	Simulink.DataIOCC {
+	  $ObjectID		  13
+	  Version		  "1.17.1"
+	  DisabledProps		  []
+	  Description		  ""
+	  Decimation		  "1"
+	  ExternalInput		  "[t,u]"
+	  FinalStateName	  "xFinal"
+	  InitialState		  "xInitial"
+	  LimitDataPoints	  off
+	  MaxDataPoints		  "1000"
+	  LoadExternalInput	  off
+	  LoadInitialState	  off
+	  SaveFinalState	  off
+	  SaveCompleteFinalSimState on
+	  SaveFormat		  "StructureWithTime"
+	  SignalLoggingSaveFormat "Dataset"
+	  SaveOutput		  off
+	  SaveState		  off
+	  SignalLogging		  off
+	  DSMLogging		  off
+	  InspectSignalLogs	  off
+	  VisualizeSimOutput	  on
+	  StreamToWorkspace	  off
+	  StreamVariableName	  "streamout"
+	  SaveTime		  off
+	  ReturnWorkspaceOutputs  off
+	  StateSaveName		  "xout"
+	  TimeSaveName		  "tout"
+	  OutputSaveName	  "yout"
+	  SignalLoggingName	  "logsout"
+	  DSMLoggingName	  "dsmout"
+	  OutputOption		  "RefineOutputTimes"
+	  OutputTimes		  "[]"
+	  ReturnWorkspaceOutputsName "out"
+	  Refine		  "1"
+	  LoggingToFile		  off
+	  DatasetSignalFormat	  "timeseries"
+	  LoggingFileName	  "out.mat"
+	  LoggingIntervals	  "[-inf, inf]"
+	}
+	Simulink.OptimizationCC {
+	  $ObjectID		  14
+	  Version		  "1.17.1"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    13
+	    Cell		    "BooleanDataType"
+	    Cell		    "LifeSpan"
+	    Cell		    "NoFixptDivByZeroProtection"
+	    Cell		    "SimCompilerOptimization"
+	    Cell		    "AccelVerboseBuild"
+	    Cell		    "InlineParams"
+	    Cell		    "LocalBlockOutputs"
+	    Cell		    "BufferReuse"
+	    Cell		    "ExpressionFolding"
+	    Cell		    "InlineInvariantSignals"
+	    Cell		    "UseIntDivNetSlope"
+	    Cell		    "EnforceIntegerDowncast"
+	    Cell		    "RollThreshold"
+	    PropName		    "DisabledProps"
+	  }
+	  Description		  ""
+	  BlockReduction	  on
+	  BooleanDataType	  on
+	  ConditionallyExecuteInputs on
+	  DefaultParameterBehavior "Inlined"
+	  UseDivisionForNetSlopeComputation "off"
+	  UseFloatMulNetSlope	  off
+	  DefaultUnderspecifiedDataType	"double"
+	  UseSpecifiedMinMax	  off
+	  InlineInvariantSignals  on
+	  OptimizeBlockIOStorage  on
+	  BufferReuse		  on
+	  EnhancedBackFolding	  on
+	  CachingGlobalReferences off
+	  GlobalBufferReuse	  on
+	  StrengthReduction	  on
+	  AdvancedOptControl	  ""
+	  ExpressionFolding	  on
+	  BooleansAsBitfields	  off
+	  BitfieldContainerType	  "uchar_T"
+	  EnableMemcpy		  on
+	  MemcpyThreshold	  64
+	  PassReuseOutputArgsAs	  "Individual arguments"
+	  PassReuseOutputArgsThreshold 12
+	  ExpressionDepthLimit	  2147483647
+	  LocalBlockOutputs	  on
+	  RollThreshold		  5
+	  StateBitsets		  off
+	  DataBitsets		  off
+	  ActiveStateOutputEnumStorageType "Native Integer"
+	  ZeroExternalMemoryAtStartup on
+	  ZeroInternalMemoryAtStartup on
+	  InitFltsAndDblsToZero	  off
+	  NoFixptDivByZeroProtection off
+	  EfficientFloat2IntCast  on
+	  EfficientMapNaN2IntZero on
+	  LifeSpan		  "inf"
+	  MaxStackSize		  "Inherit from target"
+	  BufferReusableBoundary  on
+	  SimCompilerOptimization "off"
+	  AccelVerboseBuild	  off
+	  OptimizeBlockOrder	  "off"
+	  OptimizeDataStoreBuffers on
+	  BusAssignmentInplaceUpdate on
+	  DifferentSizesBufferReuse off
+	}
+	Simulink.DebuggingCC {
+	  $ObjectID		  15
+	  Version		  "1.17.1"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    8
+	    Cell		    "MultiTaskRateTransMsg"
+	    Cell		    "TasksWithSamePriorityMsg"
+	    Cell		    "SigSpecEnsureSampleTimeMsg"
+	    Cell		    "SignalResolutionControl"
+	    Cell		    "RTPrefix"
+	    Cell		    "InvalidFcnCallConnMsg"
+	    Cell		    "RootOutportRequireBusObject"
+	    Cell		    "UnnecessaryDatatypeConvMsg"
+	    PropName		    "DisabledProps"
+	  }
+	  Description		  ""
+	  RTPrefix		  "error"
+	  ConsistencyChecking	  "none"
+	  ArrayBoundsChecking	  "none"
+	  SignalInfNanChecking	  "error"
+	  SignalRangeChecking	  "error"
+	  ReadBeforeWriteMsg	  "EnableAllAsError"
+	  WriteAfterWriteMsg	  "EnableAllAsError"
+	  WriteAfterReadMsg	  "EnableAllAsError"
+	  AlgebraicLoopMsg	  "error"
+	  ArtificialAlgebraicLoopMsg "error"
+	  SaveWithDisabledLinksMsg "error"
+	  SaveWithParameterizedLinksMsg	"error"
+	  CheckSSInitialOutputMsg on
+	  UnderspecifiedInitializationDetection	"Simplified"
+	  MergeDetectMultiDrivingBlocksExec "error"
+	  CheckExecutionContextPreStartOutputMsg off
+	  CheckExecutionContextRuntimeOutputMsg	off
+	  SignalResolutionControl "UseLocalSettings"
+	  BlockPriorityViolationMsg "error"
+	  MinStepSizeMsg	  "warning"
+	  TimeAdjustmentMsg	  "none"
+	  MaxConsecutiveZCsMsg	  "error"
+	  MaskedZcDiagnostic	  "warning"
+	  IgnoredZcDiagnostic	  "warning"
+	  SolverPrmCheckMsg	  "error"
+	  InheritedTsInSrcMsg	  "none"
+	  MultiTaskDSMMsg	  "error"
+	  MultiTaskCondExecSysMsg "error"
+	  MultiTaskRateTransMsg	  "error"
+	  SingleTaskRateTransMsg  "none"
+	  TasksWithSamePriorityMsg "error"
+	  ExportedTasksRateTransMsg "none"
+	  SigSpecEnsureSampleTimeMsg "error"
+	  CheckMatrixSingularityMsg "error"
+	  IntegerOverflowMsg	  "error"
+	  Int32ToFloatConvMsg	  "warning"
+	  ParameterDowncastMsg	  "error"
+	  ParameterOverflowMsg	  "error"
+	  ParameterUnderflowMsg	  "error"
+	  ParameterPrecisionLossMsg "none"
+	  ParameterTunabilityLossMsg "warning"
+	  FixptConstUnderflowMsg  "error"
+	  FixptConstOverflowMsg	  "error"
+	  FixptConstPrecisionLossMsg "none"
+	  UnderSpecifiedDataTypeMsg "error"
+	  UnnecessaryDatatypeConvMsg "none"
+	  VectorMatrixConversionMsg "error"
+	  InvalidFcnCallConnMsg	  "error"
+	  FcnCallInpInsideContextMsg "warning"
+	  SignalLabelMismatchMsg  "none"
+	  UnconnectedInputMsg	  "error"
+	  UnconnectedOutputMsg	  "error"
+	  UnconnectedLineMsg	  "error"
+	  UseOnlyExistingSharedCode "error"
+	  SFcnCompatibilityMsg	  "error"
+	  FrameProcessingCompatibilityMsg "warning"
+	  UniqueDataStoreMsg	  "error"
+	  BusObjectLabelMismatch  "error"
+	  RootOutportRequireBusObject "error"
+	  AssertControl		  "DisableAll"
+	  AllowSymbolicDim	  on
+	  RowMajorDimensionSupport off
+	  ModelReferenceIOMsg	  "error"
+	  ModelReferenceMultiInstanceNormalModeStructChecksumCheck "error"
+	  ModelReferenceVersionMismatchMessage "warning"
+	  ModelReferenceIOMismatchMessage "error"
+	  UnknownTsInhSupMsg	  "error"
+	  ModelReferenceDataLoggingMessage "error"
+	  ModelReferenceSymbolNameMessage "warning"
+	  ModelReferenceExtraNoncontSigs "error"
+	  StateNameClashWarn	  "warning"
+	  SimStateInterfaceChecksumMismatchMsg "error"
+	  SimStateOlderReleaseMsg "error"
+	  ChecksumConsistencyForSSReuse	"none"
+	  InitInArrayFormatMsg	  "warning"
+	  StrictBusMsg		  "ErrorOnBusTreatedAsVector"
+	  BusNameAdapt		  "ErrorWithoutRepair"
+	  NonBusSignalsTreatedAsBus "error"
+	  SymbolicDimMinMaxWarning "warning"
+	  LossOfSymbolicDimsSimulationWarning "warning"
+	  LossOfSymbolicDimsCodeGenerationWarning "error"
+	  SymbolicDimsDataTypeCodeGenerationDiagnostic "error"
+	  BlockIODiagnostic	  "none"
+	  SFUnusedDataAndEventsDiag "warning"
+	  SFUnexpectedBacktrackingDiag "warning"
+	  SFInvalidInputDataAccessInChartInitDiag "error"
+	  SFNoUnconditionalDefaultTransitionDiag "error"
+	  SFTransitionOutsideNaturalParentDiag "error"
+	  SFUnreachableExecutionPathDiag "error"
+	  SFUndirectedBroadcastEventsDiag "error"
+	  SFTransitionActionBeforeConditionDiag	"warning"
+	  SFOutputUsedAsStateInMooreChartDiag "error"
+	  SFTemporalDelaySmallerThanSampleTimeDiag "warning"
+	  SFSelfTransitionDiag	  "warning"
+	  SFExecutionAtInitializationDiag "warning"
+	  SFMachineParentedDataDiag "warning"
+	  IntegerSaturationMsg	  "error"
+	  AllowedUnitSystems	  "all"
+	  UnitsInconsistencyMsg	  "warning"
+	  AllowAutomaticUnitConversions	on
+	  RCSCRenamedMsg	  "warning"
+	  RCSCObservableMsg	  "warning"
+	  ForceCombineOutputUpdateInSim	off
+	  UnitDatabase		  ""
+	}
+	Simulink.HardwareCC {
+	  $ObjectID		  16
+	  Version		  "1.17.1"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    2
+	    Cell		    "ProdLargestAtomicInteger"
+	    Cell		    "ProdLargestAtomicFloat"
+	    PropName		    "DisabledProps"
+	  }
+	  Description		  ""
+	  ProdBitPerChar	  8
+	  ProdBitPerShort	  16
+	  ProdBitPerInt		  32
+	  ProdBitPerLong	  64
+	  ProdBitPerLongLong	  64
+	  ProdBitPerFloat	  32
+	  ProdBitPerDouble	  64
+	  ProdBitPerPointer	  64
+	  ProdBitPerSizeT	  64
+	  ProdBitPerPtrDiffT	  64
+	  ProdLargestAtomicInteger "Integer"
+	  ProdLargestAtomicFloat  "Float"
+	  ProdIntDivRoundTo	  "Zero"
+	  ProdEndianess		  "LittleEndian"
+	  ProdWordSize		  64
+	  ProdShiftRightIntArith  on
+	  ProdLongLongMode	  off
+	  ProdHWDeviceType	  "Intel->x86-64 (Linux 64)"
+	  TargetBitPerChar	  8
+	  TargetBitPerShort	  16
+	  TargetBitPerInt	  32
+	  TargetBitPerLong	  32
+	  TargetBitPerLongLong	  64
+	  TargetBitPerFloat	  32
+	  TargetBitPerDouble	  64
+	  TargetBitPerPointer	  32
+	  TargetBitPerSizeT	  32
+	  TargetBitPerPtrDiffT	  32
+	  TargetLargestAtomicInteger "Char"
+	  TargetLargestAtomicFloat "None"
+	  TargetShiftRightIntArith on
+	  TargetLongLongMode	  off
+	  TargetIntDivRoundTo	  "Undefined"
+	  TargetEndianess	  "Unspecified"
+	  TargetWordSize	  32
+	  TargetPreprocMaxBitsSint 32
+	  TargetPreprocMaxBitsUint 32
+	  TargetHWDeviceType	  "Specified"
+	  TargetUnknown		  off
+	  ProdEqTarget		  on
+	  UseEmbeddedCoderFeatures on
+	  UseSimulinkCoderFeatures on
+	}
+	Simulink.ModelReferenceCC {
+	  $ObjectID		  17
+	  Version		  "1.17.1"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    3
+	    Cell		    "UpdateModelReferenceTargets"
+	    Cell		    "CheckModelReferenceTargetMessage"
+	    Cell		    "ModelReferenceMinAlgLoopOccurrences"
+	    PropName		    "DisabledProps"
+	  }
+	  Description		  ""
+	  UpdateModelReferenceTargets "IfOutOfDateOrStructuralChange"
+	  EnableRefExpFcnMdlSchedulingChecks on
+	  CheckModelReferenceTargetMessage "error"
+	  EnableParallelModelReferenceBuilds off
+	  ParallelModelReferenceErrorOnInvalidPool on
+	  ParallelModelReferenceMATLABWorkerInit "Load Top Model"
+	  ModelReferenceNumInstancesAllowed "Multi"
+	  PropagateVarSize	  "Infer from blocks in model"
+	  ModelDependencies	  ""
+	  ModelReferencePassRootInputsByReference on
+	  ModelReferenceMinAlgLoopOccurrences off
+	  PropagateSignalLabelsOutOfModel on
+	  SupportModelReferenceSimTargetCustomCode off
+	}
+	Simulink.SFSimCC {
+	  $ObjectID		  18
+	  Version		  "1.17.1"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    1
+	    Cell		    "SimGenImportedTypeDefs"
+	    PropName		    "DisabledProps"
+	  }
+	  Description		  ""
+	  SimCustomSourceCode	  ""
+	  SimCustomHeaderCode	  ""
+	  SimCustomInitializer	  ""
+	  SimCustomTerminator	  ""
+	  SimReservedNameArray	  []
+	  SimUserSources	  ""
+	  SimUserIncludeDirs	  ""
+	  SimUserLibraries	  ""
+	  SimUserDefines	  ""
+	  SimCustomCompilerFlags  ""
+	  SimCustomLinkerFlags	  ""
+	  SFSimEcho		  off
+	  SimCtrlC		  on
+	  SimIntegrity		  on
+	  SimUseLocalCustomCode	  off
+	  SimParseCustomCode	  on
+	  SimBuildMode		  "sf_incremental_build"
+	  SimGenImportedTypeDefs  on
+	  ModelFunctionsGlobalVisibility "on"
+	  CompileTimeRecursionLimit 50
+	  EnableRuntimeRecursion  on
+	  MATLABDynamicMemAlloc	  off
+	  MATLABDynamicMemAllocThreshold 65536
+	}
+	Simulink.RTWCC {
+	  $BackupClass		  "Simulink.RTWCC"
+	  $ObjectID		  19
+	  Version		  "1.17.1"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    8
+	    Cell		    "IncludeERTFirstTime"
+	    Cell		    "PackageGeneratedCodeAndArtifacts"
+	    Cell		    "GenerateErtSFunction"
+	    Cell		    "CodeProfilingSaveOptions"
+	    Cell		    "CodeProfilingInstrumentation"
+	    Cell		    "CodeExecutionProfileVariable"
+	    Cell		    "TargetLang"
+	    Cell		    "CodeExecutionProfiling"
+	    PropName		    "DisabledProps"
+	  }
+	  SystemTargetFile	  "cat_PkgArch.tlc"
+	  HardwareBoard		  "None"
+	  TLCOptions		  ""
+	  GenCodeOnly		  on
+	  MakeCommand		  "make_rtw"
+	  GenerateMakefile	  off
+	  PackageGeneratedCodeAndArtifacts off
+	  PackageName		  ""
+	  TemplateMakefile	  "cat_PkgArch_default_tmf"
+	  PostCodeGenCommand	  ""
+	  Description		  "R7a CAT Package Architecture Code Generation."
+	  GenerateReport	  on
+	  SaveLog		  off
+	  RTWVerbose		  on
+	  RetainRTWFile		  off
+	  RTWBuildHooks		  []
+	  ProfileTLC		  off
+	  TLCDebug		  off
+	  TLCCoverage		  off
+	  TLCAssert		  off
+	  RTWUseLocalCustomCode	  off
+	  RTWUseSimCustomCode	  on
+	  CustomSourceCode	  ""
+	  CustomHeaderCode	  ""
+	  CustomInclude		  ""
+	  CustomSource		  ""
+	  CustomLibrary		  ""
+	  CustomDefine		  ""
+	  CustomLAPACKCallback	  ""
+	  CustomFFTCallback	  ""
+	  CustomInitializer	  ""
+	  CustomTerminator	  ""
+	  Toolchain		  "Automatically locate an installed toolchain"
+	  BuildConfiguration	  "Faster Builds"
+	  CustomToolchainOptions  []
+	  IncludeHyperlinkInReport off
+	  LaunchReport		  off
+	  PortableWordSizes	  off
+	  CreateSILPILBlock	  "None"
+	  CodeExecutionProfiling  off
+	  CodeExecutionProfileVariable "executionProfile"
+	  CodeProfilingSaveOptions "AllData"
+	  CodeProfilingInstrumentation off
+	  SILDebugging		  off
+	  TargetLang		  "C"
+	  IncludeBusHierarchyInRTWFileBlockHierarchyMap	off
+	  GenerateTraceInfo	  off
+	  GenerateTraceReport	  on
+	  GenerateTraceReportSl	  on
+	  GenerateTraceReportSf	  on
+	  GenerateTraceReportEml  on
+	  GenerateWebview	  on
+	  GenerateCodeMetricsReport on
+	  GenerateCodeReplacementReport	on
+	  GenerateMissedCodeReplacementReport off
+	  RTWCompilerOptimization "off"
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    1
+	    Cell		    "MISRA C:2012 guidelines"
+	    PropName		    "ObjectivePriorities"
+	  }
+	  RTWCustomCompilerOptimizations ""
+	  CheckMdlBeforeBuild	  "Off"
+	  SharedConstantsCachingThreshold 1024
+	  Array {
+	    Type		    "Handle"
+	    Dimension		    2
+	    Simulink.CodeAppCC {
+	      $ObjectID		      20
+	      Version		      "1.17.1"
+	      Array {
+		Type			"Cell"
+		Dimension		28
+		Cell			"IgnoreCustomStorageClasses"
+		Cell			"GenerateComments"
+		Cell			"SimulinkBlockComments"
+		Cell			"MATLABSourceComments"
+		Cell			"ShowEliminatedStatement"
+		Cell			"ForceParamTrailComments"
+		Cell			"OperatorAnnotations"
+		Cell			"InsertBlockDesc"
+		Cell			"SimulinkDataObjDesc"
+		Cell			"EnableCustomComments"
+		Cell			"CustomCommentsFcn"
+		Cell			"SFDataObjDesc"
+		Cell			"MATLABFcnDesc"
+		Cell			"CustomSymbolStrGlobalVar"
+		Cell			"CustomSymbolStrType"
+		Cell			"CustomSymbolStrField"
+		Cell			"CustomSymbolStrFcn"
+		Cell			"CustomSymbolStrFcnArg"
+		Cell			"CustomSymbolStrTmpVar"
+		Cell			"CustomSymbolStrBlkIO"
+		Cell			"CustomSymbolStrMacro"
+		Cell			"UseSimReservedNames"
+		Cell			"InlinedPrmAccess"
+		Cell			"SignalNamingRule"
+		Cell			"ParamNamingRule"
+		Cell			"DefineNamingRule"
+		Cell			"DefineNamingFcn"
+		Cell			"MangleLength"
+		PropName		"DisabledProps"
+	      }
+	      Description	      ""
+	      Comment		      ""
+	      ForceParamTrailComments on
+	      GenerateComments	      on
+	      CommentStyle	      "Auto"
+	      IgnoreCustomStorageClasses off
+	      IgnoreTestpoints	      off
+	      MaxIdLength	      63
+	      PreserveName	      off
+	      PreserveNameWithParent  off
+	      ShowEliminatedStatement off
+	      OperatorAnnotations     on
+	      SimulinkDataObjDesc     on
+	      SFDataObjDesc	      on
+	      MATLABFcnDesc	      on
+	      MangleLength	      4
+	      SharedChecksumLength    8
+	      CustomSymbolStrGlobalVar "$R$N$M"
+	      CustomSymbolStrType     "$N$R$M"
+	      CustomSymbolStrField    "$N$M"
+	      CustomSymbolStrFcn      "$R$N$M$F"
+	      CustomSymbolStrModelFcn "$R$N"
+	      CustomSymbolStrFcnArg   "rt$I$N$M"
+	      CustomSymbolStrBlkIO    "rtb_$N$M"
+	      CustomSymbolStrTmpVar   "$N$M"
+	      CustomSymbolStrMacro    "$R$N$M"
+	      CustomSymbolStrUtil     "$N$C"
+	      CustomSymbolStrEmxType  "emxArray_$M$N"
+	      CustomSymbolStrEmxFcn   "emx$M$N"
+	      CustomUserTokenString   ""
+	      CustomCommentsFcn	      ""
+	      DefineNamingRule	      "None"
+	      DefineNamingFcn	      ""
+	      ParamNamingRule	      "None"
+	      ParamNamingFcn	      ""
+	      SignalNamingRule	      "None"
+	      SignalNamingFcn	      ""
+	      InsertBlockDesc	      on
+	      InsertPolySpaceComments off
+	      SimulinkBlockComments   on
+	      StateflowObjectComments on
+	      MATLABSourceComments    on
+	      EnableCustomComments    off
+	      InternalIdentifierFile  ""
+	      InternalIdentifier      "Classic"
+	      InlinedPrmAccess	      "Literals"
+	      ReqsInCode	      on
+	      UseSimReservedNames     on
+	      ReservedNameArray	      []
+	    }
+	    Simulink.STFCustomTargetCC {
+	      $BackupClass	      "Simulink.TargetCC"
+	      $ObjectID		      21
+	      Version		      "1.17.1"
+	      Array {
+		Type			"Cell"
+		Dimension		24
+		Cell			"Cat_SuppressSimpleParameterInitialization"
+		Cell			"Cat_CheckExternalReferences"
+		Cell			"ModelReferenceCompliant"
+		Cell			"ParMdlRefBuildCompliant"
+		Cell			"UtilityFuncGeneration"
+		Cell			"CompOptLevelCompliant"
+		Cell			"ModelStepFunctionPrototypeControlCompliant"
+		Cell			"CPPClassGenCompliant"
+		Cell			"SupportAbsoluteTime"
+		Cell			"CombineOutputUpdateFcns"
+		Cell			"GRTInterface"
+		Cell			"SupportContinuousTime"
+		Cell			"IncludeMdlTerminateFcn"
+		Cell			"GeneratePreprocessorConditionals"
+		Cell			"SuppressErrorStatus"
+		Cell			"CombineSignalStateStructs"
+		Cell			"MatFileLogging"
+		Cell			"ParenthesesLevel"
+		Cell			"IncludeFileDelimiter"
+		Cell			"GenerateSampleERTMain"
+		Cell			"GenerateSharedConstants"
+		Cell			"SupportNonInlinedSFcns"
+		Cell			"ERTFirstTimeCompliant"
+		Cell			"GenFloatMathFcnCalls"
+		PropName		"DisabledProps"
+	      }
+	      Description	      ""
+	      TargetFcnLib	      "ansi_tfl_table_tmw.mat"
+	      TargetLibSuffix	      ""
+	      TargetPreCompLibLocation ""
+	      GenFloatMathFcnCalls    "NOT IN USE"
+	      TargetLangStandard      "C89/C90 (ANSI)"
+	      CodeReplacementLibrary  "None"
+	      UtilityFuncGeneration   "Shared location"
+	      MultiwordTypeDef	      "User defined"
+	      MultiwordLength	      2048
+	      GenerateFullHeader      on
+	      InferredTypesCompatibility off
+	      ExistingSharedCode      ""
+	      GenerateSampleERTMain   off
+	      GenerateTestInterfaces  off
+	      ModelReferenceCompliant on
+	      ParMdlRefBuildCompliant off
+	      CompOptLevelCompliant   off
+	      ConcurrentExecutionCompliant off
+	      IncludeMdlTerminateFcn  off
+	      GeneratePreprocessorConditionals "Use local settings"
+	      CombineOutputUpdateFcns on
+	      CombineSignalStateStructs	off
+	      SuppressErrorStatus     on
+	      IncludeFileDelimiter    "Auto"
+	      ERTCustomFileBanners    on
+	      SupportAbsoluteTime     off
+	      LogVarNameModifier      "rt_"
+	      MatFileLogging	      off
+	      MultiInstanceERTCode    on
+	      CodeInterfacePackaging  "Reusable function"
+	      SupportNonFinite	      on
+	      SupportComplex	      off
+	      PurelyIntegerCode	      off
+	      SupportContinuousTime   off
+	      SupportNonInlinedSFcns  off
+	      RemoveDisableFunc	      off
+	      RemoveResetFunc	      on
+	      SupportVariableSizeSignals on
+	      ParenthesesLevel	      "Maximum"
+	      CastingMode	      "Nominal"
+	      MATLABClassNameForMDSCustomization "Simulink.SoftwareTarget.ERTCustomization"
+	      ModelStepFunctionPrototypeControlCompliant off
+	      CPPClassGenCompliant    off
+	      AutosarCompliant	      off
+	      MDXCompliant	      off
+	      GRTInterface	      off
+	      GenerateAllocFcn	      off
+	      UseToolchainInfoCompliant	off
+	      GenerateSharedConstants off
+	      CoderGroups	      []
+	      AccessMethods	      []
+	      LookupTableObjectStructAxisOrder "1,2,3,4,..."
+	      LUTObjectStructOrderExplicitValues "Size,Breakpoints,Table"
+	      LUTObjectStructOrderEvenSpacing "Size,Breakpoints,Table"
+	      ArrayLayout	      "Column-major"
+	      SystemTargetFile	      "cat_PkgArch.tlc"
+	      DialogCategory	      0
+	      Array {
+		Type			"Handle"
+		Dimension		1
+		Simulink.ERTTargetCC {
+		  $BackupClass		  "Simulink.TargetCC"
+		  $ObjectID		  22
+		  Version		  "1.17.1"
+		  Array {
+		    Type		    "Cell"
+		    Dimension		    49
+		    Cell		    "ModelReferenceCompliant"
+		    Cell		    "ParMdlRefBuildCompliant"
+		    Cell		    "RateGroupingCode"
+		    Cell		    "UtilityFuncGeneration"
+		    Cell		    "CompOptLevelCompliant"
+		    Cell		    "ModelStepFunctionPrototypeControlCompliant"
+		    Cell		    "CPPClassGenCompliant"
+		    Cell		    "InlinedParameterPlacement"
+		    Cell		    "SupportAbsoluteTime"
+		    Cell		    "CombineOutputUpdateFcns"
+		    Cell		    "GRTInterface"
+		    Cell		    "SupportContinuousTime"
+		    Cell		    "IncludeMdlTerminateFcn"
+		    Cell		    "GeneratePreprocessorConditionals"
+		    Cell		    "SuppressErrorStatus"
+		    Cell		    "CombineSignalStateStructs"
+		    Cell		    "MatFileLogging"
+		    Cell		    "RootIOFormat"
+		    Cell		    "ExtMode"
+		    Cell		    "GenerateASAP2"
+		    Cell		    "RTWCAPIParams"
+		    Cell		    "RTWCAPISignals"
+		    Cell		    "RTWCAPIStates"
+		    Cell		    "RTWCAPIRootIO"
+		    Cell		    "ParenthesesLevel"
+		    Cell		    "PreserveExpressionOrder"
+		    Cell		    "PreserveIfCondition"
+		    Cell		    "SuppressUnreachableDefaultCases"
+		    Cell		    "ERTSrcFileBannerTemplate"
+		    Cell		    "ERTHdrFileBannerTemplate"
+		    Cell		    "ERTDataSrcFileTemplate"
+		    Cell		    "ERTDataHdrFileTemplate"
+		    Cell		    "ERTCustomFileTemplate"
+		    Cell		    "TargetOS"
+		    Cell		    "ReplacementTypes"
+		    Cell		    "GlobalDataDefinition"
+		    Cell		    "GlobalDataReference"
+		    Cell		    "EnableDataOwnership"
+		    Cell		    "IncludeFileDelimiter"
+		    Cell		    "SignalDisplayLevel"
+		    Cell		    "ParamTuneLevel"
+		    Cell		    "ERTFilePackagingFormat"
+		    Cell		    "GenerateSampleERTMain"
+		    Cell		    "GenerateSharedConstants"
+		    Cell		    "SupportNonInlinedSFcns"
+		    Cell		    "GenFloatMathFcnCalls"
+		    Cell		    "PreserveExternInFcnDecls"
+		    Cell		    "ERTFirstTimeCompliant"
+		    Cell		    "EnableUserReplacementTypes"
+		    PropName		    "DisabledProps"
+		  }
+		  Description		  ""
+		  TargetFcnLib		  "ansi_tfl_table_tmw.mat"
+		  TargetLibSuffix	  ""
+		  TargetPreCompLibLocation ""
+		  GenFloatMathFcnCalls	  "NOT IN USE"
+		  TargetLangStandard	  "C89/C90 (ANSI)"
+		  CodeReplacementLibrary  "None"
+		  UtilityFuncGeneration	  "Shared location"
+		  MultiwordTypeDef	  "User defined"
+		  MultiwordLength	  2048
+		  GenerateFullHeader	  on
+		  InferredTypesCompatibility off
+		  ExistingSharedCode	  ""
+		  GenerateSampleERTMain	  off
+		  GenerateTestInterfaces  off
+		  ModelReferenceCompliant on
+		  ParMdlRefBuildCompliant off
+		  CompOptLevelCompliant	  off
+		  ConcurrentExecutionCompliant off
+		  IncludeMdlTerminateFcn  off
+		  GeneratePreprocessorConditionals "Use local settings"
+		  CombineOutputUpdateFcns on
+		  CombineSignalStateStructs off
+		  SuppressErrorStatus	  on
+		  IncludeFileDelimiter	  "Auto"
+		  ERTCustomFileBanners	  on
+		  SupportAbsoluteTime	  off
+		  LogVarNameModifier	  "rt_"
+		  MatFileLogging	  off
+		  MultiInstanceERTCode	  on
+		  CodeInterfacePackaging  "Reusable function"
+		  SupportNonFinite	  on
+		  SupportComplex	  off
+		  PurelyIntegerCode	  off
+		  SupportContinuousTime	  off
+		  SupportNonInlinedSFcns  off
+		  RemoveDisableFunc	  off
+		  RemoveResetFunc	  on
+		  SupportVariableSizeSignals on
+		  ParenthesesLevel	  "Maximum"
+		  CastingMode		  "Nominal"
+		  MATLABClassNameForMDSCustomization "Simulink.SoftwareTarget.ERTCustomization"
+		  ModelStepFunctionPrototypeControlCompliant off
+		  CPPClassGenCompliant	  off
+		  AutosarCompliant	  off
+		  MDXCompliant		  off
+		  GRTInterface		  off
+		  GenerateAllocFcn	  off
+		  UseToolchainInfoCompliant off
+		  GenerateSharedConstants off
+		  CoderGroups		  []
+		  AccessMethods		  []
+		  LookupTableObjectStructAxisOrder "1,2,3,4,..."
+		  LUTObjectStructOrderExplicitValues "Size,Breakpoints,Table"
+		  LUTObjectStructOrderEvenSpacing "Size,Breakpoints,Table"
+		  ArrayLayout		  "Column-major"
+		  GenerateASAP2		  off
+		  ExtMode		  off
+		  ExtModeTransport	  0
+		  ExtModeStaticAlloc	  off
+		  ExtModeStaticAllocSize  1000000
+		  ExtModeTesting	  off
+		  ExtModeMexFile	  "ext_comm"
+		  ExtModeMexArgs	  ""
+		  ExtModeIntrfLevel	  "Level1"
+		  InlinedParameterPlacement "Hierarchical"
+		  TargetOS		  "BareBoardExample"
+		  MultiInstanceErrorCode  "None"
+		  RootIOFormat		  "Individual arguments"
+		  RTWCAPISignals	  off
+		  RTWCAPIParams		  off
+		  RTWCAPIStates		  off
+		  RTWCAPIRootIO		  off
+		  ERTSrcFileBannerTemplate "cat_code_template.cgt"
+		  ERTHdrFileBannerTemplate "cat_code_template.cgt"
+		  ERTDataSrcFileTemplate  "cat_code_template.cgt"
+		  ERTDataHdrFileTemplate  "cat_code_template.cgt"
+		  ERTCustomFileTemplate	  "cat_PkgArch_CFP.tlc"
+		  EnableDataOwnership	  off
+		  SignalDisplayLevel	  10
+		  ParamTuneLevel	  10
+		  GlobalDataDefinition	  "Auto"
+		  DataDefinitionFile	  "global.c"
+		  GlobalDataReference	  "Auto"
+		  ERTFilePackagingFormat  "Modular"
+		  DataReferenceFile	  "global.h"
+		  PreserveExpressionOrder off
+		  PreserveIfCondition	  off
+		  ConvertIfToSwitch	  on
+		  PreserveExternInFcnDecls on
+		  PreserveStaticInFcnDecls on
+		  SuppressUnreachableDefaultCases off
+		  EnableSignedLeftShifts  on
+		  EnableSignedRightShifts on
+		  IndentStyle		  "K&R"
+		  IndentSize		  "2"
+		  EnableUserReplacementTypes on
+		  Array {
+		    Type		    "Struct"
+		    Dimension		    1
+		    MATStruct {
+		    double		    ""
+		    single		    ""
+		    int32		    "int32_t"
+		    int16		    "int16_t"
+		    int8		    "int8_t"
+		    uint32		    "uint32_t"
+		    uint16		    "uint16_t"
+		    uint8		    "uint8_t"
+		    boolean		    ""
+		    int			    ""
+		    uint		    ""
+		    char		    ""
+		    }
+		    PropName		    "ReplacementTypes"
+		  }
+		  MaxIdInt32		  "MAX_int32_T"
+		  MinIdInt32		  "MIN_int32_T"
+		  MaxIdUint32		  "MAX_uint32_T"
+		  MaxIdInt16		  "MAX_int16_T"
+		  MinIdInt16		  "MIN_int16_T"
+		  MaxIdUint16		  "MAX_uint16_T"
+		  MaxIdInt8		  "MAX_int8_T"
+		  MinIdInt8		  "MIN_int8_T"
+		  MaxIdUint8		  "MAX_uint8_T"
+		  BooleanTrueId		  "true"
+		  BooleanFalseId	  "false"
+		  TypeLimitIdReplacementHeaderFile ""
+		  MemSecPackage		  "--- None ---"
+		  MemSecDataConstants	  "Default"
+		  MemSecDataIO		  "Default"
+		  MemSecDataInternal	  "Default"
+		  MemSecDataParameters	  "Default"
+		  MemSecFuncInitTerm	  "Default"
+		  MemSecFuncExecute	  "Default"
+		  MemSecFuncSharedUtil	  "Default"
+		  GroupConstants	  "Default"
+		  GroupRootInputs	  "Default"
+		  GroupRootOutputs	  "Default"
+		  GroupInternal		  "Default"
+		  GroupParameters	  "Default"
+		  GroupDataTransfer	  "Default"
+		  GroupSharedLocalDataStores "Default"
+		  GroupInstanceSpecificParameters "Default"
+		  GroupModelData	  "Default"
+		}
+		PropName		"Components"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatPackageDevelopmentStage"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Development"
+		  Value			  1
+		  String		  "Beta"
+		  Value			  2
+		  String		  "Production"
+		}
+		Name			"CatPackageDevelopmentStage"
+		Value			"Development"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatPackageInvocationStyle"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "GlobalWorkAndConfigStructOnly"
+		  Value			  1
+		  String		  "VoidVoidFunctions"
+		  Value			  2
+		  String		  "TwoPointerSubsystemServices"
+		}
+		Name			"CatPackageInvocationStyle"
+		Value			"VoidVoidFunctions"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1GeneratePackageArchCode"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "ModelCodeAndPackageObjectFile"
+		  Value			  1
+		  String		  "PackageObjectFileOnly"
+		  Value			  2
+		  String		  "ModelCodeOnly"
+		}
+		Name			"GeneratePackageArchCode"
+		Value			"ModelCodeAndPackageObjectFile"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1FixPtUtilType"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "macro"
+		  Value			  1
+		  String		  "function"
+		}
+		Name			"FixPtUtilType"
+		Value			"macro"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatSharedUtilsManglingOption"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Release_Name"
+		  Value			  1
+		  String		  "Model_Name"
+		  Value			  2
+		  String		  "Custom"
+		}
+		Name			"CatSharedUtilsManglingOption"
+		Value			"Release_Name"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatSharedUtilsManglingCustom"
+		Value			"myCustomPrefix"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CAT_MaxStackSize"
+		Value			"rtInf"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_SkipEMC2GeneratedFiles"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_PeriodicallyRefreshPTunablePConst"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_NonReentrantSampleInputs"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_RemoveExtInInitialization"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_SuppressSimpleParameterInitialization"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_GeneratePolyspaceArtifacts"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"Cat_GeneratePolyspaceArtifactsBaseRate"
+		Value			"0.001"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatSimAppCompileFlag"
+		Value			""
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatSimAppGlobalFlag"
+		Value			""
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatSimAppComponentFlag"
+		Value			""
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckForScopeDisplayBlocks"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1Cat_CheckExtReferences"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "error"
+		  Value			  1
+		  String		  "warning"
+		  Value			  2
+		  String		  "none"
+		}
+		Name			"Cat_CheckExtReferences"
+		Value			"warning"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckTypeDefMismatch"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1Cat_CheckSignalObjectsMatchModel"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "error"
+		  Value			  1
+		  String		  "warning"
+		  Value			  2
+		  String		  "none"
+		}
+		Name			"Cat_CheckSignalObjectsMatchModel"
+		Value			"warning"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckSignalResolution"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckMapBlockUsage"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckMapObjectUsage"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckMWSignBlock"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckParamOVNames"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"Cat_OVNameRegExpr"
+		Value			".+_[Oo][Vv]$"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1Cat_ChkR2007bDtcBug"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "error"
+		  Value			  1
+		  String		  "warning"
+		  Value			  2
+		  String		  "none"
+		}
+		Name			"Cat_ChkR2007bDtcBug"
+		Value			"warning"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1Cat_ChkR2007benablesubsystemOutportbug"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "error"
+		  Value			  1
+		  String		  "warning"
+		  Value			  2
+		  String		  "none"
+		}
+		Name			"Cat_ChkR2007benablesubsystemOutportbug"
+		Value			"error"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1Cat_ChkR2007bVitualselectorToRatelimitCodegenBug"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "error"
+		  Value			  1
+		  String		  "warning"
+		  Value			  2
+		  String		  "none"
+		}
+		Name			"Cat_ChkR2007bVitualselectorToRatelimitCodegenBug"
+		Value			"error"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1Cat_CheckMWMathBlock"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "error"
+		  Value			  1
+		  String		  "warning"
+		  Value			  2
+		  String		  "none"
+		}
+		Name			"Cat_CheckMWMathBlock"
+		Value			"warning"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ConfigIncludeFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\include"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ConfigSourceFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\src"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"PackageSourceFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\src"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"PackageIncludeFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\include"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"MapSourceFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\src"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"MapIncludeFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\include"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"TuneIncludeFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\include"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CATsharedUtilsSrcDir"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\src"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CATsharedUtilsIncDir"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\include"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"MakeletDestinationFile"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\makelet\\toa_wl00.mk"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"SpecialFilesAndDirectories"
+		Value			""
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCalToolConfig_CreateModelView"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCalToolConfig_CreateEMC2"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCalToolConfig_CreateASAP2"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1Asap2Ver"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "1.51"
+		  Value			  1
+		  String		  "1.61"
+		}
+		Name			"Asap2Ver"
+		Value			"1.61"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCalToolConfig_CreateCadetWinV2"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCalToolConfig_CreateParamDtList"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"EMC2SourceFileDirectory"
+		Value			"."
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ASAP2FileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\doc"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CadetWinFileDirectory"
+		Value			"..\\..\\..\\toa_wl00_x86_64-b\\doc"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ModelViewFileDirectory"
+		Value			"."
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatEMC2Config_IncludeDWork"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Exclude_All_States"
+		  Value			  1
+		  String		  "Include_Named_States_Only"
+		  Value			  2
+		  String		  "Include_All_States"
+		}
+		Name			"CatEMC2Config_IncludeDWork"
+		Value			"Include_Named_States_Only"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_TestPointVariablesOnly"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatEMC2Config_MangleParameters"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Create_Variable_and_Param_with_Same_Name"
+		  Value			  1
+		  String		  "Add_underscore_h_to_Param_entry"
+		  Value			  2
+		  String		  "Add_underscore_v_to_Variable_entry"
+		}
+		Name			"CatEMC2Config_MangleParameters"
+		Value			"Add_underscore_h_to_Param_entry"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatEMC2Config_NameGuidelines"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Unlimited_Names_and_Hash_Alias"
+		  Value			  1
+		  String		  "Short_Name_Valid_in_all_Tools"
+		  Value			  2
+		  String		  "Unlimited_Name_and_Unlimited_Alias"
+		}
+		Name			"CatEMC2Config_NameGuidelines"
+		Value			"Short_Name_Valid_in_all_Tools"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_AppendInstance"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_GenerateParFile"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_GenerateRemapFcnFile"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_GenerateMapFile"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_CreateCANapeModelView"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_CANapeModelViewTraceSignals"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"EnableCommonAxes"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatEMC2Config_GenExtVarDesc"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatASAP2Config_ModelHierarchyGroups"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "No_Model_Hierarchy"
+		  Value			  1
+		  String		  "Pruned_Model_Hierarchy"
+		  Value			  2
+		  String		  "Full_Model_Hierarchy"
+		}
+		Name			"CatASAP2Config_ModelHierarchyGroups"
+		Value			"Pruned_Model_Hierarchy"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatASAP2Config_SymbolNamingCompiler"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "A4_(Diab_ELF)"
+		  Value			  1
+		  String		  "A3_(MRI_IEEE)"
+		}
+		Name			"CatASAP2Config_SymbolNamingCompiler"
+		Value			"A4_(Diab_ELF)"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatASAP2Config_MeasurementSignalGroups"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Model_Hierarchy_AND_Flat_List"
+		  Value			  1
+		  String		  "Model_Hierarchy_Only"
+		  Value			  2
+		  String		  "Flat_List_Only"
+		}
+		Name			"CatASAP2Config_MeasurementSignalGroups"
+		Value			"Model_Hierarchy_Only"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatASAP2Config_GenModelView"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatASAP2Config_ModelViewSignalTrace"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"int32"
+		Name			"CatASAP2Config_CCPSampleTime"
+		Value			30
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatASAP2Config_CCPVersion"
+		Value			"0x210"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatASAP2Config_CROMsg"
+		Value			"0x2010000"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatASAP2Config_DTOMsg"
+		Value			"0x2020000"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatASAP2Config_ExtIDs"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"int32"
+		Name			"CatASAP2Config_CCPStation"
+		Value			0
+	      }
+	      CustomProperty {
+		DataType		"int32"
+		Name			"CatASAP2Config_CCPBaudRate"
+		Value			250000
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatASAP2Config_XCPEthEnable"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatASAP2Config_XCPEthIPAddress"
+		Value			"165.26.79.19"
+	      }
+	      CustomProperty {
+		DataType		"int32"
+		Name			"CatASAP2Config_XCPEthPort"
+		Value			60000
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1CatASAP2Config_XCPEthProtocol"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "UDP"
+		  Value			  1
+		  String		  "TCP"
+		}
+		Name			"CatASAP2Config_XCPEthProtocol"
+		Value			"UDP"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CatCadetWinConfig_MID"
+		Value			"0xFF"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCadetWinConfig_CreateArrayParameter"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCadetWinConfig_CreateArraySignal"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCadetWinConfig_CreateMap"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"CatCalToolConfig_UpdateSystemArchitect"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"SysArchDestFile"
+		Value			""
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"SysArchASAP2SubTableFile"
+		Value			""
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1SysArchStateUntestpointedSimulink"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "None"
+		  Value			  1
+		  String		  "Named"
+		  Value			  2
+		  String		  "All"
+		}
+		Name			"SysArchStateUntestpointedSimulink"
+		Value			"None"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1SysArchStateTestpointedSimulink"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "None"
+		  Value			  1
+		  String		  "Named"
+		  Value			  2
+		  String		  "All"
+		}
+		Name			"SysArchStateTestpointedSimulink"
+		Value			"None"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1SysArchStateStateflowLocal"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "None"
+		  Value			  1
+		  String		  "All"
+		}
+		Name			"SysArchStateStateflowLocal"
+		Value			"None"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1SysArchStateBlockState"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "None"
+		  Value			  1
+		  String		  "Named"
+		  Value			  2
+		  String		  "All"
+		}
+		Name			"SysArchStateBlockState"
+		Value			"None"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1SysArchStateCatPParamsRAM"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "None"
+		  Value			  1
+		  String		  "OnlyOV"
+		  Value			  2
+		  String		  "All"
+		}
+		Name			"SysArchStateCatPParamsRAM"
+		Value			"None"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_C__CATutils_4_6_2_a5m2_lib_autocode_CATutils_MatLab_toolbox_AutoCode_targets_cat_PkgA"
+		"rch_cat_PkgArch_cat_PkgArch_1SysArchStateCatPParamsROM"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "None"
+		  Value			  1
+		  String		  "All"
+		}
+		Name			"SysArchStateCatPParamsROM"
+		Value			"None"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"SysArch_GenModelView"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"SysArch_ModelViewSignalTrace"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"Cat_CheckExternalReferences"
+		Value			on
+	      }
+	    }
+	    PropName		    "Components"
+	  }
+	}
+	SlCovCC.ConfigComp {
+	  $ObjectID		  23
+	  Version		  "1.17.1"
+	  DisabledProps		  []
+	  Description		  "Simulink Coverage Configuration Component"
+	  Name			  "Simulink Coverage"
+	  CovEnable		  off
+	  CovScope		  "EntireSystem"
+	  CovIncludeTopModel	  on
+	  RecordCoverage	  off
+	  CovPath		  "/"
+	  CovSaveName		  "covdata"
+	  CovCompData		  ""
+	  CovMetricSettings	  "dwe"
+	  CovFilter		  ""
+	  CovHTMLOptions	  ""
+	  CovNameIncrementing	  off
+	  CovHtmlReporting	  off
+	  CovForceBlockReductionOff on
+	  CovEnableCumulative	  on
+	  CovSaveCumulativeToWorkspaceVar off
+	  CovSaveSingleToWorkspaceVar off
+	  CovCumulativeVarName	  "covCumulativeData"
+	  CovCumulativeReport	  off
+	  CovSaveOutputData	  on
+	  CovOutputDir		  "slcov_output/$ModelName$"
+	  CovDataFileName	  "$ModelName$_cvdata"
+	  CovShowResultsExplorer  on
+	  CovReportOnPause	  on
+	  CovModelRefEnable	  "off"
+	  CovModelRefExcluded	  ""
+	  CovExternalEMLEnable	  on
+	  CovSFcnEnable		  on
+	  CovBoundaryAbsTol	  1e-05
+	  CovBoundaryRelTol	  0.01
+	  CovUseTimeInterval	  off
+	  CovStartTime		  0
+	  CovStopTime		  0
+	  CovMcdcMode		  "Masking"
+	}
+	PropName		"Components"
+      }
+      Name		      "Configuration"
+      ExtraOptions	      "-aIgnoreTestpoints=0 "
+      CurrentDlgPage	      "Diagnostics"
+      ConfigPrmDlgPosition    [ 71, 71, 1211, 651 ]
+    }
+    PropName		    "ConfigurationSets"
+  }
+  Simulink.ConfigSet {
+    $PropName		    "ActiveConfigurationSet"
+    $ObjectID		    11
+  }
+  Object {
+    $PropName		    "DataTransfer"
+    $ObjectID		    24
+    $ClassName		    "Simulink.GlobalDataTransfer"
+    DefaultTransitionBetweenSyncTasks "Ensure deterministic transfer (maximum delay)"
+    DefaultTransitionBetweenAsyncTasks "Ensure data integrity only"
+    DefaultTransitionBetweenContTasks "Ensure deterministic transfer (minimum delay)"
+    DefaultExtrapolationMethodBetweenContTasks "None"
+    AutoInsertRateTranBlk   [0]
+  }
+  ExplicitPartitioning	  off
+  BlockDefaults {
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    NamePlacement	    "normal"
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+    ShowName		    on
+    HideAutomaticName	    on
+    BlockRotation	    0
+    BlockMirror		    off
+  }
+  AnnotationDefaults {
+    HorizontalAlignment	    "center"
+    VerticalAlignment	    "middle"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+    MarkupType		    "model"
+    UseDisplayTextAsClickCallback off
+    AnnotationType	    "note_annotation"
+    FixedHeight		    off
+    FixedWidth		    off
+    Interpreter		    "off"
+  }
+  LineDefaults {
+    FontName		    "Helvetica"
+    FontSize		    9
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  MaskDefaults {
+    SelfModifiable	    "off"
+    IconFrame		    "on"
+    IconOpaque		    "opaque"
+    RunInitForIconRedraw    "analyze"
+    IconRotate		    "none"
+    PortRotate		    "default"
+    IconUnits		    "autoscale"
+  }
+  MaskParameterDefaults {
+    Evaluate		    "on"
+    Tunable		    "on"
+    NeverSave		    "off"
+    Internal		    "off"
+    ReadOnly		    "off"
+    Enabled		    "on"
+    Visible		    "on"
+    ToolTip		    "on"
+  }
+  BlockParameterDefaults {
+    Block {
+      BlockType		      Concatenate
+      NumInputs		      "2"
+      Mode		      "Vector"
+      ConcatenateDimension    "1"
+    }
+    Block {
+      BlockType		      Constant
+      Value		      "1"
+      VectorParams1D	      on
+      SamplingMode	      "Sample based"
+      OutMin		      "[]"
+      OutMax		      "[]"
+      OutDataTypeStr	      "Inherit: Inherit from 'Constant value'"
+      LockScale		      off
+      SampleTime	      "inf"
+      FramePeriod	      "inf"
+      PreserveConstantTs      off
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      OutMin		      "[]"
+      OutMax		      "[]"
+      OutDataTypeStr	      "Inherit: Inherit via back propagation"
+      LockScale		      off
+      ConvertRealWorld	      "Real World Value (RWV)"
+      RndMeth		      "Zero"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Inport
+      Port		      "1"
+      OutputFunctionCall      off
+      OutMin		      "[]"
+      OutMax		      "[]"
+      OutDataTypeStr	      "Inherit: auto"
+      LockScale		      off
+      BusOutputAsStruct	      off
+      Unit		      "inherit"
+      PortDimensions	      "-1"
+      VarSizeSig	      "Inherit"
+      SampleTime	      "-1"
+      SignalType	      "auto"
+      SamplingMode	      "auto"
+      LatchByDelayingOutsideSignal off
+      LatchInputForFeedbackSignals off
+      Interpolate	      on
+    }
+    Block {
+      BlockType		      Outport
+      Port		      "1"
+      OutMin		      "[]"
+      OutMax		      "[]"
+      OutDataTypeStr	      "Inherit: auto"
+      LockScale		      off
+      BusOutputAsStruct	      off
+      Unit		      "inherit"
+      PortDimensions	      "-1"
+      VarSizeSig	      "Inherit"
+      SampleTime	      "-1"
+      SignalType	      "auto"
+      SamplingMode	      "auto"
+      EnsureOutportIsVirtual  off
+      SourceOfInitialOutputValue "Dialog"
+      OutputWhenDisabled      "held"
+      InitialOutput	      "[]"
+      MustResolveToSignalObject	off
+      OutputWhenUnConnected   off
+      OutputWhenUnconnectedValue "0"
+      VectorParamsAs1DForOutWhenUnconnected off
+    }
+  }
+  System {
+    Name		    "toa_wl00"
+    Location		    [-1287, -7, 8, 688]
+    Open		    on
+    PortBlocksUseCompactNotation off
+    ModelBrowserVisibility  off
+    ModelBrowserWidth	    200
+    ScreenColor		    "white"
+    PaperOrientation	    "landscape"
+    PaperPositionMode	    "auto"
+    PaperType		    "usletter"
+    PaperUnits		    "inches"
+    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+    TiledPageScale	    1
+    ShowPageBoundaries	    off
+    ZoomFactor		    "100"
+    ReportName		    "simulink-default.rpt"
+    SIDHighWatermark	    "637"
+    Block {
+      BlockType		      Inport
+      Name		      "Invalidate_Outputs"
+      SID		      "611"
+      Position		      [285, -47, 315, -33]
+      ZOrder		      23593
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Invalidate_Outputs"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Lift_Valve_Command"
+      SID		      "2"
+      Position		      [285, -17, 315, -3]
+      ZOrder		      23546
+      Port		      "2"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Lift_Valve_Command"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Tilt_Valve_Command"
+      SID		      "3"
+      Position		      [285, 13, 315, 27]
+      ZOrder		      23547
+      Port		      "3"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Tilt_Valve_Command"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Tilt_Extension"
+      SID		      "4"
+      Position		      [285, 43, 315, 57]
+      ZOrder		      23548
+      Port		      "4"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Tilt_Extension"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Lift_Angle"
+      SID		      "5"
+      Position		      [285, 73, 315, 87]
+      ZOrder		      23549
+      Port		      "5"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Lift_Angle"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Lift_HE_Pressure"
+      SID		      "6"
+      Position		      [285, 103, 315, 117]
+      ZOrder		      23550
+      Port		      "6"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Lift_HE_Pressure"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Lift_RE_Pressure"
+      SID		      "7"
+      Position		      [285, 133, 315, 147]
+      ZOrder		      23551
+      Port		      "7"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Lift_RE_Pressure"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Tilt_HE_Pressure"
+      SID		      "8"
+      Position		      [285, 163, 315, 177]
+      ZOrder		      23552
+      Port		      "8"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Tilt_HE_Pressure"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Tilt_RE_Pressure"
+      SID		      "9"
+      Position		      [285, 193, 315, 207]
+      ZOrder		      23553
+      Port		      "9"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Tilt_RE_Pressure"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Steering_Angle"
+      SID		      "11"
+      Position		      [285, 253, 315, 267]
+      ZOrder		      23555
+      Port		      "10"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Steering_Angle"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Tool_Mass"
+      SID		      "12"
+      Position		      [285, 283, 315, 297]
+      ZOrder		      23556
+      Port		      "11"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Tool_Mass"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "PCS_Truck_Target"
+      SID		      "14"
+      Position		      [285, 313, 315, 327]
+      ZOrder		      23558
+      Port		      "12"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"PCS_Truck_Target"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "PCS_Truck_Start_Weight"
+      SID		      "15"
+      Position		      [285, 343, 315, 357]
+      ZOrder		      23559
+      Port		      "13"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"PCS_Truck_Start_Weight"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "PCS_Bucket_Current_Weight_Accuracy"
+      SID		      "16"
+      Position		      [285, 373, 315, 387]
+      ZOrder		      23560
+      Port		      "14"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"PCS_Bucket_Current_Weight_Accuracy"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "PCS_Bucket_Current_Weight"
+      SID		      "17"
+      Position		      [285, 403, 315, 417]
+      ZOrder		      23561
+      Port		      "15"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"PCS_Bucket_Current_Weight"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "PCS_Tipoff_Mode"
+      SID		      "18"
+      Position		      [285, 433, 315, 447]
+      ZOrder		      23562
+      Port		      "16"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"PCS_Tipoff_Mode"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "EEF_IMU_AccelX"
+      SID		      "594"
+      Position		      [-210, 183, -180, 197]
+      ZOrder		      23576
+      Port		      "17"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"EEF_IMU_AccelX"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "EEF_IMU_AccelY"
+      SID		      "595"
+      Position		      [-210, 223, -180, 237]
+      ZOrder		      23577
+      Port		      "18"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"EEF_IMU_AccelY"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "EEF_IMU_AccelZ"
+      SID		      "596"
+      Position		      [-210, 263, -180, 277]
+      ZOrder		      23578
+      Port		      "19"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"EEF_IMU_AccelZ"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Zero_Offset"
+      SID		      "614"
+      Position		      [285, 493, 315, 507]
+      ZOrder		      23596
+      Port		      "20"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Zero_Offset"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Simple_Cal_Factor"
+      SID		      "615"
+      Position		      [285, 523, 315, 537]
+      ZOrder		      23597
+      Port		      "21"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Simple_Cal_Factor"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "IMU_Pitch_Cal"
+      SID		      "616"
+      Position		      [285, 553, 315, 567]
+      ZOrder		      23598
+      Port		      "22"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"IMU_Pitch_Cal"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Bucket_Angle"
+      SID		      "617"
+      Position		      [285, 583, 315, 597]
+      ZOrder		      23599
+      Port		      "23"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Bucket_Angle"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Unlatch_Trigger"
+      SID		      "619"
+      Position		      [285, 643, 315, 657]
+      ZOrder		      23601
+      Port		      "24"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Unlatch_Trigger"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Anchor_Zero_Offset"
+      SID		      "623"
+      Position		      [285, 673, 315, 687]
+      ZOrder		      23605
+      Port		      "25"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Anchor_Zero_Offset"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Anchor_Factor"
+      SID		      "624"
+      Position		      [285, 703, 315, 717]
+      ZOrder		      23606
+      Port		      "26"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Anchor_Factor"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "CPM_Pass_Count"
+      SID		      "626"
+      Position		      [285, 463, 315, 477]
+      ZOrder		      23608
+      Port		      "27"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"CPM_Pass_Count"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Lift_Norm_Angle"
+      SID		      "627"
+      Position		      [285, 733, 315, 747]
+      ZOrder		      23609
+      Port		      "28"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Lift_Norm_Angle"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Lift_Norm_Length"
+      SID		      "628"
+      Position		      [285, 763, 315, 777]
+      ZOrder		      23610
+      Port		      "29"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Lift_Norm_Length"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Tilt_Norm_Angle"
+      SID		      "629"
+      Position		      [285, 793, 315, 807]
+      ZOrder		      23611
+      Port		      "30"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Tilt_Norm_Angle"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Tilt_Norm_Length"
+      SID		      "630"
+      Position		      [285, 823, 315, 837]
+      ZOrder		      23612
+      Port		      "31"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Tilt_Norm_Length"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Friction_Mu"
+      SID		      "636"
+      Position		      [285, 853, 315, 867]
+      ZOrder		      23618
+      Port		      "32"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Friction_Mu"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Inport
+      Name		      "Friction_Offset"
+      SID		      "637"
+      Position		      [285, 883, 315, 897]
+      ZOrder		      23619
+      Port		      "33"
+      IconDisplay	      "Port number"
+      Port {
+	PortNumber		1
+	Name			"Friction_Offset"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Apply Name"
+      SID		      "597"
+      Ports		      [1, 1]
+      Position		      [-10, 178, 115, 202]
+      ZOrder		      23580
+      ShowName		      off
+      LibraryVersion	      "1.34"
+      SourceBlock	      "lib_CATutils_Utilities_ApplyName_v2/Apply Name"
+      SourceType	      "Apply Name"
+      ContentPreviewEnabled   off
+      sigLabel		      "'toa_inImuAcclX'"
+      enTst		      "true"
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Apply Name2"
+      SID		      "598"
+      Ports		      [1, 1]
+      Position		      [-10, 218, 115, 242]
+      ZOrder		      23581
+      ShowName		      off
+      LibraryVersion	      "1.34"
+      SourceBlock	      "lib_CATutils_Utilities_ApplyName_v2/Apply Name"
+      SourceType	      "Apply Name"
+      ContentPreviewEnabled   off
+      sigLabel		      "'toa_inImuAcclY'"
+      enTst		      "true"
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Apply Name3"
+      SID		      "599"
+      Ports		      [1, 1]
+      Position		      [-10, 258, 115, 282]
+      ZOrder		      23582
+      ShowName		      off
+      LibraryVersion	      "1.34"
+      SourceBlock	      "lib_CATutils_Utilities_ApplyName_v2/Apply Name"
+      SourceType	      "Apply Name"
+      ContentPreviewEnabled   off
+      sigLabel		      "'toa_inImuAcclZ'"
+      enTst		      "true"
+    }
+    Block {
+      BlockType		      Concatenate
+      Name		      "Concatenate Vector"
+      SID		      "600"
+      Ports		      [3, 1]
+      Position		      [210, 173, 215, 287]
+      ZOrder		      23579
+      NumInputs		      "3"
+      Mode		      "Multidimensional array"
+    }
+    Block {
+      BlockType		      Constant
+      Name		      "Constant"
+      SID		      "622"
+      Position		      [495, 612, 525, 628]
+      ZOrder		      23604
+      ShowName		      off
+      HideAutomaticName	      off
+      Value		      "true"
+      OutDataTypeStr	      "boolean"
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      Name		      "Data Type Conversion"
+      SID		      "606"
+      Position		      [1010, 385, 1070, 405]
+      ZOrder		      23588
+      OutMin		      "[0]"
+      OutMax		      "[6]"
+      OutDataTypeStr	      "fixdt('uint8', 'DataTypeOverride', 'Off')"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
+      Port {
+	PortNumber		1
+	Name			"Tipoff_Assist_Adv_Error_Code"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      Name		      "Data Type Conversion1"
+      SID		      "607"
+      Position		      [1010, 145, 1070, 165]
+      ZOrder		      23589
+      OutMin		      "[0]"
+      OutMax		      "[5]"
+      OutDataTypeStr	      "fixdt('uint8', 'DataTypeOverride', 'Off')"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
+      Port {
+	PortNumber		1
+	Name			"Weigh_Status"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      Name		      "Data Type Conversion2"
+      SID		      "608"
+      Position		      [515, 430, 575, 450]
+      ZOrder		      23590
+      OutDataTypeStr	      "Enum: TipAssistCpmTipOffMode_t"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      Name		      "Data Type Conversion3"
+      SID		      "613"
+      Position		      [1045, 865, 1105, 885]
+      ZOrder		      23595
+      OutMin		      "[0]"
+      OutMax		      "[5]"
+      OutDataTypeStr	      "fixdt('uint8', 'DataTypeOverride', 'Off')"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
+      Port {
+	PortNumber		1
+	Name			"Payload_Status_Send_To_CPM"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      Name		      "Data Type Conversion4"
+      SID		      "635"
+      Position		      [1045, 685, 1105, 705]
+      ZOrder		      23617
+      OutMin		      "[0]"
+      OutMax		      "[5]"
+      OutDataTypeStr	      "fixdt('uint8', 'DataTypeOverride', 'Off')"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
+      Port {
+	PortNumber		1
+	Name			"Unsecured_PFW_Status"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Package Instance"
+      SID		      "593"
+      Ports		      []
+      Position		      [20, -67, 136, -33]
+      ZOrder		      23575
+      ShowName		      off
+      LibraryVersion	      "1.98"
+      SourceBlock	      "package_instance/PkgInstance"
+      SourceType	      "CAT_PACKAGE_INSTANCE"
+      ContentPreviewEnabled   off
+      pkgName		      "toa_wl00"
+      InitTaskTag	      "SSS_TID_INIT"
+      tidHeader		      "sss_oel_defs.h"
+      availModelRates	      "{ '0.02', 'SSS_TID_20MSEC' }"
+      Platform		      "Any (No Hardware Dependencies)"
+      TPUA_TCR1		      "12800"
+      TPUA_TCR2		      "200"
+      TPUB_TCR1		      "12800"
+      TPUB_TCR2		      "200"
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Tip-Off Assist Support Lib"
+      SID		      "1"
+      Ports		      [32, 16]
+      Position		      [620, -46, 930, 896]
+      ZOrder		      23545
+      ForegroundColor	      "red"
+      BackgroundColor	      "yellow"
+      LibraryVersion	      "1.296"
+      SourceBlock	      "tip_assist_lib_support/Tip-Off Assist Support Lib"
+      SourceType	      "SubSystem"
+      ContentPreviewEnabled   off
+      Port {
+	PortNumber		1
+	Name			"Tilt_Sensitivity"
+	PropagatedSignals	"toa_outTiltSensToBucket"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		2
+	Name			"Tilt_HE_Pressure_Out"
+	PropagatedSignals	"toa_outTiltHePress"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		3
+	Name			"Arbitrated_Payload_Norm_Error"
+	PropagatedSignals	"toa_outPayloadArbNormError"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		5
+	Name			"Payload_Norm_Stdev"
+	PropagatedSignals	"toa_outPfwPayloadNormStdev"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		6
+	Name			"PCS_Bucket_Current_Weight_Accuracy_Out"
+	PropagatedSignals	"toa_outCpmAccu"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		7
+	Name			"PCS_Bucket_Current_Weight_Norm_Error_Out"
+	PropagatedSignals	"toa_outCpmPayloadNormError"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		9
+	Name			"Spill_Rate_Norm"
+	PropagatedSignals	"toa_outSpillRateNorm"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		10
+	Name			"Bucket_Payload_Target"
+	PropagatedSignals	"toa_outBucketPayloadTarget"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		11
+	Name			"Unsecured_Payload_Upper_Bound_Norm"
+	PropagatedSignals	"toa_outUnsecPayloadNormUp"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		12
+	Name			"Unsecured_Payload_Lower_Bound_Norm"
+	PropagatedSignals	"toa_outUnsecPayloadNormLow"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		14
+	Name			"Min_Secure_Bucket_Angle"
+	PropagatedSignals	"toa_outMinSecBucketAng"
+	MustResolveToSignalObject on
+      }
+      Port {
+	PortNumber		15
+	Name			"Payload_Send_To_CPM"
+	PropagatedSignals	"toa_outSendCpmPayload"
+	MustResolveToSignalObject on
+      }
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Tilt_Sensitivity"
+      SID		      "19"
+      Position		      [1315, -32, 1345, -18]
+      ZOrder		      23563
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Tilt_HE_Pressure_Out"
+      SID		      "20"
+      Position		      [1315, 33, 1345, 47]
+      ZOrder		      23564
+      Port		      "2"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Arbitrated_Payload_Norm_Error"
+      SID		      "21"
+      Position		      [1315, 88, 1345, 102]
+      ZOrder		      23565
+      Port		      "3"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Weigh_Status"
+      SID		      "22"
+      Position		      [1315, 148, 1345, 162]
+      ZOrder		      23566
+      Port		      "4"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Payload_Norm_Stdev"
+      SID		      "23"
+      Position		      [1315, 208, 1345, 222]
+      ZOrder		      23567
+      Port		      "5"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "PCS_Bucket_Current_Weight_Accuracy_Out"
+      SID		      "24"
+      Position		      [1315, 268, 1345, 282]
+      ZOrder		      23568
+      Port		      "6"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "PCS_Bucket_Current_Weight_Norm_Error_Out"
+      SID		      "25"
+      Position		      [1315, 328, 1345, 342]
+      ZOrder		      23569
+      Port		      "7"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Tipoff_Assist_Adv_Error_Code"
+      SID		      "26"
+      Position		      [1315, 388, 1345, 402]
+      ZOrder		      23570
+      Port		      "8"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Spill_Rate_Norm"
+      SID		      "27"
+      Position		      [1315, 448, 1345, 462]
+      ZOrder		      23571
+      Port		      "9"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Bucket_Payload_Target"
+      SID		      "625"
+      Position		      [1315, 508, 1345, 522]
+      ZOrder		      23607
+      Port		      "10"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Payload_Send_To_CPM"
+      SID		      "609"
+      Position		      [1315, 808, 1345, 822]
+      ZOrder		      23591
+      Port		      "11"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Payload_Status_Send_To_CPM"
+      SID		      "610"
+      Position		      [1315, 868, 1345, 882]
+      ZOrder		      23592
+      Port		      "12"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Unsecured_Payload_Upper_Bound_Norm"
+      SID		      "631"
+      Position		      [1315, 568, 1345, 582]
+      ZOrder		      23613
+      Port		      "13"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Unsecured_Payload_Lower_Bound_Norm"
+      SID		      "632"
+      Position		      [1315, 628, 1345, 642]
+      ZOrder		      23614
+      Port		      "14"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Unsecured_PFW_Status"
+      SID		      "633"
+      Position		      [1315, 688, 1345, 702]
+      ZOrder		      23615
+      Port		      "15"
+      IconDisplay	      "Port number"
+    }
+    Block {
+      BlockType		      Outport
+      Name		      "Min_Secure_Bucket_Angle"
+      SID		      "634"
+      Position		      [1315, 748, 1345, 762]
+      ZOrder		      23616
+      Port		      "16"
+      IconDisplay	      "Port number"
+    }
+    Line {
+      Name		      "Steering_Angle"
+      ZOrder		      80
+      Labels		      [1, 1]
+      SrcBlock		      "Steering_Angle"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      11
+    }
+    Line {
+      Name		      "Tool_Mass"
+      ZOrder		      79
+      Labels		      [1, 1]
+      SrcBlock		      "Tool_Mass"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      12
+    }
+    Line {
+      Name		      "PCS_Truck_Target"
+      ZOrder		      13
+      Labels		      [1, 1]
+      SrcBlock		      "PCS_Truck_Target"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      13
+    }
+    Line {
+      Name		      "PCS_Truck_Start_Weight"
+      ZOrder		      14
+      Labels		      [1, 1]
+      SrcBlock		      "PCS_Truck_Start_Weight"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      14
+    }
+    Line {
+      Name		      "PCS_Bucket_Current_Weight_Accuracy"
+      ZOrder		      15
+      Labels		      [1, 1]
+      SrcBlock		      "PCS_Bucket_Current_Weight_Accuracy"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      15
+    }
+    Line {
+      Name		      "PCS_Bucket_Current_Weight"
+      ZOrder		      16
+      Labels		      [1, 1]
+      SrcBlock		      "PCS_Bucket_Current_Weight"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      16
+    }
+    Line {
+      Name		      "Tilt_Sensitivity"
+      ZOrder		      18
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      1
+      DstBlock		      "Tilt_Sensitivity"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Tilt_HE_Pressure_Out"
+      ZOrder		      19
+      Labels		      [2, 0]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      2
+      Points		      [183, 0; 0, 5]
+      DstBlock		      "Tilt_HE_Pressure_Out"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Arbitrated_Payload_Norm_Error"
+      ZOrder		      20
+      Labels		      [1, 0]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      3
+      DstBlock		      "Arbitrated_Payload_Norm_Error"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Payload_Norm_Stdev"
+      ZOrder		      22
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      5
+      DstBlock		      "Payload_Norm_Stdev"
+      DstPort		      1
+    }
+    Line {
+      Name		      "PCS_Bucket_Current_Weight_Accuracy_Out"
+      ZOrder		      23
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      6
+      DstBlock		      "PCS_Bucket_Current_Weight_Accuracy_Out"
+      DstPort		      1
+    }
+    Line {
+      Name		      "PCS_Bucket_Current_Weight_Norm_Error_Out"
+      ZOrder		      24
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      7
+      DstBlock		      "PCS_Bucket_Current_Weight_Norm_Error_Out"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Spill_Rate_Norm"
+      ZOrder		      26
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      9
+      DstBlock		      "Spill_Rate_Norm"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      27
+      SrcBlock		      "Apply Name2"
+      SrcPort		      1
+      DstBlock		      "Concatenate Vector"
+      DstPort		      2
+    }
+    Line {
+      ZOrder		      28
+      SrcBlock		      "Apply Name"
+      SrcPort		      1
+      DstBlock		      "Concatenate Vector"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      29
+      SrcBlock		      "Apply Name3"
+      SrcPort		      1
+      DstBlock		      "Concatenate Vector"
+      DstPort		      3
+    }
+    Line {
+      Name		      "EEF_IMU_AccelX"
+      ZOrder		      31
+      Labels		      [0, 0]
+      SrcBlock		      "EEF_IMU_AccelX"
+      SrcPort		      1
+      DstBlock		      "Apply Name"
+      DstPort		      1
+    }
+    Line {
+      Name		      "EEF_IMU_AccelY"
+      ZOrder		      32
+      Labels		      [0, 0]
+      SrcBlock		      "EEF_IMU_AccelY"
+      SrcPort		      1
+      DstBlock		      "Apply Name2"
+      DstPort		      1
+    }
+    Line {
+      Name		      "EEF_IMU_AccelZ"
+      ZOrder		      33
+      Labels		      [0, 0]
+      SrcBlock		      "EEF_IMU_AccelZ"
+      SrcPort		      1
+      DstBlock		      "Apply Name3"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      81
+      SrcBlock		      "Concatenate Vector"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      10
+    }
+    Line {
+      Name		      "PCS_Tipoff_Mode"
+      ZOrder		      71
+      Labels		      [1, 1]
+      SrcBlock		      "PCS_Tipoff_Mode"
+      SrcPort		      1
+      DstBlock		      "Data Type Conversion2"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      67
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      8
+      DstBlock		      "Data Type Conversion"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Tipoff_Assist_Adv_Error_Code"
+      ZOrder		      68
+      Labels		      [-1, 0]
+      SrcBlock		      "Data Type Conversion"
+      SrcPort		      1
+      DstBlock		      "Tipoff_Assist_Adv_Error_Code"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      69
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      4
+      DstBlock		      "Data Type Conversion1"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Weigh_Status"
+      ZOrder		      70
+      Labels		      [1, 1]
+      SrcBlock		      "Data Type Conversion1"
+      SrcPort		      1
+      DstBlock		      "Weigh_Status"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      72
+      SrcBlock		      "Data Type Conversion2"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      17
+    }
+    Line {
+      Name		      "Payload_Status_Send_To_CPM"
+      ZOrder		      119
+      Labels		      [0, 0]
+      SrcBlock		      "Data Type Conversion3"
+      SrcPort		      1
+      DstBlock		      "Payload_Status_Send_To_CPM"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Invalidate_Outputs"
+      ZOrder		      82
+      Labels		      [1, 1]
+      SrcBlock		      "Invalidate_Outputs"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Lift_Valve_Command"
+      ZOrder		      83
+      Labels		      [1, 1]
+      SrcBlock		      "Lift_Valve_Command"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      2
+    }
+    Line {
+      Name		      "Tilt_Valve_Command"
+      ZOrder		      84
+      Labels		      [1, 1]
+      SrcBlock		      "Tilt_Valve_Command"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      3
+    }
+    Line {
+      Name		      "Tilt_Extension"
+      ZOrder		      85
+      Labels		      [1, 1]
+      SrcBlock		      "Tilt_Extension"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      4
+    }
+    Line {
+      Name		      "Lift_Angle"
+      ZOrder		      86
+      Labels		      [1, 1]
+      SrcBlock		      "Lift_Angle"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      5
+    }
+    Line {
+      Name		      "Lift_HE_Pressure"
+      ZOrder		      87
+      Labels		      [1, 1]
+      SrcBlock		      "Lift_HE_Pressure"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      6
+    }
+    Line {
+      Name		      "Lift_RE_Pressure"
+      ZOrder		      88
+      Labels		      [1, 1]
+      SrcBlock		      "Lift_RE_Pressure"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      7
+    }
+    Line {
+      Name		      "Tilt_HE_Pressure"
+      ZOrder		      89
+      Labels		      [1, 1]
+      SrcBlock		      "Tilt_HE_Pressure"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      8
+    }
+    Line {
+      Name		      "Tilt_RE_Pressure"
+      ZOrder		      90
+      Labels		      [1, 1]
+      SrcBlock		      "Tilt_RE_Pressure"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      9
+    }
+    Line {
+      Name		      "Zero_Offset"
+      ZOrder		      167
+      Labels		      [1, 1]
+      SrcBlock		      "Zero_Offset"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      19
+    }
+    Line {
+      Name		      "Simple_Cal_Factor"
+      ZOrder		      166
+      Labels		      [1, 1]
+      SrcBlock		      "Simple_Cal_Factor"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      20
+    }
+    Line {
+      Name		      "IMU_Pitch_Cal"
+      ZOrder		      165
+      Labels		      [1, 1]
+      SrcBlock		      "IMU_Pitch_Cal"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      21
+    }
+    Line {
+      Name		      "Bucket_Angle"
+      ZOrder		      164
+      Labels		      [1, 1]
+      SrcBlock		      "Bucket_Angle"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      22
+    }
+    Line {
+      Name		      "Unlatch_Trigger"
+      ZOrder		      162
+      Labels		      [1, 1]
+      SrcBlock		      "Unlatch_Trigger"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      24
+    }
+    Line {
+      ZOrder		      163
+      SrcBlock		      "Constant"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      23
+    }
+    Line {
+      Name		      "Anchor_Zero_Offset"
+      ZOrder		      161
+      Labels		      [1, 1]
+      SrcBlock		      "Anchor_Zero_Offset"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      25
+    }
+    Line {
+      Name		      "Anchor_Factor"
+      ZOrder		      160
+      Labels		      [1, 1]
+      SrcBlock		      "Anchor_Factor"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      26
+    }
+    Line {
+      Name		      "Bucket_Payload_Target"
+      ZOrder		      143
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      10
+      DstBlock		      "Bucket_Payload_Target"
+      DstPort		      1
+    }
+    Line {
+      Name		      "CPM_Pass_Count"
+      ZOrder		      177
+      Labels		      [1, 1]
+      SrcBlock		      "CPM_Pass_Count"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      18
+    }
+    Line {
+      Name		      "Lift_Norm_Angle"
+      ZOrder		      179
+      Labels		      [1, 1]
+      SrcBlock		      "Lift_Norm_Angle"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      27
+    }
+    Line {
+      Name		      "Lift_Norm_Length"
+      ZOrder		      181
+      Labels		      [1, 1]
+      SrcBlock		      "Lift_Norm_Length"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      28
+    }
+    Line {
+      Name		      "Tilt_Norm_Angle"
+      ZOrder		      183
+      Labels		      [1, 1]
+      SrcBlock		      "Tilt_Norm_Angle"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      29
+    }
+    Line {
+      Name		      "Tilt_Norm_Length"
+      ZOrder		      185
+      Labels		      [1, 1]
+      SrcBlock		      "Tilt_Norm_Length"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      30
+    }
+    Line {
+      Name		      "Unsecured_PFW_Status"
+      ZOrder		      194
+      Labels		      [1, 1]
+      SrcBlock		      "Data Type Conversion4"
+      SrcPort		      1
+      DstBlock		      "Unsecured_PFW_Status"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      197
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      16
+      DstBlock		      "Data Type Conversion3"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Unsecured_Payload_Upper_Bound_Norm"
+      ZOrder		      198
+      Labels		      [0, 0]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      11
+      DstBlock		      "Unsecured_Payload_Upper_Bound_Norm"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Unsecured_Payload_Lower_Bound_Norm"
+      ZOrder		      199
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      12
+      DstBlock		      "Unsecured_Payload_Lower_Bound_Norm"
+      DstPort		      1
+    }
+    Line {
+      ZOrder		      200
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      13
+      DstBlock		      "Data Type Conversion4"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Min_Secure_Bucket_Angle"
+      ZOrder		      201
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      14
+      DstBlock		      "Min_Secure_Bucket_Angle"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Payload_Send_To_CPM"
+      ZOrder		      202
+      Labels		      [1, 1]
+      SrcBlock		      "Tip-Off Assist Support Lib"
+      SrcPort		      15
+      DstBlock		      "Payload_Send_To_CPM"
+      DstPort		      1
+    }
+    Line {
+      Name		      "Friction_Mu"
+      ZOrder		      203
+      Labels		      [1, 1]
+      SrcBlock		      "Friction_Mu"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      31
+    }
+    Line {
+      Name		      "Friction_Offset"
+      ZOrder		      204
+      Labels		      [1, 1]
+      SrcBlock		      "Friction_Offset"
+      SrcPort		      1
+      DstBlock		      "Tip-Off Assist Support Lib"
+      DstPort		      32
+    }
+  }
+}
+#Finite State Machines
+#
+#   Stateflow 80000012
+#
+#
+Stateflow {
+  machine {
+    id			    1
+    name		    "toa_wl00"
+    created		    "17-Jun-2019 10:41:20"
+    isLibrary		    0
+    sfVersion		    80000012
+    firstTarget		    2
+  }
+  target {
+    id			    2
+    machine		    1
+    name		    "sfun"
+    description		    "Default Simulink S-Function Target."
+    linkNode		    [1 0 3]
+  }
+  target {
+    id			    3
+    machine		    1
+    name		    "rtw"
+    linkNode		    [1 2 0]
+  }
+}

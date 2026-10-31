@@ -8,6 +8,7 @@ DESCRIPTION:
 ** -- #Include's --
 *******************************************************************************/
 #include <chrono>
+#include <cstdlib>
 #include <pthread.h>
 #include <sched.h>
 #include <string>
@@ -128,8 +129,12 @@ bool LpsSaJobMgrApp::initialize( )
 {
     bool everythingOk = true;
     LpsSaJobMgrCnfg defaultConfig;
-
-   RCLCPP_INFO(get_logger(), "JobManager::initialize");
+    
+    {
+        declare_parameter<std::string>("logger_threshold", "error");
+        std::string const loggerThreshold = get_parameter("logger_threshold").as_string();
+        ROS2Logger::Instance().SetLogLevel(loggerThreshold);
+    }
 
     { // Default matches config/LpsSaJobMgrApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 1.
         declare_parameter<std::string>("scheduler", "SCHED_RR");
@@ -379,6 +384,16 @@ bool LpsSaJobMgrApp::parseUiConfigurableFeatures() {
 
     try {
         std::string uiConfigJsonFilePath = get_parameter("ui_show_feature_config_json_file_path").as_string();
+        const std::string configDirToken = "${CAT_CONFIG_DIR}";
+        const auto configDirTokenPos = uiConfigJsonFilePath.find(configDirToken);
+        if (configDirTokenPos != std::string::npos) {
+            const char* configDir = std::getenv("CAT_CONFIG_DIR");
+            if (nullptr == configDir) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "CAT_CONFIG_DIR environment variable not set");
+                return ret;
+            }
+            uiConfigJsonFilePath.replace(configDirTokenPos, configDirToken.size(), configDir);
+        }
         if (!uiConfigJsonFilePath.empty()) {
                 RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"JSON file found: %s", uiConfigJsonFilePath.c_str());
 
@@ -590,14 +605,5 @@ bool LpsSaJobMgrApp::saveConfig() {
 
 int main(int argc, char** argv)
 {
-    // Configure ROS2 log output path and format (rcl_logging_interface env).
-    // Pattern replicated from ScsToRos2Bridge (commit 9972fa8f).
-    {
-        std::string const rosLogDir = "/tmp/appdata/CPM/log";
-        std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
-        setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
-        setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
-    }
-
     return ros2_wrapper::Ros2TaskWrapper::run<LpsSaJobMgrApp>(argc, argv);
 }

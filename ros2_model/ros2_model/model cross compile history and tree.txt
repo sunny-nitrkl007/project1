@@ -1,0 +1,314 @@
+1990  colcon build --packages-select job_mgr_interfaces --cmake-args -DCMAKE_TOOLCHAIN_FILE=/home/u_via/repo/ros2_model/aarch64.cmake -DCMAKE_BUILD_TYPE=Release
+ 1991  colcon build --cmake-args -DCMAKE_TOOLCHAIN_FILE=/home/u_via/repo/ros2_model/aarch64.cmake -DCMAKE_BUILD_TYPE=Release
+ 1992  source sdk/ros2_jazzy_sdk/setup.bash
+ 1993  colcon build --cmake-args -DCMAKE_TOOLCHAIN_FILE=/home/u_via/repo/ros2_model/aarch64.cmake -DCMAKE_BUILD_TYPE=Release
+ 1994  find . -name package.xml | head
+ 1995  touch ~/repo/ros2_model/sdk/COLCON_IGNORE
+ 1996  colcon list
+ 1997  cd ~/repo/ros2_model
+ 1998  colcon build   --cmake-args   -DCMAKE_TOOLCHAIN_FILE=$PWD/aarch64.cmake
+ 1999  ll
+ 2000  rm -rf build install log
+ 2001  ll
+ 2002  cd src/
+ 2003  ls
+ 2004  mkdir ~/backup
+ 2005  mv my_interfaces ~/backup/
+ 2006  mv person_* ~/backup/
+ 2007  cd ..
+ 2008  colcon build   --cmake-args   -DCMAKE_TOOLCHAIN_FILE=$PWD/aarch64.cmake
+ 2009  file /home/u_via/repo/ros2_model/install/cpm_common_interfaces/lib/libcpm_common_interfaces__rosidl_generator_c.so
+ 2010  source install/setup.bash 
+ 2011  colcon build   --cmake-args   -DCMAKE_TOOLCHAIN_FILE=$PWD/aarch64.cmake
+ 2012  ls install/cpm_common_interfaces/share/cpm_common_interfaces
+ 2013  find install -name "*cpm_common_interfacesConfig.cmake"
+ 2014  rm -rf build/job_mgr_interfaces
+ 2015  colcon build   --cmake-args   -DCMAKE_TOOLCHAIN_FILE=$PWD/aarch64.cmake
+ 2016  source install/setup.bash
+ 2017  echo $CMAKE_PREFIX_PATH | tr ':' '\n' | grep cpm_common_interfaces
+ 2018  find ~/repo/ros2_model/install/cpm_common_interfaces -maxdepth 4 -type f | head -50
+ 2019  find ~/repo/ros2_model -name 'cpm_common_interfacesConfig.cmake' -o -name 'cpm_common_interfaces-config.cmake'
+ 2020  find ~/repo/ros2_model -path '*cpm_common_interfaces*' -type f | head -50
+ 2021  export CMAKE_PREFIX_PATH="$PWD/install/cpm_common_interfaces:$CMAKE_PREFIX_PATH"
+ 2022  echo $CMAKE_PREFIX_PATH | tr ':' '\n' | grep cpm_common
+ 2023  rm -rf build/job_mgr_interfaces
+ 2024  colcon build   --cmake-args   -DCMAKE_TOOLCHAIN_FILE=$PWD/aarch64.cmake
+ 2025  grep -n "CMAKE_FIND_ROOT_PATH" aarch64.cmake
+ 2026  grep -n "PACKAGE" aarch64.cmake
+ 2027  grep -n "SYSROOT" aarch64.cmake
+ 2028  rm -rf build install log
+ 2029  colcon build   --cmake-args   -DCMAKE_TOOLCHAIN_FILE=$PWD/aarch64.cmake
+ 2030  find sdk -name "libdl.so*"
+ 2031  ls -l sdk/aarch64-linux-gnu/sysroot/usr/lib/aarch64-linux-gnu/libdl*
+ 2032  cd sdk/aarch64-linux-gnu/sysroot/usr/lib/aarch64-linux-gnu
+ 2033  ln -s libdl.so.2 libdl.so
+ 2034  cd ../../../../../../
+ 2035  colcon build   --cmake-args   -DCMAKE_TOOLCHAIN_FILE=$PWD/aarch64.cmake
+ 2036  tree
+ 2037  history
+ 
+ 
+ 
+ 
+ tree -L 3
+2026/08/12 16:37:32.999133 cmd_run.go:1609: WARNING: will not expose Kerberos tickets' path: Unsupported KRB5CCNAME: KEYRING:persistent:45763
+.
+├── aarch64.cmake
+├── build
+│   ├── COLCON_IGNORE
+│   ├── cpm_common_interfaces
+│   │   ├── ament_cmake_core
+│   │   ├── ament_cmake_environment_hooks
+│   │   ├── ament_cmake_export_dependencies
+│   │   ├── ament_cmake_export_include_directories
+│   │   ├── ament_cmake_export_libraries
+│   │   ├── ament_cmake_export_targets
+│   │   ├── ament_cmake_index
+│   │   ├── ament_cmake_package_templates
+│   │   ├── ament_cmake_python
+│   │   ├── ament_cmake_uninstall_target
+│   │   ├── AMENT_IGNORE
+│   │   ├── cmake_args.last
+│   │   ├── CMakeCache.txt
+│   │   ├── CMakeFiles
+│   │   ├── cmake_install.cmake
+│   │   ├── colcon_build.rc
+│   │   ├── colcon_command_prefix_build.sh
+│   │   ├── colcon_command_prefix_build.sh.env
+│   │   ├── cpm_common_interfaces__py
+│   │   ├── cpm_common_interfaces__rs
+│   │   ├── CTestConfiguration.ini
+│   │   ├── CTestCustom.cmake
+│   │   ├── CTestTestfile.cmake
+│   │   ├── install_manifest.txt
+│   │   ├── libcpm_common_interfaces__rosidl_generator_c.so
+│   │   ├── libcpm_common_interfaces__rosidl_generator_py.so
+│   │   ├── libcpm_common_interfaces__rosidl_typesupport_cpp.so
+│   │   ├── libcpm_common_interfaces__rosidl_typesupport_c.so
+│   │   ├── libcpm_common_interfaces__rosidl_typesupport_fastrtps_cpp.so
+│   │   ├── libcpm_common_interfaces__rosidl_typesupport_fastrtps_c.so
+│   │   ├── libcpm_common_interfaces__rosidl_typesupport_introspection_cpp.so
+│   │   ├── libcpm_common_interfaces__rosidl_typesupport_introspection_c.so
+│   │   ├── Makefile
+│   │   ├── rosidl_adapter
+│   │   ├── rosidl_adapter__arguments__cpm_common_interfaces.json
+│   │   ├── rosidl_cmake
+│   │   ├── rosidl_generator_c
+│   │   ├── rosidl_generator_c__arguments.json
+│   │   ├── rosidl_generator_cpp
+│   │   ├── rosidl_generator_cpp__arguments.json
+│   │   ├── rosidl_generator_py
+│   │   ├── rosidl_generator_py__arguments.json
+│   │   ├── rosidl_generator_rs
+│   │   ├── rosidl_generator_rs__arguments.json
+│   │   ├── rosidl_generator_type_description
+│   │   ├── rosidl_generator_type_description__arguments.json
+│   │   ├── rosidl_typesupport_c
+│   │   ├── rosidl_typesupport_c__arguments.json
+│   │   ├── rosidl_typesupport_cpp
+│   │   ├── rosidl_typesupport_cpp__arguments.json
+│   │   ├── rosidl_typesupport_fastrtps_c
+│   │   ├── rosidl_typesupport_fastrtps_c__arguments.json
+│   │   ├── rosidl_typesupport_fastrtps_cpp
+│   │   ├── rosidl_typesupport_fastrtps_cpp__arguments.json
+│   │   ├── rosidl_typesupport_introspection_c
+│   │   ├── rosidl_typesupport_introspection_c__arguments.json
+│   │   ├── rosidl_typesupport_introspection_cpp
+│   │   └── rosidl_typesupport_introspection_cpp__arguments.json
+│   ├── job_mgr_interfaces
+│   │   ├── ament_cmake_core
+│   │   ├── ament_cmake_environment_hooks
+│   │   ├── ament_cmake_export_dependencies
+│   │   ├── ament_cmake_export_include_directories
+│   │   ├── ament_cmake_export_libraries
+│   │   ├── ament_cmake_export_targets
+│   │   ├── ament_cmake_index
+│   │   ├── ament_cmake_package_templates
+│   │   ├── ament_cmake_python
+│   │   ├── ament_cmake_uninstall_target
+│   │   ├── AMENT_IGNORE
+│   │   ├── cmake_args.last
+│   │   ├── CMakeCache.txt
+│   │   ├── CMakeFiles
+│   │   ├── cmake_install.cmake
+│   │   ├── colcon_build.rc
+│   │   ├── colcon_command_prefix_build.sh
+│   │   ├── colcon_command_prefix_build.sh.env
+│   │   ├── CTestConfiguration.ini
+│   │   ├── CTestCustom.cmake
+│   │   ├── CTestTestfile.cmake
+│   │   ├── install_manifest.txt
+│   │   ├── job_mgr_interfaces__py
+│   │   ├── job_mgr_interfaces__rs
+│   │   ├── libjob_mgr_interfaces__rosidl_generator_c.so
+│   │   ├── libjob_mgr_interfaces__rosidl_generator_py.so
+│   │   ├── libjob_mgr_interfaces__rosidl_typesupport_cpp.so
+│   │   ├── libjob_mgr_interfaces__rosidl_typesupport_c.so
+│   │   ├── libjob_mgr_interfaces__rosidl_typesupport_fastrtps_cpp.so
+│   │   ├── libjob_mgr_interfaces__rosidl_typesupport_fastrtps_c.so
+│   │   ├── libjob_mgr_interfaces__rosidl_typesupport_introspection_cpp.so
+│   │   ├── libjob_mgr_interfaces__rosidl_typesupport_introspection_c.so
+│   │   ├── Makefile
+│   │   ├── rosidl_adapter
+│   │   ├── rosidl_adapter__arguments__job_mgr_interfaces.json
+│   │   ├── rosidl_cmake
+│   │   ├── rosidl_generator_c
+│   │   ├── rosidl_generator_c__arguments.json
+│   │   ├── rosidl_generator_cpp
+│   │   ├── rosidl_generator_cpp__arguments.json
+│   │   ├── rosidl_generator_py
+│   │   ├── rosidl_generator_py__arguments.json
+│   │   ├── rosidl_generator_rs
+│   │   ├── rosidl_generator_rs__arguments.json
+│   │   ├── rosidl_generator_type_description
+│   │   ├── rosidl_generator_type_description__arguments.json
+│   │   ├── rosidl_typesupport_c
+│   │   ├── rosidl_typesupport_c__arguments.json
+│   │   ├── rosidl_typesupport_cpp
+│   │   ├── rosidl_typesupport_cpp__arguments.json
+│   │   ├── rosidl_typesupport_fastrtps_c
+│   │   ├── rosidl_typesupport_fastrtps_c__arguments.json
+│   │   ├── rosidl_typesupport_fastrtps_cpp
+│   │   ├── rosidl_typesupport_fastrtps_cpp__arguments.json
+│   │   ├── rosidl_typesupport_introspection_c
+│   │   ├── rosidl_typesupport_introspection_c__arguments.json
+│   │   ├── rosidl_typesupport_introspection_cpp
+│   │   └── rosidl_typesupport_introspection_cpp__arguments.json
+│   └── weigh_app_interfaces
+│       ├── ament_cmake_core
+│       ├── ament_cmake_environment_hooks
+│       ├── ament_cmake_export_dependencies
+│       ├── ament_cmake_export_include_directories
+│       ├── ament_cmake_export_libraries
+│       ├── ament_cmake_export_targets
+│       ├── ament_cmake_index
+│       ├── ament_cmake_package_templates
+│       ├── ament_cmake_python
+│       ├── ament_cmake_uninstall_target
+│       ├── AMENT_IGNORE
+│       ├── cmake_args.last
+│       ├── CMakeCache.txt
+│       ├── CMakeFiles
+│       ├── cmake_install.cmake
+│       ├── colcon_build.rc
+│       ├── colcon_command_prefix_build.sh
+│       ├── colcon_command_prefix_build.sh.env
+│       ├── CTestConfiguration.ini
+│       ├── CTestCustom.cmake
+│       ├── CTestTestfile.cmake
+│       ├── install_manifest.txt
+│       ├── libweigh_app_interfaces__rosidl_generator_c.so
+│       ├── libweigh_app_interfaces__rosidl_generator_py.so
+│       ├── libweigh_app_interfaces__rosidl_typesupport_cpp.so
+│       ├── libweigh_app_interfaces__rosidl_typesupport_c.so
+│       ├── libweigh_app_interfaces__rosidl_typesupport_fastrtps_cpp.so
+│       ├── libweigh_app_interfaces__rosidl_typesupport_fastrtps_c.so
+│       ├── libweigh_app_interfaces__rosidl_typesupport_introspection_cpp.so
+│       ├── libweigh_app_interfaces__rosidl_typesupport_introspection_c.so
+│       ├── Makefile
+│       ├── rosidl_adapter
+│       ├── rosidl_adapter__arguments__weigh_app_interfaces.json
+│       ├── rosidl_cmake
+│       ├── rosidl_generator_c
+│       ├── rosidl_generator_c__arguments.json
+│       ├── rosidl_generator_cpp
+│       ├── rosidl_generator_cpp__arguments.json
+│       ├── rosidl_generator_py
+│       ├── rosidl_generator_py__arguments.json
+│       ├── rosidl_generator_rs
+│       ├── rosidl_generator_rs__arguments.json
+│       ├── rosidl_generator_type_description
+│       ├── rosidl_generator_type_description__arguments.json
+│       ├── rosidl_typesupport_c
+│       ├── rosidl_typesupport_c__arguments.json
+│       ├── rosidl_typesupport_cpp
+│       ├── rosidl_typesupport_cpp__arguments.json
+│       ├── rosidl_typesupport_fastrtps_c
+│       ├── rosidl_typesupport_fastrtps_c__arguments.json
+│       ├── rosidl_typesupport_fastrtps_cpp
+│       ├── rosidl_typesupport_fastrtps_cpp__arguments.json
+│       ├── rosidl_typesupport_introspection_c
+│       ├── rosidl_typesupport_introspection_c__arguments.json
+│       ├── rosidl_typesupport_introspection_cpp
+│       ├── rosidl_typesupport_introspection_cpp__arguments.json
+│       ├── weigh_app_interfaces__py
+│       └── weigh_app_interfaces__rs
+├── install
+│   ├── COLCON_IGNORE
+│   ├── cpm_common_interfaces
+│   │   ├── include
+│   │   ├── lib
+│   │   └── share
+│   ├── job_mgr_interfaces
+│   │   ├── include
+│   │   ├── lib
+│   │   └── share
+│   ├── local_setup.bash
+│   ├── local_setup.ps1
+│   ├── local_setup.sh
+│   ├── _local_setup_util_ps1.py
+│   ├── _local_setup_util_sh.py
+│   ├── local_setup.zsh
+│   ├── setup.bash
+│   ├── setup.ps1
+│   ├── setup.sh
+│   ├── setup.zsh
+│   └── weigh_app_interfaces
+│       ├── include
+│       ├── lib
+│       └── share
+├── log
+│   ├── build_2026-08-12_16-31-24
+│   │   ├── cpm_common_interfaces
+│   │   ├── events.log
+│   │   ├── job_mgr_interfaces
+│   │   ├── logger_all.log
+│   │   └── weigh_app_interfaces
+│   ├── build_2026-08-12_16-35-41
+│   │   ├── cpm_common_interfaces
+│   │   ├── events.log
+│   │   ├── job_mgr_interfaces
+│   │   ├── logger_all.log
+│   │   └── weigh_app_interfaces
+│   ├── COLCON_IGNORE
+│   ├── latest -> latest_build
+│   └── latest_build -> build_2026-08-12_16-35-41
+├── move.sh
+├── sdk
+│   ├── aarch64-linux-gnu
+│   │   ├── bin
+│   │   ├── include
+│   │   ├── lib
+│   │   └── sysroot
+│   ├── COLCON_IGNORE
+│   └── ros2_jazzy_sdk
+│       ├── bin
+│       ├── conaninfo.txt
+│       ├── conanmanifest.txt
+│       ├── include
+│       ├── lib
+│       ├── local_setup.bash
+│       ├── local_setup.sh
+│       ├── _local_setup_util.py
+│       ├── local_setup.zsh
+│       ├── setup.bash
+│       ├── setup.sh
+│       ├── setup.zsh
+│       ├── share
+│       ├── src
+│       └── tools
+└── src
+    ├── cpm_common_interfaces
+    │   ├── CMakeLists.txt
+    │   ├── msg
+    │   └── package.xml
+    ├── job_mgr_interfaces
+    │   ├── CMakeLists.txt
+    │   ├── msg
+    │   └── package.xml
+    └── weigh_app_interfaces
+        ├── CMakeLists.txt
+        ├── msg
+        └── package.xml
+
+127 directories, 131 files

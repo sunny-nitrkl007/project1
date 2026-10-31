@@ -1,0 +1,3277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.9">
+<title>
+579-5116-01
+Software History
+</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body
+{
+  font-family:"Arial Narrow", Arial, Helvetica, Sans-Serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer, #application, #component, #namecode
+{
+  font-family:"Arial Narrow", Arial, Helvetica, Sans-Serif;
+}
+
+#logo
+{
+	max-height:60pt;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: bold;
+}
+
+h1
+{
+  background-color:#FFCC00;
+  font-size:18pt;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-bottom: 2px solid black;
+}
+
+h2
+{
+  background-color:#F7F7F7;
+  font-size:16pt;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  border-bottom: 1px solid black;
+}
+
+h3, h4, h5, h6
+{
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h3
+{
+  border-bottom: 2px solid silver;
+}
+h2
+{
+  padding-top: 0.5em;
+}
+h3
+{
+  float: left;
+}
+h3 + *
+{
+  clear: left;
+}
+h5
+{
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: black; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author, #application, #component, #namecode {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+.release_note
+{
+  margin-top:    5px;
+  margin-bottom: 5px;
+  border:10px solid black;
+  padding:5px;
+}
+.sect2
+{
+  margin-left:   10px;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: black;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: black;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: black;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="book">
+<img id="logo" src="data:image/png;base64,
+iVBORw0KGgoAAAANSUhEUgAAANgAAABMCAYAAAAP13m4AAAABHNCSVQICAgIfAhkiAAADQtJREFU
+eJztnHtsVFUex7+37bRjebU8CqyV4TFiC4HWWt4Q2LogC2uLirWNaySsSFKMJpaQoG6iRkASiYmY
+hZQaE02QGA2LtFSLLDFQYShLS1tod4jFSoFioe30Ne85+wfMdab33Dt3Hnc6kN8nmXTmnPP7nXPv
+9Dvn8TvnCowxBoIgNCFuuBtAEA8yJDCC0BASGEFoCAmMIDSEBEYQGkICIwgNIYERhIaQwAhCQ0hg
+BKEhJDCC0BASGEFoCAmMIDSEBEYQGkICIwgNIYERhIaQwAhCQ0hgBKEhJDCC0BASGEFoCAmMIDSE
+BEYQGkICIwgNIYERhIaQwAhCQxKGo9LGxkYcO3YMLS0tcLvd0Ov1yMnJwfr16zF+/PiA9k6nE4Ig
++KUxxhAfH4+4uD9+M7q7u5GQoP4S3W43UlJSMDAwALfbLamDh8fjgV6vR1JSEgCgt7cXAGRt4+Li
+MGLECEV/FotFsd1KPnj2brcbo0aNQnx8PADAYrFAEASxjYwxxMXFYeTIkSH7DITZbOZek9PphNFo
+5PqxWq1wOBx+36kvjDGMGDEiYBtMJhOqq6sxdepUvPTSS6raGzFYFDGbzUyv1zMAsq/HH39c0UdG
+RoaivZfffvtNsZyS/bJly4Kyee+998R61drodDr2zjvvSK7v9OnTqn2MHz+eHTp0yM/+7Nmz3LJV
+VVVimYSEBEn+jBkzZO+5yWTi+qysrFT+wu9hsVgUr2PoNXgpKChQfS+eeeYZro8pU6awjRs3spqa
+GvbZZ58xAKy1tVVVuyNB1IaIra2tmDlzJmw2m2K5uro6xZ6jpaVF0Z7dexK4TqcLuo3eX9jU1NSg
+7Hx/+SdMmKDKxul04oMPPkBaWppful6vV13v7du3UVRUhDfffFNMS0xM5Jb19ctr47hx42Tr8fbO
+Sj6VOH/+fEj5KSkpqvwDwOHDhyEIAgYHB8W0goICfP7552hvb0d+fj7ef/99MMYwffp01X7DJWoC
+W7FiRVDlX3vtNUnazZs3A9odO3YsqHp8UTMkjLSPzs5OvPvuu2HV+fHHH6OjoyMsH1piMpnCyg+G
++fPni+9PnTqFvLw8NDQ0oKWlBW1tbQCAbdu24aeffopYnUpERWBWqxXXrl3j5m3atImbXl5eLkn7
+/vvvA9ZVWVkJ4I+eLBicTmfQNuHYedm9e3dY9gCwY8eOsH1oxdmzZxXzA/VwwXDp0iXx+/DO50eP
+Ho21a9eKPfeUKVPQ398fsTqViIrAmpubuekNDQ0oKyvjCsdut0vSfvjhB7/POp0OkyZN8ks7cuQI
+gLvDPYPBgJycHCxYsEB28SQjIwPz5s1DdnY2FixYoHgdxcXFWLdund9r5cqVyMjIULTbsGEDBgcH
+cePGDaSnp0vyAw2bgbuLBN3d3bI99IkTJwL6GC7OnTvn93n06NF+n61Wq2pfBoMBjDFYrVY899xz
+3DKnT58GANy6dUv8W1FRgc7OTgDAvn37kJubq7rOsIjGRK++vp47Mb127RpjjLHa2lrFBQsvY8aM
+8cufM2cO27hxY0A7xhh7/fXXuXU0NTVJyubn50vK6fV6VdealpYmsd2yZYuYX11dzW1HT08PY4yx
+8+fPc/OtVqvoIysrS5KfmJjIGGPswoULXPuTJ0+K9pMnT5bkz58/X/aa5L6/EydOqLonQ+1efvll
+SVpzc7PEjlfOYDAo+gbAvvzyS8YYY3V1dSwlJYUdOXKEMcbYmTNn2IsvvsieffZZVe2OBMMaB3O7
+3X5/A2GxWPw+L1y4EIsWLZKUq6mpkaT5Tn596e7uVlW32jby8Hg84nuDwRCSf5fLJb6fOnWqJN/h
+cACIzDwyknh7EV9WrlwpSQs0jPTCVAz9vWWys7NRU1OD7du3w2g0orCwELNnz8a3336rqq5IMCxx
+sFDgTUoXLVrE7eorKyuxZMmSaDQrYowdO1Z1WblVvViEt4CxfPlybrkNGzZEpE7f6cCsWbNw6dKl
+iPgNhftmJwdvnrZ48WLMmTNHkv7dd99FvH65YKcafAOhZrM57LYEM2cZbng9U3p6uiRQrrYH8/0e
+5Hoz3qhmuIiJHsx3+CMHT2CPPfYYgLs33XcYpsUvlsvlwieffIK+vj4xzeFwICcnBwUFBYq2XV1d
+uHLlCtrb2/HCCy9I8nkhiaH4xtpqa2tl89UMoaLJ0AUOL48++ijq6+vFz77vlbDZbGhsbERfXx9K
+Skok+enp6UHFz7QmJgS2ZMmSgP8YQ7+ARx55RHz/9NNPi6uHXi5fvoxZs2ZFrI1utxtvvPGGJH39
++vUBBXbw4EEcPHiQm5eamoq9e/cGrL+kpATJycmor6/nxrwiea2RZOiPgbfnMhqNqkXlS0dHB+bO
+nSub39DQELRPLYkJgQWCF0OzWCzIzc2F2+3m/sMdPXo0Kv90ycnJIdtu2rQJZWVlqsru27dPMT8/
+Pz/kdmiJd2+mF+8CzcyZMyVla2trMW/evJDqycrKCkmwWnNfzMG8wWNfent70dTUhK6uLq7AtJiH
+RZoDBw7giSeeiIivt99+OyJ+IsnVq1claZmZmQDAjR2eOXMm5LouXrwIQRC48dPh5L4Q2NAAMwBk
+Zs6CzWZDW1sbVqz4syT/559/jkbTMDAwEJb9hQsXsHXr1rB8VFdXh2WvFbyFC2/PJdeDhYt3Xh4r
+xITATCYTBEGAXq8Xj374xnOGLnCUlGzB5cuXgDs74W7/O06e/A/eeuufEr/Xr1+PWBsTEhLw1Vdf
+Yf/+/eJr79693In2UEpLS8EYA2MM2dnZkvw9e/YE9PHQQw8hKSkJiYmJSEpKwrRp0/Dqq6+ip6eH
+G1eKBXhL9LNnzwYA7uqvmh7MaDSK97K0tFSS39bWpjq2GQ1iYg7mXeCQ6959txId/ncl1hWsgavt
+b3B03h066mzN2LHjv1iydDnWrvmLWLaiogKbN2+OSBvj4+NRVFQUkq1vkLu8vDykbTpygfJYhicw
+j8cDs9nMPcP1yy+/BPTpDagDwEcffcT9cTKZTFi9enWQrdWGmBCY0u6D48ePi+9/v23FhHF6OC6n
+wmXtEVvvtFyApykJa/5qx81b/Zg88e6SdSQF5hsGCAe5w4EOh0P2qAkA9Pf3yx6IjFV4Agt04LGv
+rw+jRo0Kq95obeRVQ0wMEZX44osvMHnyZDDGMGHcddjqBLhsPUA8IAj3XgmA2+mArU7ApLROMMaQ
+mpqKioqK4W6+BDmhxtoWp0gQSkwuEvOwcDYFRJphbYn3Rigd+c7KysaNGzcAy34MnjfCIwDCPXH5
+IsQBHgEYrJ0G9B9CV1cXMjIy8euvv0akrQ+iAMJF6Z40NjaG5FMuMH2/EpUhotxGVu+WH9/dEV5W
+rVoFANi6tRSutnw4fj8K6KTC8kUQAKYDBpuLoU8/iebmy7hzpyf8C8AfPwZDd50wxiAIQlDP/ohF
+QjkBrhQDDPUQZThL9bFIVHow3hkoAJg7dy62b9+OvLw8v/SHH35YXJq3N0+A43ZgcXkRBAA6wHa9
+DM4r2Rg37u62mXDH5TabDYIgQKfT+b0SExOxePHisHzHAjU1NeKDcHxfu3btkpzf8rJw4UKuDcAf
+6uXm5uLHH3/E4cOHUVVVxV2BfdB6sKgILC0tjfsUJLvdjg8//NAv7fnnn0d7ezvgvgJbnQC39TaE
+BHXi8iIIABIAZ99F2BvvLhzs2v1pOJegiJonYd2vJCcnhzQ85vVgy5Ytw5NPPol169Zh9erVKCws
+lJSJ5UcfhELU5mBqFhwOHCjH119/DdZdBmvdTHG+FQrCPVu3ywlbnYCpUyxgjGHixImhOYwQcv+s
+D9oc7+LFi5K0GTNmKH72Eq7IYuleRvWhN3IbXgHgf+YreOWVf8BxdRWs5s1gcQA8AHOH9wID3B5g
+8NwMwPIvdHR0+MVIePNDNUf45crz4lW+8T25c1/exRi5+araMIGcvW96MMddnE5n0IdN5U5HDN29
+ITd1OHXqFAB+XFRN21tbWwOWiRZRnZkXFxejuLgYO3fuRFNTEzweD1wuF7755hsAgLtjG+IEAYl/
+Ci2gqwyD685BxCdMR1VVFfbs2YPjx49ze7S8vDy/h4kqYbfb/Z7lUVRUhK6uLnFl1Gq1+p1PMhgM
+WLNmjd/Qq7+/H2azGUajEWPHjsWqVaswZswY0SaYB6jy7Ht7e/2eXVJYWIjOzs6APgcGBpCZmYmR
+I0dKfPJgjMHhcKCtrQ1PPfWU39ytp6eHu3ujoKAAOp1OvBeDg4OiQJcuXYqBgQHx8XAul0vyDJbS
+0lK0traK12K322MqDiawWDtARBAPELETkSOIBxASGEFoCAmMIDSEBEYQGkICIwgNIYERhIaQwAhC
+Q0hgBKEhJDCC0BASGEFoCAmMIDSEBEYQGkICIwgNIYERhIaQwAhCQ0hgBKEhJDCC0BASGEFoCAmM
+IDSEBEYQGkICIwgNIYERhIaQwAhCQ0hgBKEh/wcOwsvnxo5stAAAAABJRU5ErkJggg==" alt="Caterpillar's Logo">
+<div id="header">
+</div>
+<div id="content">
+<div class="release_note">
+<h1  id="_579_5116_01">579-5116-01</h1>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_19_0">CPM Core Linux (0.19.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2021-09-23</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.19.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.3.0 ALPHA_09</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala/Dave Janik</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_cmpa2875_ais_4_3_alpha_8_updates">cmpa2875: AIS 4.3 Alpha 8 updates</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cmpa2887_updates_to_csvtodldapp_to_support_signed_2_byte_hex_data">cmpa2887: updates to CsvToDldApp to support signed 2 byte hex data</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cpm_2_0_int_updates">cpm_2.0_int updates</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>tp912140: system comms fix, remove patch for platform libs
+tp904908: imu_fom, IMU test points for data collection</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_coaching_updates">Coaching updates</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>cmpa2874: fix 3x3 enable, don't show Tips turned off by Operator or System
+cmpa2857: add_diag_to_ShowHide, add flag to ShowHide response for Datalink Diag state</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_18_0">CPM Core Linux (0.18.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2021-08-16</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.18.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.3.0 ALPHA_03</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_2">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_cmpa2814_integrate_ais_4_3_alpha_3">cmpa2814: Integrate AIS 4.3 Alpha 3</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Remove scl_eth_health and scl_j1939_health patches from apply_patch_ais_all.
+Added rpaClientTask to zzzAutostart app_init.sh.
+Update zzzAutostart app_init.sh with a app_lighttpd.conf patch to disable pgt reverse proxy configuration of lighttpd.
+Updated DataLinkData OCS plugin to display the same parameter from multiple sources.
+Added machineNameDefault of NOT_SET for Robot.rb.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cmpa2796_integrate_ais_4_3_alpha_2">cmpa2796: Integrate AIS 4.3 Alpha 2.</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Updated eta-ais patches.
+Updated removeBinLibContent patches for eta-ais 4.3 A02 RC.
+Changed location of output files to /tmp/outputFiles (RAM) (outputFileDir.txt).</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_coaching_updates_2">Coaching updates</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>2840:Coaching, update WMA, prevent divide by zero.
+2827:added standAloneUiStatus flag in .rb.
+2808: coaching code clean up.
+2799:Coaching, added flag for algorithm selection POISSON vs WMA.
+2798:Coaching, add WMA tested against spreadsheet.
+2721:Coaching, add WMA algorithm option.
+Coaching, added configurable window for WMA algorithm.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_17_0">CPM Core Linux (0.17.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2021-06-15</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.17.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.3.0 ALPHA_01</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_3">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_cmpa2744_cpm_core_linux_integration_changes_for_ais_4_3_alpha_1">cmpa2744 : CPM Core Linux Integration changes for AIS 4 3 Alpha 1.</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Updated patches for AIS 4.3 ALPHA_1 RC.
+</p>
+</li>
+<li>
+<p>
+Updated TES common for AIS 4.3 ALPHA_01 RC.
+</p>
+</li>
+</ul></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cpma2790_added_gps_parameter_read_support_from_cda">cpma2790: Added GPS parameter read support from CDA.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cpma2796_changed_location_of_output_files_to_tmp_outputfiles_ram">cpma2796: Changed location of output files to /tmp/outputFiles (RAM).</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cpma2796_resolved_remaining_merge_issues_with_ais_4_3_a02">cpma2796: Resolved remaining merge issues with AIS 4.3 A02.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cmpa2799_coaching_add_flag_to_indicate_poisson_or_wma_algorithm_to_drive_stars_and_badges">cmpa2799: Coaching, add flag to indicate Poisson or WMA algorithm to drive Stars and Badges.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cpma2796_updated_removebinlibcontent_patches_for_eta_ais_4_3_a02_rc">cpma2796: Updated removeBinLibContent patches for eta-ais 4.3 A02 RC.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cmpa2798_coaching_add_wma_algorithm">cmpa2798: Coaching, add WMA algorithm.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cmpa2808_coaching_fix_gps_bad_records_for_map_feature">cmpa2808: Coaching, fix GPS-BAD records for MAP feature.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cmpa2795_coaching_1st_attempt_to_fix_gps_bad_in_map_feature">cmpa2795: Coaching, 1st attempt to fix GPS-BAD in MAP feature.</h3>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_16_0">CPM Core Linux (0.16.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2021-06-14</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.16.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.2.0 ALPHA_02</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_4">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us877424_add_cgi_error_codes_so_ui_can_detect_errors_and_fail">us877424 : Add cgi error codes so UI can detect errors and fail</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Return an http error code when there is an error.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us875539_serial_printer_crash_add_logs">us875539 : Serial printer crash add logs</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Log errno is serial port open fails.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us877511_fixed_cgi_error_response_and_removed_stop_cgi_functionality">us877511 : Fixed cgi error response and removed stop cgi functionality</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Removed stop cgi functionality when jhm is not running for example.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us877208_strip_cgi_bin_content_also_for_release_reduce_size">us877208 : Strip cgi-bin content also for release - reduce size</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us890846_fixed_pwm_input_period_interpolation">us890846 : Fixed PWM input period interpolation</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us885573_yellow_key_time_sync">us885573 : Yellow-key time sync</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Use re-entrant versions of local time and gmtime for thread-safety.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us886056_update_switchinputapp_to_support_debounce">us886056 : Update SwitchInputApp to support debounce</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Update switch processing to allow separate debounce counts for open vs. closed.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us867664_support_for_kgs_and_lbs">us867664 : Support for kgs and lbs</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us826952_updated_bridge_app_tti_log_level">us826952 : Updated Bridge App TTI log level</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Adjust log levels and clear unsupported files from FTB tx file queue.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us888931_added_external_imu_bias_estimation_inhibit_option">us888931 : Added external IMU bias estimation inhibit option</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_coaching_common_framework_updates">Coaching Common Framework Updates</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us899941_minor_updates_for_dsi">us899941 : Minor updates for DSI</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us901095_remove_tip_records_on_reset_from_breadcrumblog">us901095 : Remove TIP records on reset from breadcrumbLog</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us900199_updates_for_to_use_ais_nvm_utilities">us900199 : Updates for to use ais-NVM utilities</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us887662_fix_psr_name_amp_category_flipped">us887662 : Fix PSR, name &amp; Category flipped</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us896740_fix_again_sea_behavior_for_new_ui">us896740 : Fix again SEA behavior for new UI</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us889942_ran_cpp_check_and_added_suprressions_for_new_false_warnings">us889942 : Ran cpp check and added suprressions for new false warnings</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us896740_add_temp_install_pids">us896740 : Add Temp Install PIDs</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us896815_check_safestate_when_updating_tipviewcounter">us896815 : Check safeState when updating TipViewCounter</h3>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_15_0">CPM Core Linux (0.15.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2021-04-26</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.15.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.2.0 ALPHA_01</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_5">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us887248_can_over_udp_amp_cpop">us887248 : CAN over UDP &amp; CPOP</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Add support for CAN over UDP &amp; CPOP to
+DatalinkMgrToDld (Configurable Periodic Output Protocol).</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us888141_remove_span_class_monospaced_require_interfaces_coaching_rb_span">us888141 Remove <span class="monospaced">require interfaces_Coaching.rb</span></h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Remove `require interfaces_Coaching.rb`from
+XcpServerTask.rb. NOTE: AT/LWL Coaching will need to
+add this to their XcpServerTask_aux.rb.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us855859_tpms2_gps_data">us855859 TPMS2: GPS Data</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Read GPS Data (including Northing, Easting, and
+Elevation) over CDA.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us838474_lmt_oea_tkph_minestar_tmac_message">us838474 : LMT OEA TKPH MineStar TMAC Message.</h3>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_14_0">CPM Core Linux (0.14.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2020-11-19</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.14.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.1.0 ALPHA_16</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_6">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us878209_datalinkdata_scs_channel_and_datalinkmgrtodld">us878209 : DataLinkData SCS channel and DatalinkMgrToDld</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Updated DataLinkData SCS channel and DatalinkMgrToDld TaskPlugin
+to support multiple source IDs for the same parameter.
+IMPORTANT: This required an interface change to the DataLinkData STL
+container of parameters. The unordered_map&lt;key, DataLinkParam&gt; was
+converted to a unordered_map&lt;key, std::list&lt;DataLinkParam&gt;&gt;, where
+the inner list contains one or more DataLinkParams with identical
+DataLinkParamInfo metadata with the exception of SourceId and/or
+DataLinkType.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us883232_jhm2wsserver_to_support_converting_websocket">us883232 : Jhm2WsServer to support converting WebSocket</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Add Jhm2WsServer to support converting WebSocketrequests into
+Jhm2ParamMsgRequest for use by the AisJhm2DataServer. Currently
+supports ParameterRequest(2), FileRequest, and CommandRequest(2).
+Parameter and File requests can be one-time or periodic.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Moved the majority of jhm2 to legacy in favor of the AIS version.
+Only jhm2CgiApp remains since the AIS version is incompatible with MWL
+See prod/common/jhm2WsServer/README.md for more details</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us882913_tes_common_ais_for_compatibility_with_eta_ais">us882913 : TES-Common-ais for compatibility with eta-ais</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Updated TES-Common-ais for compatibility with eta-ais ALPHA_16.
+DatalinkManager interface has changed to support split Rx/Tx
+parameters, and the same parameter from a different SourceId
+/DataLinkProtocol.</pre>
+</div></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Added platform/common for common includes/libraries, and updated
+tes_platform.py.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us875060_us882913_coachingtiphistory">us875060, us882913: CoachingTipHistory</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Added CoachingTipHistory and $CA11 (Application History PSR)
+BDT support.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_u879877_string_to_show_hde">u879877: String to Show-Hde</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Add software version string to Show-Hde response.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us876725_add_getter_for_pwm_last_sample_time">us876725: Add getter for pwm last sample time.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us879573_updates_to_support_images">us879573: Updates to support images.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us856259_add_csvtodldapp_to_sandbox">us856259: Add csvToDldApp to sandbox.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us875539_fix_serial_printer_crash">us875539: Fix serial printer crash.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us878625_clean_up_datalinkmgrtodld_plugin">us878625: Clean up DatalinkMgrToDld plugin.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us873299_reset_breadcrumb_on_reset_command">us873299: Reset breadcrumb on reset command.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us828924_patches_for_latest_acd2">us828924: Patches for latest ACD2</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Updated patches for latest ACD2 develop branch e28baa.
+Updated Makefile.patch for latest acd2 develop branch. fix memory
+leak when in DEBUG.</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us877084_afsw_scl_2020_4_0_rc8_tag_for_health">us877084: AFSW_SCL_2020.4.0.rc8 tag for health</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Pick up AFSW_SCL_2020.4.0.rc8 tag for health, dlinfo
+and dlinfo_mager libs</pre>
+</div></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_integration_information">Integration Information</h3>
+<div class="paragraph"><p>To use ACD2, need to update the CPM project level SConstruct
+to use some new functions from eta-ais. The diff from LWL
+Coaching as a reference archieved in Core Linux 0.13.0 release.
+\TES-common-ais\patch\example\0_13_0_SConstruct.diff</p></div>
+<div class="paragraph"><p>One another change to make at the project level is to remove the
+const qualifier from app_oel_rtos_posix_config. This was done to
+support runtime configurable OEL tasks in OelTaskManager (used by ACD2).
+There is no functional impact on the existing code.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_13_0">CPM Core Linux (0.13.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2020-08-17</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.13.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.1.0 ALPHA_14</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_7">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_updated_ethernet_port_stats_config_file_to_fix_build_gulamhs">updated ethernet port stats config file to fix build (gulamhs)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us861224_updates_for_ais_alpha_14_machas3">us861224: Updates for AIS ALPHA_14 (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us828924_resolved_segfaults_in_datalinkmgttodld_machas3">us828924: Resolved segfaults in DatalinkMgtToDld (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us870036_updates_to_work_with_latest_acd2_branch_in_eta_ais_janikdc">us870036:updates to work with latest ACD2 branch in eta-ais (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us868546_update_datalinkmgrtodld_plugin_and_coachtask_janikdc">us868546:update DatalinkMgrToDld plugin and CoachTask (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us867685_updates_for_pid_f0b2_janikdc">us867685:updates for PID F0B2 (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us867978_fix_opid_f0b2_janikdc">us867978:fix OpID F0B2 (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us860760_added_coachingsummarydataforacd2_plugin_janikdc">us860760:added CoachingSummaryDataForAcd2 plugin (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us860760_update_datalinkmgrtodld_plugin_janikdc">us860760:update DatalinkMgrToDld plugin (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us860760_add_datalinkmgrtodld_plugin_minor_coaching_updates_janikdc">us860760:add DatalinkMgrToDld plugin, minor Coaching updates (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us858314_tip_trigger_to_csv_janikdc">us858314:tip trigger to csv (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us861049_updated_badge_logic_removed_logging_janikdc">us861049:updated badge logic removed logging (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us861049_updated_badge_logic_janikdc">us861049:updated badge logic (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us861376_zero_at_startup_janikdc">us861376:Zero at startup (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us853469_add_pid_d02922_janikdc">us853469:add PID D02922 (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us842786_add_ability_to_set_systipenablestatestatus_dynamically_janikdc">us842786:add ability to set sysTipEnableStateStatus dynamically (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us861039_update_to_use_tipviewed_command_janikdc">us861039: update to use TipViewed command (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us867978_fix_cppcheck_warnings_janikdc">us867978:fix cppcheck warnings (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us860760_cleanup_plugins_janikdc">us860760:cleanup plugins (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_828924_minor_updates_tested_on_at_test_bench_janikdc">828924:minor updates tested on AT Test Bench (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us867685_wip_updates_janikdc">us867685:wip updates (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_828924_minor_log_updates_janikdc">828924: minor log updates (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us869302_minor_updates_janikdc">us869302:minor updates (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us860760_minor_updates_janikdc">us860760:minor updates (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us867685_minor_updates_janikdc">us867685:minor updates (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_integration_information_2">Integration Information</h3>
+<div class="paragraph"><p>To use ACD2, need to update the CPM project level SConstruct
+to use some new functions from eta-ais. The diff from LWL
+Coaching as a reference archieved in Core Linux 0.13.0 release.
+\TES-common-ais\patch\example\0_13_0_SConstruct.diff</p></div>
+<div class="paragraph"><p>One another change to make at the project level is to remove the
+const qualifier from app_oel_rtos_posix_config. This was done to
+support runtime configurable OEL tasks in OelTaskManager (used by ACD2).
+There is no functional impact on the existing code.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_12_0">CPM Core Linux (0.12.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2020-08-17</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.12.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.1.0 ALPHA_13</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_8">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_resolved_merge_issue_with_m_j1939taskpriority_machas3">Resolved merge issue with m_j1939TaskPriority (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us858926_fixed_erroneous_control_bitfield_dropdown_in_bmi_autogen_ods_machas3">us858926: Fixed erroneous CONTROL_BITFIELD dropdown in bmi autogen ods (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us858926_remove_csf_pgt_client_patch_machas3">us858926: remove csf_pgt_client patch (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us858926_add_csf_eth_health_2019_2_0_patch_remove_unneded_a6n1_libraries_machas3">us858926: Add CSF_ETH_HEALTH_2019.2.0 patch. Remove unneded A6N1 libraries (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us846641_changed_readlctask_8217_s_exitoncompletion_default_option_to_em_false_em_to_avoid_taskcrashed_diagnostic_machas3">us846641: Changed ReadLCTask&#8217;s ExitOnCompletion default option to <em>false</em> to avoid TaskCrashed diagnostic (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us846641_updated_ocs_configs_for_alpha_12_machas3">us846641: Updated OCS configs for ALPHA 12 (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us841726_changed_default_name_of_ethernetpgtserver_json_to_match_autogen_format_machas3">us841726: Changed default name of EthernetPgtServer json to match autogen format (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_ms841707_resolved_datalinkdata_merge_conflict_machas3">ms841707: Resolved DataLinkData merge conflict (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_added_machinesleep_autonomy_condition_patch_from_mwl_machas3">Added MachineSleep autonomy condition patch from MWL (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us846641_update_tes_common_to_ais_alpha_12_rc_machas3">us846641: Update TES common to AIS ALPHA 12 RC (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_replaced_hard_coded_constants_with_define_gundas1">Replaced hard coded constants with #define (gundas1)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_restore_nvm_hpp_from_previous_commit_928a88f5915a95254529cf0d952878679d4342a1_gundas1">Restore nvm.hpp from previous commit 928a88f5915a95254529cf0d952878679d4342a1 (gundas1)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_undo_change_ethernetportstatistics_cyclerate_hz_from_4_to_1_gundas1">Undo change EthernetPortStatistics cycleRate_hz from 4 to 1 (gundas1)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_optimize_cleanup_function_so_while_loop_do_not_take_more_cpu_time_gundas1">Optimize cleanup function, so while loop do not take more cpu time (gundas1)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us856971_cadet_amp_html_working_for_web_page_id_janikdc">us856971:Cadet &amp; .html working for web page id (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us785774_add_language_path_to_show_hide_no_videourl_when_no_associated_video_in_ui_response_janikdc">us785774:add language path to show-hide, no videoUrl when no associated video in UI response (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us847093_add_badge_count_and_op_id_to_showhide_response_update_ui_tip_increment_so_it_logs_janikdc">us847093:add badge count and Op ID to ShowHide response, update UI tip increment so it logs (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us847206_segment_logging_into_breadcrumb_janikdc">us847206:Segment logging into breadcrumb (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us859391_update_breadcrumb_configurations_in_rb_janikdc">us859391:update breadcrumb configurations in .rb (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us847179_updates_for_coaching_cycleid_janikdc">us847179:updates for Coaching CycleID  (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us856658_add_ui_config_for_time_and_distance_triggers_for_gps_records_in_breadcrumb_janikdc">us856658:add UI config for Time and Distance triggers for GPS records in breadcrumb  (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us846641_fix_makefile_for_ais_alpha_12_janikdc">us846641:fix Makefile for AIS_Alpha_12 (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us848935_update_xcp_response_to_keep_tips_in_order_janikdc">us848935:update XCP response to keep tips in order (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us849441_update_bmiethernet_rb_config_parameter_janikdc">us849441:update BmiEthernet.rb config parameter (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us843066_fix_logic_bug_to_calc_good_janikdc">us843066:fix logic bug to calc % good (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us859391_update_coachingtaskgps_processing_for_breadcrumbs_janikdc">us859391:update CoachingTaskGps processing for breadcrumbs (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us847093_add_badge_count_and_op_id_to_showhide_response_update_ui_tip_increment_so_it_logs_janikdc_2">us847093:add badge count and Op ID to ShowHide response, update UI tip increment so it logs (janikdc)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_tp823395_revert_logger_threshold_back_to_error_maleken">TP823395: Revert logger threshold back to error (maleken)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_fixed_bug_with_serial_printer_parity_bit_setting_shattar">Fixed bug with serial printer parity bit setting (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_fixed_static_constexpr_member_variable_issue_shattar">Fixed static constexpr member variable issue (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_report_proper_http_status_code_503_when_jhm_is_down_shattar">Report proper http status code 503 when jhm is down (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_close_socket_before_resetting_socket_descriptor_shattar">Close socket before resetting socket descriptor (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_cancel_pending_grpc_read_on_cleanup_shattar">Cancel pending grpc read on cleanup (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_fixed_merge_issue_in_datalinkdata_h_for_uint32_t_mid_shattar">Fixed merge issue in DataLinkData.h for uint32_t mid (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_fixed_uids_for_new_vp3_record_entries_moved_tag_default_to_application_shattar">Fixed UIDs for new VP3 record entries, moved tag default to application (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us846641_fixed_issue_with_readlctask_aux_rb_patch_pcmtaskbase_cpp_to_remove_core_temperature_spam_shattar">us846641: Fixed issue with ReadLCTask_aux.rb, patch PcmTaskBase.cpp to remove core temperature spam (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us846641_more_updates_for_ais_alpha_12_shattar">us846641: More updates for AIS ALPHA 12 (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_handle_null_string_terminator_handling_in_security_id_description_shattar">Handle null string terminator handling in security id description (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_clean_up_bmij1939_log_levels_and_fixed_var_length_data_types_to_remove_unused_and_match_csv_file_shattar">Clean up BmiJ1939 log levels and fixed var length data types to remove unused and match csv file (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_add_newline_at_end_of_file_if_it_is_missing_for_print_shattar">Add newline at end of file if it is missing for print (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_fix_remote_printer_issues_shattar">Fix remote printer issues (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_fix_assignment_operator_for_datalink_param_and_fix_constructors_shattar">Fix assignment operator for datalink param and fix constructors (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_wip_fix_j1939_restricted_reads_and_parsing_of_security_id_shattar">WIP fix J1939 restricted reads and parsing of security id (shattar)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_changed_bdt_string_length_and_status_record_truck_name_length_gulamhs_pavan">Changed bdt string length and status record truck name length  (gulamhs / pavan)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_don_8217_t_return_false_if_we_have_zero_parameters_gulamhs_pavan">Don&#8217;t return false if we have zero parameters (gulamhs / pavan)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_ftb_stall_on_key_on_gulamhs_pavan">FTB stall on key-on (gulamhs / pavan)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_added_custom_list_names_and_truck_ticket_number_to_loadrecord_in_vp3_files_gulamhs_pavan">Added custom list names and truck ticket number to loadrecord in VP3 files (gulamhs / pavan)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_stop_cgi_requests_when_jhm_is_not_running_gulamhs_pavan">Stop cgi requests when jhm is not running (gulamhs / pavan)</h3>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_11_0">CPM Core Linux (0.11.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2020-03-11</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.11.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_9">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us805718_bmij1939_health_integration_for_fmi9_14_support_gundas1">us805718 - BmiJ1939 health integration for FMI9/14 support (gundas1)</h3>
+<div class="paragraph"><p>Added support for data link and node based diagnostics. FMI 9 and FMI 14 reported
+for PID, PGN, ADT protocols. These are reported in the DataLinkData diagnostics.
+Note: This implementation will change new data link strategy in the future release.
+i.e., only FMI9 raised per data link. ET would request BDT file for the parameter
+diagnostics information.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us827224_a6n2_n1_analysis_ecm_ethernet_pgt_server_support_part_1_pid_machas3">us827224 - A6N2/N1 Analysis ECM Ethernet PGT server support (Part 1 PID) (machas3)</h3>
+<div class="paragraph"><p>Add EthernetPgtServer plugin that can be integrated into the ACD or a standlone
+app (sandbox/EthernetPgtServerTest as an example). A project specific plugin
+must be created to feed the server
+(sandbox/EthernetPgtServerTest/EthernetPgtServerTestDataProducer.hpp
+as an example).</p></div>
+<div class="paragraph"><p>Improved DataLinkData logging info. Note that the Parameter Name string is only
+included if the logging level is DEBUG.</p></div>
+<div class="paragraph"><p>SPN/CAT EXT ID support will be added in a later story.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us834233_fix_memory_leak_in_bmiethernet_machas3">us834233 - Fix memory leak in BmiEthernet  (machas3)</h3>
+<div class="paragraph"><p>The csf_pgt_client library version 2018.2.0 has a memory leak. Add patch to use
+version 2019.4.0 of csf_pgt_client library.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us826802_improve_datalinkdata_part_2_machas3">us826802 - Improve DataLinkData (Part 2)  (machas3)</h3>
+<div class="paragraph"><p>Simplified the STL container to allow more efficient retrieval using only
+Parameter ID and ParameterIdentifierType (PID, CAT EXT ID, etc).
+If the same PID is sourced from multitple SIDs and/or DataLinkTypes, the
+producer must create multiple DataLinkData objects to publish.</p></div>
+<div class="paragraph"><p>Replace DlDataMap with an unordered_map, remove DlPidMap (NOTE: may
+require a minor change to the CPM project code if the iterator
+type returned by GetDataLinkDataMapPtr is hard coded.</p></div>
+<div class="paragraph"><p>Remove DataLinkType from DataLinkParamInfo in favor of DataLinkData&#8217;s version
+(NOTE: might require a CPM project code change for producers of DataLinkData).</p></div>
+<div class="paragraph"><p>Add a source field so that a producer can avoid consuming its own DataLinkData.</p></div>
+<div class="paragraph"><p>Delete deprecated GetXXXParamInfoXXX functions.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us832682_bmiethernet_all_paramtype_are_0_in_datalinkdata_machas3">us832682 - bmiEthernet, all ParamType are 0 in DataLinkData  (machas3)</h3>
+<div class="paragraph"><p>Fix bug caused by confusion between ParameterType and ParameterIdentifierType</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us829539_fix_app_init_sh_standardize_activetasks_and_productionlogger_machas3">us829539 - Fix app_init.sh, Standardize ActiveTasks and ProductionLogger  (machas3)</h3>
+<div class="paragraph"><p>Fix bug in app_int.sh where robot file is not being created if it doesn&#8217;t exist</p></div>
+<div class="paragraph"><p>Improve ActiveTasks to load CPM specific task files in production scenario.
+Add instructions for how to use scenarios.</p></div>
+<div class="paragraph"><p>ProductionLogger_*.rb does not need all in the CPM interfaces. Remove
+ProductionLogger_CpmCommon.rb and update the example to override the
+ProductionLogger paramters only.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us832482_add_datalinkdata_ocs_plugin_machas3">us832482 - add DataLinkData-OCS plugin  (machas3)</h3>
+<div class="paragraph"><p>Added DataLinkData Monitor OCS plugin.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us832745_investigate_fix_xcp_server_on_vm_machas3">us832745 investigate/fix xcp server on VM  (machas3)</h3>
+<div class="paragraph"><p>Updated XCP Server allow IP Address to be configurable from ruby to support
+debugging on VM (default is still 165.26.79.19).</p></div>
+<div class="paragraph"><p>To take advantage of this change, see app/xcp_server/README</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us832716_merge_coaching_int_updates_into_tes_common_0_11_0_machas3">us832716 -  Merge COACHING_INT updates into TES Common 0.11.0  (machas3)</h3>
+<div class="paragraph"><p>us723169 - Sync with AIS ALPHA 11. Added A6N1 build support. Removed
+rapidjson 1.1.0. Added A6NX platform with common includes and libs, this
+allows the CPM build process to be decoupled from AIS/TES common
+platformCommon changes (see doc/ssp_setup/app/SConstruct for details).
+Added tes_platform.py module to handle importing of libraries/includes.
+Added build targets for patching eta-ais files. Downgraded to
+CSF_ETH_HEALTH_2019.2.0 to resolve A6N1 issue with BmiEthernet.</p></div>
+<div class="paragraph"><p>us818875 - Update productionActiveTasks.rb to load project specific
+ActiveTask_* files. Converted CoachingShowHideStatus to an SCS
+channel, added coachingEnabled, coachingInstalled, machineInSafeState.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us786115_add_coachingsystemenabled_to_coachingtask_set_based_on_internalmsn_machas3">us786115 - Add coachingSystemEnabled to CoachingTask, set based on InternalMsn  (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us829404_add_support_for_variant_build_directories_needed_by_mwl_for_sa_au2020_machas3">us829404 - Add support for variant build directories (needed by MWL for SA/AU2020)  (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us825219_fix_ui_reset_in_coachingsummarydata_and_coaching3x3data_machas3">us825219 - Fix UI Reset in CoachingSummaryData and Coaching3x3Data  (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us829018_add_rb_default_config_for_installed_and_enabled_machas3">us829018 - Add .rb default config for Installed and Enabled  (machas3)</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us837288_update_to_4_poisson_thresholds_for_scoring_tips">us837288 - Update to 4 Poisson thresholds for scoring tips.</h3>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us710280_vp3record_h_added_new_add_data_to_record_template_for_string_data_machas3">us710280 - VP3Record.h - added new add_data_to_record template for string data  (machas3)</h3>
+<div class="paragraph"><p>Added to support MG.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us812418_serialprinter_app_stalls_shattar">us812418 - SerialPrinter app stalls  (shattar)</h3>
+<div class="paragraph"><p>Fix issue where printer app would stall when printing large tickets.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us822921_vp3_cycle_segmentation_data_issues_shattar">us822921 - VP3 cycle segmentation data issues  (shattar)</h3>
+<div class="paragraph"><p>Make sure VP3 file starts with status record.  Fix memory leak in VP3FileCreationApp.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us829404_separate_build_directories_for_different_target_variants_shattar">us829404 - Separate build directories for different target variants  (shattar)</h3>
+<div class="paragraph"><p>Support separate build directories for different build variants and targets.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us829147_add_deadlines_to_grpc_calls_in_cdaiothubcomms_shattar">us829147 - Add deadlines to grpc calls in CdaIoTHubComms  (shattar)</h3>
+<div class="paragraph"><p>Add deadlines (timeouts) to IoT hub related gRPC calls so they don’t block forever.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us818962_single_mal_named_vp3_file_halts_all_files_being_sent_to_back_office_shattar">us818962 - single mal-named VP3 file halts all files being sent to back office  (shattar)</h3>
+<div class="paragraph"><p>Skip FTB file transfers with bad file names that were clogging the tx queue.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us831538_limit_number_of_vp3_files_held_for_local_download_shattar">us831538 - Limit number of vp3 files held for local download  (shattar)</h3>
+<div class="paragraph"><p>Add configurable maximum number of files kept for VP3 local download.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us826967_update_offboard_message_interface_shattar">us826967 - Update offboard message interface  (shattar)</h3>
+<div class="paragraph"><p>Add support for “one-shot” IoTHub messages where it will try once and discard on fail.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us758750_listmgr_update_csv_file_import_and_export_format_shattar">us758750 - ListMgr update csv file import and export format  (shattar)</h3>
+<div class="paragraph"><p>Updated csv file format for truck and material lists to match the back office format.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us832902_vp3filecreatorapp_status_record_revisit_shattar">us832902 - VP3FileCreatorApp status record - revisit  (shattar)</h3>
+<div class="paragraph"><p>Added default status record for VP3 files, and make the requirement of a status record optional/configurable.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us821961_print_tickets_to_yk_over_cda_sft_shattar">us821961 - Print tickets to YK over CDA-SFT  (shattar)</h3>
+<div class="paragraph"><p>Add remote printer app.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us833488_pwm_inputs_not_reporting_correct_faults_shattar">us833488 - PWM inputs not reporting correct faults  (shattar)</h3>
+<div class="paragraph"><p>Add input state and timeout support to PWM inputs.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us831099_reduce_vp3_creation_rate_to_increase_file_size_shattar">us831099 - Reduce vp3 creation rate to increase file size  (shattar)</h3>
+<div class="paragraph"><p>Support “Triggered” VP3 file creation as triggered by product link through FTB, minor
+fixed to get it to work.
+Minor updates to AppReg.h, nvm.hpp, CreateFileRequest.h, and PartNumbers.h</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us841165_vp3_header_records_must_be_at_beginning_and_ftb_fixes_shattar">us841165 - VP3 header records must be at beginning and FTB fixes  (shattar)</h3>
+<div class="paragraph"><p>Fix the order of records in the VP3 file so that the header records are first.  Removed config
+part num from header.
+Fixed thread deadlock (stalled) issue in FTB by adding deadlines (timeouts) to CDA
+transmits.
+Fixed issue in FTB ConnectToCDAServer where it would connect, then disconnect, then
+connect again instead of just connecting once.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us841184_bmij1939_now_using_instance_name_shattar">us841184 – BmiJ1939 now using “instance name”  (shattar)</h3>
+<div class="paragraph"><p>BmiJ1939 now using “instance name” as AppReg name so that apps can register to more that one
+instance of BmiJ1939.
+Changed key off timeout to 32 minutes for FTB and VP3 Creator.  This is so that we can stay
+alive longer than the engine (max 30 minutes) and record those segment records.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us829545_bmij1939_fixes_shattar">us829545 – BmiJ1939 fixes  (shattar)</h3>
+<div class="paragraph"><p>Fixed BmiJ1939 app crashes when PGN times out.
+Fixed BmiJ1939 runs at 100% CPU in clean up.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_integration_information_3">Integration Information</h3>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+eta-ais AIS_APP_TEMPLATE_4.1.0_ALPHA_11 is required.
+</p>
+</li>
+<li>
+<p>
+The ssp Makefile must be updated to build the apply_ais_patch_all target in TES-common-ais:
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p># Prefix for the application verity file.  Used in zzzAutostart.
+APP_VERITY_PREFIX=CPM</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre># Patch AIS files. See TES-common-ais Makefile for details
+    make apply_patch_ais_all APP_VERITY_PREFIX=${APP_VERITY_PREFIX} -C ${TES_DIR}</pre>
+</div></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+The CPM project SConstruct should be updated to include the PLATFORM in the build flags:
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>baseEnv.Append(
+    CCFLAGS = [
+        &#8230;
+        <em>-DRAPIDJSON_HAS_STDSTRING=1</em>,
+        (<em>-D%s=</em> %(baseEnv[<em>PLATFORM</em>]).replace(<em>-</em>, <em>_</em>)), # Add PLATFORM to build flags, hyphens not permitted
+    ]</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Any apps using the GetDataLinkDataMapPtr interface of DataLinkData may have to update iterator handling code.
+</p>
+</li>
+<li>
+<p>
+Any apps getting/setting the DataLinkType of DataLinkParam will have to instead get/set from the DataLinkData object.
+</p>
+</li>
+</ol></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_10_0">CPM Core Linux (0.10.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-11-11</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.10.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_10">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us823378_update_dld_output_channel_publish_to_call_handledatalinkdatamap_and_cleardlpdiaginfo_machas3">us823378 - Update DLD output channel publish to call HandleDataLinkDataMap and ClearDlpDiagInfo (machas3)</h3>
+<div class="paragraph"><p>Updated DataLinkDataOutputChannel::publish to call HandleDataLinkDataMap and ClearDlpDiagInfo.
+Updated Bmi apps to remove these function calls.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us788956_us826338_remove_custom_lighttpd_configs_instead_use_servicedashboard_8217_s_defaults_machas3">us788956, us826338 - Remove custom lighttpd configs, instead use ServiceDashboard&#8217;s defaults (machas3)</h3>
+<div class="paragraph"><p>Removed custom lighttpd configs, instead ServiceDashboard&#8217;s defaults will be used  Added custom
+app_init.sh and restart_mon.sh for zzzAutostart and updated example ssp Makefile for their use.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us822801_optimize_filetransferbridgeapp_memory_usage_gulamhs">us822801 - Optimize FileTransferBridgeApp memory usage (gulamhs)</h3>
+<div class="paragraph"><p>Fixed ssl lib usage memory leak in FileTransferBridgeApp.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us828299_increase_canv3_buffer_size_in_bmij1939_gulamhs">us828299 - Increase canv3 buffer size in BmiJ1939 (gulamhs)</h3>
+<div class="paragraph"><p>Increased canv3 buffer size in BmiJ1939 from {150, 350} to {1000, 1000}.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us820538_add_config_production_activetasks_rb_to_run_productionlogger_by_default_machas3">us820538 - Add config/production/ActiveTasks.rb to run ProductionLogger by default (machas3)</h3>
+<div class="paragraph"><p>Added config/production/ActiveTasks.rb to run ProductionLogger by default.  Usage instructions:
+1. Copy DOC_DIR/app/config/DataTypeTable_CPM.rb (suffix must match DATATYPETABLE in the ssp Makefile).
+   Add any CPM Project specific scs channels.
+2. Create a CPM_DIR/config/ProductionLogger_CPM.rb with these SCS channels
+   (use config/ProductionLogger_CpmCommon.rb as a reference).</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us820782_create_taskplugin_and_taskpluginmgr_classes_to_support_the_sharing_of_modular_plugins_machas3_gundas1">us820782 - Create TaskPlugin and TaskPluginMgr classes to support the sharing of modular plugins (machas3, gundas1)</h3>
+<div class="paragraph"><p>Created TaskPlugin and TaskPluginMgr classes to support the sharing of modular plugins between
+projects that have similar needs.  Usage instructions are in prod/infrastructure/plugins/TaskPlugin/README.</p></div>
+<div class="paragraph"><p>Created EthernetPortStatistics ACD plugin to provide a BDT to ET.  Usage instructions are in
+prod/infrastructure/plugins/EthernetPortStatistics/README.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us812368_create_datalinkdatareceiver_plugin_machas3">us812368 - Create DataLinkDataReceiver plugin (machas3)</h3>
+<div class="paragraph"><p>Created DataLinkDataReceiver plugin.  This plugin is used to allow multiple other plugins to
+share a single DataLinkData scs input channel.  Usage instructions are in
+prod/infrastructure/plugins/DataLinkDataReceiver/README.</p></div>
+<div class="paragraph"><p>Updated DataLinkData diagnostics to store based on cid and mid.  This change should be transparent
+to the producer/consumer.</p></div>
+<div class="paragraph"><p>Added DataLinkType to DataLinkData class.  This can be used by the consumer to use/ignore an entire
+DataLinkData object based on DataLinkType (such as when used for reporting FMI diagnostics).</p></div>
+<div class="paragraph"><p>Updated BmiJ1939 to set CAN1/CAN2 in DataLinkData based on ruby config.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us812328_create_datalinkdatapublisher_plugin_machas3">us812328 - Create DataLinkDataPublisher plugin (machas3)</h3>
+<div class="paragraph"><p>Created DataLinkDataPublisher plugin.  This plugin is used to allow multiple other plugins to
+share a single DataLinkData scs output channel.  Usage instructions are in
+prod/infrastructure/plugins/DataLinkDataPublisher/README.</p></div>
+<div class="paragraph"><p>Updated jhm2 version of rapidjson to 1.1.0.  Moved to local machineCommon until AIS updates.
+To use, add the following to platform/A6N2/includes-list.txt:</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>#../../TES-common-ais/build-A6N2/prod/machineCommon/content/prod/common</pre>
+</div></div>
+<div class="paragraph"><p>If there are any CPM project apps that use rapidjson:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Replace all cases of "include &lt;jhm2/rapidjson" with "#include &lt;rapidjson".
+</p>
+</li>
+<li>
+<p>
+Remove all cases of
+</p>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>#define RAPIDJSON_NAMESPACE rapidjson110
+#define RAPIDJSON_HAS_STDSTRING 1</pre>
+</div></div>
+</li>
+<li>
+<p>
+Replace all "rapidjson110" references with "rapidjson"
+</p>
+</li>
+<li>
+<p>
+Add the following to CCFlags in SConstruct
+</p>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>'-DRAPIDJSON_HAS_STDSTRING=1',</pre>
+</div></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Added DataLinkData::GetLastPIDValueIfReceived.  Updated DataLinkParam to set PIDDataReceived to
+true if value is updated.</p></div>
+<div class="paragraph"><p>Added displayRequired to CoachingSummaryData.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us817647_add_getlastpidvalueifgood_and_getlastpidvalueengifgood_functions_machas3">us817647 - Add GetLastPIDValueIfGood and GetLastPIDValueEngIfGood functions (machas3)</h3>
+<div class="paragraph"><p>Added GetLastPIDValueIfGood and GetLastPIDValueEngIfGood functions to DataLinkParam to reduce
+duplication in consumer code.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us812734_us816321_us816641_add_breadcrumblog_scs_channel_to_support_logging_of_events_to_hlog_and_xcp_with_gps_location_machas3">us812734, us816321, us816641 - Add BreadcrumbLog scs channel to support logging of events to hlog and xcp with GPS location (machas3)</h3>
+<div class="paragraph"><p>Added BreadcrumbLog scs channel to support logging of events to hlog and xcp with GPS location.
+Currently supported breadcrumb events are:
+- UI Commands
+- Keyswitch On/Off
+- Coaching Tip Trigger</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us815125_move_xcp_server_library_to_tes_common_machas3">us815125 - Move xcp_server library to TES Common (machas3)</h3>
+<div class="paragraph"><p>Moved xcp_server library to TES Common, incorporating CPM 2.0/AU2020 enhancements.  Usage
+instructions are in /apps/xcp_server/README.</p></div>
+<div class="paragraph"><p>Created xcpable interface to allow the scs channels to populate the xcp ParameterDB rather
+than aisXcpServer.  Usage example is in
+prod/common/interfaces/CoachingSummaryData/CoachingSummaryData.h</p></div>
+<div class="paragraph"><p>Coaching: Added tipStatus to CoachingTipResult_t</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us812338_create_jsonable_interface_to_simplify_websocket_responses_machas3">us812338 - Create jsonable interface to simplify websocket responses (machas3)</h3>
+<div class="paragraph"><p>Created jsonable interface to simplify websocket responses by allowing scs channels to generate
+their own json.  jsonable is defined in prod/common/interfaces/JSON/jsonable.h.  Updated
+BreadcrumbLog to implement jsonable.</p></div>
+<div class="paragraph"><p>Coaching: Added CoachingShowHideStatus.  Updated Coaching3x3Data and CoachingSummaryData to
+implement jsonable.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us786562_create_security_system_current_security_id_cat_ext_f0b2_varlengthdatalinkparam_machas3">us786562 - Create Security System Current Security ID (CAT EXT $F0B2) VarLengthDataLinkParam (machas3)</h3>
+<div class="paragraph"><p>Created Security System Current Security ID (CAT EXT $F0B2) VarLengthDataLinkParam.
+Added to CoachingTask</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us817691_fix_getparambyid_issue_when_receive_multiple_datalinkdata_objects_machas3">us817691 - Fix GetParamByID issue when receive multiple DataLinkData objects (machas3)</h3>
+<div class="paragraph"><p>Fixed segmentation fault issue in GetParamByID when multiple DataLinkData
+objects are received in the same executive cycle.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us813799_add_videourl_to_3x3_machas3">us813799 - Add videoUrl to 3x3 (machas3)</h3>
+<div class="paragraph"><p>Coaching: Added videoUrl to 3x3.  Fixed bug with UI Reset clearing operatorName.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us812409_replaced_nan_with_1_0_in_coachingsummarydata_machas3">us812409 - Replaced NAN with 1.0 in CoachingSummaryData (machas3)</h3>
+<div class="paragraph"><p>Coaching: Replaced NAN with 1.0 in CoachingSummaryData</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us756955_add_coachingenabled_flag_to_coachingsummarydata_and_coaching3x3data_machas3">us756955 - Add coachingEnabled flag to CoachingSummaryData and Coaching3x3Data (machas3)</h3>
+<div class="paragraph"><p>Coaching: Added coachingEnabled flag to CoachingSummaryData and Coaching3x3Data</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us817343_fix_bug_with_ui_reset_clearing_the_cyclerate_hz_in_scs_channels_machas3">us817343 - Fix bug with UI Reset clearing the cycleRate_hz in scs channels (machas3)</h3>
+<div class="paragraph"><p>Coaching: Fixed bug with UI Reset clearing the cycleRate_hz in scs channels.  Fix
+Coaching3x3Data to always updated time and severity total update.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us782417_update_migration_docs_with_au2020_cpm_2_0_sa_lessons_learned_machas3">us782417 - Update migration docs with AU2020/CPM 2.0 SA lessons learned (machas3)</h3>
+<div class="paragraph"><p>Updated 4.1 migration docs with AU2020/CPM 2.0 SA lessons learned.  Delete old verities
+before creating new ones.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us827799_update_4_1_migration_docs_with_at_haul_lessons_learned_machas3">us827799 - Update 4.1 migration docs with AT Haul lessons learned (machas3)</h3>
+<div class="paragraph"><p>Updated 4.1 migration docs with AT Haul lessons learned.  Updated ssp_setup/app/SConstruct
+to load default include and library paths from TES Common.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpm_core_linux_0_9_0">CPM Core Linux (0.9.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-08-16</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.9.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_11">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us709871_upgrade_from_ais_4_0_to_4_1_for_cpm_projects_machas3">us709871 - Upgrade from ais 4.0 to 4.1 for CPM projects   (machas3)</h3>
+<div class="paragraph"><p>Updated TES Common to use eta-ais template app 4.1.  This was primarily tested with
+AIS_APP_TEMPLATE_4.1.0_ALPHA_08, but should be compatible with AIS_APP_TEMPLATE_4.1.0_ALPHA_10.</p></div>
+<div class="paragraph"><p>The major features of 4.1 are:
+        -       Access to latest AIS content (4.0 app is deprecated and is only updated with critical
+                content).</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The ability to build for multiple targets at once (e.g. ‘make project_a6n2’ will not
+                overwrite the output from ‘make project_ocs’ and vice versa).
+</p>
+</li>
+<li>
+<p>
+Dramatically improved build time for ‘make release’.
+</p>
+</li>
+<li>
+<p>
+Improved syncSoftware.  ‘make verity_all_a6n2’ now creates 4 total verities: CPM,
+                zzzAutostart, ossSoftware, DefaultConfig.  syncSoftware will transfer the latter
+                3 verities to the ECM and will copy the CPM specific bin/lib/config directories
+                to /opt as r/w so they can be overwritten as needed.  This makes it a much
+                quicker and versatile option for debugging than making a verity for the CPM
+                content.
+</p>
+</li>
+</ul></div>
+<div class="sect3">
+<h4 id="_note">Note:</h4>
+<div class="paragraph"><p>Instructions for updating existing/creating new CPM super projects can be found in
+doc/ssp_setup (ais_4.1_migration.txt and new_ssp_setup.txt, respectively).  Updated build
+commands are in doc/build_commands.txt</p></div>
+</div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us791997_update_filetransferbridgeapp_to_use_cert_manager_protobuf_lib_in_ais_4_1_machas3">us791997 - Update FileTransferBridgeApp to use cert_manager_protobuf lib in AIS 4.1   (machas3)</h3>
+<div class="paragraph"><p>Compiled FileTransferBridgeApp using libcert_manager_protobuf.a for CDA 2019.5.0</p></div>
+<div class="sect3">
+<h4 id="_note_2">Note:</h4>
+<div class="paragraph"><p>By default, FileTransferBridgeApp is compiled using CDA_2018.5.0.  It can be compiled
+using CDA_2019.5.0, but as of this release it will not communicate with the Telematics
+Yellow Key to send VP3 files.</p></div>
+</div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us808085_at_coaching_use_bmi_j1939_to_request_lat_long_machas3">us808085 - AT Coaching: use bmi_J1939 to request Lat-Long    (machas3)</h3>
+<div class="paragraph"><p>In GPSDataLinkParam added option for GetGpsLatitude/Longitude to return 0-180/0-360 ranges
+per CDL PID $F84D.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us786826_us794229_us794515_us795396_us796556_us796569_us799453_us799669_us800895">us786826, us794229, us794515, us795396, us796556, us796569, us799453, us799669, us800895,</h3>
+<div class="paragraph"><p>us801042, us801044, us805350, us805512, - Create CoachingTask (machas3)</p></div>
+<div class="paragraph"><p>Created CoachingTask and related SCS channels.  Use by copying sandbox/CoachingTaskExample
+folder to the CPM project apps directory and updating it for the specific application.</p></div>
+<div class="paragraph"><p>Added the following functions to prod/common/fileio:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+tes_common_ais::directory::copy - Copies all files and folders in the source to dest.
+</p>
+</li>
+<li>
+<p>
+tes_common_ais::nvm::read, store - Added support for serializing multiple objects to
+        a single file.
+</p>
+</li>
+<li>
+<p>
+tes_common_ais::nvm::count - Returns the number of nvm records stored in the provided
+        path.
+</p>
+</li>
+<li>
+<p>
+tes_common_ais::nvm::deleteOldest - Deletes the oldest nvm records stored in the
+        provided path.
+</p>
+</li>
+</ul></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_merged_tes_common_0_8_1_updates_gundas1">Merged TES Common 0.8.1 updates (gundas1)</h3>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>Merged TES Common 0.8.1 release updates into 0.9.0 release.</pre>
+</div></div>
+<div class="sect3">
+<h4 id="_note_3">Note:</h4>
+<div class="ulist"><ul>
+<li>
+<p>
+0.9.0 updated to use AIS eta-ais template app 4.1.
+</p>
+</li>
+<li>
+<p>
+0.8.1 using AIS eta-ais template app 4.0 in maintenance mode.
+Only critical updates will be added in the future.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_8_1">TES Common Applications (0.8.1)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-08-16</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.8.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_12">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us803653_cpm_2_0_sa_tmac_telemetry_data_to_telematics_using_sft_machas3">us803653 - CPM 2.0 SA: TMAC/Telemetry data to Telematics using SFT (machas3)</h3>
+<div class="paragraph"><p>Added PCS/Loader Cycle TMAC/Telemetry data to FileTransferBridgeApp.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us792913_improve_simplify_datalinkdata_machas3">us792913 - Improve/Simplify DataLinkData  (machas3)</h3>
+<div class="paragraph"><p>Refactored DataLinkParam and DataLinkParamInfo to move all "static" metadata to
+DataLinkParamInfo and variable data to DataLinkParam.  Made the following
+client-side changes:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+DataLinkData::GetParams - Allows iteration through the internal container
+          using C++11 range-based for loops.  Usage (const is optional):
+        for (const DataLinkParam&amp; dlParam : dataLinkData.GetParams())
+            {
+                switch (dlParam.GetParamId())
+                    { &#8230;
+</p>
+</li>
+<li>
+<p>
+DataLinkData::AddDataLinkParam - Now returns false if all necessary metadata
+          for the parameter has not been set.
+</p>
+</li>
+<li>
+<p>
+DataLinkData::UpdateDataLinkParam - Now returns false if the update failed.
+</p>
+</li>
+<li>
+<p>
+DataLinkData::GetParamByID - New function that provides a pointer to the
+          DataLinkParam with the provided PID and ParameterIdType.  Overloads are
+          provided if the Parameter comes from another source (i.e. SID/Source Address
+          and DataLinkType)
+</p>
+</li>
+<li>
+<p>
+DataLinkData::GetParamValueIndexByName, GetParamValueIndexByPID - Deleted,
+          they were poorty implemented functions that returned 0 ( a valid index) if
+          the parameter was not found.
+</p>
+</li>
+<li>
+<p>
+DataLinkParam::SetLastValue - Can take either a vector&lt;unsigned_8&gt; or
+          uint32_t for fixed length PIDs.  In either case, lastValue should be the raw,
+          unpacked value read from the datalink.  DSI is required, i.e. lastValue
+          cannot be set without the DSI and vice versa.
+</p>
+</li>
+<li>
+<p>
+DataLinkParam::SetLastValueDsi – Removed per changes to SetLastValue
+</p>
+</li>
+<li>
+<p>
+DataLinkParam::SetVarLengthParamValue - Sets the lastValue for variable
+          length PIDs.  Can take either a vector or uint8_t array.
+</p>
+</li>
+<li>
+<p>
+DataLinkParam::SetLastValueEng - New function that allows the engineering
+          value to be directly set for fixed length PIDs.  Raw value is computed
+          based on Scaling and Offset and stored internally.  Simplifies internal
+          publish of DataLinkData.
+</p>
+</li>
+<li>
+<p>
+DataLinkParamInfo::GetDataLinkTypeString, GetParamIdTypeString,
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+GetParameterTypeString, GetUnitsString, VarLengthDataLinkParamFactory
+</dt>
+<dd>
+<p>
+          GetVarLengthParamTypeString - New functions to get std::string representations
+          for the corresponding data.  Used for OCS plugin that will eventually appear
+          in eta-ais, can also be used for debugging.
+</p>
+</dd>
+</dl></div>
+</li>
+</ul></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us808416_fix_unsupported_json_parser_special_characters_and_symbols_machas3">us808416 - Fix unsupported JSON parser special characters and symbols (machas3)</h3>
+<div class="paragraph"><p>Updated Bmi Autogen to replace . and \ characters in JSON keys with spaces.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us783857_au2020_l2_configure_weighing_app_to_use_datalink_inputs_machas3">us783857 - AU2020 L2: Configure weighing app to use datalink inputs (machas3)</h3>
+<div class="paragraph"><p>Extended PwmInputChannels to allow direct access to the PWM Inputs.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us805716_make_preferred_j1939_address_configurable_through_ruby_divyaa">us805716 - Make preferred J1939 address configurable through ruby (divyaa)</h3>
+<div class="paragraph"><p>Supported for configuring the J1939 Preferred address through j1939 ruby file instead of
+configuring through application.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us807412_review_log_statements_in_bmij1939_divyaa">us807412 - Review log statements in BmiJ1939 (divyaa)</h3>
+<div class="paragraph"><p>Removed unnecessary logs from J1939 and changed logging to appropriate log level.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us807762_support_parameter_types_in_one_j1939_json_config_divyaa">us807762 - Support parameter types in one J1939 JSON config (divyaa)</h3>
+<div class="paragraph"><p>Support PIDs and PGNs in one JSON config file. Each parameter type has separate tag for
+PID’s, PGN’s and CAT EXT ID’s. Application needs to look for key
+BMI_J1939_CONFIG_JSON_FILE_PATH in ruby file instead of 2 or 3 JSON file paths such as
+BMI_J1939_PGN_CONFIG_JSON_FILE_PATH and BMI_J1939_CDL_PID_CONFIG_JSON_FILE_PATH in
+machine specific robot file. Update Automation scripts as well for combined PID and
+PGN in one J1939 config JSON file. J1939 App would exit with proper error messages
+if JSON parsing fails and as well if required PROP-A PGN is not added under PGN
+section in JSON config file.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us800941_verify_pgn_map_cat_ext_id_with_variable_length_divyaa">us800941 Verify PGN, MAP, CAT EXT ID with Variable length (divyaa)</h3>
+<div class="paragraph"><p>Updated BmiJ1939 to support variable length params such PGN’s, PID’s through MAP and CAT Ext ID’s.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us804666_add_support_for_cat_ext_ids_in_bmiethernet_app_gundas1">us804666 Add support for CAT Ext Ids in BmiEthernet app (gundas1)</h3>
+<div class="paragraph"><p>Added support for CAT Ext ids in BmiEthernet app. Found a CSNS bug that&#8217;s not
+passing data status in the handler. So, BmiEthernet app doesn&#8217;t communicate
+data status properly. We will have fix in next release 0.10.0 assuming
+CSNS would have fix by then.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_8_0">TES Common Applications (0.8.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-25-07</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.8.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_13">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us770573_filetransferbridgeappcda_senddatafile_incorrectly_handles_return_codes_shattar">us770573 - FileTransferBridgeAppCda::SendDataFile incorrectly handles return codes (shattar)</h3>
+<div class="paragraph"><p>Currently, every TransferReturnMessage return code other than QUEUED_SUCCESS is treated the same.
+Updated SendDataFile function to handle all return codes correctly received from TransferReturnMessage.</p></div>
+<div class="paragraph"><p>Updated FileTransferBridgeRequestStorage::GenerateFileNamev2 to allow only characters in a portable
+file name character set should be allowed [A-Za-z0-9._-].</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us783715_remove_datatype_from_datalinkdata_machas3">us783715 - Remove DataType from DataLinkData (machas3)</h3>
+<div class="paragraph"><p>Removed DataType attribute in DataLinkParamInfo.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us784041_j1939_app_registration_kamals2">us784041 J1939 App Registration (kamals2)</h3>
+<div class="paragraph"><p>Added app registration support to BmiJ1939</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us734864_bmi_j1939_update_to_arbitrate_source_address_ravadm">us734864 BMI-J1939, update to arbitrate source address (ravadm)</h3>
+<div class="paragraph"><p>Added arbitrate source address claim support to BmiJ1939.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us785000_remove_obsolete_macros_from_bmi_autogen_spreadsheet_machas3">us785000 Remove obsolete macros from bmi_autogen spreadsheet (machas3)</h3>
+<div class="paragraph"><p>Removed the macros from Sheet1 of bmi_autogen_v1.ods.  They are obsolete,
+per bmi_autogen_readme.txt the bmi_autogen_lib macros should be used instead.
+Also provide an <em>exportBmi_common</em> sub that can be used inside LibreOffice,
+it will not auto-close the workbook after running.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us789241_woa_iot_communications_shattar">us789241 WOA iOT communications (shattar)</h3>
+<div class="paragraph"><p>Added support for work order assist required file types.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us787224_gps_pid_add_access_functions_for_engineering_latitude_and_longitude_values_machas3">us787224 GPS PID: Add access functions for engineering latitude and longitude values (machas3)</h3>
+<div class="paragraph"><p>Added access functions to the GPSDataLinkParam class to provide the latitude and longitude.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us779460_add_restricted_read_param_support_to_j1939_app_divyaa">us779460 Add restricted read param support to J1939 app (divyaa)</h3>
+<div class="paragraph"><p>Added support for restricted read PIDs based on ADT param.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us790311_change_varlengthparamblock_from_fixed_array_to_vector_shattar">us790311 Change VarLengthParamBlock from fixed array to vector (shattar)</h3>
+<div class="paragraph"><p>Changed VarLengthParamBlock from fixed array to vector.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us792511_update_bmi_autogen_spreadsheet_for_0_8_0_machas3">us792511 Update bmi_autogen spreadsheet for 0.8.0 (machas3)</h3>
+<div class="paragraph"><p>Updated bmi autogen spreadsheet and scripts to support CAT EXT IDS.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us792889_bmij1939_adt_for_more_than_1_parameter_is_not_working_divyaa">us792889 BmiJ1939: ADT for more than 1 parameter is not working (divyaa)</h3>
+<div class="paragraph"><p>Fixed issue with J1939 app when reading more than one ADT parameter.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us794234_add_handshake_to_calibration_ui_interfaces_shattar">us794234 Add handshake to calibration UI interfaces (shattar)</h3>
+<div class="paragraph"><p>Added handshake number to calibration UI request and response interfaces.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_7_0">TES Common Applications (0.7.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-05-06</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.7.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_14">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us777873_resolve_vp3record_compile_warnings_gundas1">us777873 - Resolve VP3Record compile warnings (gundas1)</h3>
+<div class="paragraph"><p>Resolved compile warnings in VP3Record that are elevated to errors if -Werror flag is used</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us770211_add_bmi_support_for_unsupported_generic_variable_length_pids_gundas1">us770211 - Add Bmi Support for unsupported/generic variable length PIDs (gundas1)</h3>
+<div class="paragraph"><p>Previously, BmiCdl and BmiJ1939 only supported specific variable length PIDs (GPS, TIME_ZONE, PRODUCT_ID)
+that had their own entries in VarLengthDataLinkParamParamPool.  With this release, if the
+VarLengthDataType (BmiJ1939) or VarLengthParamType (BmiCdl) is set to UNSUPPORTED, the received
+data will be stored in DataLinkParmInfo.  It is the client&#8217;s responsibility to interpret/decode the "raw"
+data array returned by GetVarParamBlock().</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us756006_add_spreadsheet_to_generate_bmij1939_bmicdl_bmiethernet_json_files_gundas1">us756006 - Add spreadsheet to generate BmiJ1939/BmiCdl/BmiEthernet json files (gundas1)</h3>
+<div class="paragraph"><p>Instead of manually generating the bmi json files, the desired parameters can be added to one or more
+spreadsheets that will autogenerate the files.  If desired, this autogeneration can be done at application
+compile time.  Note that it is necessary to install LibreOffice in the Virtual Machine to use this feature.</p></div>
+<div class="paragraph"><p>The instructions are documented in config/bmi_autogen_readme.txt</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us722372_add_security_system_current_key_gundas1">us722372 - Add Security System Current Key (gundas1)</h3>
+<div class="paragraph"><p>To support the "OperatorIDCsv" feature, a VariableDatatLinkParam was added for Security System Current Key.
+CPMOperatorIdList was also added to support csv upload/download and json responses to the UI.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us748445_bmi_cdl_app_automated_regression_test_gundas1">us748445 – BMI CDL app Automated regression test (gundas1)</h3>
+<div class="paragraph"><p>Developed Python scripts to Automate the test of BMI CDL app through Vbench. Various test JSON files with all combinations of the protocol are used to test. Note that it is necessary to enable the automation testing in the BMI CDL app SConscript. The Instructions are documented in  apps/TestAutomation /BmiCdl/Manual_BMI_CDL_Automation_Test.docx.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us748445_bmi_cdl_app_automated_regression_test_gundas1_2">us748445 – BMI CDL app Automated regression test (gundas1)</h3>
+<div class="paragraph"><p>Developed Python scripts to Automate the test of BMI J1939 app through Vbench. Various test JSON files with all combinations of the protocol are used to test. Note that it is necessary to enable the automation testing in the BMI J1939 app SConscript. The Instructions are documented in  apps/TestAutomation /BmiJ1939/Manual_BMI_J1939_Automation_Test.docx.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us777835_support_vp3_file_local_download_gundas1">us777835 - Support VP3 file local download (gundas1)</h3>
+<div class="paragraph"><p>Added vp3 file local download support and fixed some file transfer bridge file system error handling.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_us773707_add_spn_support_to_bmiethernet_app_gundas1">us773707 - Add SPN support to BmiEthernet App (gundas1)</h3>
+<div class="paragraph"><p>BmiEthernet support publishing raw data for requested SPN.
+Note: there was no simulator available to verify this functionality. This will be fully validated in the future release as soon simulation is ready.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_6_0">TES Common Applications (0.6.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-04-09</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.6.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_15">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_us770238_pid_data_acquisition_over_ethernet_gundas1">us770238 - PID data acquisition over Ethernet (gundas1)</h3>
+<div class="paragraph"><p>Added support for PID data acquisition (PGT) over ethernet.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_5_0">TES Common Applications (0.5.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-02-11</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.5.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_16">Release Summary Information</h2>
+<div class="sectionbody">
+</div>
+</div>
+<div class="sect1">
+<h2 id="_required_eta_ais_version_gundas1">Required eta-ais version (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>AIS_APP_TEMPLATE_4.0.0_ALPHA_31</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_bmij1939_app_gundas1">Add BmiJ1939 app (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Added new BmiJ1939 Rx app that is configurable using JSON.
+The following Rx services are supported:
+ - CDL PID over J1939 (SPB, PGB, Real Poll, Map, ADT)
+ - PGN</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_app_registration_to_bmicdl_and_pwminputapp_gundas1">Add app registration to BmiCdl and PwmInputApp (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Updated BmiCdl and PwmInputApp to support app registration through
+the AppRegInput interface.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_create_partnumbers_channel_gundas1">Create PartNumbers channel (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Removed TES Common version of ShmClock.  The part numbers and product id
+were added to a new PartNumbers channel.  Updated VP3FileCreationApp to
+use the new PartNumbers channel.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_product_id_support_gundas1">Add Product ID support (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Updated DataLinkData to support the variable length Product ID parameter.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_tmac_file_support_gundas1">Add TMAC file support (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Updated FileTransferBridgeApp to support TMAC files.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fix_vp3_header_timestamp_gundas1">Fix VP3 header timestamp (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Updated VP3FileCreationApp correctly to use the timezone offset provided by ShmClock.
+Added get_tz_struct and get_tz_data helper functions to directly get/set timezone
+information from/to an ShmClock object.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_common_nvm_store_read_functions_gundas1">Add common NVM store/read functions (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Added nvm::store and nvm::read template functions for any
+object that implements boost::serialize.  Contained in &lt;fileio/nvm.hpp&gt;</p></div>
+<div class="paragraph"><p>Added directory::create to provide a standard exception handling function for
+creating directories.  Contained in &lt;fileio/directory.hpp&gt;</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_change_iflocker_to_use_a_shared_lock_gundas1">Change iflocker to use a shared lock (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Changed iflocker to use a shared lock for reading instead of an exclusive write lock.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_a_iso8601utc_time_parsing_gundas1">Add a ISO8601UTC time parsing (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Added a ISO8601UTC time parsing utility in print.hpp.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_add_iothubcomms_to_file_transfer_bridge_app_gundas1">Add IoTHubComms to file transfer bridge app (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Added the IoTHubComms to file transfer bridge app.
+NOTE: Commented out the code that started that service.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fix_remaining_bytes_to_read_is_decremented_twice_for_a_single_read_gundas1">Fix remaining bytes to read is decremented twice for a single read (gundas1)</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>In "boost/cgi/cgi/request_service.hpp" in parse_post_vars(), the remaining bytes
+to read is decremented twice for a single read. Once in the client read_some,
+and once in the request service parst_post_vars. This is because a reference
+to the client bytes_left is used rather than a copy of the bytes left.</p></div>
+<div class="paragraph"><p>std::size_t&amp; bytes_left (impl.client_.bytes_left_);</p></div>
+<div class="paragraph"><p>Should be
+std::size_t bytes_left (impl.client_.bytes_left_);</p></div>
+<div class="paragraph"><p>For content lengths that are not multiples of 128, the double decrement rolls
+over and the post data is read until the eof is encountered, possibly greater
+than the content length.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_4_1">TES Common Applications (0.4.1)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-01-15</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.4.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_17">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_auto_detect_cpp_check_install_status_gundas1">Auto detect cpp check install status (gundas1)</h3>
+<div class="paragraph"><p>Auto detect cpp check install status. If cpp check not found
+run cpp check installer. User still need to respond to prompts
+during the installation.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_fix_compile_warning_gundas1">Fix compile warning (gundas1)</h3>
+<div class="paragraph"><p>Fixed compiler warning that may show as error for applications
+using Werror.</p></div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_4_0">TES Common Applications (0.4.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2019-01-09</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_18">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_integrate_cpp_check_with_tes_common_apps_gundas1">Integrate CPP check with TES COMMON apps (gundas1)</h3>
+<div class="paragraph"><p>Integrated CPP check with make file. When TES common apps are compiled,
+CPP check results are generated.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_updates_for_ui_calibrations_gundas1">Updates for UI calibrations (gundas1)</h3>
+<div class="paragraph"><p>Updated for UI calibrations, move scs objects to TES Common.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_add_new_file_type_10087_support_for_ftb_gundas1">Add new file type(10087) support for FTB (gundas1)</h3>
+<div class="paragraph"><p>Added new file type(10087) to support list sync config hash responses in FileTransferBridgeApp.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_update_registration_check_in_vp3creatorapp_gundas1">Update Registration check in VP3CreatorApp (gundas1)</h3>
+<div class="paragraph"><p>Updated to fix app registration between FileTransferBridgeApp and VP3FileCreatorApp.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_default_values_for_shm_clock_gundas1">Default values for SHM clock (gundas1)</h3>
+<div class="paragraph"><p>Added Default values for SHM clock.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_time_zone_handling_in_vp3filecreationapp_gundas1">Time Zone handling in VP3FileCreationApp (gundas1)</h3>
+<div class="paragraph"><p>Fixed timezone handling in VP3FileCreationApp.</p></div>
+<div class="paragraph"><p>Fixed logging for vp3 app.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_add_sync_lock_gundas1">Add sync lock (gundas1)</h3>
+<div class="paragraph"><p>Acquired lock before adding data link param to data link data interface object.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img alt="Note" src="data:image/png;base64,
+">
+</td>
+<td class="content">Not all of the dependancies have been represented.</td>
+</tr></table>
+</div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_3_0">TES Common Applications (0.3.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2018-10-22</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.3.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_19">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_add_outputapp_gundas1">Add OutputApp (gundas1)</h3>
+<div class="paragraph"><p>Added udpated OutputApp to TES Common Apps.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_add_outputapptest_gundas1">Add OutputAppTest (gundas1)</h3>
+<div class="paragraph"><p>Added OutputAppTest to run automated test.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_add_support_for_cdl_diagnostics_gundas1">Add support for CDL Diagnostics (gundas1)</h3>
+<div class="paragraph"><p>Added Support for FMI-9 and FMI-14 CDL Diagnostics.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_update_cdl_test_app_gundas1">Update CDL Test App (gundas1)</h3>
+<div class="paragraph"><p>Updated CDL Test App to verify diagnostics.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_add_tmac_telemetry_transfer_support_gundas1">Add TMAC Telemetry Transfer Support (gundas1)</h3>
+<div class="paragraph"><p>Added TMAC Telemetry Transfer proto file and Generated code.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img alt="Note" src="data:image/png;base64,
+">
+</td>
+<td class="content">Not all of the dependancies have been represented.</td>
+</tr></table>
+</div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_2_0">TES Common Applications (0.2.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2018-09-04</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.2.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_20">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_add_generatefilenamev2_function_gundas1">Add GenerateFileNamev2 function(gundas1)</h3>
+<div class="paragraph"><p>Added GenerateFileNamev2 to generate Telematics compliance file name.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_update_generatefilenamev2_references_gundas1">Update GenerateFileNamev2 references(gundas1)</h3>
+<div class="paragraph"><p>Updated GenerateFileNamev2 references to call udpated API.</p></div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_update_vp3sim_ruby_file_gundas1">Update VP3Sim ruby file(gundas1)</h3>
+<div class="paragraph"><p>Updated VP3Sim ruby file.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img alt="Note" src="data:image/png;base64,
+">
+</td>
+<td class="content">Not all of the dependancies have been represented.</td>
+</tr></table>
+</div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tes_common_applications_0_1_0">TES Common Applications (0.1.0)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all"
+style="
+width:30%;
+">
+<caption class="title">Release Information</caption>
+<col style="width:50%;">
+<col style="width:50%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">2018-07-31</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Release Label/Tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">0.1.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">AIS Template</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Released By</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Subba Gundala</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_summary_information_21">Release Summary Information</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_applications_gundas1">Applications (gundas1)</h3>
+<div class="sect3">
+<h4 id="_bmicdl">bmiCdl</h4>
+</div>
+<div class="sect3">
+<h4 id="_filetransferbridgeapp">FileTransferBridgeApp</h4>
+</div>
+<div class="sect3">
+<h4 id="_pwminputapp">PwmInputApp</h4>
+</div>
+<div class="sect3">
+<h4 id="_serialprinterapp">SerialPrinterApp</h4>
+</div>
+<div class="sect3">
+<h4 id="_switchinputapp">SwitchInputApp</h4>
+</div>
+<div class="sect3">
+<h4 id="_vp3filecreatorapp">VP3FileCreatorApp</h4>
+</div>
+</div>
+<div style="clear: both;"></div>
+<div class="sect2">
+<h3 id="_interfaces_gundas1">Interfaces (gundas1)</h3>
+<div class="sect3">
+<h4 id="_appreg">AppReg</h4>
+</div>
+<div class="sect3">
+<h4 id="_createfilerequest">CreateFileRequest</h4>
+</div>
+<div class="sect3">
+<h4 id="_datalinkdata">DataLinkData</h4>
+</div>
+<div class="sect3">
+<h4 id="_filetransferbridgeindication">FileTransferBridgeIndication</h4>
+</div>
+<div class="sect3">
+<h4 id="_filetransferbridgerequest">FileTransferBridgeRequest</h4>
+</div>
+<div class="sect3">
+<h4 id="_filetransferbridgeresponse">FileTransferBridgeResponse</h4>
+</div>
+<div class="sect3">
+<h4 id="_pwminputchannels">PwmInputChannels</h4>
+</div>
+<div class="sect3">
+<h4 id="_serialprinter">SerialPrinter</h4>
+</div>
+<div class="sect3">
+<h4 id="_shmclock">ShmClock</h4>
+</div>
+<div class="sect3">
+<h4 id="_switchinputscs">SwitchInputScs</h4>
+</div>
+<div class="sect3">
+<h4 id="_vp3record">VP3Record</h4>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img alt="Note" src="data:image/png;base64,
+">
+</td>
+<td class="content">Not all of the dependencies have been represented.</td>
+</tr></table>
+</div>
+</div>
+</div>
+<div style="clear: both;"></div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr></div>
+<div id="footer">
+<div id="footer-text">
+<p>&copy; 2015-2021 Caterpillar Inc. All rights reserved. CAT, CATERPILLAR, their respective logos, "Caterpillar Yellow," as well as corporate and product identities used herein, are trademarks of Caterpillar and may not be used without permission.</p>
+<p>Caterpillar: Confidential Green</p>
+</div>
+</div>
+</body>
+</html>

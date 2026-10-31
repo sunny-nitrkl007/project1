@@ -1,0 +1,17 @@
+########################################################################
+# environment/makefiles/Makefile.options            clearmake
+########################################################################
+
+# This is a generated file, NO NOT EDIT
+
+
+
+
+# This is required in every directory where clearmake is invoked
+# with these scripts.
+
+# Use clearmake GNU compatibility
+# NOTE:  This could have been defined as an environment variable
+# but this is preferable to avoid dependencies on the user's
+# environment and to avoid affecting other builds.
+CCASE_MAKE_COMPAT = gnu

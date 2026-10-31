@@ -1,0 +1,80 @@
+diff --git a/prod/ais_build_tools/content/build-verity.sh b/prod/ais_build_tools/content/build-verity.sh
+index 7da5461707..3354895468 100755
+--- a/prod/ais_build_tools/content/build-verity.sh
++++ b/prod/ais_build_tools/content/build-verity.sh
+@@ -285,7 +285,7 @@ dd if=/dev/zero of="${imageName}" bs=4096 count="${BLOCKS}"
+ 
+ # mount the image
+ echo "Mounting ${imageName} to ${mountDir} ..."
+-run_as_root mount -t ext2 -o loop,rw,user "${imageName}" "${mountDir}" || exit 1
++run_as_root mount -t ext2 -o loop,rw "${imageName}" "${mountDir}" || exit 1
+ 
+ # sync the image directory contents to the mounted image
+ echo "Syncing ${stageDir} to ${mountDir} ..."
+diff --git a/prod/ais_build_tools/content/platform/A6N2/config.mk b/prod/ais_build_tools/content/platform/A6N2/config.mk
+index f15dfd5494..54f6abc955 100644
+--- a/prod/ais_build_tools/content/platform/A6N2/config.mk
++++ b/prod/ais_build_tools/content/platform/A6N2/config.mk
+@@ -35,3 +35,12 @@ OS_IMG_FILES?=pv-prodcerts/signed/a6n2_blue_5527263-83_bzImage_a6n2bluekey_fit.b
+ 
+ # include SMARTMONTOOLS
+ export INSTALL_SMARTMONTOOLS_OSS_CONTENT=true
++
++#
++# Set AIS_APP_INTERPRETER when using the Dynamic Interpreter
++#
++ifneq ($(strip $(ENABLE_DYNAMIC_INTEPRETER)),no)
++export AIS_APP_INTERPRETER?=$(X86_64_VERITY_DYNAMIC_INTERPRETER)
++else
++export AIS_APP_INTERPRETER=
++endif
+diff --git a/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt b/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt
+index 5dc5475dc0..0344511f78 100644
+--- a/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt
++++ b/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt
+@@ -1,11 +1,13 @@
+ # specify dynamic loader path
+-# Note: INTERPRETER will be inferred from inputs
++# Note: INTERPRETER needs to be an absolute path,
++#       but if it's empty, default INTERPRETER will be used.
+ AUTODETECT_INTERPRETER=${AIS_APP_AUTODETECT_INTERPRETER}
++INTERPRETER=${AIS_APP_INTERPRETER}
+ # map build paths local to ${BUILD_DIR} to target paths
+-bin:/opt/appSoftware/bin
+-cgi-bin:/opt/appSoftware/cgi-bin
+-lib:/opt/appSoftware/lib
++bin:/opt/CPM/bin
++cgi-bin:/opt/CPM/cgi-bin
++lib:/opt/CPM/lib
+ ossSoftware:/opt/ossSoftware
+-www:/opt/appSoftware/www
++www:/opt/CPM/www
+ ${DETECT_COMMON_EXT_ROOT}:/opt/aisObjectDetectSoftware
+ ${POSELIB_EXT_ROOT}:/opt/aisPoseLibSoftware
+diff --git a/prod/ais_build_tools/content/verity-config/ossSoftware/verity-create.sh b/prod/ais_build_tools/content/verity-config/ossSoftware/verity-create.sh
+index af4181e031..a8d5ad2aeb 100755
+--- a/prod/ais_build_tools/content/verity-config/ossSoftware/verity-create.sh
++++ b/prod/ais_build_tools/content/verity-config/ossSoftware/verity-create.sh
+@@ -89,10 +89,6 @@ do
+ done
+ unset critical_vars
+ 
+-# ${CAT_DIR}/${APPNAME} should exist, otherwise we have a problem
+-[[ ! -d "${CAT_DIR}/${APPNAME}" ]] \
+-    && { echo "${THISF/${TLD}/.}: ERROR: Directory ${CAT_DIR}/${APPNAME} not found"; exit 1; }
+-
+ # remove any existing ${CAT_DIR}/verity/${APPNAME}.zip file directory
+ x="${CAT_DIR}/verity/${APPNAME}.zip"
+ [[ -e "${x}" ]] \
+@@ -104,6 +100,11 @@ x="${CAT_DIR}/verity/${APPNAME}.zip"
+ # retrieve various additional files
+ rsync -rmptl --exclude-from="${VERITY_EXCLUDE}" "${VERITY_CFG_DIR}" "${CAT_DIR}"/.
+ rsync -rmptl --exclude-from="${VERITY_EXCLUDE}" "${VEH_DD_DEFS}" "${CAT_DIR}/${APPNAME}"/.
++
++# ${CAT_DIR}/${APPNAME} should exist after rsync, otherwise we have a problem
++[[ ! -d "${CAT_DIR}/${APPNAME}" ]] \
++    && { echo "${THISF/${TLD}/.}: ERROR: Directory ${CAT_DIR}/${APPNAME} not found"; exit 1; }
++
+ # make any app*.sh files executable by the user
+ find "${CAT_DIR}/${APPNAME}" -name "app*.sh" -type f -print0 2>/dev/null | xargs -0 -r chmod +x
+ 

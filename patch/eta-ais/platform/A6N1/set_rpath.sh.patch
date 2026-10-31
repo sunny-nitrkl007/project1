@@ -1,0 +1,24 @@
+diff --git a/platform/A6N1/set_rpath.sh b/platform/A6N1/set_rpath.sh
+index e9d6ed5..2a55290 100644
+--- a/platform/A6N1/set_rpath.sh
++++ b/platform/A6N1/set_rpath.sh
+@@ -6,8 +6,8 @@
+ ###
+ if [ "X" == "X${RPATH}" ]
+ then
+-    RPATH="/opt/appSoftware/lib"
+-    RPATH+=":/opt/appSoftware/lib/python"
++    RPATH="/opt/CPM/lib"
++    RPATH+=":/opt/CPM/lib/python"
+     RPATH+=":/opt/ossSoftware/lib"
+     RPATH+=":/opt/ossSoftware/usr/lib"
+     RPATH+=":/opt/ossSoftware/usr/lib/ruby/1.8/x86_64-linux"
+@@ -36,7 +36,7 @@ echo "Using RPATH=${RPATH}"
+ ###
+ # now, search for all ELF files and update their RPATH/RUNPATH strings, if they have one.
+ ###
+-for f in $(find {lib,bin,ossSoftware} -type f 2>/dev/null | xargs file | grep ELF | cut -f1 -d:)
++for f in $(find {lib,bin,cgi-bin,ossSoftware} -type f 2>/dev/null | xargs file | grep ELF | cut -f1 -d:)
+ do
+     x=$(readelf -d ${f} 2>/dev/null | grep -E 'RUNPATH|RPATH')
+     if [[ "X" != "X${x}" ]]; then

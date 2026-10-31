@@ -1,0 +1,29 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'testEnv' )
+ 
+sourceFiles = [ 
+    'VP3Test.cpp'
+]
+
+VP3Test = testEnv.Program( 
+        target = 'VP3Test',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log'] 
+
+    )
+
+testEnv.InstallBinary( VP3Test )
+#testEnv.Alias("VP3Test", "#bin/VP3Test")
+
+

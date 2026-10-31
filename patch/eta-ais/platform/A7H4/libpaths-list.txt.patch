@@ -1,0 +1,35 @@
+diff --git a/platform/A7H4/libpaths-list.txt b/platform/A7H4/libpaths-list.txt
+index e69de29bb2..16ccad5850 100644
+--- a/platform/A7H4/libpaths-list.txt
++++ b/platform/A7H4/libpaths-list.txt
+@@ -0,0 +1,30 @@
++# A7H4 library paths
++# Build output lib directories (AIS core libs: ais_task, ais_config, etc.)
++#lib
++#lib/1a
++#lib/1a/lib
++
++# ssp-linux-is7/tgt_gcc_arm64_guest prebuilt libraries
++${AIS_PC_TARGET_CONTENT}/core_telematics
++${AIS_PC_TARGET_CONTENT}/core_telematics/cert_manager
++${AIS_PC_TARGET_CONTENT}/core_telematics/connection_manager
++${AIS_PC_TARGET_CONTENT}/core_telematics/ipc
++${AIS_PC_TARGET_CONTENT}/core_telematics/log
++${AIS_PC_TARGET_CONTENT}/lib_a4/hal
++${AIS_PC_TARGET_CONTENT}/lib_a4/hal_common
++${AIS_PC_TARGET_CONTENT}/lib_a4/hmpl
++${AIS_PC_TARGET_CONTENT}/lib_a4/scl
++${AIS_PC_TARGET_CONTENT}/lib_csf
++${AIS_PC_TARGET_CONTENT}/lib_oel/oel
++${AIS_PC_TARGET_CONTENT}/lib_oss/pugixml
++${AIS_PC_TARGET_CONTENT}/lib_oss/tinyxml
++${AIS_PC_TARGET_CONTENT}/lib_oss/tinyxml2
++${AIS_PC_TARGET_CONTENT}/lib_scl_info
++${AIS_PC_TARGET_CONTENT}/lib_sys/osa
++${AIS_PC_TARGET_CONTENT}/scl_crypto-a
++
++# Gen7 conan cache libraries (protobuf/abseil/fast-dds/fast-cdr)
++${GEN7_TARGET_PROTOBUF_DIR}/lib
++${GEN7_TARGET_ABSEIL_DIR}/lib
++${GEN7_TARGET_FAST_CDR_DIR}/lib
++${GEN7_TARGET_FAST_DDS_DIR}/lib

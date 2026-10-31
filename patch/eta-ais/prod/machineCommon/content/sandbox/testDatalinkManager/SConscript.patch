@@ -1,0 +1,46 @@
+diff --git a/prod/machineCommon/content/sandbox/testDatalinkManager/SConscript b/prod/machineCommon/content/sandbox/testDatalinkManager/SConscript
+index d6a17d7e52..627279ac2f 100644
+--- a/prod/machineCommon/content/sandbox/testDatalinkManager/SConscript
++++ b/prod/machineCommon/content/sandbox/testDatalinkManager/SConscript
+@@ -10,22 +10,22 @@
+ Import( 'machineCommonEnv' )
+ localEnv = machineCommonEnv.Clone();
+ 
+-if localEnv[ 'DATALINKMANAGER_SUPPORTED' ]:
+-    import os
+-
+-    # Read lib lists
+-    libList = localEnv.getLibsListFromModule('DatalinkManager')
+-    libList += localEnv.getLibsListFromModule('OelTaskManager')
+-
+-    sourceFiles = [
+-        'TestDatalinkManager.cpp',
+-        'TestDatalinkManagerPluginMgr.cpp',
+-    ]
+-
+-    testDatalinkManager = localEnv.ProgramWrapper(
+-        target = 'testDatalinkManager',
+-        source = sourceFiles,
+-        LIBS = [libList, 'ais_task', 'csvUtil', ]
+-    )
+-
+-    localEnv.InstallBinary( testDatalinkManager )
++#if localEnv[ 'DATALINKMANAGER_SUPPORTED' ]:
++#    import os
++#
++#    # Read lib lists
++#    libList = localEnv.getLibsListFromModule('DatalinkManager')
++#    libList += localEnv.getLibsListFromModule('OelTaskManager')
++#
++#    sourceFiles = [
++#        'TestDatalinkManager.cpp',
++#        'TestDatalinkManagerPluginMgr.cpp',
++#    ]
++#
++#    testDatalinkManager = localEnv.ProgramWrapper(
++#        target = 'testDatalinkManager',
++#        source = sourceFiles,
++#        LIBS = [libList, 'ais_task', 'csvUtil', ]
++#    )
++#
++#    localEnv.InstallBinary( testDatalinkManager )

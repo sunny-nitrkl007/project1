@@ -1,0 +1,42 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for common/
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'commonEnv' )
+
+# Only build for ECM target, requires SCL headers
+if ( commonEnv['PLATFORM'] in [ 'A6N1', 'A6N2', ]):
+    # 1. bmi_ethernet_parser
+    sourceFiles = [
+        'bmi_ethernet_parser.cpp',
+    ]
+
+    bmi_ethernet_parser = commonEnv.SharedLibraryWrapper(
+        target='bmi_ethernet_parser',
+        source=sourceFiles,
+        LIBS = [ 'ais_log', 'ais_config' ],
+    )
+
+    commonEnv.InstallLibrary( bmi_ethernet_parser )
+
+# 2. bmi_ethernet_util
+sourceFiles = [
+    'bmi_ethernet_util.cpp',
+]
+
+bmi_ethernet_util = commonEnv.SharedLibraryWrapper(
+    target='bmi_ethernet_util',
+    source=sourceFiles,
+    LIBS = [ 'ais_log', 'ais_config' ],
+)
+
+commonEnv.InstallLibrary( bmi_ethernet_util )

@@ -1,0 +1,38 @@
+diff --git a/removeBinLibContent_A6N2.sh b/removeBinLibContent_A6N2.sh
+index f8a77f9be0..03b2a859d6 100755
+--- a/removeBinLibContent_A6N2.sh
++++ b/removeBinLibContent_A6N2.sh
+@@ -6,7 +6,13 @@ echo    " removing unneeded A6N2 content "
+ echo    ""
+ 
+ 
+-cd build-A6N2
++if [ "$#" -ge 1 ]
++then
++cd $1
++else
++ cd build-A6N2
++fi
++
+ rm    -f bin/bCamera*
+ rm    -f bin/BCamera*
+ rm    -f bin/template*
+@@ -90,3 +96,18 @@ rm    -f lib/*StartupSequence*
+ rm    -f lib/*StationReservation*
+ rm    -f lib/*TabletAllocation*
+ 
++# Patch to remove eta-ais tests and examples
++rm -Rf bin/unit_test
++rm -Rf bin/testFLGauge
++rm -Rf bin/testFLPlotXY
++rm -Rf bin/testIOTask
++rm -Rf bin/testJhmTask
++rm -Rf bin/testMachineSNTask
++rm -Rf bin/testRTC
++rm -Rf bin/testSLERPInterpolation
++rm -Rf bin/testWidgets
++rm -Rf bin/vehicleStateTaskTest
++rm -Rf bin/exampleReader
++rm -Rf bin/exampleWriter
++rm -Rf bin/joystick_example
++rm -Rf bin/logProcessorExample

@@ -1,0 +1,9 @@
+-I. /
+-I../include
+-I../../lps_common/include
+-I../../lps_app_common/include
+-I$(VOB_ROOT)\lib_a4\hal\include
+-I$(VOB_ROOT)\lib_a4\scl\include
+-I$(VOB_ROOT)\lib_oel\oel\include
+
+

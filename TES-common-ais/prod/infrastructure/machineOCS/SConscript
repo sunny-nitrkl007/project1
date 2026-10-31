@@ -1,0 +1,21 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Joseph Manojlovich (jmanoj@rec.ri.cmu.edu)
+## @date      June 9, 2008
+## @brief     SConscript for the simpleOCS application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'infEnv' )
+import os.path;
+
+machineOCSEnv = infEnv.Clone();
+
+Export('machineOCSEnv')
+
+machineOCSEnv.buildit('plugins', ['suse'])

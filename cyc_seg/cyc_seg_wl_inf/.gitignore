@@ -1,0 +1,132 @@
+# auto save files created periodically by the M-Script Editor while editing a .m file,
+# so that if MATLAB crashes you're less likely to lose your work
+*.asv
+
+# auto save files created before certain operations by Simulink,
+# so that if MATLAB crashes you can recover your work
+*.mdl.autosave
+
+# Directory containing temporary Stateflow files,
+# created in R13 but not R2007b and later
+sfprj/
+
+# Directory containing temporary Simulink, Stateflow, and Embedded MATLAB files,
+# created in Rr2007b and later.  We try to copy out the files that aren't temporary to other locations,
+# but it is possible users may want to archive these files
+slprj/
+
+# Temporary S-Function created when models containing Stateflow and Embedded MATLAB are updated
+*_sfun.mexw32
+
+# Temporary S-Function created when models containing Stateflow and Embedded MATLAB are updated
+*_sfun.mexw64
+
+# Temporary S-Function created when models containing Stateflow and Embedded MATLAB are updated
+*_sfun.mexa64
+
+# Directory containing C code generated from model using ert.tlc target
+# Unsure if users would want to archive this, or move the files to a -a repository
+*_ert_rtw/
+
+# Directory containing C code generated from model using xpc.tlc target
+*_xpc_rtw/
+
+# Directory containing output of xPC build when using xpc.tlc target in stand-alone mode
+*_xpc_emb/
+
+# File created during build using xpc.tlc target when not using stand-alone mode
+*.dlm
+
+# Directory containing C code generated from model using cat_PkgArch.tlc target
+# Unsure if users would want to archive this, or move the files to a -a repository
+*_cat_rtw/
+
+# Directory containing C code generated from model using cat_flashfile.tlc target
+# Unsure if users would want to archive this, or move the files to a -a repository
+*_cat_ff/
+
+# ignore simulink coverage report artifacts
+scv_images
+*summary_cov*.html
+
+# ignore tgt_* directories (target directories)
+tgt_*/
+
+# Other common forms of back-up files
+*~
+*.bak
+*.bck
+
+# ignore Eclipse metadata
+.metadata/
+
+# Visual Studio source control
+*.vspscc
+
+# Visual Studio intermediate file
+*.sbr
+
+# Binary representation of a resource
+*.aps
+
+# IntelliSense Database
+*.ncb
+# Precompiled header
+*.pch
+
+# Visual Studio program database
+*.pdb
+
+# Visual Studio intermediate debug file
+*.idb
+
+# Visual Studio incremental linking file
+*.ilk
+
+# Object file
+*.obj
+*.o
+
+# Swap file
+*.swp
+
+# Cache file
+*.cache
+
+# Ivy
+*.md5
+*.sha1
+distrib/
+lib/
+lib-artifact/
+lib-ivy/
+cache-ivy/
+
+#Core-Trans subsystem source specific
+# do not archive the buildlog here, it should be in the -a repo
+./*.buildlog
+*mdl_autogen.buildlog
+
+#All derived object directories
+do_*/
+
+#copied sl_dyn files from lib_autocode - not to be archived in core_trans
+sl_dyn_R2009B/
+
+#EC make files
+.emake/
+emake.data
+*ec_build_output/
+emake.data.bak
+
+# Common forms of back-up files
+*~
+*.bak
+*.bck
+
+#Windows Trash
+thumbs.db
+desktop.ini
+
+#All Girt output
+girt_*

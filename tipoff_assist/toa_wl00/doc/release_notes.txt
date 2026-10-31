@@ -1,0 +1,205 @@
+:toc2:
+:icons:
+:data-uri:
+:backend: html5
+== Tip-Off Assist WL (980-982) ==
+
+
+=== Release 0.2.0.dev03 ===
+
+==== CHANGE SUMMARY ====
+|===============
+|*Date:*                             |06SEP2019
+|*Base Label:*                       |New hash from Shaun(cc2a625636715dea04b1e58a35948d8cd04636e3)
+|*Released By:*                      |Rafal Krzepisz
+|*Entry Repo for use with Git/Ivy:*  |git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00.git
+|*Release Summary:*                  |Changes + TP UserStory 812441/803264  
+|===============
+
+
+==== DEPENDENCIES ====
+
+Refer to the toa_wl00/deps/ivy.xml for this repository.
+
+==== CHANGE DESCRIPTION: ====
+
+* Application APIs:
+  
+** Header files to include  
+  toa_wl00_model_if.h 
+  
+** Function calls, init and update:
+  
+  void toa_wl00_po_init(void)
+  void toa_wl00_po_0(void)
+
+* The jump in Tag is due to numerous set of changes as per Git 
+
+* Shaun removed all added TestPoints and provided new input.
+  The Git hash from Shaun: cc2a625636715dea04b1e58a35948d8cd04636e3 (0.2.0.dev03)
+
+* The base point for this release was provided via TargetProcess Story 812441.
+  The Git hash value given: 2e22ad90a580d63afed083a5bfdbd56e4f5d21a8 (0.2.0.dev02)
+  
+
+* There is set of changes which has been added since last release.  
+  These changes can hopefully be tracked via TargetProcess (Huzeffa, Shawn).  
+
+* New input interface added: float TOA_imu_pitch_cal;
+ 
+* More TestPoints added to the block containing toa_imu_cal_pitch_angle.
+  
+* NOTE: the following structure was manually made as Global for purpose of troubleshooting:
+  toa_wl00_work_t toa_wl00_work;
+  It is externed via toa_wl00_model_if.h 
+  
+* The 'Communicator Page for Tip-Off Assist (980-982)' describes the details of integration 
+  into the Application:    https://catedocs.ecorp.cat.com/28/cpm_toa_wl00/index.html
+* Repositories created for the project:
+ 
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_inf.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_x86_64-b.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00-tgt_gcc_4.8.2_x86_64-a.git
+
+
+
+
+==== KNOWN ISSUES: ====
+ 
+* None 
+ 
+==== SUPPORTED APPLICATION NUMBERS: ====
+
+|===============
+|*App Num*                |*Description*
+| MWL                     | 980-982 
+|===============
+
+
+=== Release 0.2.0.dev01 ===
+
+==== CHANGE SUMMARY ====
+|===============
+|*Date:*                             |04SEP2019
+|*Base Label:*                       |SomeHash - info below
+|*Released By:*                      |Rafal Krzepisz
+|*Entry Repo for use with Git/Ivy:*  |git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00.git
+|*Release Summary:*                  |Changes + TP UserStory 812441 
+|===============
+
+
+==== DEPENDENCIES ====
+
+Refer to the toa_wl00/deps/ivy.xml for this repository.
+
+==== CHANGE DESCRIPTION: ====
+
+* The jump in Tag is due to numerous set of changes as per Git 
+
+* The base point for this release was provided via TargetProcess Story 812441.
+  The Git hash value given: 2e22ad90a580d63afed083a5bfdbd56e4f5d21a8
+
+* There is set of changes which has been added since last release.  
+  These changes can hopefully be tracked via TargetProcess (Huzeffa, Shawn).  
+
+* Provided TestPoints to the Signals listed within the TargetProcess story.
+  Also added test points to all of the Inputs for the Model (all prefixed with toa_).
+
+* NOTE: the following structure was manually made as Global for purpose of troubleshooting:
+  toa_wl00_work_t toa_wl00_work;
+  It is externed via toa_wl00_model_if.h 
+  
+* The 'Communicator Page for Tip-Off Assist (980-982)' describes the details of integration 
+  into the Application:    https://catedocs.ecorp.cat.com/28/cpm_toa_wl00/index.html
+* Repositories created for the project:
+ 
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_inf.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_x86_64-b.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00-tgt_gcc_4.8.2_x86_64-a.git
+
+
+
+
+==== KNOWN ISSUES: ====
+ 
+* None 
+ 
+==== SUPPORTED APPLICATION NUMBERS: ====
+
+|===============
+|*App Num*                |*Description*
+| MWL                     | 980-982 
+|===============
+
+=== Release 0.1.0.dev01 ===
+
+==== CHANGE SUMMARY ====
+|===============
+|*Date:*                             |13MAY2019
+|*Base Label:*                       |Initial release
+|*Released By:*                      |Rafal Krzepisz
+|*Entry Repo for use with Git/Ivy:*  |git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00.git
+|*Release Summary:*                  |Initial release within Lib-Info-Product 
+|===============
+
+
+==== DEPENDENCIES ====
+
+Refer to the toa_wl00/deps/ivy.xml for this repository.
+
+==== CHANGE DESCRIPTION: ====
+
+
+* The 'Communicator Page for Tip-Off Assist (980-982)' describes the details of integration 
+  into the Application:    https://catedocs.ecorp.cat.com/28/cpm_toa_wl00/index.html
+  
+* Initial, new framework within gitgis.ecorp.cat.com GitLab. 
+* Dependent repos added (model source, interface, derived content)
+* GIRT setup
+* Makefile setup for CodeGeneration
+
+
+* Repositories created for the project:
+ 
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_inf.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_x86_64-b.git
+  git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00-tgt_gcc_4.8.2_x86_64-a.git
+
+
+* Folder structure, repositories, layout as per IVY configuration:
+  
+** Buildescriptions used by CPM Team for Model based projects + 
+  lib/lib_info_products/common_buildescriptions/
+
+** Model source for Tip-Off Assist +
+  lib/lib_info_products/toa_wl00/
+
+** Set of Interfaces for the Tip-Off Assist feature +
+  lib/lib_info_products/toa_wl00_inf/
+
+** Model derived c-code for Tip-Off Assist on WL machines +
+   lib/lib_info_products/toa_wl00_x86_64-b/
+
+** Tip-Off Assist dll and library will be used for regression (VirtualPlatform) +
+   lib/lib_info_products/toa_wl00-a/tgt_gcc_4.8.2_sim_win64/
+
+** SystemArchitect related SuperPackages as used by CPM Team Model based projects +
+   lib/lib_info_products/ysa_super_packages/
+
+
+
+==== KNOWN ISSUES: ====
+ 
+* None 
+ 
+==== SUPPORTED APPLICATION NUMBERS: ====
+
+|===============
+|*App Num*                |*Description*
+| MWL                     | 980-982 
+|===============
+
+

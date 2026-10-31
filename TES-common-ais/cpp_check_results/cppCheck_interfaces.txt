@@ -1,0 +1,6 @@
+[prod/common/interfaces/CalMgrCmdResp/CalMgrCmdResp.h:54]: (warning) Member variable 'CalMgrCmdRespStorage::CalibrationResp' is not initialized in the constructor.
+[prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:200]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:285]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:332]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/common/interfaces/FileTransferBridgeReadParamResponse/FileTransferBridgeReadParamResponse.h:28]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/common/interfaces/FileTransferBridgeReadParamResponse/FileTransferBridgeReadParamResponse.h:30]: (warning) Redundant code: Found a statement that begins with numeric constant.

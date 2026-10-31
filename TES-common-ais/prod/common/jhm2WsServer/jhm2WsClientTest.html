@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Jhm2 WebSocket Client</title>
+</head>
+
+<body>
+  <script>
+    "use strict";
+    var ws;
+    window.onload = function () {
+      ws = new WebSocket("ws://165.26.79.19:55566/payload");         // ECM
+      //ws = new WebSocket("ws://172.20.177.134:55566/payload");       // VM, replace with your EC address (inet)
+      ws.onmessage = function (evt) {
+        console.log("WebSocket message received:", evt);
+        document.getElementById("Response").innerHTML = prettify(evt.data);
+      };
+      ws.onopen = function (evt) {
+        console.log("WebSocket is open now.");
+      };
+      ws.onclose = function (evt) {
+        console.log("WebSocket is closed now (", evt.code, "), ", evt.reason);
+      };
+      ws.onerror = function (evt) {
+        console.error("WebSocket error observed:", evt);
+      };
+      document.getElementById("ParamNames").setAttribute('size', '50')
+      document.getElementById("CommandNames").setAttribute('size', '150')
+
+      // Map Enter to button presses
+      {
+        var input = document.getElementById("ParamNames")
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault()
+            // Trigger the button element with a click
+            document.getElementById("ParamRequestBtn").click();
+          }
+       })
+      }
+      {
+        var input = document.getElementById("CommandNames")
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault()
+            // Trigger the button element with a click
+            document.getElementById("CommandRequestBtn").click();
+          }
+       })
+      }
+      {
+        var input = document.getElementById("FileName")
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault()
+            // Trigger the button element with a click
+            document.getElementById("FileRequestBtn").click();
+          }
+       })
+      }
+    }
+
+    window.onclose = function () {
+      ws.close();
+    }
+
+    function prettify(string) {
+      return JSON.stringify(JSON.parse(string), null, '  ').replace(/ /g, '&nbsp').replace(/\n\r?/g, '<br />')
+    }
+
+    function sendMessage(message) {
+      ws.send(message)
+      document.getElementById("Request").innerHTML = prettify(message)
+    }
+
+    function requestParam() {
+      var elem = document.getElementById("ParamNames")
+      var name = elem.value
+      var wsRequestType = document.querySelector('input[name="WsRequestType"]:checked').value
+      var message = '{"queryStrings":{"requestType":"ParameterRequest2", "paramsRequested":['.concat(name).concat(']},"wsRequestType":"').concat(wsRequestType).concat('"')
+      var rateSec = document.getElementById("RateSec").value
+      if (rateSec.length) {
+        message = message.concat(',"rateSec":"').concat(rateSec).concat('"')
+      }
+      
+      message = message.concat('}')
+      sendMessage(message);
+    }
+    
+    function requestCommands() {
+      var elem = document.getElementById("CommandNames")
+      var name = elem.value
+      var message = '{"queryStrings":{"requestType":"CommandRequest2"},"body":{'.concat(name).concat('}}')
+      sendMessage(message);
+    }
+    
+    function requestFile() {
+      var elem = document.getElementById("FileName")
+      var name = elem.value
+      var wsRequestType = document.querySelector('input[name="WsRequestType"]:checked').value
+      var message = '{"queryStrings":{"requestType":"FileRequest", "fileRequested":'.concat(name).concat('},"wsRequestType":"').concat(wsRequestType).concat('"')
+      var rateSec = document.getElementById("RateSec").value
+      if (rateSec.length) {
+        message = message.concat(',"rateSec":"').concat(rateSec).concat('"')
+      }
+      
+      message = message.concat('}')
+      sendMessage(message);
+    }
+
+</script>
+
+<u><h2>Jhm2 WebSocket Client</h2></u>
+<br>
+<b>Parameter </b> <button id="ParamRequestBtn" onclick="requestParam()">Request</button>  <input type="text" id="ParamNames"> <i>array of strings enclosed in " and separate with , e.g. <u>"TruckInfo","PayloadInfo"</u></i>
+<br><br>
+<b>File </b> <button id="FileRequestBtn" onclick="requestFile()">Request</button>  <input type="text" id="FileName"> <i>string enclosed in ", e.g. <u>"TruckList" or "UI_SHOW_FEATURE_CONFIG"</u></i>
+<br><br>
+<form>
+  <input type="radio" id="add" name="WsRequestType" value="Add" checked>
+  <label for="add"><b>Add</b>  </label> <i>One-time or Periodic read</i><br>
+  <input type="radio" id="remove" name="WsRequestType" value="Remove">
+  <label for="remove"><b>Remove</b></label> <i>Remove a periodic read. NOTE: if Paramters were added as a single group, they must also be removed as a group</i><br>
+  <input type="radio" id="cancel" name="WsRequestType" value="Cancel">
+  <label for="cancel"><b>Cancel</b></label> <i>Cancel all periodic reads</i><br>
+</form>
+<br>
+<b>Rate (Sec): <input type="number" id="RateSec"></b><i> Only needed for <b>Add</b> request</u></i>
+<br><br>
+***************************
+<br><br>
+
+<b>Command(s) </b><button id="CommandRequestBtn" onclick="requestCommands()">Request</button> <input type="text" id="CommandNames">
+<br><br>
+<i>collection of objects, format is command specific e.g. <u>"TruckInfo_Wr":{"id":"2","name":"Truck Two","targetWeight":"300.2"}, "MaterialList":[{"id":"3", "name":"Granite","density":"44.2"}, {"name":"Sand","density":"22.2"}]</u></i>
+
+<br><br>
+***************************
+<br><br>
+
+<h3>Request</h3>
+<p id="Request">--</p>
+<h3>Response</h3>
+<p id="Response"></p>
+</body>
+
+</html>
+

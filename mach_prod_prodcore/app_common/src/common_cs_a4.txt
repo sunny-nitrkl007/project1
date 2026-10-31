@@ -1,0 +1,39 @@
+element /cots_afsw/...   COTS_AFSW_2011_1.0_PROD
+
+
+#A4 Core Library
+element /lib_a4/...                           AFSW_2007_Q2_PROD
+element /lib_a4/...                           AFSW_2011_4.0_ALPHA_2_BASE_1
+element /lib_afsw_release/...                 A4_AFSW_2007_Q2_PROD
+
+#A4 Core Library
+element /lib_a4/...                           AFSW_2011_4.0_ALPHA_2_BASE_1
+
+#A4 OEL Library
+element /lib_oel/...                          AFSW_2011_4.0_ALPHA_2_BASE_1
+
+#A4 SCL Library
+element /lib_scl/...                          SCL_CD_2004_Q1_PROD
+element /lib_scl/scl_info/...                 SCL_INFO_2012_3.0
+
+#CAL_MGR LIB
+element /lib_cml/...                          CML_2004_Q4_PROD
+
+# Lib Info
+element /lib_info/...                         INFO_5.9.1_PROD  
+
+#Standards C Library
+element /lib_standards/...                    STANDARDS_C_13.0_PROD
+
+#Development Tools (H-File Generator, Debugger, Basic Build GUI, ...)
+element  /dev_tools/build_tools/...           COMMANDER_TOOLS_2.5  
+element /dev_tools/...                        DEV_TOOLS_2007_Q1_PROD
+
+#lib_monitor vob
+element * BML_BDT_3.0_ALPHA_1
+element * BML_4.0_ALPHA_9
+element * BML_INTL_3.0_ALPHA_1
+
+# Common Makefiles required for compiling and linking
+element \lib_machine\...                       MACH_TOOLS_3.5.0
+

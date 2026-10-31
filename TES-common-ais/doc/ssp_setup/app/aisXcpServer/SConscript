@@ -1,0 +1,34 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Christopher Baker
+## @date      October 22nd, 2010
+## @brief     SConscript for the Null example task
+##
+## @attention Copyright (C) 2010
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'testEnv' )
+
+localEnv = testEnv.Clone()
+
+# Include the TES Common directory so that we can find xcp_server header files.
+xcpServerDir = localEnv[ 'TES_COMMON_DIR' ] + '/apps/xcp_server/'
+
+localEnv.Append(CPPPATH = [xcpServerDir + 'linux'])
+
+sourceFiles = [
+    'XcpServerTask.cpp',
+    'xcpServerDb.cpp'
+]
+
+aisXcpServer = localEnv.Program(
+        target = 'aisXcpServer',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'xcp_server', 'bmi_ethernet_util' ]
+    )
+
+localEnv.InstallBinary(aisXcpServer)

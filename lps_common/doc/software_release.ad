@@ -1,0 +1,62 @@
+:copyright: Copyright (C) 2015-2015 Caterpillar Inc. All Rights Reserved.
+= LPS Common Library Software Release Procedure
+
+= Tool Information
+
+.Summary Of Tools Used
+ - Git:            MSysGit 1.9.4 (Preview 2014-09-29) For Windows
+ - Ivy Utilities:  12.6.1
+ - Electric Make:  7.1.4.52942 32-bit (build_7.1_52942_OPT_2014.04.25_08:09:18)
+
+NOTE:  All other tools are called out under version control.
+
+== Release Procedure
+
+.Process
+ 1) Do software changes.
+ 2) Test it to insure that it works.
+ 3) Make sure to update any external dependancies in the Ivy file.
+    Update "deps/ivy.xml" to reference any lower level libraries
+    or tools used by this release unit.
+ 4) Change directory to the repository area under the Ivy view with the desired
+    content to be released.
+    e.g.
+        (100)% cd /c/users/<cwsid>/ivy/<view>/lib/lib_mach_productivity/lps/lps_common
+ 5) Ensure that all content has been commited.
+    If any files are reported, then the release should not go forward
+    until it is resolved.
+    e.g.
+        (101)% git status --untracked
+        # On branch master
+        nothing to commit, working directory clean
+ 6) Tag repository with new release version.
+    IMP NOTE: replace release tag before publish descriptor.
+    e.g.	    
+		(102)% git tag -m "New release." 0.1.0
+		
+ 7) Push tag (and commit if it has not already been synched) to server.
+    e.g.       
+		(103)% git push --tags origin master				
+		
+ 8) Update release computer's Ivy Dependancy database.
+    e.g.
+        (104)% ivyu project --install
+ 9) Create Ivy Descriptor for new release, and publish it locally to
+    release computer's ivy-xml resolver.
+	IMP NOTE: replace release tag before publish descriptor.
+    e.g.   	
+		(105)% ivyu --descriptor cat/ess-info/lps_common TBD pubFR --ivyoffset deps --tag 0.1.0
+				
+10) Ensure that Ivy Domain for new release only contains newly released
+    descriptor.
+    e.g.
+        (106)% cd /c/users/<cwsid>/ivy/ivy-xml/ivy-mach_productivity/
+        (107)% git status --untracked
+      
+11) Add new Ivy descriptor for this release to Ivy Dependancy repository.
+    e.g.
+        (108)% git add --all
+        (109)% git commit -m "Release Ivy Descriptors for new release."
+12) Push commit of Ivy descriptor for this release to public repository.
+    e.g.
+        (110)% git push origin master

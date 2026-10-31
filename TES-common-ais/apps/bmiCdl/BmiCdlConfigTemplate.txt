@@ -1,0 +1,92 @@
+Description: This document helps to understand the json file
+
+{
+	/* ECM Header*/
+	"cdl2_cbs_ecm_header_t": {
+		"table_id": "0x00",			 //   ID32_t Table ID 
+		"table_format_level": "0x01",// unsigned_8 Table Format Level
+		"enabled": "0x00",			 //unsigned_8 Enabled (not used here, controlled by system table)
+		"num_table_entries": 1 		 // Number of ecm entrees
+	},
+
+	/* ECM Entry*/
+	"ecm_0": {
+		"ecm_id32": "0x1B", 		// ECM MID
+		"mid": "0x1B", 				// ECM MID
+		"ecm_control": "0x00",		// CBS_ECM_REQ(ECM required) 0x00, CBS_ECM_OPT(ECM optional) x80
+		"cid": 1273,				// ECM CID
+		"periodic_fnc_id32": "0x00",// periodic_fnc_id32
+		"periodic_interval": 10		// periodic func interval
+	},
+	
+	/* Param Header*/
+	"cdl2_cbs_parm_header_t": {
+		"table_id": "0x00",				//  ID32_t Table ID 
+		"table_format_level": "0x01",	// unsigned_8 Table Format Level
+		"enabled": "0x00",				// unsigned_8 Enabled (not used here, controlled by system table)
+		"num_table_entries": 1			// Number of param entrees
+	},
+
+	
+	/* Param Entry*/
+	"parameter_0": {
+		"cdl2_cbs_parm_cdl_id_t": "0xF5D9",  // Param ID(PID)
+		"parm_control_req": "0x00", // CBS_ECM_REQ(param required) 0x00, CBS_ECM_OPT(param optional) 0x80
+		"parm_control_rev": "0x40", // CDL2_DATA_REV(data reversal) 0x00, CDL2_DATA_NONREV(data nonreversal) 0x40
+		"parm_request_type": 1,  	// see below for enum cdl2_cbs_parm_request_type_e
+		"parameter_type": 2, 		// see below for enum cdl2_parameter_type_e
+		"mid": "0x1B",  			// ECM MID 
+		"request_rate": 200, 		// Request rate (ms) - 200, 1000, etc..
+		"Scaling": "1.0",  			// get scalling from cata data link page
+		"Offset": "0",  			// get offset from cata data link page
+		"Units": 0,  				// get units from cata data link page
+		"VarLengthParamType" : 0, 	// see below for enum VarLengthParamType (For GPS 1, actual gear 2 and all other 0)
+	}
+}
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Below enums are used in filling some of the JSON fields.
+
+// From file cdl2_struct.h
+typedef enum
+{
+   CBS_SPB_REQUEST = 0,
+   CBS_PGB_REQUEST,
+   CBS_ADT_REQUEST,
+   CBS_READ_POLL,
+   CBS_INVALID_REQ_TYPE
+} cdl2_cbs_parm_request_type_e;
+
+// From file  cdl2_struct.h
+typedef enum
+{
+  CDL2_U8_DSI = 0,         /* Unsigned Byte + Data Status ID */
+  CDL2_I8_DSI,             /* Signed Byte + Data Status ID */
+  CDL2_U16_DSI,            /* Unsigned Word + Data Status ID */
+  CDL2_I16_DSI,            /* Signed Word + Data Status ID */
+  CDL2_U32_DSI,            /* Unsigned Long + Data Status ID */
+  CDL2_I32_DSI,            /* Signed Long + Data Status ID */
+  CDL2_U8_NO_DSI,          /* Unsigned Byte + ** NO ** Data Status ID */
+  CDL2_I8_NO_DSI,          /* Signed Byte + ** NO ** Data Status ID */
+  CDL2_U16_NO_DSI,         /* Unsigned Word + ** NO ** Data Status ID */
+  CDL2_I16_NO_DSI,         /* Signed Word + ** NO ** Data Status ID */
+  CDL2_U32_NO_DSI,         /* Unsigned Long + ** NO ** Data Status ID */
+  CDL2_I32_NO_DSI,         /* Signed Long + ** NO ** Data Status ID */
+  CDL2_VAR_NO_DSI          /* Variable length, NO Data Status Checking Defined */
+} cdl2_parameter_type_e;
+
+
+// From file VarLengthDataLinkParamPool.h
+enum VarLengthParamType
+{
+ NOT_APPLICABLE = 0,
+ GPS,
+ SPL_PID_REV_DATA_BYTE_ORDER // use this for speacial pid's to reverse data (ex pid:F5D9) 
+};
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+BmiCdlCfg.cpp file reads this json file into following structs:
+
+1) BmiCdlCdl2CbsEcmApp_t
+2) BmiCdlAppCfg_t

@@ -1,0 +1,360 @@
+= Hub Filesystem Design
+:toc:
+:numbered:
+
+************************************
+[halign="center", grid="none", frame="none"]
+|===========================================
+|*CATERPILLAR CONFIDENTIAL: YELLOW*
+|*The information contained within this manual is classified as Caterpillar Confidential Information. +
+Any reproduction, dissemination or use of this information is forbidden without the prior express written consent of an
+authorized Caterpillar representative. +
+All rights are reserved by Caterpillar, Inc.*
+|===========================================
+************************************
+
+== Document History ==
+[width="100%",cols="10,10,15,40",options="header"]
+|=======
+|Document Version |Date Revised |Revised By      |Description of Change
+|1.0              |12/12/2022   |Adrian Cojocari |Initial document
+|1.1              |02/23/2023   |Adrian Cojocari |Added SRS_HUB_0126, SRS_HUB_0127
+|=======
+
+== Overview
+
+This document defines the requirements and design of the Hub filesystem.
+This document does not provide low-level detailed design information, as this information 
+can be found in the Doxygen documents.
+
+Hub Filesystem library provides facilities for performing operations on file systems and their components, such as paths, regular files, and directories.
+
+== Definitions
+
+[width="100%",cols="1,2",options="header"]
+|=======
+|Term               |Definition
+|MPLr               |Machine Performance Level Required from ISO 19014-1 [EXT1].
+|AIS                |Autonomy Infrastructure Software.
+|API                |Application Programming Interface.
+|GPS                |Global Position System.
+|=======
+
+== Document References
+
+=== Internal
+
+[width="100%",cols="1,2",options="header"]
+|=======
+|Ref #              |Document
+|[INT1]             |Autonomy Infrastructure Software Development Process
+|=======
+
+=== External
+
+[width="100%",cols="1,2",options="header"]
+|=======
+|Ref #              |Document
+|[EXT1]             |ISO 19014-1:2018
+|=======
+
+== Requirements
+
+=== Safety Level
++[SRS_HUB_0001]+
+Hub Filesystem library shall be MPLr d.
++[end]+
+
+
+=== Functional Requirements
+
+==== File Requirements
++[SRS_HUB_0101]+
+Hub Filesystem library shall provide an interface for creating a file object by specifying their path.
++[end]+
+
++[SRS_HUB_0102]+
+Hub Filesystem library shall provide a interface to open a file. If the file is already open, this will throw an exception.
++[end]+
+
++[SRS_HUB_0103]+
+Hub Filesystem library shall provide a interface to open a file in append mode.
++[end]+
+
++[SRS_HUB_0104]+
+Hub Filesystem library shall provide a interface to close a file. If the file is not open, throw an exception.
++[end]+
+
++[SRS_HUB_0105]+
+Hub Filesystem library shall provide a interface to read a block of data from a file into a given buffer.
++[end]+
+
++[SRS_HUB_0106]+
+Hub Filesystem library shall provide a interface to write a block of data into a given file and return the number of bytes written.
++[end]+
+
++[SRS_HUB_0107]+
+Hub Filesystem library shall provide a interface to read the entire content of a file into a target string.
++[end]+
+
++[SRS_HUB_0108]+
+Hub Filesystem library shall provide a interface to write an entire string to a given file.
++[end]+
+
++[SRS_HUB_0109]+
+Hub Filesystem library shall provide a interface to seek a given position (based on the direction specified) in a given file.
++[end]+
+
++[SRS_HUB_0110]+
+Hub Filesystem library shall provide a interface that returns current position of the read/write cursor of a given file, as an offset value.
++[end]+
+
++[SRS_HUB_0111]+
+Hub Filesystem library shall provide a interface to truncate or expand a given file to a specified size.
++[end]+
+
++[SRS_HUB_0112]+
+Hub Filesystem library shall provide a interface to flush a given file, synchronizing its contents out to disk.
++[end]+ 
+
++[SRS_HUB_0113]+
+Hub Filesystem library shall provide a interface to lock a range of bytes of a file.
++[end]+ 
+
++[SRS_HUB_0114]+
+Hub Filesystem library shall provide a interface to unlock a range of bytes of a file.
++[end]+ 
+
++[SRS_HUB_0115]+
+Hub Filesystem library shall provide a interface to map a view of a file into an active address space.
++[end]+ 
+
++[SRS_HUB_0116]+
+Hub Filesystem library shall provide a interface to unmap the view of memory at a given address.
++[end]+ 
+
++[SRS_HUB_0117]+
+Hub Filesystem library shall make file objects assignable to one another.
++[end]+ 
+
++[SRS_HUB_0118]+
+Hub Filesystem library shall make file objects equality comparable between one another.
++[end]+ 
+
++[SRS_HUB_0119]+
+Hub Filesystem library shall provide an interface for creating a file object by specifying a parent and a child path object.
++[end]+
+
++[SRS_HUB_0120]+
+Hub Filesystem library shall provide an interface for creating a file object using another file object (copy constructor)
++[end]+
+
++[SRS_HUB_0121]+
+Hub Filesystem library shall provide a interface to read the entire content of a file into a target abstract_buffer.
++[end]+
+
++[SRS_HUB_0122]+
+Hub Filesystem library shall provide a interface to read the entire content of a file into a target specified template type.
++[end]+
+
++[SRS_HUB_0123]+
+Hub Filesystem library shall provide a interface to read the entire content of a file into a target specified template type or return a default value if read fails.
++[end]+
+
++[SRS_HUB_0124]+
+Hub Filesystem library shall provide a interface to write an entire abstract_buffer to a given file.
++[end]+
+
++[SRS_HUB_0125]+
+Hub Filesystem library shall provide a interface to write entirely an buffer to a given file and throw an exception if anything goes wrong.
++[end]+
+
++[SRS_HUB_0126]+
+Hub Filesystem library shall provide a interface to open a file with open_disposition flag passed as argument.
+[options="header",cols="1,3"]
+|===
+| flag                         | description
+//-----------------------------------------------------------
+|disposition_default           | platform-dependant default settings.
+|disposition_create_new        | Creates a file, as long as it does not already exist. Fail if file already exists.
+|disposition_create_always     | Creates a file, even if it already exists.
+|disposition_open_existing     | Opens a file, if it already exists. Fail if file does not exist.
+|disposition_open_always       | Opens a file, even if it already exists. If file does not exist, it will be created.
+|===
++[end]+
+
++[SRS_HUB_0127]+
+Hub Filesystem library shall provide a interface to open a file with access_flags passed as argument.
+[options="header",cols="1,3"]
+|===
+| flag                 | description
+//-----------------------------------------------------------
+|access_read           | read permission.
+|access_write          | write permission.
+|access_execute        | execute permission.
+|===
++[end]+
+
+==== Path Requirements
+
++[SRS_HUB_0201]+
+Hub Filesystem library shall provide an interface for creating path objects from strings.
++[end]+
+
++[SRS_HUB_0202]+
+Hub Filesystem library shall provide a interface to get the size of a file, in bytes.
++[end]+
+
++[SRS_HUB_0203]+
+Hub Filesystem library shall provide a interface to check if a file exists.
++[end]+
+
++[SRS_HUB_0204]+
+Hub Filesystem library shall provide a interface to return the status of a file (such as modification times, size, type).
++[end]+
+
++[SRS_HUB_0205]+
+Hub Filesystem library shall provide a interface to check if a given path points to a directory.
++[end]+
+
++[SRS_HUB_0206]+
+Hub Filesystem library shall provide a interface to check if a given path points to a file.
++[end]+
+
++[SRS_HUB_0207]+
+Hub Filesystem library shall provide a interface to check if a given path is an absolute path to a file.
++[end]+
+
++[SRS_HUB_0208]+
+Hub Filesystem library shall provide a interface to get the absolute path for a path.
++[end]+
+
++[SRS_HUB_0209]+
+Hub Filesystem library shall provide a interface to get the relative path to a path.
++[end]+
+
++[SRS_HUB_0210]+
+Hub Filesystem library shall provide a interface to get the parent path for a path.
++[end]+
+
++[SRS_HUB_0211]+
+Hub Filesystem library shall provide a interface to get file name from a path.
++[end]+
+
++[SRS_HUB_0212]+
+Hub Filesystem library shall provide a interface to get file name from a path without extension.
++[end]+
+
++[SRS_HUB_0213]+
+Hub Filesystem library shall provide a interface  to get file extension from a path.
++[end]+
+
++[SRS_HUB_0214]+
+Hub Filesystem library shall provide a interface to check if path is empty.
++[end]+
+
++[SRS_HUB_0215]+
+Hub Filesystem library shall provide a interface to return a path in string format.
++[end]+
+
++[SRS_HUB_0216]+
+Hub Filesystem library shall provide a interface to 'touch' a file in a given path. Touching a file will create an empty file if a file does not exist or update the timestamp if the file exists.
++[end]+
+
++[SRS_HUB_0217]+
+Hub Filesystem library shall provide a interface to change the owner of a path to a specified username.
++[end]+
+
++[SRS_HUB_0218]+
+Hub Filesystem library shall provide a interface to rename a file to a specified target.
++[end]+
+
++[SRS_HUB_0219]+
+Hub Filesystem library shall provide an interface to remove a file located at a given path.
++[end]+
+
++[SRS_HUB_0220]+
+Hub Filesystem library shall provide a interface to remove all of the files in a given path.
++[end]+
+
++[SRS_HUB_0221]+
+Hub Filesystem library shall provide a interface to create all of the directories (recursively, if necessary) that are represented by a given path.
++[end]+
+
++[SRS_HUB_0222]+
+Hub Filesystem library shall provide a interface to get a list of child files to a given path.
++[end]+
+
++[SRS_HUB_0223]+
+Hub Filesystem library shall provide a interface to change directory permissions.
++[end]+
+
++[SRS_HUB_0224]+
+Hub Filesystem library shall make path objects assignable with other path object.
++[end]+ 
+
++[SRS_HUB_0225]+
+Hub Filesystem library shall make path objects comparable with other path object using next operators :
+[options="header",cols="1,3"]
+|===
+| operator      | description
+//-----------------------------------------------------------
+|<              | path size smaller.
+|>              | path size bigger.
+|!=             | paths not equal.
+|===
++[end]+
+
++[SRS_HUB_0226]+
+Hub Filesystem library shall make path objects concatenable with other path object.
++[end]+ 
+
++[SRS_HUB_0227]+
+Hub Filesystem library shall provide an interface for creating path objects using provided parent and child path.
++[end]+
+
++[SRS_HUB_0228]+
+Hub Filesystem library shall provide an interface for creating path objects from provided character buffer.
++[end]+
+
++[SRS_HUB_0229]+
+Hub Filesystem library shall provide a interface to return a path in C-style string format.
++[end]+
+
++[SRS_HUB_0230]+
+Hub Filesystem library shall provide an interface to get the absolute path for a specified path if it exists or return the specified path if the absolute path does not exist.
++[end]+
+
++[SRS_HUB_0231]+
+Hub Filesystem library shall provide an interface to remove a file located at a given path if file exists.
++[end]+
+
++[SRS_HUB_0232]+
+Hub Filesystem library shall provide an interface to resolves an path, replacing all instances of '.' and '..' with appropriate directory layout.
++[end]+
+
+== Design Overview
+
+The Hub filesystem library is used to manipulate files and directories.
+ 
+== Design Constraints
+
+=== Operating System Dependencies
+None
+
+=== Fault Tolerance and Detection
+status_exception is thrown on fault conditions.
+
+=== Memory Allocation
+
+std::vector and std::string are used
+
+=== Thread Safety
+
+The overall code base is not implicitly thread safe and therefore users must be aware of the limitations.
+It's vital that any interactions with protected variables in this library be protected when there are multiple threads of execution.
+
+== Programming Interface
+
+Refer to the location of doxygen documentation.
+

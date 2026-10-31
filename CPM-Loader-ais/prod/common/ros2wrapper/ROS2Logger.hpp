@@ -1,8 +1,8 @@
 #pragma once
-
+ 
 #include <rclcpp/rclcpp.hpp>
 #include <string>
-
+ 
 // ---------------------------------------------------------------------------
 // AIS → ROS2 severity-level mapping
 //
@@ -18,7 +18,7 @@
 // info           INFO            1:1 — informational
 // debug          DEBUG           1:1 — developer diagnostic
 // ---------------------------------------------------------------------------
-
+ 
 class ROS2Logger
 {
 public:
@@ -27,31 +27,54 @@ public:
         static ROS2Logger instance;
         return instance;
     }
-
-    void SetFeatureName(const std::string& featureName,
-                        RCUTILS_LOG_SEVERITY level = RCUTILS_LOG_SEVERITY_ERROR)
+ 
+    void SetFeatureName(const std::string& featureName)
     {
         m_logger = rclcpp::get_logger(featureName);
+    }
+    void SetLogLevel(const std::string& loggerThreshold)
+    {
+        RCUTILS_LOG_SEVERITY level = StringToSeverity(loggerThreshold);
         rcutils_ret_t ret = rcutils_logging_set_logger_level(m_logger.get_name(), level);
         if (ret != RCUTILS_RET_OK)
         {
             std::cerr << "Failed to set logger level for " << m_logger.get_name() << std::endl;
         }
     }
-
+ 
     const rclcpp::Logger& GetLogger() const
     {
         return m_logger;
     }
-
+ 
 private:
     ROS2Logger()
         : m_logger(rclcpp::get_logger("Default"))
     {
     }
-
+ 
     ROS2Logger(const ROS2Logger&) = delete;
     ROS2Logger& operator=(const ROS2Logger&) = delete;
-
+ 
+    RCUTILS_LOG_SEVERITY StringToSeverity(const std::string& level)
+    {
+        if (level == "debug")
+            return RCUTILS_LOG_SEVERITY_DEBUG;
+ 
+        if (level == "info")
+            return RCUTILS_LOG_SEVERITY_INFO;
+ 
+        if (level == "warn")
+            return RCUTILS_LOG_SEVERITY_WARN;
+ 
+        if (level == "error")
+            return RCUTILS_LOG_SEVERITY_ERROR;
+ 
+        if (level == "fatal")
+            return RCUTILS_LOG_SEVERITY_FATAL;
+ 
+        return RCUTILS_LOG_SEVERITY_ERROR;
+    }
+ 
     rclcpp::Logger m_logger;
 };

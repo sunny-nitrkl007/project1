@@ -1,0 +1,13 @@
+diff -ruN ServiceDashboard/config/lighttpd-common.conf ServiceDashboardNew/config/lighttpd-common.conf
+--- ServiceDashboard/config/lighttpd-common.conf	2020-12-02 16:35:41.793519931 -0600
++++ ServiceDashboardNew/config/lighttpd-common.conf	2020-12-02 16:44:54.229519000 -0600
+@@ -38,3 +38,9 @@
+ else $HTTP["url"] =~ "^/CPM" {
+    setenv.add-response-header = ("Cache-Control" => "no-cache, max-age=0")
+ }
++
++# Patch to support ethernet PGT server
++$HTTP["url"] =~ "^/api" {
++   alias.url += ("" => "/opt/CPM/cgi-bin/csf_httpd_cgi_event_handler.cgi")
++   cgi.assign = ("" => "")
++}

@@ -1,0 +1,51 @@
+#!/usr/bin/python
+
+Import( 'baseEnv' )
+localEnv = baseEnv.Clone()
+
+##############################################################
+
+fileListUnitTest = localEnv.ProgramWrapper(
+    target = 'ais_filesystem_filelistTest',
+    source = 'FileListTest.cpp',
+    LIBS = [
+        localEnv['BOOST_TEST'],
+        localEnv['BOOST_FILESYSTEM'],
+        'ais_filesystem',
+        ]
+    )
+
+fileUnitTest = localEnv.ProgramWrapper(
+    target = 'ais_filesystem_fileTest',
+    source = 'FileTest.cpp',
+    LIBS = [
+        localEnv['BOOST_TEST'],
+        localEnv['BOOST_FILESYSTEM'],
+        'ais_filesystem',
+        ]
+    )
+
+dirUnitTest = localEnv.ProgramWrapper(
+    target = 'ais_filesystem_dirTest',
+    source = 'DirTest.cpp',
+    LIBS = [
+        localEnv['BOOST_TEST'],
+        localEnv['BOOST_FILESYSTEM'],
+        'ais_filesystem',
+        ]
+    )
+
+dir2UnitTest = localEnv.ProgramWrapper(
+    target = 'ais_filesystem_dirTest2',
+    source = 'DirTest2.cpp',
+    LIBS = [
+        localEnv['BOOST_TEST'],
+        localEnv['BOOST_FILESYSTEM'],
+        'ais_filesystem',
+        ]
+    )
+
+localEnv.InstallUnitTest(fileListUnitTest)
+localEnv.InstallUnitTest(fileUnitTest)
+localEnv.InstallUnitTest(dirUnitTest)
+localEnv.InstallUnitTest(dir2UnitTest)

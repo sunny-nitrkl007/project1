@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>WebSocket Test</title>
+</head>
+
+<body>
+  <script>
+    "use strict";
+    var ws;
+    window.onload = function () {
+      ws = new WebSocket("ws://165.26.79.19:55566/coaching");         // A6N2
+//      ws = new WebSocket("ws://10.0.2.15:55566/coaching");            // VM  replace 10.0.2.15 with your ip address (inet)
+      ws.onmessage = function (evt) {
+        console.log("WebSocket message received:", evt);
+        document.getElementById("output").innerHTML = prettify(evt.data);
+      };
+      ws.onopen = function (evt) {
+        console.log("WebSocket is open now.");
+      };
+      ws.onclose = function (evt) {
+        console.log("WebSocket is closed now (", evt.code, "), ", evt.reason);
+      };
+      ws.onerror = function (evt) {
+        console.error("WebSocket error observed:", evt);
+      };
+    }
+
+    window.onclose = function () {
+      ws.close();
+    }
+
+    function prettify(string) {
+      return JSON.stringify(JSON.parse(string), null, '  ').replace(/ /g, '&nbsp').replace(/\n\r?/g, '<br />')
+    }
+
+    function sendMessage(message) {
+      ws.send(message)
+      document.getElementById("sentMessage").innerHTML = message
+    }
+
+    function onClickGetSummary() {
+      sendMessage('{"Command": "Start", "GrpId":0}');
+    }
+
+    function onClickGetSummaryEvery2s() {
+      sendMessage('{"Command": "Start", "GrpId":0, "Interval":2000}');
+    }
+
+    function onClickStopSummary() {
+      sendMessage('{"Command": "Stop", "GrpId":0}');
+    }
+
+    function onClickGet3x3() {
+      sendMessage('{"Command": "Start", "GrpId":1}');
+    }
+
+    function onClickGet3x3Every500ms() {
+      sendMessage('{"Command": "Start", "GrpId":1, "Interval":500}');
+    }
+
+    function onClickStop3x3() {
+      sendMessage('{"Command": "Stop", "GrpId":1}');
+    }
+
+    function onClickGetBreadcrumbs() {
+      sendMessage('{"Command": "Start", "GrpId":2}');
+    }
+
+    function onClickGetBreadcrumbsEvery5s() {
+      sendMessage('{"Command": "Start", "GrpId":2, "Interval":5000}');
+    }
+
+    function onClickStopBreadcrumbs() {
+      sendMessage('{"Command": "Stop", "GrpId":2}');
+    }
+   
+    function onClickGetShowHide() {
+      sendMessage('{"Command": "Start", "GrpId":3}');
+    }
+
+    function onClickStopShowHide() {
+      sendMessage('{"Command": "Stop", "GrpId":3}');
+    }
+   
+    function onClickAndy() {
+      sendMessage('{"Command": "Operator", "GrpId":1, "Name":"Andy"}');
+    }
+
+    function onClickBarry() {
+      sendMessage('{"Command": "Operator", "GrpId":1, "Name":"Barry"}');
+    }
+
+    function onClickCharlie() {
+      sendMessage('{"Command": "Operator", "GrpId":1, "Name":"Charlie"}');
+    }
+
+    function onClickDanny() {
+      sendMessage('{"Command": "Operator", "GrpId":1, "Name":"Danny"}');
+    }
+
+    function onClickEddy() {
+      sendMessage('{"Command": "Operator", "GrpId":1, "Name":"Eddy"}');
+    }
+
+    function onClickNone() {
+      sendMessage('{"Command": "Operator", "GrpId":1, "Name":"None"}');
+    }
+
+    function onClickReset() {
+      sendMessage('{"Command": "Reset"}');
+    }
+
+    function setOperatorId() {
+      var opIdElement = document.getElementById("operatorId")
+      var opId = opIdElement.value
+      var message = '{"Command": "Operator", "GrpId":1, "Name":"'.concat(opId).concat('"}')
+      sendMessage(message);
+    }
+
+    function setBreadcrumbRecords() {
+      var BreadcrumbValueElement = document.getElementById("BreadcrumbValue")
+      var BreadcrumbValue = BreadcrumbValueElement.value
+      var message = '{"Command": "SetBreadcrumbRecords", "Value":'.concat(BreadcrumbValue).concat('}')
+      sendMessage(message);
+    }
+ 
+    function setBreadcrumbGPSTimeSeconds() {
+      var BreadcrumbValueElement = document.getElementById("BreadcrumbValue")
+      var BreadcrumbValue = BreadcrumbValueElement.value
+      var message = '{"Command": "SetBreadcrumbGpsTimeSeconds", "Value":'.concat(BreadcrumbValue).concat('}')
+      sendMessage(message);
+    }
+
+    function setBreadcrumbGPSDistanceMeters() {
+      var BreadcrumbValueElement = document.getElementById("BreadcrumbValue")
+      var BreadcrumbValue = BreadcrumbValueElement.value
+      var message = '{"Command": "SetBreadcrumbGpsDistanceMeters", "Value":'.concat(BreadcrumbValue).concat('}')
+      sendMessage(message);
+    }
+
+    function setTipAutoEnableTime() {
+      var tipAutoEnableTimeSecondsElement = document.getElementById("tipAutoEnableTimeSeconds")
+      var tipAutoEnableTimeSeconds = tipAutoEnableTimeSecondsElement.value
+      var message = '{"Command": "TipAutoEnableTime", "Seconds":'.concat(tipAutoEnableTimeSeconds).concat('}')
+      sendMessage(message);
+    }
+    
+    function setTipOn() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TipOn", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+    function setTipOff() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TipOff", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+    function setTipShow() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TipShow", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+    function setTipHide() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TipHide", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+    function setTutorialViewed() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TutorialViewed", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+    function setTipViewed() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TipViewed", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+    function setTipIncrement() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TipIncrement", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+    function setTipDecrement() {
+      var tipNumberElement = document.getElementById("tipNumber")
+      var tipNumber = tipNumberElement.value
+      var message = '{"Command": "TipDecrement", "TipId":'.concat(tipNumber).concat('}')
+      sendMessage(message);
+    }
+
+</script>
+<button onclick="onClickReset()">Reset</button>
+<br><br>
+<button onclick="onClickGetSummary()">Get Summary</button>
+<button onclick="onClickGetSummaryEvery2s()">Get Summary Every 2s</button>
+<button onclick="onClickStopSummary()">Stop Summary</button>
+<br><br>
+<button onclick="onClickGet3x3()">Get 3x3</button>
+<button onclick="onClickGet3x3Every500ms()">Get 3x3 Every 500ms</button>
+<button onclick="onClickStop3x3()">Stop 3x3</button>
+<br><br>
+<button onclick="onClickGetBreadcrumbs()">Get Breadcrumbs</button>
+<button onclick="onClickGetBreadcrumbsEvery5s()">Get Breadcrumbs Every 5s</button>
+<button onclick="onClickStopBreadcrumbs()">Stop Breadcrumbs</button>
+<br><br>
+<button onclick="onClickGetShowHide()">Get Show/Hide</button>
+<button onclick="onClickStopShowHide()">Stop Show/Hide</button>
+<br><br>
+<button onclick="onClickAndy()">Andy</button>
+<button onclick="onClickBarry()">Barry</button>
+<button onclick="onClickCharlie()">Charlie</button>
+<button onclick="onClickDanny()">Danny</button>
+<button onclick="onClickEddy()">Eddy</button>
+<button onclick="onClickNone()">None</button>
+<br><br>
+<h5>Operator ID
+  <input type="text" id="operatorId">
+  <button onclick="setOperatorId()">Set</button>
+</h5>
+<h5>Tip Auto-Enable Time
+  <input type="number" min="1" value="604800" id="tipAutoEnableTimeSeconds">
+  <button onclick="setTipAutoEnableTime()">Set</button>
+  </h5>
+<h5>Tip Number
+  <input type="number" min="1" value="1" id="tipNumber">
+  <button onclick="setTipOn()">Op-On</button>
+  <button onclick="setTipOff()">Op-Off</button>
+  <button onclick="setTipShow()">Sys-On</button>
+  <button onclick="setTipHide()">Sys-Off</button>
+  <button onclick="setTutorialViewed()">Video Viewed</button>
+  <button onclick="setTipViewed()">TipViewed</button>
+  <button onclick="setTipIncrement()">INC</button>
+  <button onclick="setTipDecrement()">DEC</button>
+</h5>
+<h5>Breadcrumb
+  <input type="number" min="10" value="1000" id="BreadcrumbValue">
+  <button onclick="setBreadcrumbRecords()">Records</button>
+  <button onclick="setBreadcrumbGPSTimeSeconds()">GPS-Seconds</button>
+  <button onclick="setBreadcrumbGPSDistanceMeters()">GPS-Meters</button>
+</h5>
+<p id="sentMessage">--</p>
+<p id="output"></p>
+</body>
+
+</html>
+

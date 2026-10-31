@@ -1,0 +1,13 @@
+# Ignore temporary build artifacts
+
+# Never going to make another commit, don't need to archive this file
+/.gitignore
+
+# Never going to archive anything in app
+/app/
+
+# Never going to archive temporary files
+Makefile
+Makefile.options
+*.o
+*.ls

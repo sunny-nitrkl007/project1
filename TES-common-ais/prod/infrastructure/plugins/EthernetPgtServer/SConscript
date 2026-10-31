@@ -1,0 +1,32 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    autogen
+##
+## @attention Copyright (C) 2017
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+Import( 'infEnv' )
+
+sourceFiles = [
+    'EthernetPgtServer.cpp',
+    'csf_pgt_server/config/src/csf_pgt_server_config.c',
+    'scl_pdb/config/src/scl_pdb_tx_config.c',
+]
+
+infEnv.Append( CPPPATH = [
+                           'csf_pgt_server/config/include',
+                           'scl_pdb/config/include',
+] )
+
+EthernetPgtServer = infEnv.SharedLibraryWrapper(
+    target='ethernetPgtServer',
+    source=sourceFiles,
+    # NOTE: LIBS need to be included by the app
+)
+
+infEnv.InstallLibrary( EthernetPgtServer )

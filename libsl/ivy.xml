@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Note that this file must be named ivy.xml in a module -->
+<ivy-module version="2.0"
+		xmlns:e="http://ant.apache.org/ivy/extra"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	<!-- Replace this information with specific module information -->
+	<info e:ivydom="ivy-dt" organisation="com.cat.e" module="cat/dt/libsl" status="integration" e:vpath="lib_autocode_release/lib_simulink"/>
+	<!-- Configurations defined for this module. Please do not make up new
+	     configurations. Copy the desired configurations from the ivyutils
+	     file named, "common-conf.xml". If new configurations are necessary,
+	     consult with the Ivy Utility team. -->
+	<configurations defaultconf="rel">
+		<conf name="rel" description="retrieve only artifacts that are part of this release unit"/>
+		<conf name="dev" description="retrieve artifacts needed for development and releasing" />
+	</configurations>
+	<!-- Publications defines what artifacts are included with this module
+	     Note, there must be a publications section or a single artifact is
+	     assumed named <module>.jar. Thus, if no artifacts are needed,
+	     create an empty publications block. -->
+	<publications>
+		<artifact conf="*" ext="xml" name="git-repo" type="git"/>
+	</publications>
+	<!-- Define any dependencies for this module. Note, "*->@" means map all module
+	     configurations to equally named configurations for the dependency. -->
+	<dependencies defaultconf="*->@">
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/oel"                                rev="2016.14.0"        conf="dev->rel"/>
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/scl"                                rev="2016.9.0"         conf="dev->rel"/>
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/hal_include"                        rev="2016.49.0"        conf="dev->rel"/>
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/boot_inc"                           rev="2016.3.0"         conf="dev->rel"/>
+		<!-- For python.exe -->
+		<dependency e:ivydom="ivy-dt"  org="com.portablepython" name="oss/portable_python"                            rev="2.7.6.1"          conf="dev->rel"/>
+		<!-- For gmake.exe -->
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="oss/make"                                       rev="MAKE4.1_2015.1.0" conf="dev->rel"/>
+		<!-- For tgt_ar_diab_5.9.4.0_PPCVLEEF -->
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/oel-tgt_ar_diab_5.9.4.0_PPCVLEEF-a" rev="2016.14.0"        conf="dev->rel"/>
+		<!-- For tgt_cc32r_4.30_M32Rx -->
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/oel-tgt_cc32r_4.30_M32Rx-a"         rev="2016.14.0"        conf="dev->rel"/>
+		<!-- For tgt_diab_4.2b_PPC555EH -->
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/oel-tgt_diab_4.2b_PPC555EH-a"       rev="2016.14.0"        conf="dev->rel"/>
+		<!-- For tgt_diab_5.8.0.0_PPCVLEEF -->
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/oel-tgt_diab_5.8.0.0_PPCVLEEF-a"    rev="2016.14.0"        conf="dev->rel"/>
+		<!-- For tgt_sim_gcc_4.8.2_x86-64 -->
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/oel-tgt_sim_gcc_4.8.2_x86-64-a"     rev="2016.14.0"        conf="dev->rel"/>
+		<!-- For tgt_rvct_2.1_ARM7TDMI -->
+		<dependency e:ivydom="ivy-csf" org="com.cat.e"          name="cat/ess-csf/oel-tgt_rvct_2.1_ARM7TDMI-a"        rev="2016.14.0"        conf="dev->rel"/>
+	</dependencies>
+</ivy-module>

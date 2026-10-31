@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+###############################################################################
+## @file      SConscript
+## @brief     SConscript for the autonomyCondition diagnostics and events application.
+##
+## @attention COPYRIGHT (C) 2011 CATERPILLAR INC. ALL RIGHTS RESERVED.
+## @attention All rights reserved
+###############################################################################
+# create environment
+Import( 'testEnv' )
+localEnv = testEnv.Clone();
+
+tesPluginDir = localEnv[ 'TES_COMMON_DIR' ] + '/prod/infrastructure/plugins/'
+appDir = localEnv[ 'TES_COMMON_DIR' ] + '/sandbox/EthernetPgtServerTest/'
+
+ethernetPgtServerLibList = localEnv.getLibsListFromPath(tesPluginDir + 'EthernetPgtServer')
+
+sourceFiles = [
+    'EthernetPgtServerTest.cpp',
+    'src_app/app_inits.c',
+    'src_app/app_rtos_config_posix.c',
+    'src_app/app_task.c',
+    'src_catdl/app_cdl_mod_globals.c',
+    # Plugins
+    'PluginMgr.cpp',
+]
+
+localEnv.Append(CPPPATH = [ appDir + 'src_app', ])
+
+# Build for ECM target only
+if ( localEnv[ 'PLATFORM' ] in [ 'D6XX', 'A6N1', 'A6N2' ] ):
+    libList = [
+        'ais_task',
+        'ais_log',
+        'ais_config',
+        'commTask',
+        ethernetPgtServerLibList,
+        'dbg_log',
+        'oel_',
+        'oel_u',
+        'oel_rtos_posix',
+        'oel_rtos',
+        'taskPluginMgr',
+        # 'version',
+        # 'ais_time',
+        # 'ais_simpleComms',
+        # 'ais_serialization',
+    ]
+
+    ethernetPgtServerTest = localEnv.ProgramWrapper( 
+        target = 'ethernetPgtServerTest',
+        source = sourceFiles,
+        LIBS = libList
+    )
+
+    localEnv.InstallBinary( ethernetPgtServerTest )

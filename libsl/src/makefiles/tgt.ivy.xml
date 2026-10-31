@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<ivy-module
+    version="2.0"
+    xmlns:e="http://ant.apache.org/ivy/extra"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info
+      module="/cat/dt/libsl/tgt/template"
+	  e:ivydom="build"
+	  organisation="com.cat.e"
+	  revision="TBD"/>
+  <configurations defaultconf="rel">
+    <conf
+	    name="rel"
+	    description="retrieve only artifacts that are part of this release unit"/>
+  </configurations>
+  <publications>
+    <artifact
+	    conf="*"
+		ext="xml"
+		name="git-repo"
+		type="git"/>
+  </publications>
+</ivy-module>
+

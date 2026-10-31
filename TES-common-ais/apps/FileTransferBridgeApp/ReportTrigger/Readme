@@ -1,0 +1,5 @@
+[ReportTrigger.proto]                        Protobuf file given by Telematics team
+[ReportTrigger.pb.h] [ReportTrigger.pb.cc]   Header and source files generated from the above Protobuf file:
+
+${SSP_LINUX_PATH}/lib_oss/grpc-a/tgt_gcc_4.4.3_ubuntu/protoc/protoc --cpp_out=${PROTO_FILE_PATH} ${PROTO_FILE_PATH}/ReportTrigger.proto
+

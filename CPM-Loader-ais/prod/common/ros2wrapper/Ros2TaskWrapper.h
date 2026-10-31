@@ -51,23 +51,17 @@ public:
     template<typename AppT>
     static int run(int argc, char** argv)
     {
+        std::string const rosLogDir = "/tmp/appdata/CPM/log";
+        std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
+        setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
+        setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
         std::vector<char*> rosArgv;
-        std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
-        int rosArgc = static_cast<int>(rosArgv.size());
+        std::string const nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
+        int const rosArgc = static_cast<int>(rosArgv.size());
 
         ROS2Logger::Instance().SetFeatureName(nodeName);
 
-        // Block SIGINT/SIGTERM/SIGQUIT on this thread before anything else runs,
-        // so every thread rclcpp::init()/the DDS layer spawns inherits the block
-        // too (POSIX threads inherit the creating thread's signal mask at
-        // pthread_create() time). Without this, a signal can still land on one
-        // of those internal threads instead of our sigwait() thread below.
-        blockExitSignals();
-
-        // SignalHandlerOptions::None stops rclcpp from installing its own
-        // competing SIGINT/SIGTERM handler -- our registerSignalHandling()
-        // below is the only thing that reacts to these signals now.
-        rclcpp::init(rosArgc, rosArgv.data(), rclcpp::InitOptions(), rclcpp::SignalHandlerOptions::None);
+        rclcpp::init(rosArgc, rosArgv.data());
 
         auto app = std::make_shared<AppT>(nodeName);
 
@@ -76,7 +70,7 @@ public:
 
         registerSignalHandling(executor);
 
-        bool initialized = app->beforeInitialize() && app->initialize();
+        bool const initialized = app->beforeInitialize() && app->initialize();
         if (initialized) {
             app->startExecutiveTimer();
             executor->spin();
@@ -183,7 +177,11 @@ private:
         return nodeName;
     }
 
-    static void blockExitSignals()
+    // Reproduces ais_task/ais/task/sigcatch.cpp exactly: block the exit
+    // signals on every thread, hand them to one dedicated thread via
+    // sigwait(). 1st/2nd signal interrupts the executor; 3rd forces an
+    // immediate exit with no cleanup, matching AIS's documented behavior.
+    static void registerSignalHandling(std::shared_ptr<rclcpp::Executor> executor)
     {
         sigset_t signalSet;
         sigemptyset(&signalSet);
@@ -191,14 +189,7 @@ private:
         sigaddset(&signalSet, SIGTERM);
         sigaddset(&signalSet, SIGQUIT);
         pthread_sigmask(SIG_BLOCK, &signalSet, nullptr);
-    }
 
-    // Reproduces ais_task/ais/task/sigcatch.cpp exactly: hand the (already
-    // blocked -- see blockExitSignals() above) exit signals to one dedicated
-    // thread via sigwait(). 1st/2nd signal interrupts the executor; 3rd forces
-    // an immediate exit with no cleanup, matching AIS's documented behavior.
-    static void registerSignalHandling(std::shared_ptr<rclcpp::Executor> executor)
-    {
         std::thread signalThread([executor]() {
             static std::atomic<uint32_t> signalsCaught{0};
             constexpr uint32_t maxExitSignalsToCatch = 3;

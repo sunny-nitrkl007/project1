@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemArchitect xmlns="http://catelectronics.corp.cat.com/SASchema">
+<Artifact id="b8331848-338c-4474-950f-9973193325a3" kind="systemComponent" contentGenerator="SystemArchitect" contentGeneratorVersion="2.0.0" version="0.0.0" versionId="7092feb6-c13a-4f69-9dd9-9532e39090a0" scope="partialProcess" process="6115eafb-0f72-4795-9a4c-739f00395aeb">
+<Include artifact="91e79496-8f59-4078-a83f-d1c2d71389b6" localPath="lib_info_products\toa_wl00\sys\ysa\toa_00_calcompts.ysac"/>
+<Include artifact="af6d054f-5a81-4f71-bea5-dfe8a6dede7a" localPath="lib_info_products\toa_wl00\sys\ysa\toa_00_calcompvar.ysac"/>
+<Include artifact="7ae4b67b-da10-40b2-b0c0-dfa44f057fd9" localPath="lib_info_products\toa_wl00\sys\ysa\data\wl_fix00.ysac"/>
+<Include artifact="aa057062-45ae-4618-ae1d-4c0e11acd630" localPath="lib_info_products\toa_wl00\sys\ysa\toa_00_calcompfix.ysac"/>
+<Include artifact="20b6fc4e-6132-425e-bb68-880ba8821b6c" localPath="lib_info_products\toa_wl00\sys\ysa\toa_00_calcompexp.ysas"/>
+<Include artifact="b4132dda-6a21-442c-9de4-21c0d2bd8131" localPath="lib_info_products\toa_wl00\sys\ysa\data\wl_980_var00.ysac"/>
+<Include artifact="048674f9-c966-47b0-9167-748f193b567e" localPath="lib_info_products\toa_wl00\sys\ysa\toa_00_calcompprop.ysas"/>
+<ProcessInstance id="6115eafb-0f72-4795-9a4c-739f00395aeb" name="toa_sys"/>
+</Artifact>
+</SystemArchitect>

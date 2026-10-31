@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
+>
+  <info module="cat/ess-info/lps_app_common"
+        e:ivydom="ivy-mach_productivity"
+        e:vpath="lib_mach_productivity/lps/lps_app_common"
+        organisation="com.cat.e"
+        revision="#!RevReplace!#"
+        status="integration"
+  />
+  <configurations defaultconf="rel">
+    <conf description="retrieve only artifacts necessary to use the module"   name="rel"/>
+    <conf description="retrieve artifacts that are part of this release unit" name="nodep"/>
+    <conf description="retrieve artifacts needed to build this release unit"  name="dev"/>
+  </configurations>
+  <publications>
+    <artifact ext="xml" name="git-repo" type="git"/>
+  </publications>
+  <dependencies defaultconf="*->@">
+  <dependency conf="dev->rel_girt_win32" name="cat/dt/mach_tools_cluster" rev="11.0.0.rc5" e:ivydom="ivy-ms_makefiles" org="com.cat.e"/>
+  </dependencies>
+</ivy-module>

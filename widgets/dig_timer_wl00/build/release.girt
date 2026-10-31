@@ -1,0 +1,32 @@
+#dig_timer_wl00 Release Script
+#     This is a girt script that is used to release this library.
+
+#Load 'htsrc/software_change.txt' into variable 'release_notes'
+file load release_notes ../htsrc/software_change.txt;
+
+notify print "Retrieving name of release unit from release notes...";
+regex search many "^= (?P<name>.+) Software History$"  ${release_notes.contents};
+notify print "     ==> name = '${name}'";
+
+#Escape text in name so it can be used in regular expression later.
+regex escape name ${name};
+
+notify print "Retrieving version from release notes...";
+regex search many "^== ${name} \((?P<version>.+)\)$" ${release_notes.contents};
+notify print "     ==> version = '${version}'";
+
+notify print "Verfying version in 'Release Information' table in release notes...";
+regex search one ver_verify "^\|\s+Release Label/Tag\s+\|\s+${version}$" ${release_notes.contents};
+notify print "     ==> Verfied!";
+
+notify print "Retrieving comment from +summary_latest+ AsciiDoc variable...";
+regex search many "^:summary_latest: (?P<comment>.+)"  ${release_notes.contents};
+notify print "     ==> comment = '${comment}'";
+
+
+#Set Desired Version Number For Release
+#     Must be done after all of the release entries have been registered.
+release entry version ${version} ${comment};
+
+#Work Flow:  Remote (Version 00)
+include ${view_root}/dt/release/girt/scripts/wf_local_00.girt

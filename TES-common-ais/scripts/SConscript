@@ -1,0 +1,6 @@
+#!/usr/bin/python
+import os
+Import('baseEnv')
+my_env = baseEnv.Clone();
+
+my_env.InstallScript(os.getcwd() + '/syncSoftwareDirs')

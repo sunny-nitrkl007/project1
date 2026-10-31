@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connectionmanager>
+   <vlan>
+      <!-- addressmode: 0=static, 1=DHCP Client, 2=LLA -->
+      <!--              addressmode is ignored if devicetype is present. -->
+      <!-- name:        Identifier name of A6N1 Ports-->
+      <!-- master:      0=NotApplicable,1=master,2=slave-->
+      <!-- devicetype:  1=CellAir, 2=SatAir -->
+      <!--              If devicetype is present, conn_mgr will only set up -->
+      <!--              port/vlan/interface and not the IP address. -->
+      <!-- ipaddr:      IP address to use in static addressmode -->
+      <!-- netmask:     netmask to use in static addressmode -->
+      <!--              dotted-decimal form, like "255.255.255.0" -->
+      <!-- metric:      20=WiredEthernet, 30=Wifi, 40=Cellular, -->
+      <!--              50=SatelliteSBD, 60=SatelliteCSC -->
+      <!-- dhcp_dns:    1=use DHCP-provided DNS -->
+      <!--              0=set up DHCP, but don't use gateway's DNS -->
+      <!-- gateway:     static configuration of default gateway, can be "" -->
+      <!--              for local only use -->
+      <!-- speed:       10, 100, *auto (default) -->
+      <!-- duplex:      full, half, *auto (default) -->
+      <device port="1" name="BR1 - Triangle 34-35" vlan="20" master="2" enable="1" />
+      <device port="2" name="BR2 - Triangle 18-19" vlan="20" master="1" enable="1" />
+      <device port="3" name="ETH1 - Triangle 1-4" vlan="20" speed="10" duplex="full" enable="1" />
+      <device port="4" name="ETH2 - Circle 39-42" vlan="20" speed="10" duplex="full" addressmode="0" ipaddr="165.26.79.19" netmask="255.255.254.0" enable="1" />
+   </vlan>
+   <systemconfig>
+      <!-- static systemconfig will only take effect if dhcp_dns="1" is not -->
+      <!-- specified above or if DHCP fails -->
+      <dns primary="8.8.8.8" secondary="8.8.4.4" />
+   </systemconfig>
+</connectionmanager>

@@ -1,0 +1,15 @@
+Sheet,Key,Typedef
+BmiJ1939_PID,Units,DlpUnits_t
+BmiJ1939_PID,RequestType,J1939ParamReqType_t
+BmiJ1939_PID,VarLengthDataType,VarLengthParamType
+BmiJ1939_PID,ParameterType,cdl2_parameter_type_e
+BmiJ1939_PGN,Control Bitfield,pgn_control_bitfield
+BmiCdl_ECM,ecm_control,cdl_control
+BmiCdl_PID,parm_control_req,cdl_control
+BmiCdl_PID,parm_control_rev,parm_control_rev
+BmiCdl_PID,parm_request_type,cdl2_cbs_parm_request_type_e
+BmiCdl_PID,parameter_type,cdl2_parameter_type_e
+BmiCdl_PID,Units,DlpUnits_t
+BmiCdl_PID,VarLengthParamType,VarLengthParamType
+BmiEth_PID,VarLengthDataType,VarLengthParamType
+BmiEth_PID,Units,DlpUnits_t

@@ -1,0 +1,112 @@
+#Git/Ivy Release Tool (GIRT) Release Script
+#Register Release Entries Which Make Up Entire Release Unit
+#     Define each Ivy Module which makes up release.
+#     Define in dependency order: lowest to highest.
+release entry ivy mdl_source  ../deps/ivy.xml;
+release entry ivy c_interface ../../toa_wl00_inf/deps/ivy.xml;
+release entry ivy c_source    ../../toa_wl00_x86_64-b/deps/ivy.xml;
+#removing -a from release since we are not building that
+#release entry ivy sim_lib_dll ../../toa_wl00-a/tgt_gcc_4.8.2_sim_win64/deps/ivy.xml;
+
+
+#Load 'release_notes.txt' into variable 'release_notes'
+file load release_notes ../doc/release_notes.txt;
+
+#Search for repository name
+regex search one name     "^== (.+) ==" ${release_notes} "No name found...";
+#Search for release version
+regex search one version  "^=== Release (.+) ==="     ${release_notes};
+#Search for release summary
+regex search one summary  "^.*Release Summary:.*?\|(.+)"   ${release_notes};
+#Find the main change description
+regex search many "==== CHANGE DESCRIPTION: ====[\n\r\s]+(?P<rel_notes>[\n\r\s\S]*?)[\n\r\s]+==== KNOWN ISSUES: ====" ${release_notes} "No change description found ..." ;
+
+# Get the name of the library to be released
+notify print "****************************************************************";
+notify print " Releasing library: " ${name};
+notify print "";
+
+# Extract the comment from the sofware change document
+notify print "****************************************************************";
+notify print " Comment: " ${summary};
+notify print "";
+
+# Extract the Tag to be applied
+notify print "****************************************************************";
+notify print " Tag being applied: " ${version}; 
+notify print "";
+notify print "****************************************************************";
+
+#Set Desired Version Number For Release
+#     Must be done after all of the release entries have been registered.
+release entry version ${version} "Release ${version} of Tip-Off Assist sub-system.  ${summary}";
+
+#Configure Release Commit Mode
+#  none = Ensure that repository is clean.
+#   all = Commit all content.
+release mode commit ${mdl_source}  all;
+release mode commit ${c_interface} all; 
+release mode commit ${c_source}    all; 
+#release mode commit ${sim_lib_dll} all; 
+
+
+#Configure Release Tree Mode
+#  yes = Content will be added on current branch.
+#  no  = Separate tree will be created for content. Orphant release
+release mode tree ${mdl_source}  yes;
+release mode tree ${c_interface} yes;
+release mode tree ${c_source}    no;
+#release mode tree ${sim_lib_dll} no;
+
+#Figure out who is doing the release.
+ldap lookup login_id person_current;
+
+#Name the system engineer for this application
+ldap lookup login_id person_subsys gulamhs;
+
+#Create list of people that e-mail should be sent to.
+ldap lookup login_id person_1 currisd;
+ldap lookup login_id person_2 maleken;
+ldap lookup login_id person_3 krzeprp;
+
+
+#Append to email list.
+variable append email_to_list "${person_subsys.email}";
+variable append email_to_list "${person_1.email}";
+variable append email_to_list "${person_2.email}";
+variable append email_to_list "${person_3.email}";
+
+
+filesystem status sc_status ../doc/release_notes.txt;
+
+variable set subject "Release of ${version} of the ${name} repository";
+
+# Email message text:
+variable set message_text
+"
+
+Version ${version} of the ${name} ( ${c_source.ivy_descriptor.module} ) repository has been released
+by ${person_current.name} (contact at x-${person_current.phone_number} Email:${person_current.email})
+
+Questions with regards to this release, and its contents should be directed to:
+${person_subsys.name} x-${person_subsys.phone_number} Email: ${person_subsys.email}
+
+Change Description:
+===================
+
+${rel_notes}
+
+If you have gotten this far and would like to read some more, visit the release notes at:
+<VIEW_ROOT>/${sc_status.path_view}
+
+";
+
+#variable dump;
+
+#Include remaining release procedure from girt script directory
+#Work Flow Remote Version 00
+#     Remote Publish
+#     No Build
+include ${view_root}/dt/release/girt/scripts/wf_remote_00.girt;
+
+notify email text ${email_to_list} "${subject}" ${message_text};

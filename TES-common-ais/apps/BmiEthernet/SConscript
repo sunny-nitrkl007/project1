@@ -1,0 +1,58 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+Import( 'testEnv' )
+
+bmiEthernetEnv = testEnv.Clone()
+
+bmiEthernetEnv.Append( CPPPATH = ['.',
+                         'csf_eth_health/config/include',
+                         'csf_pgt_client/config/include',
+                         'csf_fit/config/include',
+                         'scl_pdb/config/include',
+                            ] )
+
+sourceFiles = [
+    'BmiEth.cpp',
+    'BmiEthWrapper.cpp',
+    'app_rtos_config_posix.c',
+    'app_recv_main.c',
+    'app_inits.c',
+    'app_cdl_mod_globals.c',
+    'BmiEthDiag.cpp',
+    'BmiEthPidHndlr.cpp',
+    'BmiEthSpnHndlr.cpp',
+    'BmiEthCatExtIdHndlr.cpp',
+    'csf_eth_health/config/src/csf_eth_health_config.c',
+    'csf_pgt_client/config/src/csf_pgt_client_config.c',
+    'csf_fit/config/src/csf_fit_config.c',
+    'scl_pdb/config/src/scl_pdb_rx_config.c',
+]
+
+bmiEthernet = bmiEthernetEnv.ProgramWrapper(
+        target = 'bmiEthernet',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log', 'commTask',
+                  'csf_eth_health', 'csf_pgt_client', 'csf_fit', 'csf_xml_build',
+                  'scl_util',
+                  'oel_u', 'oel_rtos_posix', 'oel_posix', 'oel_rtos',
+                  'curl', 'scl_pdb', 'cdl2_pit', 'scl_eth_sc', 'scl_snmpd', 'dataLinkDataWrapper', 'bmi_ethernet_parser',  'bmi_ethernet_util', 
+               ]
+    )
+
+
+bmiEthernetEnv.InstallBinary( bmiEthernet )
+
+
+bmiEthernetEnv.Alias("bmiEthernet", "#bin/bmiEthernet")

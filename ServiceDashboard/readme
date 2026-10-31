@@ -1,0 +1,34 @@
+The original verity is located here
+-----------------------------------
+repo:   git@git1.corp.cat.com:/cat/ess-csf/web_manager-a
+tag:    CoreTelematics_2020.17.1
+commit: 9a4cc7d590e76fd5b43a8ce376f0302aad317c82
+files:
+    .\web_manager-a\tgt_gcc_5.1.0_a6n2\ServiceDashboard_Lite_A6N2_02020082802.verity
+    .\web_manager-a\tgt_gcc_5.1.0_a6n2\ServiceDashboard_Lite_A6N2_02020082802.verity_verify
+
+
+Mounting the verity
+-----------------------------------
+mkdir -p "${mountDir}" "${tmpDir}"
+sudo mount -o loop,ro,user "${verityImage}" "${mountDir}"
+sudo rsync -rlW --delete --inplace "${mountDir}/." "${tmpDir}/."
+sudo chown -R $USER: "${tmpDir}/."
+sudo umount "${mountDir}"
+rm -rf "${mountDir}"
+
+Now ${tmpDir} contains the original contents of the mounted verity.
+
+Creating the patch
+-----------------------------------
+The build process applies the patch that is created with the following:
+
+diff -ruN ServiceDashboard ServiceDashboardNew > ServiceDashboard.patch
+
+Where the "ServiceDashboardNew" is the edited version of the contents, and
+"ServiceDashboard" is the original version of the contents that came from
+the verity.
+
+The patch is then applied with:
+
+patch -u -p0 < ServiceDashboard.patch

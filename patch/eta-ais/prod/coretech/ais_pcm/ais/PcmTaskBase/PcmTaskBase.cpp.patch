@@ -1,0 +1,31 @@
+diff --git a/prod/coretech/ais_pcm/ais/PcmTaskBase/PcmTaskBase.cpp b/prod/coretech/ais_pcm/ais/PcmTaskBase/PcmTaskBase.cpp
+index e331f6d..225fb81 100644
+--- a/prod/coretech/ais_pcm/ais/PcmTaskBase/PcmTaskBase.cpp
++++ b/prod/coretech/ais_pcm/ais/PcmTaskBase/PcmTaskBase.cpp
+@@ -1503,6 +1503,26 @@ void PcmTaskBase::cleanup( )
+   {
+     AIS_LOG_WARN( "Failed to request TimeSync to be gracefully terminated." );
+   }
++
++  // Invoke queue_app_logs_to_ftb.sh to generate app_log_capture during keyoff
++  char* catDir = getenv("CAT_DIR");
++  if (nullptr != catDir)
++  {
++    std::string command = catDir;
++    command += "/scripts/queue_app_logs_to_ftb.sh";
++
++    int rc = std::system( command.c_str() );
++
++    if (0 == rc)
++    {
++      AIS_LOG_INFO("queue_app_logs_to_ftb.sh returned success.");
++    }
++    else
++    {
++      AIS_LOG_NOTICE("queue_app_logs_to_ftb.sh returned an error.");
++    }
++  }
++
+   // Notify the shutdown object that all processes have been successfully shutdown
+   AIS_LOG_INFO("Notifying ShutdownObject processes have been stopped");
+   auto& shutdownObject = getShutdown();

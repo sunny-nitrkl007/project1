@@ -1,0 +1,100 @@
+// generated from rosidl_typesupport_fastrtps_cpp/resource/idl__rosidl_typesupport_fastrtps_cpp.hpp.em
+// with input from job_mgr_interfaces:msg/DispBestBktWt.idl
+// generated code does not contain a copyright notice
+
+#ifndef JOB_MGR_INTERFACES__MSG__DETAIL__DISP_BEST_BKT_WT__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
+#define JOB_MGR_INTERFACES__MSG__DETAIL__DISP_BEST_BKT_WT__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
+
+#include <cstddef>
+#include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_typesupport_interface/macros.h"
+#include "job_mgr_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h"
+#include "job_mgr_interfaces/msg/detail/disp_best_bkt_wt__struct.hpp"
+
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wunused-parameter"
+# ifdef __clang__
+#  pragma clang diagnostic ignored "-Wdeprecated-register"
+#  pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
+# endif
+#endif
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+
+#include "fastcdr/Cdr.h"
+
+namespace job_mgr_interfaces
+{
+
+namespace msg
+{
+
+namespace typesupport_fastrtps_cpp
+{
+
+bool
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+cdr_serialize(
+  const job_mgr_interfaces::msg::DispBestBktWt & ros_message,
+  eprosima::fastcdr::Cdr & cdr);
+
+bool
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+cdr_deserialize(
+  eprosima::fastcdr::Cdr & cdr,
+  job_mgr_interfaces::msg::DispBestBktWt & ros_message);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+get_serialized_size(
+  const job_mgr_interfaces::msg::DispBestBktWt & ros_message,
+  size_t current_alignment);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+max_serialized_size_DispBestBktWt(
+  bool & full_bounded,
+  bool & is_plain,
+  size_t current_alignment);
+
+bool
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+cdr_serialize_key(
+  const job_mgr_interfaces::msg::DispBestBktWt & ros_message,
+  eprosima::fastcdr::Cdr &);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+get_serialized_size_key(
+  const job_mgr_interfaces::msg::DispBestBktWt & ros_message,
+  size_t current_alignment);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+max_serialized_size_key_DispBestBktWt(
+  bool & full_bounded,
+  bool & is_plain,
+  size_t current_alignment);
+
+}  // namespace typesupport_fastrtps_cpp
+
+}  // namespace msg
+
+}  // namespace job_mgr_interfaces
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_job_mgr_interfaces
+const rosidl_message_type_support_t *
+  ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_cpp, job_mgr_interfaces, msg, DispBestBktWt)();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // JOB_MGR_INTERFACES__MSG__DETAIL__DISP_BEST_BKT_WT__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_

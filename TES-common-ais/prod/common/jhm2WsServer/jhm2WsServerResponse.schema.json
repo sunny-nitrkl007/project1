@@ -1,0 +1,129 @@
+{
+    "type": "object",
+    "description": "Response from server.",
+    "default": {},
+    "examples": [
+        {
+            "httpStatusCode": 204,
+            "responseType": "CommandRequest2",
+            "body": {}
+        },
+        {
+            "httpStatusCode": 400,
+            "responseType": "ParameterRequest2",
+            "body": {
+              "error": "unable to parse rateSec"
+            }
+        },{
+            "httpStatusCode": 200,
+            "responseType": "ParameterRequest2",
+            "body": {
+                "TruckInfo": {
+                    "enabled": {
+                        "value": "1"
+                    },
+                    "id": {
+                        "value": "0"
+                    },
+                    "name": {
+                        "value": ""
+                    },
+                    "targetWeight": {
+                        "value": "0.000"
+                    }
+                }
+            }
+        }
+    ],
+    "required": [
+        "responseType",
+        "body",
+        "httpStatusCode"
+    ],
+    "properties": {
+        "responseType": {
+            "$id": "#/properties/responseType",
+            "type": "string",
+            "description": "Matched the requestType that initiated the response.",
+            "enum": ["ParameterRequest", "CommandRequest", "FileRequest", "ParameterRequest2", "CommandRequest2"],
+            "default": "",
+            "examples": [
+                "CommandRequest2"
+            ]
+        },
+        "paramsRequested": {
+            "$id": "#/properties/paramsRequested",
+            "type": "array",
+            "description": "Parameters requested",
+            "default": [],
+            "examples": [
+                [
+                    "TruckInfo",
+                    "PayloadInfo"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/paramsRequested/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/paramsRequested/items/anyOf/0",
+                        "type": "string",
+                        "examples": [
+                            "TruckInfo",
+                            "PayloadInfo"
+                        ]
+                    }
+                ]
+            }
+        },
+        "fileRequested": {
+            "$id": "#/properties/fileRequested",
+            "type": "string",
+            "description": "File Requested",
+            "examples": [
+                "TruckList"
+            ]
+        },
+        "body": {
+            "$id": "#/properties/body",
+            "type": "object",
+            "description": "Contents are 1) if httpStatusCode=400: error message 2) else if responseType=CommandRequest(2): empty, 3) else if responseType=ParameterRequest(2): parameter data, 4) else if responseType=FileRequest: file contents",
+            "default": {},
+            "examples": [
+                {"error": "unable to parse rateSec"},
+                {},
+                {
+                    "TruckInfo": {
+                      "enabled": {
+                        "value": "1"
+                      },
+                      "id": {
+                        "value": "0"
+                      },
+                      "name": {
+                        "value": ""
+                      },
+                      "targetWeight": {
+                        "value": "0.000"
+                      }
+                    }
+                  }
+            ],
+            "required": [],
+            "additionalProperties": true
+        },
+        "httpStatusCode": {
+            "$id": "#/properties/httpStatusCode",
+            "type": "integer",
+            "description": "HTTP Status Code, ref https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html",
+            "default": 0,
+            "examples": [
+                200,
+                204,
+                400
+            ]
+        }
+    },
+    "additionalProperties": true
+}

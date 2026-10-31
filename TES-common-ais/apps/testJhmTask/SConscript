@@ -1,0 +1,15 @@
+
+Import( 'testEnv' )
+
+sourceFiles = [
+    'TestJhmTask.cpp'
+]
+
+testJhmTask = testEnv.ProgramWrapper(
+        target = 'testJhmTask',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log', 'ais_simpleComms' ]
+    )
+
+testEnv.InstallBinary( testJhmTask )
+testEnv.Alias("testJhmTask", "#bin/testJhmTask")

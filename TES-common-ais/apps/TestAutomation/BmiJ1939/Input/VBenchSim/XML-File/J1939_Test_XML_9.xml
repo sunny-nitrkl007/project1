@@ -1,0 +1,67 @@
+<vbench>
+	<module name="J1939CAT_BMI_47_9" cdl_sid="57" j1939_sid= "47" enable= "1" j1939_name="ECM_47" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<cdl_map param="Body up" pid="F604" enable="1" enable_read="1"  value="1"/>
+	<cdl_map param="Ambient Temp" pid="F477" enable="1" enable_read="1"  value="1"/>
+	<cdl_map param="Tank Level" pid="F428" enable="1" enable_read="1"  value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+
+	<module name="J1939CAT_BMI_00_9" cdl_sid="24" j1939_sid= "00" enable= "1" j1939_name="ECM_00" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<cdl_map param="Fuel Rate" pid="F525" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Engine Speed" pid="40" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Total Fuel" pid="C8" enable="1" enable_read="1" value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+	
+	<module name="J1939CAT_BMI_03_9" cdl_sid="1B" j1939_sid= "03" enable= "1" j1939_name="ECM_03" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<cdl_map param="Ground Speed" pid="F4FD" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Actual Gear" pid="F5D9" enable="1" enable_read="1" value="8193"/>
+	<cdl_map param="Odometer" pid="FC2E" enable="1" enable_read="1" value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+	
+	<module name="J1939CAT_BMI_0B_9" cdl_sid="" j1939_sid= "0B" enable= "1" j1939_name="ECM_0B" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<cdl_map param="Machine Slope" pid="F533" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Machine Yaw Rate" pid="D01373" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Machine Longitudinal Acceleration" pid="D01375" enable="1" enable_read="1" value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+
+	<module action="create" cdl_sid="00" eddt_version="03" enable="1" j1939_name="00491B0191180080" j1939_sid="05" name="ENGINE Control #1">
+		<j1939_broadcast enable="1" broadcast_dest="FF" broadcast_rate="1000" id="F004" param="ELECTRONIC ENGINE CONTROLLER 1" value="7A7A7A7A31327A7A"  is_public="1"/> 	
+	</module>
+	<module action="create" cdl_sid="00" eddt_version="03" enable="1" j1939_name="00491B0191180081" j1939_sid="01" name="ENGINE Control #2">	
+		<j1939_broadcast enable="1" broadcast_dest="FF" broadcast_rate="1000" id="F003" param="ELECTRONIC ENGINE CONTROLLER 2" value="7A7A313231327A7A" is_public="1"/>
+	</module>
+	<module action="create" cdl_sid="00" eddt_version="03" enable="1" j1939_name="00491B0191180082" j1939_sid="02" name="ENGINE Control #3">
+		<j1939_broadcast enable="1" broadcast_dest="FF" broadcast_rate="1000" id="F002" param="ELECTRONIC TRANSMISSION CONTROLLER 1" value="7B323334357B7B7B" is_public="1"/> 
+	</module>
+	<module action="create" cdl_sid="00" eddt_version="03" enable="1" j1939_name="00491B0191180083" j1939_sid="04" name="ENGINE Control #4">
+		<j1939_broadcast enable="1" broadcast_dest="FF" broadcast_rate="1000" id="F005" param="ELECTRONIC TRANSMISSION CONTROLLER 2" value="7A7A7A7A7A7C347A" is_public="1"/> 		
+	</module>
+	<module action="create" cdl_sid="00" eddt_version="03" enable="1" j1939_name="00491B0191180084" j1939_sid="06" name="ENGINE Control #5">
+		<j1939_broadcast enable="1" broadcast_dest="FF" broadcast_rate="1000" id="F001" param="ELECTRONIC BRAKE CONTROLLER 1" value="7C557C7C7C35367C" is_public="1"/> 				
+	</module>
+</vbench>
+
+

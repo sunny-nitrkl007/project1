@@ -1,0 +1,221 @@
+/******************************************************************************
+*** FILE:
+*** task_times.h
+***
+*** COPYRIGHT NOTICE:
+*** Copyright 2006.  Caterpillar Inc.  All Rights Reserved.
+*** This work contains Caterpillar's proprietary information which
+*** may constitute a trade secret and/or be confidential.  Copyright
+*** notice is precautionary only and does not imply publication.
+***
+*** DESCRIPTION:
+*** This is the private include file for the task times.
+***
+******************************************************************************/
+#ifndef TASK_TIMES_H_
+#define TASK_TIMES_H_
+
+#define OSTICKDURATION 10000000
+
+/*Task 1X Period in ticks*/
+#define TASK_1X_PERIOD  1
+
+/*Task 1X Loop Time in seconds*/
+#define TASK_1X_LPTIM (TASK_1X_PERIOD*OSTICKDURATION/1000000000.0)
+
+/*Task 1X Loop Time in milli-seconds */
+#define TASK_1X_LPTIM_MS (TASK_1X_PERIOD*OSTICKDURATION/1000000.0)
+
+/*Task 1X Loop Time in micro-seconds */
+#define TASK_1X_LPTIM_US (TASK_1X_PERIOD*OSTICKDURATION/1000.0)
+
+/*Task 1X Inverse Loop Time in cycles/second */
+#define TASK_1X_INV_LPTIM (1000000000.0/(TASK_1X_PERIOD*OSTICKDURATION))
+
+/*Task 2X Period in ticks*/
+#define TASK_2X_PERIOD  2
+
+/*Task 2X Loop Time in seconds*/
+#define TASK_2X_LPTIM (TASK_2X_PERIOD*OSTICKDURATION/1000000000.0)
+
+/*Task 2X Loop Time in milli-seconds */
+#define TASK_2X_LPTIM_MS (TASK_2X_PERIOD*OSTICKDURATION/1000000.0)
+
+/*Task 2X Loop Time in micro-seconds */
+#define TASK_2X_LPTIM_US (TASK_2X_PERIOD*OSTICKDURATION/1000.0)
+
+/*Task 2X Inverse Loop Time in cycles/second */
+#define TASK_2X_INV_LPTIM (1000000000.0/(TASK_2X_PERIOD*OSTICKDURATION))
+
+/*Task 3X Period in ticks*/
+#define TASK_3X_PERIOD  3
+
+/*Task 3X Loop Time in seconds*/
+#define TASK_3X_LPTIM (TASK_3X_PERIOD*OSTICKDURATION/1000000000.0)
+
+/*Task 3X Loop Time in milli-seconds */
+#define TASK_3X_LPTIM_MS (TASK_3X_PERIOD*OSTICKDURATION/1000000.0)
+
+/*Task 3X Loop Time in micro-seconds */
+#define TASK_3X_LPTIM_US (TASK_3X_PERIOD*OSTICKDURATION/1000.0)
+
+/*Task 3X Inverse Loop Time in cycles/second */
+#define TASK_3X_INV_LPTIM (1000000000.0/(TASK_3X_PERIOD*OSTICKDURATION))
+
+/*Task 4X Period in ticks*/
+#define TASK_4X_PERIOD  4
+
+/*Task 4X Loop Time in seconds*/
+#define TASK_4X_LPTIM (TASK_4X_PERIOD*OSTICKDURATION/1000000000.0)
+
+/*Task 4X Loop Time in milli-seconds */
+#define TASK_4X_LPTIM_MS (TASK_4X_PERIOD*OSTICKDURATION/1000000.0)
+
+/*Task 4X Loop Time in micro-seconds */
+#define TASK_4X_LPTIM_US (TASK_4X_PERIOD*OSTICKDURATION/1000.0)
+
+/*Task 4X Inverse Loop Time in cycles/second */
+#define TASK_4X_INV_LPTIM (1000000000.0/(TASK_4X_PERIOD*OSTICKDURATION))
+
+/*Task 8X Period in ticks*/
+#define TASK_8X_PERIOD  8
+
+/*Task 8X Loop Time in seconds*/
+#define TASK_8X_LPTIM (TASK_8X_PERIOD*OSTICKDURATION/1000000000.0)
+
+/*Task 8X Loop Time in milli-seconds */
+#define TASK_8X_LPTIM_MS (TASK_8X_PERIOD*OSTICKDURATION/1000000.0)
+
+/*Task 8X Loop Time in micro-seconds */
+#define TASK_8X_LPTIM_US (TASK_8X_PERIOD*OSTICKDURATION/1000.0)
+
+/*Task 8X Inverse Loop Time in cycles/second */
+#define TASK_8X_INV_LPTIM (1000000000.0/(TASK_8X_PERIOD*OSTICKDURATION))
+
+
+
+/*Task 1X Timing Constants defined w.r.t. Task 1X Loop Time*/
+#define TASK_1X_HR_01_000  (((3600*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_HR_00_025  (((900*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_HR_00_125  (((450*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_HR_00_100  (((360*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_MIN_03_000 (((180*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_MIN_02_000 (((120*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_MIN_01_000 (((60*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_MIN_00_500 (((30*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_MIN_00_250 (((15*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_20_000 (((20*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_10_500 (((10.5*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_10_000 (((10*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_05_000 (((5*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_04_000 (((4*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_03_000 (((3*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_02_000 (((2*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_01_000 (((1*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_750 (((0.75*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_500 (((0.5*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_250 (((0.25*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_200 (((0.2*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_100 (((0.1*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_060 (((0.06*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_050 (((0.05*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+#define TASK_1X_SEC_00_040 (((0.04*2)+TASK_1X_LPTIM)/(2*TASK_1X_LPTIM))
+
+/*Task 2X Timing Constants defined w.r.t. Task 2X Loop Time*/
+#define TASK_2X_HR_01_000  (((3600*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_HR_00_025  (((900*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_HR_00_125  (((450*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_HR_00_100  (((360*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_MIN_03_000 (((180*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_MIN_02_000 (((120*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_MIN_01_000 (((60*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_MIN_00_500 (((30*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_MIN_00_250 (((15*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_20_000 (((20*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_10_000 (((10*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_05_000 (((5*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_04_000 (((4*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_03_000 (((3*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_02_000 (((2*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_01_000 (((1*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_500 (((0.5*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_300 (((0.30*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_250 (((0.25*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_200 (((0.2*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_120 (((0.12*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_100 (((0.1*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_060 (((0.06*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_050 (((0.05*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+#define TASK_2X_SEC_00_040 (((0.04*2)+TASK_2X_LPTIM)/(2*TASK_2X_LPTIM))
+
+/*Task 3X Timing Constants defined w.r.t. Task 3X Loop Time*/
+#define TASK_3X_HR_01_000  (((3600*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_HR_00_025  (((900*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_HR_00_125  (((450*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_HR_00_100  (((360*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_MIN_03_000 (((180*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_MIN_01_000 (((60*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_MIN_00_500 (((30*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_MIN_00_250 (((15*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_20_000 (((20*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_10_000 (((10*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_05_000 (((5*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_04_000 (((4*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_03_000 (((3*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_02_000 (((2*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_01_000 (((1*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_00_500 (((0.5*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_00_250 (((0.25*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_00_200 (((0.2*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_00_100 (((0.1*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_00_060 (((0.06*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+#define TASK_3X_SEC_00_050 (((0.05*2)+TASK_3X_LPTIM)/(2*TASK_3X_LPTIM))
+
+/*Task 4X Timing Constants defined w.r.t. Task 4X Loop Time*/
+#define TASK_4X_HR_01_000  (((3600*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_HR_00_025  (((900*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_HR_00_125  (((450*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_HR_00_100  (((360*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_MIN_03_000 (((180*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_MIN_01_000 (((60*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_MIN_00_500 (((30*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_MIN_00_250 (((15*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_20_000 (((20*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_10_000 (((10*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_05_000 (((5*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_04_000 (((4*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_03_000 (((3*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_02_000 (((2*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_01_000 (((1*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_00_500 (((0.5*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_00_250 (((0.25*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_00_200 (((0.2*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_00_100 (((0.1*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_00_060 (((0.06*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+#define TASK_4X_SEC_00_050 (((0.05*2)+TASK_4X_LPTIM)/(2*TASK_4X_LPTIM))
+
+/*Task 8X Timing Constants defined w.r.t. Task 8X Loop Time*/
+#define TASK_8X_HR_01_000  (((3600*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_HR_00_025  (((900*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_HR_00_125  (((450*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_HR_00_100  (((360*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_MIN_03_000 (((180*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_MIN_01_000 (((60*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_MIN_00_500 (((30*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_MIN_00_250 (((15*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_20_000 (((20*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_10_000 (((10*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_05_000 (((5*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_04_000 (((4*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_03_000 (((3*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_02_000 (((2*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_01_000 (((1*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_00_500 (((0.5*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_00_250 (((0.25*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_00_200 (((0.2*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_00_100 (((0.1*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_00_060 (((0.06*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+#define TASK_8X_SEC_00_050 (((0.05*2)+TASK_8X_LPTIM)/(2*TASK_8X_LPTIM))
+
+
+#endif /* __TASK_TIMES_H__ */

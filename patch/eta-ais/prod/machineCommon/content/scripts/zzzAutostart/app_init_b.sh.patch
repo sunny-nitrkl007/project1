@@ -1,0 +1,26 @@
+diff --git a/prod/machineCommon/content/scripts/zzzAutostart/app_init_b.sh b/prod/machineCommon/content/scripts/zzzAutostart/app_init_b.sh
+index 2297e87..1615aa4 100755
+--- a/prod/machineCommon/content/scripts/zzzAutostart/app_init_b.sh
++++ b/prod/machineCommon/content/scripts/zzzAutostart/app_init_b.sh
+@@ -188,12 +188,15 @@ cold_boot_launch()
+   fi
+ 
+   # Non-empty robot file is required for pcm start
+-  if ! [ -f ${HOME}/etc/robot ]; then
+-    if ! [ -d ${HOME}/etc ]; then
+-      mkdir -p ${HOME}/etc/
+-    fi
+-    echo "Unknown" > ${HOME}/etc/robot
+-  fi
++  # Commenting this out because this will overwrite the new
++  # robot file in appdata with unknown all the time - this needs
++  # to be fixed in eta-ais
++  #if ! [ -f ${HOME}/etc/robot ]; then
++  #  if ! [ -d ${HOME}/etc ]; then
++  #    mkdir -p ${HOME}/etc/
++  #  fi
++  #  echo "Unknown" > ${HOME}/etc/robot
++  #fi
+ 
+   # Unmount existing log drive if it exists
+   # mkdir -p "${HOME}/log"

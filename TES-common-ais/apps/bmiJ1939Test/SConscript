@@ -1,0 +1,34 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+#Change testEnv something meaningful for vp3 app.
+Import( 'testEnv' )
+
+bmiJ1939TestEnv = testEnv.Clone();
+
+sourceFiles = [
+    'BmiJ1939Test.cpp'
+]
+
+bmiJ1939Test = bmiJ1939TestEnv.ProgramWrapper(
+        target = 'bmiJ1939Test',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log' ]
+    )
+
+bmiJ1939TestEnv.InstallBinary( bmiJ1939Test )
+
+
+bmiJ1939TestEnv.Alias("bmiJ1939Test", "#bin/bmiJ1939Test")
+
+

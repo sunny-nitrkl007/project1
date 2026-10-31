@@ -1,0 +1,40 @@
+diff --git a/prod/machineCommon/content/prod/common/rapidjson/internal/dtoa.h b/prod/machineCommon/content/prod/common/rapidjson/internal/dtoa.h
+index 8d6350e..d1fe2b3 100755
+--- a/prod/machineCommon/content/prod/common/rapidjson/internal/dtoa.h
++++ b/prod/machineCommon/content/prod/common/rapidjson/internal/dtoa.h
+@@ -19,9 +19,12 @@
+ #ifndef RAPIDJSON_DTOA_
+ #define RAPIDJSON_DTOA_
+ 
++#include <cmath>
++
+ #include "itoa.h" // GetDigitsLut()
+ #include "diyfp.h"
+ #include "ieee754.h"
++#include "pow10.h"
+ 
+ RAPIDJSON_NAMESPACE_BEGIN
+ namespace internal {
+@@ -213,6 +216,14 @@ inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
+     }
+ }
+ 
++inline double RoundToMaxDecimalPlaces(double value, int maxDecimalPlaces) {
++    if ((maxDecimalPlaces >= 0) && (maxDecimalPlaces <= 308)) {
++        double precision = Pow10(maxDecimalPlaces);
++        value = std::round(value * precision) / precision;
++    }
++    return value;
++}
++
+ inline char* dtoa(double value, char* buffer, int maxDecimalPlaces = 324) {
+     RAPIDJSON_ASSERT(maxDecimalPlaces >= 1);
+     Double d(value);
+@@ -225,6 +236,7 @@ inline char* dtoa(double value, char* buffer, int maxDecimalPlaces = 324) {
+         return &buffer[3];
+     }
+     else {
++        value = RoundToMaxDecimalPlaces(value, maxDecimalPlaces);
+         if (value < 0) {
+             *buffer++ = '-';
+             value = -value;

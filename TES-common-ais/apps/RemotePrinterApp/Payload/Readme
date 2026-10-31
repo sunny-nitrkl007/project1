@@ -1,0 +1,28 @@
+Protobuf files given by Saheed Rosenje from the Telematics E2E Team:
+Payload.proto
+
+To generate code from that, we need the correct version of the tools.
+
+There are already build and released version of protoc and grpc plugin in lib_oss/grpc-a
+
+These are tagged along with the libraries and includes for the target platform, so you will certainly be in sync.
+
+I cloned this into ~/git/a6n2
+
+$ git clone git@git1.corp.cat.com:/oss/grpc-a
+$ cd grpc-a
+$ git checkout grpc_v1.0.0_2018.1.0
+
+In order to make sure *this* toolchain is used instead of anything installed on the local host, make sure to call the 'protoc' script:
+
+$ cd tgt_gcc_4.4.3_ubuntu/protoc/
+$ cat protoc
+#/bin/sh
+SCRIPT=$(readlink -f $0)
+BASE_PATH=`dirname $SCRIPT`
+export LD_LIBRARY_PATH=$BASE_PATH:$BASE_PATH/../lib/
+$BASE_PATH/protoc-bin "$@"
+
+Example:
+
+$ ~/git/a6n2/grpc-a/tgt_gcc_4.4.3_ubuntu/protoc/protoc Payload.proto --cpp_out=./

@@ -1,0 +1,12 @@
+// generated from rosidl_generator_cpp/resource/idl.hpp.em
+// generated code does not contain a copyright notice
+
+#ifndef WEIGH_APP_INTERFACES__MSG__LPS_SA_NVM_CAL_ON_THE_FLY_MISC_UPDATES_HPP_
+#define WEIGH_APP_INTERFACES__MSG__LPS_SA_NVM_CAL_ON_THE_FLY_MISC_UPDATES_HPP_
+
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_on_the_fly_misc_updates__struct.hpp"
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_on_the_fly_misc_updates__builder.hpp"
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_on_the_fly_misc_updates__traits.hpp"
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_on_the_fly_misc_updates__type_support.hpp"
+
+#endif  // WEIGH_APP_INTERFACES__MSG__LPS_SA_NVM_CAL_ON_THE_FLY_MISC_UPDATES_HPP_

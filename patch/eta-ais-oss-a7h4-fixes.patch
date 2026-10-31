@@ -1,0 +1,38 @@
+diff --git a/platform/A7H4-GEN7/config.mk b/platform/A7H4-GEN7/config.mk
+index d62cb0d092..22c950ece6 100644
+--- a/platform/A7H4-GEN7/config.mk
++++ b/platform/A7H4-GEN7/config.mk
+@@ -4,7 +4,7 @@
+ 
+ # Use SDK for cross compiling to ARM64
+ export NO_SDK_FETCH=0
+-export DEPS_OSS_PYTHON_INPUT_CONTENT=1
++export DEPS_OSS_PYTHON_INPUT_CONTENT=0
+ 
+ # Needed for Middleware & protobuf
+ export GEN7_MIDDLEWARE_ENABLED=1
+@@ -16,4 +16,4 @@ export GEN7_MIDDLEWARE_ENABLED=1
+ include $(TLD)/platform/_COMMON/config.mk
+ 
+ # Include gstreamer in the release package
+-include $(AIS_BUILD_TOOLS)/platform/_COMMON/gst-config.mk
++# include $(AIS_BUILD_TOOLS)/platform/_COMMON/gst-config.mk
+diff --git a/platform/A7H4/config.mk b/platform/A7H4/config.mk
+index 1234567890..abcdef1234 100644
+--- a/platform/A7H4/config.mk
++++ b/platform/A7H4/config.mk
+@@ -4,7 +4,7 @@
+ 
+ # Use SDK for cross compiling to ARM64
+ export NO_SDK_FETCH=0
+-export DEPS_OSS_PYTHON_INPUT_CONTENT=1
++export DEPS_OSS_PYTHON_INPUT_CONTENT=0
+ 
+ # app-full not yet release for arm64
+ # export CORE_DOCKER_IMG_NAME=app-minimal
+@@ -13,4 +13,4 @@
+ include $(TLD)/platform/_COMMON/config.mk
+ 
+ # Include gstreamer in the release package
+-include $(AIS_BUILD_TOOLS)/platform/_COMMON/gst-config.mk
++# include $(AIS_BUILD_TOOLS)/platform/_COMMON/gst-config.mk

@@ -1,0 +1,59 @@
+
+/*.c
+slprj/*
+tip_assist_cat_ff/*
+*_cat_ff*/*
+*_t.m
+*.mexw64
+*.autosave
+*.asv
+*.tlc
+rtwmakecfg.m
+toa_wl00_cat_rtw/*
+imuCal_ert_rtw/*
+sim/codegen/*
+
+=======
+#All derived object directories
+do_*/
+
+#generated files
+mass_and_dist_sfunc.*
+tilt_sens_to_bucket_ang_sfunc.*
+build_sfunc_tilt_sens_to_bucket_ang.*
+toa_mass_and_dist_by_id_sfunc.*
+toa_tilt_sens_to_bucket_ang_by_id_sfunc.*
+
+#EC make files
+.emake/
+emake.data
+*ec_build_output/
+emake.data.bak
+
+# Common forms of back-up files
+*~
+*.bak
+*.bck
+*.orig
+
+#Windows Trash
+thumbs.db
+desktop.ini
+
+#All Girt output
+girt_*
+
+# Simulink projects
+slprj
+
+# Simulink workspace
+*_rtw
+
+# Simulink buildlog
+*.buildlog
+
+# Simulink cleanup
+*.err
+*.mexw64
+*.slxc
+

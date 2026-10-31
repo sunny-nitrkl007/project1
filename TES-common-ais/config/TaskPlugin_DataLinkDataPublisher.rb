@@ -1,0 +1,3 @@
+DataLinkDataPublisher = {
+  "enabled" => true,
+}

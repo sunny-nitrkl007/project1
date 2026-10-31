@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemArchitect xmlns="http://catelectronics.corp.cat.com/SASchema">
+<Artifact id="89a8f5de-4d06-48c6-b295-1fd952543951" kind="calibrationComponent" contentGenerator="SystemArchitect" contentGeneratorVersion="2.0.0" version="0.0.0" versionId="e7acdfab-cf43-49e0-8655-1ab62a394db5">
+<Include artifact="aba987ec-a4a6-4b38-a457-b147c786b919" localPath="lib_info_products\toa_wl00\pkg\ysa\toa_app_id\app_id_98000.ysac"/>
+<VariantIdentity id="a2f382fb-269d-4852-a12f-db1d94b95a7a" name="toa_app_id" value="0"/>
+<VariantScope variant="a2f382fb-269d-4852-a12f-db1d94b95a7a"/>
+</Artifact>
+</SystemArchitect>

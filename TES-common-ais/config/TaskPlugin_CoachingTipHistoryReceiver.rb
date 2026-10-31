@@ -1,0 +1,3 @@
+CoachingTipHistoryReceiver = {
+  "enabled" => true,
+}

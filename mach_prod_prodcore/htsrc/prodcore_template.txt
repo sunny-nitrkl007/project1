@@ -1,0 +1,9 @@
+#Migration To Git View
+element * CHECKEDOUT
+
+#Source Files
+element /lib_info_products                                  /main/LATEST
+element /lib_info_products/ProdCore                         /main/LATEST
+element /lib_info_products/ProdCore/...                          $(LABEL)
+
+#element * /main/LATEST

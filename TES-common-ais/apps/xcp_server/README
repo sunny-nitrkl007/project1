@@ -1,0 +1,89 @@
+== Convert project xcp_server library to TES Common version
+
+1. Delete CPM_DIR/apps/include/xcp_server and CPM_DIR/apps/lib/libxcp_server.a
+
+2. Replace CPM_DIR/apps/aisXcpServer/SConscript with DOC_DIR/app/aisXcpServer/SConscript.  If necessary, replace 'testEnv' with the name of /apps scons env name.
+
+3. XcpScsInputsDb.h - Delete DB_PUSH macro definitions.  Convert to DB_PUSH_ADDR macros to support xcpable interface (see 0.10.0 release notes).
+
+
+== Example XcpScsInputs.h
+
+class XcpScsInputs : public SCSInputs
+{
+
+public:
+  ParameterDb db;
+
+  SCSInData<Machine> m_machine;
+  SCSInData<CoachingSummaryData> m_coachingXcpScs;
+  SCSInData<CycleSegScs> m_CycleSegXcpScs;
+
+  ///////////////////////////////////////////////////////////////////////////////
+  /// @brief Run "update" on all of the scs channels in the structure
+  ///
+  /// @return true if any channel has new data, false otherwise
+  ///////////////////////////////////////////////////////////////////////////////
+  bool update()
+  {
+    // Coaching Summary Data - 0x020000:0x0FFFFF
+    uint32_t baseAddr = 0x020000;
+    uint32_t offset = 0;
+    if (m_coachingXcpScs.update())
+    {
+      static int m_coachingXcpScs_counter = 0;
+      DB_PUSH_ADDR(m_coachingXcpScs_counter++);
+
+      (void)m_coachingXcpScs.toXcp(db, baseAddr | offset);  // See prod/common/interfaces/CoachingSummaryData/CoachingSummaryData.h for toXcp implementation
+      m_coachingXcpScs.pop();
+    }
+
+...
+
+4. Update XcpServerTask.cpp to read the IPAddress from ruby:
+
+#include <bmi/bmi_ethernet_util.h>
+
+...
+bool XcpServerTask::initialize()
+{
+  ...
+
+  std::string ipAddress = "165.26.79.19";
+  if( !getTaskConfig().get( "IPAddress", ipAddress ))
+  {
+    LOG_WARN( "Couldn't find IPAddress Parameter in rb file, using default %s", ipAddress.c_str() );
+  } 
+
+  LOG_INFO("Initializing DB with IP address %s", ipAddress.c_str());
+  if (!xcpServerDbInit(m_xcpScsInputs.db, ipAddress.c_str()))
+  {
+      return false;
+  }
+
+5. Update xcpServerDbInit to take the ipAddress:
+
+xcpServerDb.cpp:
+
+bool xcpServerDbInit(xcp_server::ParameterDb& db, const char* ipAddress)
+
+...
+
+    	if (XCPServer_init(pXCP_, &XCPUDPConfig, ipAddress)) {
+
+xcpServerDb_private.h:
+
+bool xcpServerDbInit(xcp_server::ParameterDb& db, const char* ipAddress);
+
+6. Update SConscript:
+
+sourceFiles = [
+    'XcpServerTask.cpp',
+    'xcpServerDb.cpp'
+]
+
+aisXcpServer = localEnv.Program(
+        target = 'aisXcpServer',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'xcp_server', 'bmi_ethernet_util' ]
+    )

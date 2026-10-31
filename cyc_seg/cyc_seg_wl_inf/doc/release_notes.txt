@@ -1,0 +1,157 @@
+:toc2:
+:icons:
+:data-uri:
+:backend: html5
+== Cycle-Segmentation LWL-MWL Interface signals ==
+
+
+=== Release 9.4.0 ===
+
+==== CHANGE SUMMARY ====
+|===============
+|*Date:*                             |16April2019
+|*Base Label:*                       |9.3.1
+|*Released By:*                      |Rafal Krzepisz
+|*Entry Repo for use with Git/Ivy:*  |git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/cyc_seg_wl_inf.git
+|*Release Summary:*                  |Fix for Packed struct + deps move
+|===============
+
+
+==== DEPENDENCIES ====
+
+ Refer to the .../deps/ivy.xml for this repository.
+
+
+==== CHANGE DESCRIPTION: ====
+
+ The reason for this release is to merge 9.3.1 into main line:
+ Modify packed structures so they work correctly on both diab and gcc compilers.
+ 
+ Also with this release the set of dependencies deps/ivy.xml was moved to Model library (LWL).
+ Since 'Interface library' is shared between LWL and MWL same thing will have to be done for 
+ MWL-Cycle-Segmentation.
+
+
+==== KNOWN ISSUES: ====
+   
+.  N/A
+
+
+==== RELEASE CONTENTS: ====
+
+ Interface variables/signals for LWL and MWL Cycle-Segmentation libraries
+ 
+
+
+=== Release 9.3.1 ===
+
+==== CHANGE SUMMARY ====
+|===============
+|*Date:*                             |09JAN2019
+|*Base Label:*                       |9.3.0
+|*Released By:*                      |Subba Gundala
+|*Entry Repo for use with Git/Ivy:*  |git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/cyc_seg_wl_inf.git
+|*Release Summary:*                  |Fix for Packed struct
+|===============
+
+
+==== DEPENDENCIES ====
+
+Refer to the .../deps/ivy.xml for this repository.
+
+
+==== CHANGE DESCRIPTION: ====
+
+Modify packed structures so they work correctly on both diab and gcc compilers.
+
+
+==== KNOWN ISSUES: ====
+   
+.  N/A
+
+
+==== RELEASE CONTENTS: ====
+
+This, 'CycSeg Interface for WL', unit contains fix for packed struct.
+ 
+
+=== Release 9.3.0 ===
+
+==== CHANGE SUMMARY ====
+|===============
+|*Date:*                             |13JUL2018
+|*Base Label:*                       |9.2.0
+|*Released By:*                      |Rafal Krzepisz
+|*Entry Repo for use with Git/Ivy:*  |git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/cyc_seg_wl_inf.git
+|*Release Summary:*                  |Added wrapper code from ClearCase + active segment_active_segment_id
+|===============
+
+
+==== DEPENDENCIES ====
+
+Refer to the .../deps/ivy.xml for this repository.
+
+
+==== CHANGE DESCRIPTION: ====
+
+Output interface segment_active_segment_id added.  The output is used within Operator Coaching
+on LWL machines. Change is made to the lib_feature/totalizer/Totalizer_00_lib.mdl 
+
+Also added CycSeg C-handcode wrapper from ClearCase.  This required update to dependancies.
+
+In ClearCase implementation the content from 'Interface' unit was compiled at application level. 
+Where as the CycSeg wrapper handcode was provided in a separate library. With this release both of 
+these are released with the MODELs binaries (wl_00-a, and wl_01-a).
+
+For Linux platfroms the 'Interface' content will be picked up directly from the repo:
+. interface/include
+. interface/src
+
+Repo: git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/cyc_seg_wl_inf.git
+
+
+==== KNOWN ISSUES: ====
+   
+.  N/A
+
+
+==== RELEASE CONTENTS: ====
+
+This, 'CycSeg Interface for WL', unit contains set of signals
+for Cycle Segmentation Models on WL 00 and 01
+   
+
+
+=== Release 9.2.0 ===
+
+==== CHANGE SUMMARY ====
+|===============
+|*Date:*                             |14JUN2018
+|*Base Label:*                       |9.0.0
+|*Released By:*                      |Rafal Krzepisz
+|*Entry Repo for use with Git/Ivy:*  |git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/cyc_seg_wl_inf.git
+|*Release Summary:*                  |Initial release
+|===============
+
+
+==== DEPENDENCIES ====
+
+Refer to the .../deps/ivy.xml for this repository.
+
+
+==== CHANGE DESCRIPTION: ====
+
+Initial release of Interface signals for Cycle Segmentation on WL 00 and 01.
+
+
+==== KNOWN ISSUES: ====
+   
+.  N/A
+
+
+==== RELEASE CONTENTS: ====
+
+This, 'CycSeg Interface for WL', unit contains set of signals
+for Cycle Segmentation Models on WL 00 and 01
+   
+

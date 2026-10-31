@@ -1,0 +1,5 @@
+[prod/common/fileio/gtest/test.cpp:43]: (warning) Redundant code: Found a statement that begins with string constant.
+[prod/common/jhm2/Jhm2Ipc/Jhm2IpcClient.cpp:22]: (warning) Member variable 'Jhm2IpcClient::m_buf' is not initialized in the constructor.
+[prod/common/jhm2WsServer/Jhm2WsServer.h:41]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/common/jhm2WsServer/Jhm2WsServer.cpp:220]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/infrastructure/machineOCS/plugins/DataLinkDataPlugin.cpp:122]: (warning) Redundant code: Found a statement that begins with numeric constant.

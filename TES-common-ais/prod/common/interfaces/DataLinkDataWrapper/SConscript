@@ -1,0 +1,25 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    autogen
+##
+## @attention Copyright (C) 2017
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+
+sourceFiles = [
+    'DataLinkDataWrapper.cpp',
+]
+
+DataLinkDataWrapper = baseEnv.SharedLibraryWrapper(
+    target = 'dataLinkDataWrapper',
+    source = sourceFiles,
+    LIBS = [ 'ais_log', 'ais_config' ],
+)
+
+baseEnv.InstallLibrary( DataLinkDataWrapper )

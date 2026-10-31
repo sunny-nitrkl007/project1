@@ -1,0 +1,18 @@
+#*****************************************************************************
+# @file      SConscript for Jhm2RequestBuilder module
+# @author    Josh Struble
+# @date      3/19/2013
+#
+# @attention Copyright (C) 2013 Caterpillar Inc. All rights reserved.
+#*****************************************************************************
+#!/usr/bin/python
+Import( 'jhm2CommonEnv' )
+
+jhm2RequestBuild = jhm2CommonEnv.SharedLibraryWrapper(
+        target = 'jhm2RequestBuild',
+        source = ['Jhm2RequestBuilder.cpp'],
+        LIBS = ['ais_log', 'jhm2IpcClient', jhm2CommonEnv['BOOST_SERIALIZATION'], 'ais_serialization']
+    )
+
+jhm2CommonEnv.InstallLibrary( jhm2RequestBuild )
+

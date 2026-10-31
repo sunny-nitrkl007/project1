@@ -1,0 +1,4 @@
+No of cylinders, cylinder bore diameter, cylinder rod diameter,AutoWeighRangeConfThr,AutoWeighRangeMinLiftHt,stage one CF,stage two CF,stage three CF,damping,error band,filterFactorMean,filterFactor variance,time to step,min conf time,WF CF,Hydralic oil type(0-SE-20/1-SE-10),Lift cylinder Head End line loss 2nd order coefficient,Lift cylinder Head End line loss 1st order coefficient,Lift cylinder Rod End line loss 2nd order coefficient,Lift cylinder Rod End line loss 1st order coefficient,
+2,140,85,0.000,30,10,10,10,1,1,0.927407213,0.927407213,0.02,1.25,10,0,0,0,0,0, 
+No of cylinders, cylinder bore diameter, cylinder rod diameter,Hydralic oil type(0-SE-20/1-SE-10),Lift cylinder Head End line loss 2nd order coefficient,Lift cylinder Head End line loss 1st order coefficient,Lift cylinder Rod End line loss 2nd order coefficient,Lift cylinder Rod End line loss 1st order coefficient,startofweigh,endofweigh,poscf,wtcf,iostep,
+2,140,85,0,0,0,0,0,50,65,5,10,0.02,

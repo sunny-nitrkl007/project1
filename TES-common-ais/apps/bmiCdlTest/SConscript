@@ -1,0 +1,34 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+#Change testEnv something meaningful for vp3 app.
+Import( 'testEnv' )
+
+bmiCdlTestEnv = testEnv.Clone();
+
+sourceFiles = [
+    'BmiCdlTest.cpp'
+]
+
+bmiCdlTest = bmiCdlTestEnv.ProgramWrapper(
+        target = 'bmiCdlTest',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log' ]
+    )
+
+bmiCdlTestEnv.InstallBinary( bmiCdlTest )
+
+
+bmiCdlTestEnv.Alias("bmiCdlTest", "#bin/bmiCdlTest")
+
+

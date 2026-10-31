@@ -1,0 +1,3034 @@
+Model {
+  Name			  "mdlFxPt"
+  Version		  5.2
+  SaveDefaultBlockParams  on
+  SampleTimeColors	  off
+  LibraryLinkDisplay	  "none"
+  WideLines		  off
+  ShowLineDimensions	  off
+  ShowPortDataTypes	  on
+  ShowLoopsOnError	  on
+  IgnoreBidirectionalLines off
+  ShowStorageClass	  off
+  SortedOrder		  off
+  RecordCoverage	  off
+  CovPath		  "/"
+  CovSaveName		  "covdata"
+  CovMetricSettings	  "dw"
+  CovNameIncrementing	  off
+  CovHtmlReporting	  on
+  covSaveCumulativeToWorkspaceVar on
+  CovSaveSingleToWorkspaceVar on
+  CovCumulativeVarName	  "covCumulativeData"
+  CovCumulativeReport	  off
+  DataTypeOverride	  "UseLocalSettings"
+  MinMaxOverflowLogging	  "UseLocalSettings"
+  MinMaxOverflowArchiveMode "Overwrite"
+  BlockNameDataTip	  off
+  BlockParametersDataTip  off
+  BlockDescriptionStringDataTip	off
+  ToolBar		  on
+  StatusBar		  on
+  BrowserShowLibraryLinks off
+  BrowserLookUnderMasks	  off
+  PreLoadFcn		  "mdlData;"
+  Created		  "Wed Dec 12 08:00:03 2007"
+  UpdateHistory		  "UpdateHistoryNever"
+  ModifiedByFormat	  "%<Auto>"
+  LastModifiedBy	  "KagyRA"
+  ModifiedDateFormat	  "%<Auto>"
+  LastModifiedDate	  "Wed Dec 12 17:11:03 2007"
+  ModelVersionFormat	  "1.%<AutoIncrement:25>"
+  ConfigurationManager	  "None"
+  SimParamPage		  "RTW"
+  TargetProperties	  "DataTag0"
+  LinearizationMsg	  "none"
+  Profile		  off
+  ParamWorkspaceSource	  "MATLABWorkspace"
+  AccelSystemTargetFile	  "accel.tlc"
+  AccelTemplateMakefile	  "accel_default_tmf"
+  AccelMakeCommand	  "make_rtw"
+  TryForcingSFcnDF	  off
+  ExtModeMexFile	  "no_ext_comm"
+  ExtModeBatchMode	  off
+  ExtModeTrigType	  "manual"
+  ExtModeTrigMode	  "normal"
+  ExtModeTrigPort	  "1"
+  ExtModeTrigElement	  "any"
+  ExtModeTrigDuration	  1000
+  ExtModeTrigHoldOff	  0
+  ExtModeTrigDelay	  0
+  ExtModeTrigDirection	  "rising"
+  ExtModeTrigLevel	  0
+  ExtModeArchiveMode	  "off"
+  ExtModeAutoIncOneShot	  off
+  ExtModeIncDirWhenArm	  off
+  ExtModeAddSuffixToVar	  off
+  ExtModeWriteAllDataToWs off
+  ExtModeArmWhenConnect	  on
+  ExtModeSkipDownloadWhenConnect off
+  ExtModeLogAll		  on
+  ExtModeAutoUpdateStatusClock on
+  BufferReuse		  on
+  RTWExpressionDepthLimit 5
+  SimulationMode	  "normal"
+  Solver		  "FixedStepDiscrete"
+  SolverMode		  "Auto"
+  StartTime		  "0.0"
+  StopTime		  "inf"
+  MaxOrder		  5
+  MaxStep		  "auto"
+  MinStep		  "auto"
+  MaxNumMinSteps	  "-1"
+  InitialStep		  "auto"
+  FixedStep		  "auto"
+  RelTol		  "1e-3"
+  AbsTol		  "auto"
+  OutputOption		  "RefineOutputTimes"
+  OutputTimes		  "[]"
+  Refine		  "1"
+  LoadExternalInput	  off
+  ExternalInput		  "[t, u]"
+  LoadInitialState	  off
+  InitialState		  "xInitial"
+  SaveTime		  off
+  TimeSaveName		  "tout"
+  SaveState		  off
+  StateSaveName		  "xout"
+  SaveOutput		  off
+  OutputSaveName	  "yout"
+  SaveFinalState	  off
+  FinalStateName	  "xFinal"
+  SaveFormat		  "Array"
+  Decimation		  "1"
+  LimitDataPoints	  off
+  MaxDataPoints		  "1000"
+  SignalLoggingName	  "sigsOut"
+  ConsistencyChecking	  "none"
+  ArrayBoundsChecking	  "none"
+  AlgebraicLoopMsg	  "warning"
+  BlockPriorityViolationMsg "warning"
+  MinStepSizeMsg	  "warning"
+  InheritedTsInSrcMsg	  "warning"
+  DiscreteInheritContinuousMsg "warning"
+  MultiTaskRateTransMsg	  "error"
+  SingleTaskRateTransMsg  "none"
+  CheckForMatrixSingularity "none"
+  IntegerOverflowMsg	  "warning"
+  Int32ToFloatConvMsg	  "warning"
+  ParameterDowncastMsg	  "error"
+  ParameterOverflowMsg	  "error"
+  ParameterPrecisionLossMsg "none"
+  UnderSpecifiedDataTypeMsg "none"
+  UnnecessaryDatatypeConvMsg "none"
+  VectorMatrixConversionMsg "none"
+  InvalidFcnCallConnMsg	  "error"
+  SignalLabelMismatchMsg  "none"
+  UnconnectedInputMsg	  "warning"
+  UnconnectedOutputMsg	  "warning"
+  UnconnectedLineMsg	  "warning"
+  SfunCompatibilityCheckMsg "none"
+  RTWInlineParameters	  on
+  BlockReductionOpt	  on
+  BooleanDataType	  on
+  ConditionallyExecuteInputs on
+  ParameterPooling	  on
+  OptimizeBlockIOStorage  on
+  ZeroCross		  on
+  AssertionControl	  "UseLocalSettings"
+  ProdHWDeviceType	  "Microprocessor"
+  ProdHWWordLengths	  "8,16,32,32"
+  RTWSystemTargetFile	  "cat_ert.tlc"
+  RTWTemplateMakefile	  "cat_ert_default_tmf"
+  RTWMakeCommand	  "make_rtw"
+  RTWGenerateCodeOnly	  on
+  RTWRetainRTWFile	  on
+  TLCProfiler		  off
+  TLCDebug		  off
+  TLCCoverage		  off
+  TLCAssertion		  off
+  RTWOptions		  " -aASAP2FileDirectory=\".\" -aCAT_MaxStackSize=\"rt"
+"Inf\" -aCAT_OVregexp=\"\" -aCadetWinFileDirectory=\".\" -aCatASAP2Config_Meas"
+"urementSignalGroups=\"Model_Hierarchy_Only\" -aCatASAP2Config_ModelHierarchyG"
+"roups=\"Pruned_Model_Hierarchy\" -aCatASAP2Config_SymbolNamingCompiler=\"A4_("
+"Diab_ELF)\" -aCatCadetWinConfig_CreateArrayParameter=1 -aCatCadetWinConfig_Cr"
+"eateArraySignal=1 -aCatCadetWinConfig_CreateMap=1 -aCatCadetWinConfig_MID=\"0"
+"xFF\" -aCatCalToolConfig_ConvertPIDF=0 -aCatCalToolConfig_CreateASAP2=0 -aCat"
+"CalToolConfig_CreateCadetWin=0 -aCatCalToolConfig_CreateDebug=0 -aCatCalToolC"
+"onfig_CreateEMC2=0 -aCatCalToolConfig_CreateGredi=0 -aCatEMC2Config_AppendIns"
+"tance=1 -aCatEMC2Config_ApplyStaticVarBandAid=0 -aCatEMC2Config_CreateUnnamed"
+"Variables=0 -aCatEMC2Config_GenerateMapFile=1 -aCatEMC2Config_GenerateParFile"
+"=1 -aCatEMC2Config_GenerateRemapFcnFile=0 -aCatEMC2Config_MangleParameters=\""
+"Add_underscore_h_to_Param_entry\" -aCatEMC2Config_NameGuidelines=\"Short_Name"
+"_Valid_in_all_Tools\" -aCatGrediConfig_BinBaseAddress=\"0x2DA000\" -aCatGredi"
+"Config_BinSize=40 -aCatGrediConfig_CANBaudrate=250 -aCatGrediConfig_CROID=\"0"
+"x2010000\" -aCatGrediConfig_DTOID=\"0x2020000\" -aCatGrediConfig_ECUType=\"0x"
+"022D\" -aCatGrediConfig_MeasurementBaseAddress=\"0x2C0800\" -aCatGrediConfig_"
+"NodeID=\"0x0001\" -aCatGrediConfig_SampleInterval=20 -aCatGrediConfig_TID=1 -"
+"aCat_CheckForScopeDisplayBlocks=0 -aCat_RedExclmPreventCodeGen=0 -aCat_SkipEM"
+"C2GeneratedFiles=0 -aCombineOutputUpdateFcns=1 -aConfigSourceFileDirectory=\""
+".\" -aEMC2SourceFileDirectory=\".\" -aERTCreateCustomFiles=1 -aERTCustomFileB"
+"anners=0 -aERTCustomFileTemplate=\"example_file_process.tlc\" -aERTHdrFileBan"
+"nerTemplate=\"example_banner.tlc\" -aERTSrcFileBannerTemplate=\"example_banne"
+"r.tlc\" -aEnforceIntegerDowncast=1 -aExtMode=0 -aExtModeTesting=0 -aFixPtUtil"
+"Type=\"macro\" -aFoldNonRolledExpr=1 -aForceParamTrailComments=0 -aGenFloatMa"
+"thFcnCalls=\"ANSI_C\" -aGenerateASAP2=0 -aGenerateComments=1 -aGenerateErtSFu"
+"nction=0 -aGeneratePackageArchCode=\"ModelCodeAndPackageObjectFile\" -aGenera"
+"teReport=0 -aGenerateSampleERTMain=0 -aGrediFileDirectory=\".\" -aIgnoreCusto"
+"mStorageClasses=0 -aIncDataTypeInIds=0 -aIncHierarchyInIds=0 -aIncludeMdlTerm"
+"inateFcn=1 -aInitFltsAndDblsToZero=1 -aInlineInvariantSignals=0 -aInlineParam"
+"eters=1 -aInlinedParameterPlacement=\"NonHierarchical\" -aInlinedPrmAccess=\""
+"Literals\" -aInsertBlockDesc=0 -aLocalBlockOutputs=1 -aMapIncludeFileDirector"
+"y=\".\" -aMapSourceFileDirectory=\".\" -aMatFileLogging=0 -aMaxRTWIdLen=31 -a"
+"MultiInstanceERTCode=1 -aMultiInstanceErrorCode=\"None\" -aPackageIncludeFile"
+"Directory=\".\" -aPackageSourceFileDirectory=\".\" -aPrefixModelToSubsysFcnNa"
+"mes=1 -aPurelyIntegerCode=1 -aRTWVerbose=1 -aRfdDevelopTableStructFileName=\""
+"<DevelopTableStructFileName>\" -aRfdDevelopTableStructName=\"<DevelopTableStr"
+"uctName>\" -aRfdIncludeFileDirectory=\".\" -aRfdSourceFileDirectory=\".\" -aR"
+"ollThreshold=5 -aRootIOStructures=0 -aShowEliminatedStatements=0 -aSpecialFil"
+"esAndDirectories=\"\" -aSuppressErrorStatus=1 -aTargetOS=\"None\" -aTuneInclu"
+"deFileDirectory=\".\" -aZeroExternalMemoryAtStartup=0 -aZeroInternalMemoryAtS"
+"tartup=1"
+  BlockDefaults {
+    Orientation		    "right"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    NamePlacement	    "normal"
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+    ShowName		    on
+  }
+  BlockParameterDefaults {
+    Block {
+      BlockType		      Abs
+      SaturateOnIntegerOverflow	on
+      ZeroCross		      on
+    }
+    Block {
+      BlockType		      Constant
+      Value		      "1"
+      VectorParams1D	      on
+      ShowAdditionalParam     off
+      OutDataTypeMode	      "Inherit from 'Constant value'"
+      OutDataType	      "sfix(16)"
+      ConRadixGroup	      "Use specified scaling"
+      OutScaling	      "2^0"
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      DataType		      "auto"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      EnablePort
+      StatesWhenEnabling      "held"
+      ShowOutputPort	      off
+      ZeroCross		      on
+    }
+    Block {
+      BlockType		      Memory
+      X0		      "0"
+      InheritSampleTime	      off
+      LinearizeMemory	      off
+      RTWStateStorageClass    "Auto"
+    }
+    Block {
+      BlockType		      Outport
+      Port		      "1"
+      OutputWhenDisabled      "held"
+      InitialOutput	      "[]"
+    }
+    Block {
+      BlockType		      Product
+      Inputs		      "2"
+      Multiplication	      "Element-wise(.*)"
+      ShowAdditionalParam     off
+      InputSameDT	      on
+      OutDataTypeMode	      "Same as first input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      Reference
+    }
+    Block {
+      BlockType		      RelationalOperator
+      Operator		      ">="
+      ShowAdditionalParam     off
+      InputSameDT	      on
+      LogicOutDataTypeMode    "Logical (see Advanced Sim. Parameters)"
+      LogicDataType	      "uint(8)"
+      ZeroCross		      on
+    }
+    Block {
+      BlockType		      Saturate
+      UpperLimit	      "0.5"
+      LowerLimit	      "-0.5"
+      LinearizeAsGain	      on
+      ZeroCross		      on
+    }
+    Block {
+      BlockType		      SubSystem
+      ShowPortLabels	      on
+      Permissions	      "ReadWrite"
+      RTWSystemCode	      "Auto"
+      RTWFcnNameOpts	      "Auto"
+      RTWFileNameOpts	      "Auto"
+      SimViewingDevice	      off
+      DataTypeOverride	      "UseLocalSettings"
+      MinMaxOverflowLogging   "UseLocalSettings"
+    }
+    Block {
+      BlockType		      Sum
+      IconShape		      "rectangular"
+      Inputs		      "++"
+      ShowAdditionalParam     off
+      InputSameDT	      on
+      OutDataTypeMode	      "Same as first input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+    }
+    Block {
+      BlockType		      Switch
+      Criteria		      "u2 >= Threshold"
+      Threshold		      "0"
+      ShowAdditionalParam     off
+      InputSameDT	      on
+      OutDataTypeMode	      "Inherit via internal rule"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+      ZeroCross		      on
+    }
+    Block {
+      BlockType		      Terminator
+    }
+    Block {
+      BlockType		      TriggerPort
+      TriggerType	      "rising"
+      ShowOutputPort	      off
+      OutputDataType	      "auto"
+      ZeroCross		      on
+    }
+  }
+  AnnotationDefaults {
+    HorizontalAlignment	    "center"
+    VerticalAlignment	    "middle"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  LineDefaults {
+    FontName		    "Helvetica"
+    FontSize		    9
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  System {
+    Name		    "mdlFxPt"
+    Location		    [222, 78, 1000, 429]
+    Open		    on
+    ModelBrowserVisibility  on
+    ModelBrowserWidth	    212
+    ScreenColor		    "white"
+    PaperOrientation	    "landscape"
+    PaperPositionMode	    "auto"
+    PaperType		    "usletter"
+    PaperUnits		    "inches"
+    ZoomFactor		    "100"
+    ReportName		    "simulink-default.rpt"
+    Block {
+      BlockType		      Reference
+      Name		      "Caterpillar\nPackage Attributes"
+      Ports		      []
+      Position		      [65, 14, 181, 48]
+      ShowName		      off
+      SourceBlock	      "package_instance/PkgInstance"
+      SourceType	      "CAT_PACKAGE_INSTANCE"
+      pkgName		      "mdlFxPt"
+      InitTaskTag	      "SSS_TID_INIT"
+      availModelRates	      "{ '1.000', 'SSS_TID_1005MSEC'; '0.12', 'SSS_TID"
+"_120MSEC'; }"
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "Generate\nControl\nSignals"
+      Ports		      [0, 2]
+      Position		      [15, 94, 60, 141]
+      TreatAsAtomicUnit	      off
+      System {
+	Name			"Generate\nControl\nSignals"
+	Location		[480, 85, 1060, 386]
+	Open			off
+	ModelBrowserVisibility	on
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	Block {
+	  BlockType		  RelationalOperator
+	  Name			  "Compare"
+	  Position		  [245, 143, 265, 212]
+	  LogicOutDataTypeMode	  "Boolean"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "Constant"
+	  Position		  [20, 110, 40, 130]
+	  ShowName		  off
+	  ShowAdditionalParam	  on
+	  OutDataTypeMode	  "int32"
+	  SampleTime		  "1"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "Constant1"
+	  Position		  [200, 185, 220, 205]
+	  ShowName		  off
+	  Value			  "10"
+	  ShowAdditionalParam	  on
+	  OutDataTypeMode	  "Inherit via back propagation"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Requirements"
+	  Ports			  []
+	  Position		  [15, 13, 55, 53]
+	  ShowName		  off
+	  UserDataPersistent	  on
+	  UserData		  "DataTag1"
+	  SourceBlock		  "lib_CATutils_Utilities_DocBlock/DocBlock"
+	  SourceType		  "DocBlock"
+	  isHTML		  "off"
+	}
+	Block {
+	  BlockType		  Memory
+	  Name			  "Single-Loop Delay"
+	  Position		  [135, 250, 155, 270]
+	  Orientation		  "left"
+	  ShowName		  off
+	  InheritSampleTime	  on
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Subsystem\nRevisions"
+	  Ports			  []
+	  Position		  [60, 13, 132, 53]
+	  ShowName		  off
+	  SourceBlock		  "lib_CATutils_Utilities_RevNoteBlock/Revisio"
+"n Notes"
+	  SourceType		  "RevNoteBlock"
+	  data			  "struct('User','---','Date',730486,'Revision"
+"','---')"
+	}
+	Block {
+	  BlockType		  Sum
+	  Name			  "Sum"
+	  Ports			  [2, 1]
+	  Position		  [65, 190, 85, 210]
+	  ShowName		  off
+	  IconShape		  "round"
+	  Inputs		  "++|"
+	}
+	Block {
+	  BlockType		  Switch
+	  Name			  "Switch"
+	  Position		  [130, 100, 160, 220]
+	  ShowName		  off
+	  Threshold		  "20"
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "Enable"
+	  Position		  [310, 173, 340, 187]
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "Trigger"
+	  Position		  [310, 223, 340, 237]
+	  Port			  "2"
+	}
+	Line {
+	  SrcBlock		  "Constant"
+	  SrcPort		  1
+	  Points		  [30, 0]
+	  Branch {
+	    DstBlock		    "Switch"
+	    DstPort		    1
+	  }
+	  Branch {
+	    DstBlock		    "Sum"
+	    DstPort		    1
+	  }
+	}
+	Line {
+	  SrcBlock		  "Sum"
+	  SrcPort		  1
+	  Points		  [15, 0]
+	  Branch {
+	    DstBlock		    "Switch"
+	    DstPort		    3
+	  }
+	  Branch {
+	    Points		    [0, -40]
+	    DstBlock		    "Switch"
+	    DstPort		    2
+	  }
+	}
+	Line {
+	  SrcBlock		  "Switch"
+	  SrcPort		  1
+	  Points		  [15, 0]
+	  Branch {
+	    Points		    [0, 100]
+	    DstBlock		    "Single-Loop Delay"
+	    DstPort		    1
+	  }
+	  Branch {
+	    DstBlock		    "Compare"
+	    DstPort		    1
+	  }
+	}
+	Line {
+	  SrcBlock		  "Single-Loop Delay"
+	  SrcPort		  1
+	  Points		  [-90, 0; 0, -60]
+	  DstBlock		  "Sum"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "Constant1"
+	  SrcPort		  1
+	  DstBlock		  "Compare"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "Compare"
+	  SrcPort		  1
+	  Points		  [15, 0]
+	  Branch {
+	    DstBlock		    "Enable"
+	    DstPort		    1
+	  }
+	  Branch {
+	    Points		    [0, 50]
+	    DstBlock		    "Trigger"
+	    DstPort		    1
+	  }
+	}
+      }
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "Model\nPurpose"
+      Ports		      []
+      Position		      [15, 13, 55, 53]
+      UserDataPersistent      on
+      UserData		      "DataTag2"
+      SourceBlock	      "lib_CATutils_Utilities_DocBlock/DocBlock"
+      SourceType	      "DocBlock"
+      isHTML		      off
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "Module\nPackaging\nTool"
+      Description	      "MPM"
+      Ports		      []
+      Position		      [195, 15, 235, 47]
+      ShowName		      off
+      AttributesFormatString  "Module\\nPackaging\\nTool\\n"
+      CopyFcn		      "mcb('mdlFxPt')"
+      ModelCloseFcn	      "mpm_callback('MPTClose',[])"
+      PreSaveFcn	      "set_param(gcb, 'CopyFcn', ['mcb(''', bdroot, ''"
+"')']);"
+      OpenFcn		      "mpm_gui_options(bdroot)"
+      FontName		      "Arial"
+      FontSize		      8
+      FontWeight	      "bold"
+      ShowPortLabels	      off
+      TreatAsAtomicUnit	      off
+      MaskType		      "ModulePackagingTool"
+      MaskDescription	      "This is the Module Packaging Tool"
+      MaskDisplay	      "image(imread('mpm_icon.bmp','bmp'))\n"
+      MaskIconFrame	      off
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "autoscale"
+      System {
+	Name			"Module\nPackaging\nTool"
+	Location		[428, 296, 926, 596]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "Subsystem"
+	  Ports			  []
+	  Position		  [130, 60, 230, 110]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "Subsystem"
+	    Location		    [433, 403, 931, 703]
+	    Open		    off
+	    ModelBrowserVisibility  off
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	  }
+	}
+      }
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "rt_EnableState"
+      Ports		      [0, 0, 1]
+      Position		      [155, 150, 200, 180]
+      TreatAsAtomicUnit	      off
+      System {
+	Name			"rt_EnableState"
+	Location		[222, 78, 753, 429]
+	Open			off
+	ModelBrowserVisibility	on
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	Block {
+	  BlockType		  EnablePort
+	  Name			  "Enable Port"
+	  Ports			  []
+	  Position		  [160, 15, 180, 35]
+	  StatesWhenEnabling	  "reset"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "Constant"
+	  Position		  [15, 75, 35, 95]
+	  ShowName		  off
+	  ShowAdditionalParam	  on
+	  OutDataTypeMode	  "uint32"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Requirements"
+	  Ports			  []
+	  Position		  [15, 13, 55, 53]
+	  ShowName		  off
+	  UserDataPersistent	  on
+	  UserData		  "DataTag3"
+	  SourceBlock		  "lib_CATutils_Utilities_DocBlock/DocBlock"
+	  SourceType		  "DocBlock"
+	  isHTML		  "off"
+	}
+	Block {
+	  BlockType		  Memory
+	  Name			  "Single-Loop Delay"
+	  Position		  [130, 135, 150, 155]
+	  Orientation		  "left"
+	  ShowName		  off
+	  InheritSampleTime	  on
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Subsystem\nRevisions"
+	  Ports			  []
+	  Position		  [60, 13, 132, 53]
+	  ShowName		  off
+	  SourceBlock		  "lib_CATutils_Utilities_RevNoteBlock/Revisio"
+"n Notes"
+	  SourceType		  "RevNoteBlock"
+	  data			  "struct('User','---','Date',730486,'Revision"
+"','---')"
+	}
+	Block {
+	  BlockType		  Sum
+	  Name			  "Sum"
+	  Ports			  [2, 1]
+	  Position		  [60, 75, 80, 95]
+	  ShowName		  off
+	  IconShape		  "round"
+	  Inputs		  "|++"
+	  ShowAdditionalParam	  on
+	  Port {
+	    PortNumber		    1
+	    Name		    "rt_Enable_sig"
+	    TestPoint		    on
+	    LinearAnalysisOutput    off
+	    LinearAnalysisInput	    off
+	    RTWStorageClass	    "Auto"
+	    DataLogging		    off
+	    DataLoggingNameMode	    "SignalName"
+	    DataLoggingDecimateData off
+	    DataLoggingDecimation   "2"
+	    DataLoggingLimitDataPoints off
+	    DataLoggingMaxPoints    "5000"
+	  }
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator"
+	  Position		  [275, 75, 295, 95]
+	  ShowName		  off
+	}
+	Line {
+	  SrcBlock		  "Constant"
+	  SrcPort		  1
+	  DstBlock		  "Sum"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Single-Loop Delay"
+	  SrcPort		  1
+	  Points		  [-55, 0]
+	  DstBlock		  "Sum"
+	  DstPort		  2
+	}
+	Line {
+	  Name			  "rt_Enable_sig"
+	  SrcBlock		  "Sum"
+	  SrcPort		  1
+	  Points		  [0, 0; 90, 0]
+	  Branch {
+	    Points		    [0, 60]
+	    DstBlock		    "Single-Loop Delay"
+	    DstPort		    1
+	  }
+	  Branch {
+	    Labels		    [-1, 0]
+	    DstBlock		    "Terminator"
+	    DstPort		    1
+	  }
+	}
+      }
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "rtlibsrc\nFixPt"
+      Ports		      [0, 0, 0, 1]
+      Position		      [85, 150, 128, 180]
+      TreatAsAtomicUnit	      off
+      System {
+	Name			"rtlibsrc\nFixPt"
+	Location		[480, 85, 1060, 386]
+	Open			off
+	ModelBrowserVisibility	on
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	Block {
+	  BlockType		  TriggerPort
+	  Name			  "Trigger Port"
+	  Ports			  []
+	  Position		  [155, 20, 175, 40]
+	  TriggerType		  "either"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Requirements"
+	  Ports			  []
+	  Position		  [15, 13, 55, 53]
+	  ShowName		  off
+	  UserDataPersistent	  on
+	  UserData		  "DataTag4"
+	  SourceBlock		  "lib_CATutils_Utilities_DocBlock/DocBlock"
+	  SourceType		  "DocBlock"
+	  isHTML		  "off"
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "SaturateDivide"
+	  Ports			  []
+	  Position		  [235, 150, 279, 195]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "SaturateDivide"
+	    Location		    [222, 78, 1000, 429]
+	    Open		    off
+	    ModelBrowserVisibility  on
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "99"
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      Position		      [15, 20, 95, 40]
+	      ShowName		      off
+	      Value		      "p_i8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant1"
+	      Position		      [15, 75, 95, 95]
+	      ShowName		      off
+	      Value		      "p_u8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant10"
+	      Position		      [15, 45, 95, 65]
+	      ShowName		      off
+	      Value		      "p_i8_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant11"
+	      Position		      [15, 320, 95, 340]
+	      ShowName		      off
+	      Value		      "p_u32_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant2"
+	      Position		      [15, 130, 95, 150]
+	      ShowName		      off
+	      Value		      "p_i16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant3"
+	      Position		      [15, 185, 95, 205]
+	      ShowName		      off
+	      Value		      "p_u16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant4"
+	      Position		      [15, 240, 95, 260]
+	      ShowName		      off
+	      Value		      "p_i32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant5"
+	      Position		      [15, 295, 95, 315]
+	      ShowName		      off
+	      Value		      "p_u32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant6"
+	      Position		      [15, 265, 95, 285]
+	      ShowName		      off
+	      Value		      "p_i32_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant7"
+	      Position		      [15, 210, 95, 230]
+	      ShowName		      off
+	      Value		      "p_u16_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant8"
+	      Position		      [15, 155, 95, 175]
+	      ShowName		      off
+	      Value		      "p_i16_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant9"
+	      Position		      [15, 100, 95, 120]
+	      ShowName		      off
+	      Value		      "p_u8_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product"
+	      Ports		      [2, 1]
+	      Position		      [145, 16, 180, 69]
+	      ShowName		      off
+	      Inputs		      "*/"
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product1"
+	      Ports		      [2, 1]
+	      Position		      [145, 71, 180, 124]
+	      ShowName		      off
+	      Inputs		      "*/"
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product2"
+	      Ports		      [2, 1]
+	      Position		      [145, 126, 180, 179]
+	      ShowName		      off
+	      Inputs		      "*/"
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product3"
+	      Ports		      [2, 1]
+	      Position		      [145, 181, 180, 234]
+	      ShowName		      off
+	      Inputs		      "*/"
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product4"
+	      Ports		      [2, 1]
+	      Position		      [145, 236, 180, 289]
+	      ShowName		      off
+	      Inputs		      "*/"
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product5"
+	      Ports		      [2, 1]
+	      Position		      [145, 291, 180, 344]
+	      ShowName		      off
+	      Inputs		      "*/"
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum"
+	      Ports		      [6, 1]
+	      Position		      [240, 20, 260, 345]
+	      ShowName		      off
+	      Inputs		      "6"
+	      ShowAdditionalParam     on
+	      InputSameDT	      off
+	      OutDataTypeMode	      "uint32"
+	      Port {
+		PortNumber		1
+		Name			"SaturateDivide"
+		TestPoint		on
+		LinearAnalysisOutput	off
+		LinearAnalysisInput	off
+		RTWStorageClass		"Auto"
+		DataLogging		off
+		DataLoggingNameMode	"SignalName"
+		DataLoggingDecimateData	off
+		DataLoggingDecimation	"2"
+		DataLoggingLimitDataPoints off
+		DataLoggingMaxPoints	"5000"
+	      }
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminate\nSignal"
+	      Position		      [365, 175, 385, 195]
+	      ShowName		      off
+	    }
+	    Line {
+	      Name		      "SaturateDivide"
+	      Labels		      [0, 0]
+	      SrcBlock		      "Sum"
+	      SrcPort		      1
+	      DstBlock		      "Terminate\nSignal"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant"
+	      SrcPort		      1
+	      DstBlock		      "Product"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant10"
+	      SrcPort		      1
+	      DstBlock		      "Product"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant1"
+	      SrcPort		      1
+	      DstBlock		      "Product1"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant2"
+	      SrcPort		      1
+	      DstBlock		      "Product2"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant3"
+	      SrcPort		      1
+	      DstBlock		      "Product3"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant4"
+	      SrcPort		      1
+	      DstBlock		      "Product4"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant5"
+	      SrcPort		      1
+	      DstBlock		      "Product5"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant9"
+	      SrcPort		      1
+	      DstBlock		      "Product1"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant8"
+	      SrcPort		      1
+	      DstBlock		      "Product2"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant7"
+	      SrcPort		      1
+	      DstBlock		      "Product3"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant6"
+	      SrcPort		      1
+	      DstBlock		      "Product4"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant11"
+	      SrcPort		      1
+	      DstBlock		      "Product5"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Product"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Product1"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Product2"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      3
+	    }
+	    Line {
+	      SrcBlock		      "Product3"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      4
+	    }
+	    Line {
+	      SrcBlock		      "Product4"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      5
+	    }
+	    Line {
+	      SrcBlock		      "Product5"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      6
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "SaturateProduct"
+	  Ports			  []
+	  Position		  [145, 150, 189, 195]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "SaturateProduct"
+	    Location		    [222, 78, 753, 429]
+	    Open		    off
+	    ModelBrowserVisibility  on
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "99"
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      Position		      [15, 20, 95, 40]
+	      ShowName		      off
+	      Value		      "p_i8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant1"
+	      Position		      [15, 75, 95, 95]
+	      ShowName		      off
+	      Value		      "p_u8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant10"
+	      Position		      [15, 45, 95, 65]
+	      ShowName		      off
+	      Value		      "p_i8_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant11"
+	      Position		      [15, 320, 95, 340]
+	      ShowName		      off
+	      Value		      "p_u32_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant2"
+	      Position		      [15, 130, 95, 150]
+	      ShowName		      off
+	      Value		      "p_i16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant3"
+	      Position		      [15, 185, 95, 205]
+	      ShowName		      off
+	      Value		      "p_u16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant4"
+	      Position		      [15, 240, 95, 260]
+	      ShowName		      off
+	      Value		      "p_i32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant5"
+	      Position		      [15, 295, 95, 315]
+	      ShowName		      off
+	      Value		      "p_u32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant6"
+	      Position		      [15, 265, 95, 285]
+	      ShowName		      off
+	      Value		      "p_i32_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant7"
+	      Position		      [15, 210, 95, 230]
+	      ShowName		      off
+	      Value		      "p_u16_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant8"
+	      Position		      [15, 155, 95, 175]
+	      ShowName		      off
+	      Value		      "p_i16_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant9"
+	      Position		      [15, 100, 95, 120]
+	      ShowName		      off
+	      Value		      "p_u8_02"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product"
+	      Ports		      [2, 1]
+	      Position		      [145, 16, 180, 69]
+	      ShowName		      off
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product1"
+	      Ports		      [2, 1]
+	      Position		      [145, 71, 180, 124]
+	      ShowName		      off
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product2"
+	      Ports		      [2, 1]
+	      Position		      [145, 126, 180, 179]
+	      ShowName		      off
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product3"
+	      Ports		      [2, 1]
+	      Position		      [145, 181, 180, 234]
+	      ShowName		      off
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product4"
+	      Ports		      [2, 1]
+	      Position		      [145, 236, 180, 289]
+	      ShowName		      off
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Product
+	      Name		      "Product5"
+	      Ports		      [2, 1]
+	      Position		      [145, 291, 180, 344]
+	      ShowName		      off
+	      ShowAdditionalParam     on
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum"
+	      Ports		      [6, 1]
+	      Position		      [240, 20, 260, 345]
+	      ShowName		      off
+	      Inputs		      "6"
+	      ShowAdditionalParam     on
+	      InputSameDT	      off
+	      OutDataTypeMode	      "uint32"
+	      Port {
+		PortNumber		1
+		Name			"SaturateProduct"
+		TestPoint		on
+		LinearAnalysisOutput	off
+		LinearAnalysisInput	off
+		RTWStorageClass		"Auto"
+		DataLogging		off
+		DataLoggingNameMode	"SignalName"
+		DataLoggingDecimateData	off
+		DataLoggingDecimation	"2"
+		DataLoggingLimitDataPoints off
+		DataLoggingMaxPoints	"5000"
+	      }
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminate\nSignal"
+	      Position		      [365, 175, 385, 195]
+	      ShowName		      off
+	    }
+	    Line {
+	      SrcBlock		      "Product5"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      6
+	    }
+	    Line {
+	      SrcBlock		      "Product4"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      5
+	    }
+	    Line {
+	      SrcBlock		      "Product3"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      4
+	    }
+	    Line {
+	      SrcBlock		      "Product2"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      3
+	    }
+	    Line {
+	      SrcBlock		      "Product1"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Product"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant11"
+	      SrcPort		      1
+	      DstBlock		      "Product5"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant6"
+	      SrcPort		      1
+	      DstBlock		      "Product4"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant7"
+	      SrcPort		      1
+	      DstBlock		      "Product3"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant8"
+	      SrcPort		      1
+	      DstBlock		      "Product2"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant9"
+	      SrcPort		      1
+	      DstBlock		      "Product1"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant5"
+	      SrcPort		      1
+	      DstBlock		      "Product5"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant4"
+	      SrcPort		      1
+	      DstBlock		      "Product4"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant3"
+	      SrcPort		      1
+	      DstBlock		      "Product3"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant2"
+	      SrcPort		      1
+	      DstBlock		      "Product2"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant1"
+	      SrcPort		      1
+	      DstBlock		      "Product1"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant10"
+	      SrcPort		      1
+	      DstBlock		      "Product"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant"
+	      SrcPort		      1
+	      DstBlock		      "Product"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "SaturateProduct"
+	      Labels		      [0, 0]
+	      SrcBlock		      "Sum"
+	      SrcPort		      1
+	      DstBlock		      "Terminate\nSignal"
+	      DstPort		      1
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Subsystem\nRevisions"
+	  Ports			  []
+	  Position		  [60, 13, 132, 53]
+	  ShowName		  off
+	  SourceBlock		  "lib_CATutils_Utilities_RevNoteBlock/Revisio"
+"n Notes"
+	  SourceType		  "RevNoteBlock"
+	  data			  "struct('User','---','Date',730486,'Revision"
+"','---')"
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "rt_ABS"
+	  Ports			  []
+	  Position		  [20, 75, 64, 120]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "rt_ABS"
+	    Location		    [480, 85, 1060, 386]
+	    Open		    off
+	    ModelBrowserVisibility  on
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Abs
+	      Name		      "Abs"
+	      Position		      [160, 20, 180, 40]
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      Abs
+	      Name		      "Abs1"
+	      Position		      [160, 60, 180, 80]
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      Abs
+	      Name		      "Abs2"
+	      Position		      [160, 100, 180, 120]
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      Abs
+	      Name		      "Abs3"
+	      Position		      [160, 140, 180, 160]
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      Abs
+	      Name		      "Abs4"
+	      Position		      [160, 180, 180, 200]
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      Abs
+	      Name		      "Abs5"
+	      Position		      [160, 220, 180, 240]
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      Position		      [15, 20, 95, 40]
+	      ShowName		      off
+	      Value		      "p_i8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant1"
+	      Position		      [15, 60, 95, 80]
+	      ShowName		      off
+	      Value		      "p_u8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant2"
+	      Position		      [15, 100, 95, 120]
+	      ShowName		      off
+	      Value		      "p_i16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant3"
+	      Position		      [15, 140, 95, 160]
+	      ShowName		      off
+	      Value		      "p_u16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant4"
+	      Position		      [15, 180, 95, 200]
+	      ShowName		      off
+	      Value		      "p_i32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant5"
+	      Position		      [15, 220, 95, 240]
+	      ShowName		      off
+	      Value		      "p_u32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint32"
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum"
+	      Ports		      [6, 1]
+	      Position		      [265, 14, 285, 246]
+	      ShowName		      off
+	      Inputs		      "6"
+	      ShowAdditionalParam     on
+	      InputSameDT	      off
+	      OutDataTypeMode	      "uint32"
+	      Port {
+		PortNumber		1
+		Name			"rt_ABS_sig"
+		TestPoint		on
+		LinearAnalysisOutput	off
+		LinearAnalysisInput	off
+		RTWStorageClass		"Auto"
+		DataLogging		off
+		DataLoggingNameMode	"SignalName"
+		DataLoggingDecimateData	off
+		DataLoggingDecimation	"2"
+		DataLoggingLimitDataPoints off
+		DataLoggingMaxPoints	"5000"
+	      }
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminate\nSignal"
+	      Position		      [365, 120, 385, 140]
+	      ShowName		      off
+	    }
+	    Line {
+	      SrcBlock		      "Constant"
+	      SrcPort		      1
+	      DstBlock		      "Abs"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Abs"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "rt_ABS_sig"
+	      Labels		      [0, 0]
+	      SrcBlock		      "Sum"
+	      SrcPort		      1
+	      DstBlock		      "Terminate\nSignal"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant1"
+	      SrcPort		      1
+	      DstBlock		      "Abs1"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Abs1"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant2"
+	      SrcPort		      1
+	      DstBlock		      "Abs2"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant3"
+	      SrcPort		      1
+	      DstBlock		      "Abs3"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant4"
+	      SrcPort		      1
+	      DstBlock		      "Abs4"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant5"
+	      SrcPort		      1
+	      DstBlock		      "Abs5"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Abs2"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      3
+	    }
+	    Line {
+	      SrcBlock		      "Abs3"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      4
+	    }
+	    Line {
+	      SrcBlock		      "Abs4"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      5
+	    }
+	    Line {
+	      SrcBlock		      "Abs5"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      6
+	    }
+	    Annotation {
+	      Name		      "This doesn't actually use the\nrt_ABS m"
+"acro!"
+	      Position		      [106, 262]
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "rt_MAX"
+	  Ports			  []
+	  Position		  [135, 75, 179, 120]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "rt_MAX"
+	    Location		    [222, 78, 1000, 429]
+	    Open		    off
+	    ModelBrowserVisibility  on
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      Position		      [15, 20, 95, 40]
+	      ShowName		      off
+	      Value		      "p_i8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant1"
+	      Position		      [15, 60, 95, 80]
+	      ShowName		      off
+	      Value		      "p_u8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant2"
+	      Position		      [15, 100, 95, 120]
+	      ShowName		      off
+	      Value		      "p_i16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant3"
+	      Position		      [15, 140, 95, 160]
+	      ShowName		      off
+	      Value		      "p_u16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant4"
+	      Position		      [15, 180, 95, 200]
+	      ShowName		      off
+	      Value		      "p_i32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant5"
+	      Position		      [15, 220, 95, 240]
+	      ShowName		      off
+	      Value		      "p_u32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint32"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MAX"
+	      Position		      [160, 19, 180, 41]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "int8(-inf)"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MAX1"
+	      Position		      [160, 59, 180, 81]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "uint8(-inf)"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MAX2"
+	      Position		      [160, 99, 180, 121]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "int16(-inf)"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MAX3"
+	      Position		      [160, 139, 180, 161]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "uint16(-inf)"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MAX4"
+	      Position		      [160, 179, 180, 201]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "int32(-inf)"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MAX5"
+	      Position		      [160, 219, 180, 241]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "uint32(-inf)"
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum"
+	      Ports		      [6, 1]
+	      Position		      [265, 14, 285, 246]
+	      ShowName		      off
+	      Inputs		      "6"
+	      ShowAdditionalParam     on
+	      InputSameDT	      off
+	      OutDataTypeMode	      "uint32"
+	      Port {
+		PortNumber		1
+		Name			"rt_MAX_sig"
+		TestPoint		on
+		LinearAnalysisOutput	off
+		LinearAnalysisInput	off
+		RTWStorageClass		"Auto"
+		DataLogging		off
+		DataLoggingNameMode	"SignalName"
+		DataLoggingDecimateData	off
+		DataLoggingDecimation	"2"
+		DataLoggingLimitDataPoints off
+		DataLoggingMaxPoints	"5000"
+	      }
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminate\nSignal"
+	      Position		      [365, 120, 385, 140]
+	      ShowName		      off
+	    }
+	    Line {
+	      SrcBlock		      "Constant"
+	      SrcPort		      1
+	      DstBlock		      "MAX"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "MAX"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "rt_MAX_sig"
+	      Labels		      [0, 0]
+	      SrcBlock		      "Sum"
+	      SrcPort		      1
+	      DstBlock		      "Terminate\nSignal"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant1"
+	      SrcPort		      1
+	      DstBlock		      "MAX1"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "MAX1"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant2"
+	      SrcPort		      1
+	      DstBlock		      "MAX2"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant3"
+	      SrcPort		      1
+	      DstBlock		      "MAX3"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant4"
+	      SrcPort		      1
+	      DstBlock		      "MAX4"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant5"
+	      SrcPort		      1
+	      DstBlock		      "MAX5"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "MAX2"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      3
+	    }
+	    Line {
+	      SrcBlock		      "MAX3"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      4
+	    }
+	    Line {
+	      SrcBlock		      "MAX4"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      5
+	    }
+	    Line {
+	      SrcBlock		      "MAX5"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      6
+	    }
+	    Annotation {
+	      Name		      "This doesn't actually use the\nrt_MAX m"
+"acro!"
+	      Position		      [71, 262]
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "rt_MIN"
+	  Ports			  []
+	  Position		  [80, 75, 124, 120]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "rt_MIN"
+	    Location		    [222, 78, 1000, 429]
+	    Open		    off
+	    ModelBrowserVisibility  on
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      Position		      [15, 20, 95, 40]
+	      ShowName		      off
+	      Value		      "p_i8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant1"
+	      Position		      [15, 60, 95, 80]
+	      ShowName		      off
+	      Value		      "p_u8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant2"
+	      Position		      [15, 100, 95, 120]
+	      ShowName		      off
+	      Value		      "p_i16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant3"
+	      Position		      [15, 140, 95, 160]
+	      ShowName		      off
+	      Value		      "p_u16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant4"
+	      Position		      [15, 180, 95, 200]
+	      ShowName		      off
+	      Value		      "p_i32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant5"
+	      Position		      [15, 220, 95, 240]
+	      ShowName		      off
+	      Value		      "p_u32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint32"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MIN"
+	      Position		      [160, 19, 180, 41]
+	      ShowName		      off
+	      UpperLimit	      "int8(inf)"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MIN1"
+	      Position		      [160, 59, 180, 81]
+	      ShowName		      off
+	      UpperLimit	      "uint8(inf)"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MIN2"
+	      Position		      [160, 99, 180, 121]
+	      ShowName		      off
+	      UpperLimit	      "int16(inf)"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MIN3"
+	      Position		      [160, 139, 180, 161]
+	      ShowName		      off
+	      UpperLimit	      "uint16(inf)"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MIN4"
+	      Position		      [160, 179, 180, 201]
+	      ShowName		      off
+	      UpperLimit	      "int32(inf)"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "MIN5"
+	      Position		      [160, 219, 180, 241]
+	      ShowName		      off
+	      UpperLimit	      "uint32(inf)"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum"
+	      Ports		      [6, 1]
+	      Position		      [265, 14, 285, 246]
+	      ShowName		      off
+	      Inputs		      "6"
+	      ShowAdditionalParam     on
+	      InputSameDT	      off
+	      OutDataTypeMode	      "uint32"
+	      Port {
+		PortNumber		1
+		Name			"rt_MIN_sig"
+		TestPoint		on
+		LinearAnalysisOutput	off
+		LinearAnalysisInput	off
+		RTWStorageClass		"Auto"
+		DataLogging		off
+		DataLoggingNameMode	"SignalName"
+		DataLoggingDecimateData	off
+		DataLoggingDecimation	"2"
+		DataLoggingLimitDataPoints off
+		DataLoggingMaxPoints	"5000"
+	      }
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminate\nSignal"
+	      Position		      [365, 120, 385, 140]
+	      ShowName		      off
+	    }
+	    Line {
+	      SrcBlock		      "MIN5"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      6
+	    }
+	    Line {
+	      SrcBlock		      "MIN4"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      5
+	    }
+	    Line {
+	      SrcBlock		      "MIN3"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      4
+	    }
+	    Line {
+	      SrcBlock		      "MIN2"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      3
+	    }
+	    Line {
+	      SrcBlock		      "Constant5"
+	      SrcPort		      1
+	      DstBlock		      "MIN5"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant4"
+	      SrcPort		      1
+	      DstBlock		      "MIN4"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant3"
+	      SrcPort		      1
+	      DstBlock		      "MIN3"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant2"
+	      SrcPort		      1
+	      DstBlock		      "MIN2"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "MIN1"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant1"
+	      SrcPort		      1
+	      DstBlock		      "MIN1"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "rt_MIN_sig"
+	      Labels		      [0, 0]
+	      SrcBlock		      "Sum"
+	      SrcPort		      1
+	      DstBlock		      "Terminate\nSignal"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "MIN"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant"
+	      SrcPort		      1
+	      DstBlock		      "MIN"
+	      DstPort		      1
+	    }
+	    Annotation {
+	      Name		      "This doesn't actually use the\nrt_MIN m"
+"acro!"
+	      Position		      [107, 255]
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "rt_SATURATE"
+	  Ports			  []
+	  Position		  [195, 75, 239, 120]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "rt_SATURATE"
+	    Location		    [480, 85, 1060, 386]
+	    Open		    off
+	    ModelBrowserVisibility  on
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      Position		      [15, 20, 95, 40]
+	      ShowName		      off
+	      Value		      "p_i8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant1"
+	      Position		      [15, 60, 95, 80]
+	      ShowName		      off
+	      Value		      "p_u8_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint8"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant2"
+	      Position		      [15, 100, 95, 120]
+	      ShowName		      off
+	      Value		      "p_i16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant3"
+	      Position		      [15, 140, 95, 160]
+	      ShowName		      off
+	      Value		      "p_u16_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint16"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant4"
+	      Position		      [15, 180, 95, 200]
+	      ShowName		      off
+	      Value		      "p_i32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int32"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant5"
+	      Position		      [15, 220, 95, 240]
+	      ShowName		      off
+	      Value		      "p_u32_01"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "uint32"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "Saturation"
+	      Position		      [160, 19, 180, 41]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "Saturation1"
+	      Position		      [160, 59, 180, 81]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "Saturation2"
+	      Position		      [160, 99, 180, 121]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "Saturation3"
+	      Position		      [160, 139, 180, 161]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "Saturation4"
+	      Position		      [160, 179, 180, 201]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Saturate
+	      Name		      "Saturation5"
+	      Position		      [160, 219, 180, 241]
+	      ShowName		      off
+	      UpperLimit	      "9"
+	      LowerLimit	      "3"
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum"
+	      Ports		      [6, 1]
+	      Position		      [265, 14, 285, 246]
+	      ShowName		      off
+	      Inputs		      "6"
+	      ShowAdditionalParam     on
+	      InputSameDT	      off
+	      OutDataTypeMode	      "uint32"
+	      Port {
+		PortNumber		1
+		Name			"rt_SATURATE_sig"
+		TestPoint		on
+		LinearAnalysisOutput	off
+		LinearAnalysisInput	off
+		RTWStorageClass		"Auto"
+		DataLogging		off
+		DataLoggingNameMode	"SignalName"
+		DataLoggingDecimateData	off
+		DataLoggingDecimation	"2"
+		DataLoggingLimitDataPoints off
+		DataLoggingMaxPoints	"5000"
+	      }
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminate\nSignal"
+	      Position		      [385, 120, 405, 140]
+	      ShowName		      off
+	    }
+	    Line {
+	      SrcBlock		      "Saturation5"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      6
+	    }
+	    Line {
+	      SrcBlock		      "Saturation4"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      5
+	    }
+	    Line {
+	      SrcBlock		      "Saturation3"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      4
+	    }
+	    Line {
+	      SrcBlock		      "Saturation2"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      3
+	    }
+	    Line {
+	      SrcBlock		      "Constant5"
+	      SrcPort		      1
+	      DstBlock		      "Saturation5"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant4"
+	      SrcPort		      1
+	      DstBlock		      "Saturation4"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant3"
+	      SrcPort		      1
+	      DstBlock		      "Saturation3"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant2"
+	      SrcPort		      1
+	      DstBlock		      "Saturation2"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Saturation1"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant1"
+	      SrcPort		      1
+	      DstBlock		      "Saturation1"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "rt_SATURATE_sig"
+	      Labels		      [0, 0]
+	      SrcBlock		      "Sum"
+	      SrcPort		      1
+	      DstBlock		      "Terminate\nSignal"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Saturation"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Constant"
+	      SrcPort		      1
+	      DstBlock		      "Saturation"
+	      DstPort		      1
+	    }
+	    Annotation {
+	      Name		      "This doesn't actually use the\nrt_SATUR"
+"ATE macro!"
+	      Position		      [153, 269]
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "rt_SET_xZC_SIGSTATE"
+	  Ports			  []
+	  Position		  [45, 150, 89, 195]
+	  TreatAsAtomicUnit	  off
+	  System {
+	    Name		    "rt_SET_xZC_SIGSTATE"
+	    Location		    [222, 78, 753, 429]
+	    Open		    off
+	    ModelBrowserVisibility  on
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Reference
+	      Name		      "Compare\nto Zero"
+	      Ports		      [1, 1]
+	      Position		      [440, 55, 480, 95]
+	      ShowName		      off
+	      SourceBlock	      "lib_CATutils_Comparison_CompareToZero/C"
+"ompare\nto Zero"
+	      SourceType	      "CAT_CompareToZero"
+	      relop		      "~="
+	      outDT		      "Boolean"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      Position		      [15, 105, 35, 125]
+	      ShowName		      off
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "Inherit via back propagation"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Constant1"
+	      Position		      [15, 25, 35, 45]
+	      ShowName		      off
+	      Value		      "-1"
+	      ShowAdditionalParam     on
+	      OutDataTypeMode	      "int8"
+	    }
+	    Block {
+	      BlockType		      DataTypeConversion
+	      Name		      "Data Type Conversion\nTo Boolean"
+	      Position		      [300, 64, 340, 86]
+	      ShowName		      off
+	      DataType		      "uint8"
+	    }
+	    Block {
+	      BlockType		      Memory
+	      Name		      "Single-Loop Delay"
+	      Position		      [130, 165, 150, 185]
+	      Orientation	      "left"
+	      ShowName		      off
+	      InheritSampleTime	      on
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum"
+	      Ports		      [2, 1]
+	      Position		      [60, 105, 80, 125]
+	      ShowName		      off
+	      IconShape		      "round"
+	      Inputs		      "|++"
+	    }
+	    Block {
+	      BlockType		      Sum
+	      Name		      "Sum1"
+	      Ports		      [3, 1]
+	      Position		      [160, 214, 180, 276]
+	      Orientation	      "left"
+	      ShowName		      off
+	      Inputs		      "3"
+	      ShowAdditionalParam     on
+	      Port {
+		PortNumber		1
+		Name			"rt_SET_xZC_SIGSTATE"
+		TestPoint		on
+		LinearAnalysisOutput	off
+		LinearAnalysisInput	off
+		RTWStorageClass		"Auto"
+		DataLogging		off
+		DataLoggingNameMode	"SignalName"
+		DataLoggingDecimateData	off
+		DataLoggingDecimation	"2"
+		DataLoggingLimitDataPoints off
+		DataLoggingMaxPoints	"5000"
+	      }
+	    }
+	    Block {
+	      BlockType		      Switch
+	      Name		      "Switch"
+	      Position		      [125, 15, 155, 135]
+	      ShowName		      off
+	      Threshold		      "2"
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminator"
+	      Position		      [15, 235, 35, 255]
+	      Orientation	      "left"
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      SubSystem
+	      Name		      "rt_SET_BZC_SIGSTATE"
+	      Ports		      [0, 1, 0, 1]
+	      Position		      [510, 121, 615, 149]
+	      TreatAsAtomicUnit	      on
+	      System {
+		Name			"rt_SET_BZC_SIGSTATE"
+		Location		[222, 78, 753, 429]
+		Open			off
+		ModelBrowserVisibility	on
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  TriggerPort
+		  Name			  "Trigger"
+		  Ports			  []
+		  Position		  [125, 15, 145, 35]
+		  TriggerType		  "either"
+		  StatesWhenEnabling	  "held"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "Constant"
+		  Position		  [25, 85, 45, 105]
+		  ShowName		  off
+		  ShowAdditionalParam	  on
+		  OutDataTypeMode	  "uint32"
+		}
+		Block {
+		  BlockType		  Memory
+		  Name			  "Single-Loop Delay"
+		  Position		  [140, 145, 160, 165]
+		  Orientation		  "left"
+		  ShowName		  off
+		  InheritSampleTime	  on
+		}
+		Block {
+		  BlockType		  Sum
+		  Name			  "Sum"
+		  Ports			  [2, 1]
+		  Position		  [70, 85, 90, 105]
+		  ShowName		  off
+		  IconShape		  "round"
+		  Inputs		  "|++"
+		  ShowAdditionalParam	  on
+		}
+		Block {
+		  BlockType		  Outport
+		  Name			  "Out1"
+		  Position		  [215, 88, 245, 102]
+		}
+		Line {
+		  SrcBlock		  "Constant"
+		  SrcPort		  1
+		  DstBlock		  "Sum"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "Single-Loop Delay"
+		  SrcPort		  1
+		  Points		  [-55, 0]
+		  DstBlock		  "Sum"
+		  DstPort		  2
+		}
+		Line {
+		  SrcBlock		  "Sum"
+		  SrcPort		  1
+		  Points		  [90, 0]
+		  Branch {
+		    Points		    [0, 60]
+		    DstBlock		    "Single-Loop Delay"
+		    DstPort		    1
+		  }
+		  Branch {
+		    DstBlock		    "Out1"
+		    DstPort		    1
+		  }
+		}
+	      }
+	    }
+	    Block {
+	      BlockType		      SubSystem
+	      Name		      "rt_SET_IZC_SIGSTATE"
+	      Ports		      [0, 1, 0, 1]
+	      Position		      [200, 121, 305, 149]
+	      TreatAsAtomicUnit	      on
+	      System {
+		Name			"rt_SET_IZC_SIGSTATE"
+		Location		[401, 346, 899, 646]
+		Open			off
+		ModelBrowserVisibility	on
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  TriggerPort
+		  Name			  "Trigger"
+		  Ports			  []
+		  Position		  [125, 15, 145, 35]
+		  TriggerType		  "either"
+		  StatesWhenEnabling	  "held"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "Constant"
+		  Position		  [25, 85, 45, 105]
+		  ShowName		  off
+		  ShowAdditionalParam	  on
+		  OutDataTypeMode	  "uint32"
+		}
+		Block {
+		  BlockType		  Memory
+		  Name			  "Single-Loop Delay"
+		  Position		  [140, 145, 160, 165]
+		  Orientation		  "left"
+		  ShowName		  off
+		  InheritSampleTime	  on
+		}
+		Block {
+		  BlockType		  Sum
+		  Name			  "Sum"
+		  Ports			  [2, 1]
+		  Position		  [70, 85, 90, 105]
+		  ShowName		  off
+		  IconShape		  "round"
+		  Inputs		  "|++"
+		  ShowAdditionalParam	  on
+		}
+		Block {
+		  BlockType		  Outport
+		  Name			  "Out1"
+		  Position		  [215, 88, 245, 102]
+		}
+		Line {
+		  SrcBlock		  "Constant"
+		  SrcPort		  1
+		  DstBlock		  "Sum"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "Single-Loop Delay"
+		  SrcPort		  1
+		  Points		  [-55, 0]
+		  DstBlock		  "Sum"
+		  DstPort		  2
+		}
+		Line {
+		  SrcBlock		  "Sum"
+		  SrcPort		  1
+		  Points		  [90, 0]
+		  Branch {
+		    Points		    [0, 60]
+		    DstBlock		    "Single-Loop Delay"
+		    DstPort		    1
+		  }
+		  Branch {
+		    DstBlock		    "Out1"
+		    DstPort		    1
+		  }
+		}
+	      }
+	    }
+	    Block {
+	      BlockType		      SubSystem
+	      Name		      "rt_SET_UZC_SIGSTATE"
+	      Ports		      [0, 1, 0, 1]
+	      Position		      [345, 121, 450, 149]
+	      TreatAsAtomicUnit	      on
+	      System {
+		Name			"rt_SET_UZC_SIGSTATE"
+		Location		[222, 78, 753, 429]
+		Open			off
+		ModelBrowserVisibility	on
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  TriggerPort
+		  Name			  "Trigger"
+		  Ports			  []
+		  Position		  [125, 15, 145, 35]
+		  TriggerType		  "either"
+		  StatesWhenEnabling	  "held"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "Constant"
+		  Position		  [25, 85, 45, 105]
+		  ShowName		  off
+		  ShowAdditionalParam	  on
+		  OutDataTypeMode	  "uint32"
+		}
+		Block {
+		  BlockType		  Memory
+		  Name			  "Single-Loop Delay"
+		  Position		  [140, 145, 160, 165]
+		  Orientation		  "left"
+		  ShowName		  off
+		  InheritSampleTime	  on
+		}
+		Block {
+		  BlockType		  Sum
+		  Name			  "Sum"
+		  Ports			  [2, 1]
+		  Position		  [70, 85, 90, 105]
+		  ShowName		  off
+		  IconShape		  "round"
+		  Inputs		  "|++"
+		  ShowAdditionalParam	  on
+		}
+		Block {
+		  BlockType		  Outport
+		  Name			  "Out1"
+		  Position		  [215, 88, 245, 102]
+		}
+		Line {
+		  SrcBlock		  "Sum"
+		  SrcPort		  1
+		  Points		  [90, 0]
+		  Branch {
+		    DstBlock		    "Out1"
+		    DstPort		    1
+		  }
+		  Branch {
+		    Points		    [0, 60]
+		    DstBlock		    "Single-Loop Delay"
+		    DstPort		    1
+		  }
+		}
+		Line {
+		  SrcBlock		  "Single-Loop Delay"
+		  SrcPort		  1
+		  Points		  [-55, 0]
+		  DstBlock		  "Sum"
+		  DstPort		  2
+		}
+		Line {
+		  SrcBlock		  "Constant"
+		  SrcPort		  1
+		  DstBlock		  "Sum"
+		  DstPort		  1
+		}
+	      }
+	    }
+	    Line {
+	      SrcBlock		      "Constant"
+	      SrcPort		      1
+	      DstBlock		      "Sum"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Sum"
+	      SrcPort		      1
+	      Points		      [0, 0; 15, 0]
+	      Branch {
+		DstBlock		"Switch"
+		DstPort			3
+	      }
+	      Branch {
+		Points			[0, -40]
+		DstBlock		"Switch"
+		DstPort			2
+	      }
+	    }
+	    Line {
+	      SrcBlock		      "Switch"
+	      SrcPort		      1
+	      Points		      [0, 0; 15, 0]
+	      Branch {
+		Points			[0, 100]
+		DstBlock		"Single-Loop Delay"
+		DstPort			1
+	      }
+	      Branch {
+		Points			[75, 0]
+		Branch {
+		  DstBlock		  "rt_SET_IZC_SIGSTATE"
+		  DstPort		  trigger
+		}
+		Branch {
+		  DstBlock		  "Data Type Conversion\nTo Boolean"
+		  DstPort		  1
+		}
+	      }
+	    }
+	    Line {
+	      SrcBlock		      "Single-Loop Delay"
+	      SrcPort		      1
+	      Points		      [-55, 0]
+	      DstBlock		      "Sum"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Constant1"
+	      SrcPort		      1
+	      DstBlock		      "Switch"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "rt_SET_IZC_SIGSTATE"
+	      SrcPort		      1
+	      Points		      [10, 0; 0, 90]
+	      DstBlock		      "Sum1"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "rt_SET_UZC_SIGSTATE"
+	      SrcPort		      1
+	      Points		      [15, 0; 0, 110]
+	      DstBlock		      "Sum1"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "Data Type Conversion\nTo Boolean"
+	      SrcPort		      1
+	      Points		      [50, 0]
+	      Branch {
+		DstBlock		"rt_SET_UZC_SIGSTATE"
+		DstPort			trigger
+	      }
+	      Branch {
+		DstBlock		"Compare\nto Zero"
+		DstPort			1
+	      }
+	    }
+	    Line {
+	      SrcBlock		      "Compare\nto Zero"
+	      SrcPort		      1
+	      Points		      [75, 0]
+	      DstBlock		      "rt_SET_BZC_SIGSTATE"
+	      DstPort		      trigger
+	    }
+	    Line {
+	      SrcBlock		      "rt_SET_BZC_SIGSTATE"
+	      SrcPort		      1
+	      Points		      [20, 0; 0, 130]
+	      DstBlock		      "Sum1"
+	      DstPort		      3
+	    }
+	    Line {
+	      Name		      "rt_SET_xZC_SIGSTATE"
+	      Labels		      [0, 0]
+	      SrcBlock		      "Sum1"
+	      SrcPort		      1
+	      DstBlock		      "Terminator"
+	      DstPort		      1
+	    }
+	    Annotation {
+	      Name		      "rt_SET_IZC_SIGSTATE uses rt_I32ZCFcn.  "
+"The others just have logic.\nNobody uses rt_SET_xZC_SIGSTATE macros!"
+	      Position		      [189, 305]
+	    }
+	  }
+	}
+      }
+    }
+    Line {
+      SrcBlock		      "Generate\nControl\nSignals"
+      SrcPort		      2
+      Points		      [40, 0]
+      DstBlock		      "rtlibsrc\nFixPt"
+      DstPort		      trigger
+    }
+    Line {
+      SrcBlock		      "Generate\nControl\nSignals"
+      SrcPort		      1
+      Points		      [110, 0]
+      DstBlock		      "rt_EnableState"
+      DstPort		      enable
+    }
+  }
+}
+MatData {
+  NumRecords		  5
+  DataRecord {
+    Tag			    DataTag4
+    Data		    "  %)30     .    $ ,   8    (     @         %    "
+"\"     $    !     0         %  0 !P    $    .    9&%T80   &ES2%1-3     X   \""
+"  @  !@    @    !          4    (     0    $    !          X   !0 @  !@    @ "
+"   $          4    (     0    X!   !          0    < @  5 !H &4 ( !) &X = !E "
+"&< 90!R \"  3P!N &P >0 @ '  ;P!R '0 :0!O &X ( !O &8 ( !R '0 ; !I &( <P!R &, +"
+"@!H  H (  @ %4 ;@!S '4 < !P &\\ <@!T &4 9  @ &8 =0!N &, = !I &\\ ;@!S \"P ( !"
+"C &$ ;@ G '0 ( !F &D 9P!U '( 90 @ &\\ =0!T \"  : !O '< ( !T &\\ ( !G &4 ;@!E "
+"'( 80!T &4 ( !T &@ 90!S &4 .@ * \"  (  @ \"  <@!T %\\ 00!\" %, \"@ @ \"  (  @"
+" '( = !? $T 00!8  H (  @ \"  ( !R '0 7P!- $D 3@ * \"  (  @ \"  <@!T %\\ 30!/ "
+"$0 \"@ @ \"  (  @ '( = !? %( 10!-  H (  @ \"  ( !R '0 7P!3 $$ 5 !5 %( 00!4 $4"
+" \"@ @ \"  (  @ '( = !? %, 1P!.  H (  @ \"  ( !R '0 7P!5 $X 4P!' $X \"@ @ \" "
+" (  @ '( = !? %, 10!4 %\\ 20!: $, 7P!3 $D 1P!3 %0 00!4 $4 \"@ @ \"  (  @ '( ="
+" !? %, 10!4 %\\ 50!: $, 7P!3 $D 1P!3 %0 00!4 $4 \"@ @ \"  (  @ '( = !? %, 10!"
+"4 %\\ 0@!: $, 7P!3 $D 1P!3 %0 00!4 $4       X    X    !@    @    $          4"
+"    (     0    ,    !          0    &    ;P!F &8    "
+  }
+  DataRecord {
+    Tag			    DataTag3
+    Data		    "  %)30     .    0 $   8    (     @         %    "
+"\"     $    !     0         %  0 !P    $    .    9&%T80   &ES2%1-3     X   \""
+"P    !@    @    !          4    (     0    $    !          X   \"     !@    @"
+"    $          4    (     0   \"8    !          0   !,    5 !H &4 ( !) &X = !"
+"E &< 90!R \"  3P!N &P >0 @ '  ;P!R '0 :0!O &X ( !O &8 ( !R '0 ; !I &( <P!R &,"
+" +@!H       .    .     8    (    !          %    \"     $    #     0         "
+"$    !@   &\\ 9@!F    "
+  }
+  DataRecord {
+    Tag			    DataTag2
+    Data		    "  %)30     .    > (   8    (     @         %    "
+"\"     $    !     0         %  0 !P    $    .    9&%T80   &ES2%1-3     X   #H"
+" 0  !@    @    !          4    (     0    $    !          X   \"X 0  !@    @ "
+"   $          4    (     0   ,,    !          0   \"& 0  5 !H &D <P @ &T ;P!D"
+" &4 ;  @ &, ;P!N '0 80!I &X <P @ &8 =0!N &, = !I &\\ ;@!A &P :0!T 'D ( !T &@ "
+"80!T \"  90!X &4 <@!C &D <P!E ', ( !T &@ 90 * &8 :0!X &4 9  @ '  ;P!I &X =  @"
+" '  ;P!R '0 :0!O &X ( !O &8 ( !T &@ 90 @ %( 90!A &P +0!4 &D ;0!E \"  5P!O '( "
+":P!S &@ ;P!P  H <@!U &X = !I &T 90 @ &P :0!B '( 80!R 'D +@ @ \"  5 !H &4 ( !I"
+" &X = !E &X =  @ &D <P @ '0 ;P @ '0 90!S '0 ( !C &\\ ;0!P &$ = !I &( :0!L &D "
+"= !Y  H 9@!O '( ( !T &@ 90 @ ', : !A '( 90!D \"  4@ Q #, +P!2 #( ,  P #< 0@ @"
+" '( =0!N '0 :0!M &4 ( !L &D 8@!R &$ <@!Y \"X    .    .     8    (    !       "
+"   %    \"     $    #     0         $    !@   &\\ 9@!F    "
+  }
+  DataRecord {
+    Tag			    DataTag1
+    Data		    "  %)30     .    ^ 0   8    (     @         %    "
+"\"     $    !     0         %  0 !P    $    .    9&%T80   &ES2%1-3     X   !H"
+"!   !@    @    !          4    (     0    $    !          X    X!   !@    @  "
+"  $          4    (     0    $\"   !          0    \"!   4 !U '( < !O ', 90 *"
+" \"  (  \\ %, : !O '( =  @ &0 90!S &, <@!I '  = !I &\\ ;@ @ &\\ 9@ @ '< : !Y "
+"\"  = !H &D <P @ ', =0!B ', >0!S '0 90!M \"  90!X &D <P!T ', /@ *  H 4@!E '$ "
+"=0!I '( 90!M &4 ;@!T ', \"@ M \"  3 !I ', =  @ &\\ 9@ @ '( 90!Q '4 :0!R &4 ;0"
+"!E &X = !S \"  9@!U &P 9@!I &P ; !E &0 ( !I &X ( !T &@ :0!S \"  <P!U &( <P!Y "
+"', = !E &T \"@ M \"  3@!/ %0 ( !R &4 <0!U &D <@!E &T 90!N '0 <P @ &8 =0!L &8 "
+":0!L &P 90!D \"  80!B &\\ =@!E \"  ;P!R \"  8@!E &P ;P!W  H \"@!$ &4 <P!I &< "
+";@ * \"  (  \\ $$ ;@!Y \"  = !E '@ =  @ '0 ;P @ &4 > !P &P 80!I &X ( !W &@ 80"
+"!T \"  :0!S \"  ;@!O '0 ( !O &( =@!I &\\ =0!S \"  9@!R &\\ ;0 * \"  ( !T &@ 9"
+"0 @ &T ;P!D &4 ;  @ &D = !S &4 ; !F \"X (  @ $4 > !A &T < !L &4 <P @ &D ;@!C "
+"&P =0!D &4 ( !I &T < !L &4 ;0!E &X = !E &0 \"@ @ \"  90!Q '4 80!T &D ;P!N ', "
+"+  @ &@ ;P!W \"\\ =P!H 'D ( !T &@ 90 @ &( ; !O &, :P!S \"  80!R &4 ( !G '( ;P"
+"!U '  90!D \"P ( !W &@ >0 * \"  ( !I &T < !L &4 ;0!E &X = !E &0 ( !- &4 = !H "
+"&\\ 9  @ $$ ( !I ', ( !B &4 = !T &4 <@ @ '0 : !A &X ( !- &4 = !H &\\ 9  @ $( "
+"\"@ @ \"  =0!N &0 90!R \"  8P!O &X <P!I &0 90!R &$ = !I &\\ ;@ N #X \"@ @ \" "
+" / !2 &4 ;0!E &T 8@!E '( ( !T &@ 80!T \"  <P!H &\\ <@!T \"  < !H '( 80!S &4 <"
+"P @ &, 80!N \"  8@!E \"  :0!N ', 90!R '0 90!D  H (  @ &0 :0!R &4 8P!T &P >0 @"
+" &D ;@ @ '0 : !E \"  8@!L &\\ 8P!K \"  9 !I &$ 9P!R &$ ;0 @ &( >0 @ &0 ;P!U &"
+"( ; !E \"T 8P!L &D 8P!K &D ;@!G  H (  @ &\\ ;@ @ '0 : !E \"  8@!A &, :P!G '( "
+";P!U &X 9  N #X         #@   #@    &    \"     0         !0    @    !     P  "
+"  $         !     8   !O &8 9@    "
+  }
+  DataRecord {
+    Tag			    DataTag0
+    Data		    "  %)30     .    ^!,   8    (     @         %    "
+"\"     $    !     0         %  0 &0    $   !]    1VQO8F%L1&%T80              "
+"     $=L;V)A;$1A=&%?1FEL951E;7!A;'1E<P!R96=I<W1E<F5D5'EP90              3F%M9"
+"5)U;&5S                     $UI<V-E;&QA;F5O=7,                    .    V 0   "
+"8    (    $0         !          $    &    :&%N9&QE   !    $    $=L;V)A;$1A=&$"
+"N4V-O<&4.    D 0   8    (     0         %    \"     <    !     0         .   "
+" H (   8    (    \"0         %    \"    ' \"   !     0         \"    < (   $ "
+"   /    > $  *@!  \"P 0  ^ $  &@\"  !P @            !';&]B86Q$871A %-C;W!E &U"
+"A8VAI;F5';&]B86Q( &UA8VAI;F5';&]B86P 1VQO8F%L1&5C;&%R871I;VY,;V-A=&EO;@!);F-L"
+"=61E($EN($,@4V]U<F-E($9I;&4 1VQO8F%L4F5F97)E;F-E3&]C871I;VX 4F5F97)E;F-E($EN("
+"$,@4V]U<F-E($9I;&4 1V5N97)A=&50<F]T;W1Y<&5(96%D97)&:6QE $UA8VAI;F5687)&:6QE $"
+"9I;&5496UP;&%T97, 1FEL951E;7!L871E %1E;7!L871E<P!A8W1I=F5496UP;&%T949U;&Q0871"
+"H $,Z7$-!5'5T:6QS7#%P,G T-EQT;V]L8F]X7$5M8F5D9&5D0V]D97)<0T%40W5S=&]M7&-A=%]P"
+";U]I9%]M86-R;U]D969I;F4N=&QC                                 0    (          "
+"     P    -                                                          $       "
+"             !          (                    \"                    !P    ,   "
+" !          0    !     0    4         !@    <         \"     D    !     @    "
+"H    !     P    L    !    !     $    .          \\               X   !X    !@"
+"    @    !          4    (     0    $    !          X   !(    !@    @    -   "
+"       4    (    !0    $    !          8    4        W0(    !     0    $     "
+"    #@   #@    &    \"     8         !0    @    !     0    $         \"0    @"
+"           #P/PX    X    !@    @    &          4    (     0    $    !        "
+"  D    (               .    ,     8    (    \"0(        %    \"     $    !   "
+"  0         \"  $       X    P    !@    @    ) @        4    (     0    $    "
+"!          (  0      #@   $@    &    \"     T         !0    @    %     0    $"
+"         !@   !0       #= @    $    !     @         .    4 (   8    (    $0  "
+"       !          $    &    :&%N9&QE   !    %@   $9I;&5496UP;&%T92Y496UP;&%T9"
+"7,   X      @  !@    @    !          4    (     @    $    !          X   !0 0"
+"  !@    @    )          4    (    ( $   $    !          (    @ 0   0    0   "
+"\"H    R    -       0  & $  \" !             $9I;&5496UP;&%T90!496UP;&%T97, 8"
+"6-T:79E5&5M<&QA=&5&=6QL4&%T: !#.EQ#051U=&EL<UPQ<#)P-#9<=&]O;&)O>%Q%;6)E9&1E9$"
+"-O9&5R7$-!5$-U<W1O;5QC871?<&]?:61?;6%C<F]?9&5F:6YE+G1L8P                     "
+"       $    \"                                                          $    "
+"                !                     0    ,         !               #@   '@ "
+"   &    \"     $         !0    @    !     0    $         #@   $@    &    \"  "
+"   T         !0    @    %     0    $         !@   !0       #= @    $    !    "
+" 0         .    ( (   8    (    $0         !          $    &    :&%N9&QE   ! "
+"   $    '5S97)4>7!E<RY#=7-T;VT.    V $   8    (     0         %    \"     (  "
+"  !     0         .    * $   8    (    \"0         %    \"    /@    !     0  "
+"       \"    ^     $    '    :    (@   \"0    P    /    #X              !U<V5"
+"R5'EP97, 0W5S=&]M '5S97)4>7!E ')E86PS,E]4 '1M=U1Y<&4 8F%S951Y<&4 <VEN9VQE    "
+"                          $    \"                                            "
+"              $                    !                     P    ,         !    "
+" 4         !     8         !P              #@   '@    &    \"     $         !"
+"0    @    !     0    $         #@   $@    &    \"     T         !0    @    % "
+"    0    $         !@   !0       #= @    $    !     0         .    < ,   8   "
+" (    $0         !          $    &    :&%N9&QE   !    $P   $YA;652=6QE<RY.86U"
+"E4G5L97,       X    @ P  !@    @    !          4    (     P    $    !        "
+"  X    P @  !@    @    )          4    (      (   $    !          (      @   "
+"0    X    8 0  . $  $ !  !P 0  ^ $    \"             $YA;652=6QE<P!687)I86)L9"
+"4%P<')O86-H $YO;F4 5F%R:6%B;&5#87-E5'EP90!.;R!#:&%N9V4 5F%R:6%B;&5.86UE0W)E87"
+"1E349U;F-T:6]N \"  4&%R86UE=&5R07!P<F]A8V@ 4&%R86UE=&5R0V%S951Y<&4 4&%R86UE=&"
+"5R3F%M94-R96%T94U&=6YC=&EO;@!$969I;F5!<'!R;V%C: !$969I;F5#87-E5'EP90!$969I;F5"
+".86UE0W)E871E349U;F-T:6]N $-A<V5#871E9V]R>45N=6U,:7-T17AT                    "
+"           !     0                                                         ! "
+"                    0                    H    \"          ,    $          4  "
+"  &          <    (          ,    )          4    *          <    +          "
+",    ,          4    -          <    .     0                         .    >  "
+"   8    (     0         %    \"     $    !     0         .    2     8    (   "
+" #0         %    \"     4    !     0         &    %        -T\"     0    $   "
+" !          X    X    !@    @    &          4    (     0    $    !          D"
+"    (               .    8 8   8    (    $0         !          $    &    :&%N"
+"9&QE   !    %0   $UI<V-E;&QA;F5O=7,N3W!T:6]N<P    X    0!@  !@    @    !     "
+"     4    (    #0    $    !          X   #X @  !@    @    )          4    (  "
+"  R (   $    !          (   #( @   0   !,   \"P 0  T $  -@!   ( @  P (  ,@\" "
+"            $UI<V-E;&QA;F5O=7, 3W!T:6]N<P!);F-L=61E1FEL945N8VQO<W5R90 C:6YC;'"
+"5D92 B:&5A9&5R+F@B $-O9&5'96YE<F%T:6]N365T:&]D %-T86YD87)D $-U<W1O;4-O;6UE;G1"
+"%;F%B;&4 4&5R;6ET0FQI;F1&=6YC=&EO;D-A;&QS %!E<FUI=$1A=&%$:6-T:6]N87)Y26YI=&EA"
+";%9A;'5E<P!097)M:71$871A1&EC=&EO;F%R>41A=&%4>7!E %!E<FUI=$1A=&%$:6-T:6]N87)Y0"
+"7)R87E$:6UE;G-I;VYS %-A=F5$:6-T:6]N87)Y26Y-;V1E; !&;W)C949I>&5D4&]I;G13871U<F"
+"%T:6]N3V9F $EN=&5R;F%L07!P<F]A8V@ 1&ER96-T($EN8VQU<VEO;@!U<V5\"87-E15)45&5M<&"
+"QA=&4 4W1A=&5F;&]W0V5N=')I8P!E;F%B;&5-4%0 4&]S=%!R;V-E<W-%;F%B;&4            "
+"                   $    \"                                                   "
+"       $                    !                    #@    ,         !     4     "
+"    !@    <    !          @    !     0    D    !     @    H    !     P    L  "
+"  !    !     P    !    !0    T    !    !@    X         #P   !     !    !P   !"
+"$    !    \"    !(    !    \"0   !,    !    \"@                    X   !X    "
+"!@    @    !          4    (     0    $    !          X   !(    !@    @    - "
+"         4    (    !0    $    !          8    4        W0(    !     0    $   "
+"      #@   #     &    \"     D\"        !0    @    !     0    $          @ ! "
+"      .    ,     8    (    \"0(        %    \"     $    !     0         \"  $"
+"       X    P    !@    @    ) @        4    (     0    $    !          (  0  "
+"    #@   #     &    \"     D\"        !0    @    !     0    $          @ !   "
+"    .    ,     8    (    \"0(        %    \"     $    !     0         \"  $  "
+"     X    P    !@    @    ) @        4    (     0    $    !          (  0    "
+"  #@   #     &    \"     D\"        !0    @    !     0    $          @ !     "
+"  .    ,     8    (    \"0(        %    \"     $    !     0         \"  $    "
+"   X    P    !@    @    ) @        4    (     0    $    !          (  0      "
+"#@   #     &    \"     D\"        !0    @    !     0    $          @ !       "
+".    ,     8    (    \"0(        %    \"     $    !     0         \"  $      "
+" "
+  }
+}

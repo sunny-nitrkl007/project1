@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
+>
+  <info module="es-ms-mach-prod/ss/toa_wl00_x86_64-b"
+        e:ivydom="ivy-mach_productivity"
+        e:vpath="lib_info_products/toa_wl00_x86_64-b"
+        organisation="com.cat.e"
+        revision="#!RevReplace!#"
+        status="integration"
+  />
+  <configurations defaultconf="rel">
+    <conf description="Retrieve artifacts necessary to use the module." name="rel"/>
+    <conf description="Retrieve artifacts needed to do development."    name="dev"/>
+	<conf description="Retrieve self content only."                     name="nodep"/>
+  </configurations>
+  <publications>
+    <artifact ext="xml" name="git-repo" type="git"/>
+  </publications>
+  <dependencies defaultconf="*->@">
+    <dependency conf="dev,rel-&gt;@" name="es-ms-mach-prod/ss/toa_wl00_inf" e:ivydom="ivy-mach_productivity" org="com.cat.e"  rev="#!RevReplace!#"/>
+  </dependencies>
+</ivy-module>

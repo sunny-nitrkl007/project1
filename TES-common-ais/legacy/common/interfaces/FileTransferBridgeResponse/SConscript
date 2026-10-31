@@ -1,0 +1,60 @@
+###############################################################################
+## @file      SConscript
+## @author    autogen
+##
+## @attention COPYRIGHT (C) 2021 CATERPILLAR INC. ALL RIGHTS RESERVED.
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+
+
+# Build Channel.Input.so
+#ifaceChannelInput = baseEnv.SharedLibraryWrapper(
+#    target='FileTransferBridgeResponse.Channel.Input.so',
+#    source='Channel/Input/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel', baseEnv['BOOST_SIGNALS'] ],
+#)
+
+# Build Channel.Output.so
+#ifaceChannelOutput = baseEnv.SharedLibraryWrapper(
+#    target='FileTransferBridgeResponse.Channel.Output.so',
+#    source='Channel/Output/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel' ],
+#)
+
+# Build Channel.Output.so
+ifaceChannel = baseEnv.SharedLibraryWrapper(
+    target='FileTransferBridgeResponse.Channel.so',
+    source='Channel/channels.cpp',
+    LIBS = ['ais_serialization', 'ais_channel' ],
+)
+
+
+# Build Restorable
+ifaceRestorable = baseEnv.SharedLibraryWrapper(
+    target='FileTransferBridgeResponse.Restorable.so',
+    source='Restorable/Restorable.cpp',
+    LIBS = ['ais_serialization'],
+)
+    
+# Build TypeTraits    
+ifaceTypeTraits = baseEnv.SharedLibraryWrapper(
+  target='FileTransferBridgeResponse.TypeTraits.so',
+  source=[
+       'TypeTraits/csvable.cpp',
+        'TypeTraits/textWritable.cpp',
+   ],
+   LIBS = ['ais_serialization'],
+)
+
+#baseEnv.InstallLibrary( ifaceChannelInput )
+#baseEnv.InstallLibrary( ifaceChannelOutput )
+baseEnv.InstallLibrary( ifaceChannel )
+baseEnv.InstallLibrary( ifaceRestorable )
+baseEnv.InstallLibrary( ifaceTypeTraits )
+
+#baseEnv.Alias("FileTransferBridgeResponse", "#lib/libFileTransferBridgeResponse.Channel.Input.so")
+#baseEnv.Alias("FileTransferBridgeResponse", "#lib/libFileTransferBridgeResponse.Channel.Output.so")
+baseEnv.Alias("FileTransferBridgeResponse", "#lib/libFileTransferBridgeResponse.Channel.so")
+baseEnv.Alias("FileTransferBridgeResponse", "#lib/libFileTransferBridgeResponse.Restorable.so")
+baseEnv.Alias("FileTransferBridgeResponse", "#lib/libFileTransferBridgeResponse.TypeTraits.so")

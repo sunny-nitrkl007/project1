@@ -1,0 +1,15 @@
+diff --git a/Makefile b/Makefile
+index d432a13913..0f9c53bec8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -63,6 +63,10 @@ export AIS_BUILD_TOOLS=$(TLD)/prod/ais_build_tools/content
+ # Disable moving of app content out of bin/lib (for non multiapp)
+ export SKIP_BUILD_SYNC=1
+ 
++# Docker mount root: the host path that maps to /home/<user>/repos inside the container.
++# get-gen7-deps.sh defaults to REPO_ROOT/.. which is wrong for nested repos (ssp-CPM_Loader-ais/eta-ais).
++export HOST_MOUNT_ROOT?=$(shell readlink -f $(TLD)/../..)
++
+ #########
+ # Load the most commonly used mk files
+ #########

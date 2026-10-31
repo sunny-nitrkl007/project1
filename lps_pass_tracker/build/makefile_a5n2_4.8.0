@@ -1,0 +1,53 @@
+# This is a short-term make file. We will be creating a standard make file later.
+CC=gcc
+CP=cp
+RM=rm
+ARMCC=arm-linux-gcc
+ARMAR=arm-linux-ar
+CFLAGS=-g -fPIC -Wall -Wmissing-declarations -Wredundant-decls -Wundef -Wshadow -Wlogical-op -Wcast-align
+EXEC=lps_pass_tracker
+EXEC_PREFIX=lib
+EXEC_EXT=.a
+BUILD_ROOT=../../..
+LPS_PT_ROOT= ../..
+LPS_PT_INCLUDE= ..
+SRC_PATH = ../src/
+DEBUG=debug
+ARM=_arm
+
+PATH := ../../../../../../CPM/MAAL/ssp-app_MAAL/ssdk-a5n2/host/usr/bin:$(PATH)
+
+SOURCES = $(wildcard $(SRC_PATH)*.c)
+
+OBJS =  *.o
+
+INCLUDES= \
+		-I ./ \
+		-I$(LPS_PT_INCLUDE)/include/ \
+		-I$(LPS_PT_ROOT)/lps_pass_tracker_interface/include \
+		-I$(BUILD_ROOT)/lps_common/include \
+		-I$(BUILD_ROOT)/lps_app_common/include
+
+all: clean $(SOURCES) $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT) $(EXEC_PREFIX)$(EXEC)$(DEBUG)$(EXEC_EXT) end
+	
+
+$(EXEC_PREFIX)$(EXEC)$(EXEC_EXT):
+	$(ARMCC) $(SOURCES) $(INCLUDES) $(CFLAGS) -s -c
+	$(ARMAR) rcs $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT) $(OBJS)
+	$(CP) $@ $(LPS_PT_ROOT)/lps_pass_tracker-a/tgt_gcc_4.8.0_a5n2/$@
+	$(RM) $@
+			
+
+$(EXEC_PREFIX)$(EXEC)$(DEBUG)$(EXEC_EXT):
+	$(ARMCC) $(SOURCES) $(INCLUDES) $(CFLAGS) -c
+	$(ARMAR) rcs $@ $(OBJS)
+	$(CP) $@ $(LPS_PT_ROOT)/lps_pass_tracker-a/tgt_gcc_4.8.0_a5n2/$@
+	$(RM) $@
+
+clean:	
+	@echo "---------------------make begin a5n2----------------------"
+	@echo "Clean rebuild: Deleting compiled objects and libs"
+	rm -rf *.o  $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT) $(EXEC_PREFIX)$(EXEC)$(DEBUG)$(EXEC_EXT)	
+	
+end:
+	@echo "-------------------------make end------------------------------"

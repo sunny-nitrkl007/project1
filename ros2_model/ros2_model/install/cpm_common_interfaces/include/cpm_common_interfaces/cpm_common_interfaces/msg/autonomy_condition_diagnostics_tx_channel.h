@@ -1,0 +1,12 @@
+// generated from rosidl_generator_c/resource/idl.h.em
+// with input from cpm_common_interfaces:msg/AutonomyConditionDiagnosticsTxChannel.idl
+// generated code does not contain a copyright notice
+
+#ifndef CPM_COMMON_INTERFACES__MSG__AUTONOMY_CONDITION_DIAGNOSTICS_TX_CHANNEL_H_
+#define CPM_COMMON_INTERFACES__MSG__AUTONOMY_CONDITION_DIAGNOSTICS_TX_CHANNEL_H_
+
+#include "cpm_common_interfaces/msg/detail/autonomy_condition_diagnostics_tx_channel__struct.h"
+#include "cpm_common_interfaces/msg/detail/autonomy_condition_diagnostics_tx_channel__functions.h"
+#include "cpm_common_interfaces/msg/detail/autonomy_condition_diagnostics_tx_channel__type_support.h"
+
+#endif  // CPM_COMMON_INTERFACES__MSG__AUTONOMY_CONDITION_DIAGNOSTICS_TX_CHANNEL_H_

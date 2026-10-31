@@ -1,0 +1,19 @@
+diff --git a/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt b/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt
+index f69d6d0d77..97400fd810 100644
+--- a/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt
++++ b/prod/ais_build_tools/content/platform/_COMMON/update-rpath-map-verities.txt
+@@ -3,10 +3,10 @@
+ #       but if it's empty, default INTERPRETER will be used.
+ INTERPRETER=${AIS_APP_INTERPRETER}
+ # map build paths local to ${BUILD_DIR} to target paths
+-bin:/opt/appSoftware/bin
+-cgi-bin:/opt/appSoftware/cgi-bin
+-lib:/opt/appSoftware/lib
++bin:/opt/CPM/bin
++cgi-bin:/opt/CPM/cgi-bin
++lib:/opt/CPM/lib
+ ossSoftware:/opt/ossSoftware
+-www:/opt/appSoftware/www
++www:/opt/CPM/www
+ ext/ais_app_od-a:/opt/aisObjectDetectSoftware
+ ext/ais_app_pose-a:/opt/aisPoseLibSoftware

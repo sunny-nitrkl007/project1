@@ -1,0 +1,12 @@
+// generated from rosidl_generator_cpp/resource/idl.hpp.em
+// generated code does not contain a copyright notice
+
+#ifndef WEIGH_APP_INTERFACES__MSG__LPS_SA_NVM_CAL_DATA_CHANNEL_DATA_MAIN_HPP_
+#define WEIGH_APP_INTERFACES__MSG__LPS_SA_NVM_CAL_DATA_CHANNEL_DATA_MAIN_HPP_
+
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_data_channel_data_main__struct.hpp"
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_data_channel_data_main__builder.hpp"
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_data_channel_data_main__traits.hpp"
+#include "weigh_app_interfaces/msg/detail/lps_sa_nvm_cal_data_channel_data_main__type_support.hpp"
+
+#endif  // WEIGH_APP_INTERFACES__MSG__LPS_SA_NVM_CAL_DATA_CHANNEL_DATA_MAIN_HPP_

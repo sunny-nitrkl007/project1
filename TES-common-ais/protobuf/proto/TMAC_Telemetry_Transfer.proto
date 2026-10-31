@@ -1,0 +1,143 @@
+//******************************************************************************
+// Copyright 2018 Caterpillar Inc. All rights reserved.
+// -----------------------------------------------------------------------------
+// File name: TMAC_Telemetry_Transfer.proto
+//
+// Version: 1.1
+//
+// Description:  Message structure for communicating TMAC/Telemetry data
+// between applications before the data is reformatted and sent offboard.
+//******************************************************************************/
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+package CAT.Telemetry;
+
+
+message GpsLocation
+{
+	message Accuracy
+	{
+		bool gps_source_available = 1;	// 0 = GPS Source Available; 1 = No GPS Source Available
+		bool data_validity = 2;			// 0 = Bits 4-1 Valid; 1 = Bits 4-1 Invalid.  These bits represent the validity of the boolean fields of filtered, altitude, 3d_fix, and corrections_available.
+		bool filtered = 3;				// 0 = Unfiltered; 1 = Filtered
+		bool altitude = 4;				// 0 = Last 3D Altitude; 1 = User Entered Altitude
+		bool fix_3d = 5;				// 0 = 3D fix; 1 = 2D fix
+		bool corrections_available = 6;	// 0 = No Corrections Available; 1 = GPS Corrections Available
+		bool fix_available = 7;			// 0 = Fix Available; 1 = No Fix Available
+	}
+	uint64 timestamp = 1;				// number of seconds since 1/1/1970
+	Accuracy accuracy = 2;
+	google.protobuf.DoubleValue latitude = 3;
+	google.protobuf.DoubleValue longitude = 4;
+	google.protobuf.DoubleValue height = 5;
+	google.protobuf.UInt32Value northing = 6;		// centimeters
+	google.protobuf.UInt32Value easting = 7;		// centimeters
+	google.protobuf.UInt32Value elevation = 8;		// centimeters
+	google.protobuf.UInt32Value heading = 9;
+	google.protobuf.UInt32Value equipment_state_id = 10;		// currently not used
+	google.protobuf.UInt32Value equipment_state_flags = 11;		// currently not used
+}
+
+message TpmsCycle
+{
+	message EventMask
+	{
+		bool left_front_strut_parameter_fault = 1;
+		bool right_front_strut_parameter_fault = 2;
+		bool left_rear_strut_parameter_fault = 3;
+		bool right_rear_strut_parameter_fault = 4;
+		bool bad_lever_parameter_fault = 5;
+		bool body_position_parameter_fault = 6;
+		bool transmission_gear_parameter_fault = 7;
+		bool fuel_flow_parameter_fault = 8;
+		bool ground_speed_parameter_fault = 9;
+		bool parking_brake_parameter_fault = 10;
+		bool retarder_parameter_fault = 11;
+		bool keyed_off_after_loading = 12;
+		bool last_loader_pass_estimated = 13;
+	}
+	uint64 message_timestamp = 1;								// number of seconds since 1/1/1970
+	google.protobuf.UInt64Value dump_completion_timestamp = 2;	// number of seconds since 1/1/1970
+	google.protobuf.UInt32Value service_meter_units = 3;		// seconds
+	google.protobuf.FloatValue payload_weight = 4;				// tonnes
+	google.protobuf.FloatValue loading_time = 5;				// seconds
+	google.protobuf.FloatValue stopped_empty_time = 6;			// seconds
+	google.protobuf.FloatValue stopped_loaded_time = 7;			// seconds
+	google.protobuf.FloatValue travel_empty_time = 8;			// seconds
+	google.protobuf.FloatValue travel_empty_distance = 9;		// miles
+	google.protobuf.FloatValue travel_loaded_time = 10;			// seconds
+	google.protobuf.FloatValue travel_loaded_distance = 11;		// miles
+	google.protobuf.UInt32Value loader_pass_count = 12;
+	google.protobuf.UInt32Value transmission_shifts = 13;
+	google.protobuf.FloatValue fuel_used = 14;					// gallons
+	google.protobuf.StringValue vims_user_info = 15;			// max length of 7 ASCII characters
+	GpsLocation location = 16;
+	google.protobuf.UInt32Value operator_id = 17;
+	google.protobuf.FloatValue fuel_level = 18;					// percentage
+	EventMask event_mask = 19;
+}
+
+message TpmsDipper
+{
+	uint64 message_timestamp = 1;								// number of seconds since 1/1/1970
+	google.protobuf.FloatValue current_payload = 2;				// tonnes
+	google.protobuf.UInt64Value dipper_timestamp = 3;			// number of seconds since 1/1/1970
+	google.protobuf.UInt32Value service_meter_units = 4;		// seconds
+	GpsLocation location = 5;
+	google.protobuf.UInt32Value source_machine_id = 6;			// currently not used
+	google.protobuf.UInt32Value destination_machine_id = 7;		// currently not used
+}
+
+message TpmsLoad
+{
+	uint64 message_timestamp = 1;							// number of seconds since 1/1/1970
+	google.protobuf.FloatValue current_payload = 2;			// tonnes
+	google.protobuf.UInt64Value load_timestamp = 3;			// number of seconds since 1/1/1970
+	google.protobuf.UInt32Value service_meter_units = 4;	// seconds
+	GpsLocation location = 5;
+}
+
+message TpmsMode
+{
+	enum OperatingMode
+	{
+		UNKNOWN = 0;
+		DUMPING = 4;
+		STOPPED_EMPTY = 5;
+		TRAVELING_EMPTY = 6;
+		STOPPED_LOADED = 7;
+		TRAVELING_LOADED = 8;
+		LOADING = 9;
+		LOADING_LAST_PASS = 10;
+		FULLY_LOADED = 11;
+		REWEIGH_COMPLETE = 12;
+		UNCALIBRATED = 237;
+	}
+	uint64 message_timestamp = 1;		// number of seconds since 1/1/1970
+	OperatingMode mode = 2;
+	GpsLocation location = 3;
+}
+
+message PcsCycle
+{
+	message EventMask
+	{
+		bool reweigh_occurred = 1;
+		bool bad_lift_included = 2;
+	}
+	uint64 message_timestamp = 1;							// number of seconds since 1/1/1970
+	google.protobuf.UInt64Value cycle_timestamp = 2;		// number of seconds since 1/1/1970
+	google.protobuf.UInt32Value service_meter_units = 3;	// seconds
+	google.protobuf.FloatValue truck_weight = 4;			// tonnes
+	google.protobuf.StringValue truck_id = 5;				// max length 8 characters
+	google.protobuf.UInt32Value blast_number = 6;
+	google.protobuf.UInt32Value loader_pass_count = 7;
+	google.protobuf.UInt32Value material_id = 8;
+	google.protobuf.UInt32Value load_site_id = 9;
+	google.protobuf.StringValue vims_user_info = 10;		// max length 7 ASCII characters
+	EventMask event_mask = 11;
+	GpsLocation location = 12;
+	google.protobuf.UInt32Value operator_id = 13;
+}
+
+

@@ -1,0 +1,23 @@
+###############################################################################
+## @file      SConscript
+## @author    Stanislav Akhatov
+## @date      May 16, 2018
+## @brief     SConscript for the Input Simulation App
+##
+## @attention Copyright (C) 2018
+## @attention Caterpillar
+## @attention All rights reserved
+## @attention Caterpillar Proprietary
+###############################################################################
+#!/usr/bin/python
+Import( 'testEnv' )
+
+simAppEnv = testEnv.Clone()
+simAppObject = simAppEnv.ProgramWrapper(
+        target = 'csvToDldApp',
+        source = [ 'csvToDldApp.cpp' ],
+        LIBS = [ 'ais_task', 'csvUtil' ]
+)
+
+simAppEnv.InstallBinary( simAppObject )
+simAppEnv.Alias('csvToDldApp', '#bin/csvToDldApp')

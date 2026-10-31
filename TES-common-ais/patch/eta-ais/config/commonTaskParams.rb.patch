@@ -1,0 +1,13 @@
+diff --git a/prod/coretech/ais_task/config/commonTaskParams.rb b/prod/coretech/ais_task/config/commonTaskParams.rb
+index 06adec9..8c03485 100644
+--- a/prod/coretech/ais_task/config/commonTaskParams.rb
++++ b/prod/coretech/ais_task/config/commonTaskParams.rb
+@@ -40,7 +40,7 @@ module CommonTaskParams
+         "loggerThreshold" => Logger::ERROR,
+         "heartbeatRate" => 1.0,
+         "CommSystem" => "SimpleComms",
+-        "outputFileBackupDir" => ENV['HOME'].to_s + "/tmp/outputFiles/backup",   # Copy output log files to this directory on key-off
++        "outputFileBackupDir" => "",   # Copy output log files to this directory on key-off if exists
+ 
+         # Set the log suppression timeout values. Defaults are 0.0 (suppression disabled) for DEBUG, 1.0 seconds for all others
+         "loggerSuppressionTimeoutSec" => {

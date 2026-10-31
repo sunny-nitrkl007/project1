@@ -1,0 +1,31 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for the testTask application.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+Import( 'testEnv' )
+ 
+sourceFiles = [ 
+    'CoachingTaskTest.cpp'
+]
+
+CoachingTaskTest = testEnv.Program( 
+        target = 'CoachingTaskTest',
+        source = sourceFiles,
+        LIBS = [ 'ais_task', 'ais_config', 'ais_log'] 
+
+    )
+
+testEnv.InstallBinary( CoachingTaskTest )
+testEnv.Alias("CoachingTaskTest", "#bin/CoachingTaskTest")
+
+

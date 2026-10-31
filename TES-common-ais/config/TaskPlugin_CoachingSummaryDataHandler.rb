@@ -1,0 +1,3 @@
+CoachingSummaryDataHandler = {
+  "enabled" => true,
+}

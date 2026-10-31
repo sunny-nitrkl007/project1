@@ -1,0 +1,8 @@
+# This file indicates which files should not be added to the git repository.
+
+# Build Artifacts
+/src/makefiles/emake.data
+/src/makefiles/emake.data.backup
+
+# Temporary files
+*.asv

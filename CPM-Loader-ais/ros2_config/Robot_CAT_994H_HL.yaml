@@ -140,3 +140,4 @@ LpsSaWeighApp:
 LpsSaJobMgrApp:
   ros__parameters:
     internal_msn: "CAT94001"
+    ui_show_feature_config_json_file_path: "${CAT_CONFIG_DIR}/UI_SHOW_FEATURE_CONFIG_LWL.json"

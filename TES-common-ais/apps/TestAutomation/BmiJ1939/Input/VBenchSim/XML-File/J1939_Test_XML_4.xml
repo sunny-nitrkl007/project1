@@ -1,0 +1,54 @@
+<vbench>
+	<module name="J1939CAT_BMI_47_4" cdl_sid="57" j1939_sid= "47" enable= "1" j1939_name="ECM_47" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<j1939_map param="Body up" pid="F604" enable="1" enable_read="1"  value="1"/>
+	<j1939_map param="Ambient Temp" pid="F477" enable="1" enable_read="1"  value="1"/>
+	<j1939_map param="Product ID" pid="F82D" enable="1" enable_read="1" enable_write="0" value="52544C3131313131"/>
+	<j1939_map param="Tank Level" pid="F428" enable="1" enable_read="1"  value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+
+	<module name="J1939CAT_BMI_00_4" cdl_sid="24" j1939_sid= "00" enable= "1" j1939_name="ECM_00" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<cdl_map param="Fuel Rate" pid="F525" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Engine Speed" pid="40" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Total Fuel" pid="C8" enable="1" enable_read="1" value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+	
+	<module name="J1939CAT_BMI_03_4" cdl_sid="1B" j1939_sid= "03" enable= "1" j1939_name="ECM_03" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<cdl_map param="Ground Speed" pid="F4FD" enable="1" enable_read="1" value="1"/>
+	<cdl_map param="Actual Gear" pid="F5D9" enable="1" enable_read="1" value="8193"/>
+	<cdl_map param="Odometer" pid="FC2E" enable="1" enable_read="1" value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+	
+	<module name="J1939CAT_BMI_0B_4" cdl_sid="" j1939_sid= "0B" enable= "1" j1939_name="ECM_0B" eddt_version="03" action= "create">
+	
+	<!--J1939 PGB Parameters # Required "F038" and cdl_map configured parameters as below -->
+	<!--IMPORTANT - THIS "F038" IS NEEDED FOR VBench to Support J1939 PGB-->
+	<j1939_cat param= "Feature support level version#1" spn= "F038" enable= "1" enable_read= "1" value= "FF0101FFFFFFFFFFFFFFFFFF"/>
+	<j1939_map param="Machine Slope" pid="F533" enable="1" enable_read="1" value="1"/>
+	<j1939_map param="Machine Yaw Rate" pid="D01373" enable="1" enable_read="1" value="1"/>
+	<j1939_map param="Machine Longitudinal Acceleration" pid="D01375" enable="1" enable_read="1" value="1"/>
+	<!-- End of J1939 PGB Parameters -->
+
+	</module>
+</vbench>
+
+
+
+

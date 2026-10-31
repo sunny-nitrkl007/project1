@@ -1,0 +1,63 @@
+diff --git a/prod/machineCommon/content/prod/infrastructure/rpaClient/rpa_client_app.cpp b/prod/machineCommon/content/prod/infrastructure/rpaClient/rpa_client_app.cpp
+index 32e496d..961d577 100644
+--- a/prod/machineCommon/content/prod/infrastructure/rpaClient/rpa_client_app.cpp
++++ b/prod/machineCommon/content/prod/infrastructure/rpaClient/rpa_client_app.cpp
+@@ -22,10 +22,12 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <time.h>
+ #include <sys/mount.h>
+ #include <stdlib.h>
+ #include <pthread.h>
+ #include <string>
++#include <sys/stat.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+@@ -40,6 +42,7 @@
+ #include <ais_filesystem/filelist.h>
+ #include <ais/util/taskUtils.hpp>
+ 
++
+ /******************************************************************************
+ ** -- #Define, Struct's, Typedef's, Enum's --
+ ******************************************************************************/
+@@ -66,6 +69,9 @@
+ 
+ #define CAT_TMP HOME + "tmp/"
+ 
++//temporary until rpa.h is updated
++#define APP_READY_CODE_PAYLOAL_LEGAL_FOR_TRADE_IS_SEALED 22
++
+ /******************************************************************************
+ ** -- Function Prototypes --
+ ******************************************************************************/
+@@ -364,7 +370,26 @@ void rpa_flash_ipc_message_callback(rpa_flash_ipc_code_t ipc_code)
+       case RPA_FLASH_IPC_CODE_STATUS_REFRESH:
+          log_dbg(DB_INFO, "RPA is requesting status refresh.");
+          /* Response OK to flash */
+-         rpa_ipc_send_flash_status_response( APP_READY_CODE_OK_TO_FLASH );
++         struct stat stats;
++         if (stat("/tmp/appdata/CPM/noflash", &stats) == 0)
++         {
++             // check if file is recent (no longer than 5mins old) and current time is greater
++             // than file modified time, then don't allow flash
++             if ((time(NULL) > stats.st_mtime) && ((time(NULL) - stats.st_mtime) < 300))
++             {
++                 log_dbg(DB_INFO, "Flash not allowed due to CPM noflash file found");
++                 rpa_ipc_send_flash_status_response( APP_READY_CODE_PAYLOAL_LEGAL_FOR_TRADE_IS_SEALED );
++             }
++             else
++             {
++                 // file is stale, we will allow flashing
++                 rpa_ipc_send_flash_status_response( APP_READY_CODE_OK_TO_FLASH );
++             }
++         }
++         else
++         {
++             rpa_ipc_send_flash_status_response( APP_READY_CODE_OK_TO_FLASH );
++         }
+          break;
+          
+       case RPA_FLASH_IPC_CODE_FLASH_COMPLETE:

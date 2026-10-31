@@ -1,0 +1,142 @@
+:copyright: Copyright (C) 2015-2016 Caterpillar Inc. All Rights Reserved.
+= LPS Weighing Library Software History
+
+//****************************************************************************
+= LPS Weighing Library Software History (0.4.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2017-02-16
+| Release Label/Tag | 0.4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Replaced DigTargetWt with LoaderBktPayldTrgtWt (gundas1)
+
+Replaced DigTargetWt with LoaderBktPayldTrgtWt.
+
+//****************************************************************************
+
+//****************************************************************************
+= LPS Weighing Library Software History (0.3.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2017-02-16
+| Release Label/Tag | 0.3.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Overload Warnings added to Best Bucket Weight (gundas1)
+
+Overload Warnings added to Best Bucket Weight.
+
+=== Unused LpsDumpDetect and ZeroWeight variables removed (gundas1)
+
+Unused LpsDumpDetect and ZeroWeight variables removed.
+
+=== Zero Adjust moved from Live Weight to LLW and changed the order of Update (gundas1)
+
+Zero Adjust moved from Live Weight to LLW and changed the order of Update
+
+=== Changed the threshold of velocities (gundas1)
+
+Changed the threshold of velocities in LpsProcess.c from 0 to +/- 1 for linkage raise and lower respectively owing to filter abnormalities
+
+=== Fixed all GTest scripts with the changes made to the library (gundas1)
+
+Fixed all GTest scripts with the changes made to the library
+
+=== Replaced Cmd Per with  TiltCylVel (gundas1)
+
+Replaced Cmd Per with  TiltCylVel
+
+=== Implemented PIDs D10933 and D10822 (gundas1)
+
+Implemented PIDs D10933 and D10822
+
+=== Moved prototypes of files needed for Wrapper (gundas1)
+
+Moved prototypes of files needed for Wrapper to use from LpsPrivate.h to LpsPublic.h
+
+=== Reset too heavy to zero in best bucket weight reset (gundas1)
+
+Reset too heavy to zero in best bucket weight reset.
+
+=== Reset zero accepted status when LLW latched (gundas1)
+
+Reset zero accepted status when LLW latched.
+
+=== Replaced function LpsWeighSetZeroNeededStatus  (gundas1)
+
+Replaced function LpsWeighSetZeroNeededStatus with LpsWeighSetAutoZeroUpdateStatus since its renamed.
+
+=== Initialize zero temp default value in init function  (gundas1)
+
+Initialize zero temp default value in init function.
+
+=== Assigned best bucket weight to zero weight instead of WRW WtAvg  (gundas1)
+
+Assigned best bucket weight to zero weight instead of WRW WtAvg.
+
+=== Modified weighing library make file to pickup filter library from new location (gundas1)
+
+Modified weighing library make file to pickup filter library from new location, cpm_filters target repo.
+
+=== Changed SnoozedStatus data type (gundas1)
+
+Changed SnoozedStatus data type from unsigned_8 to LpsZeroNeededStatus_t.
+
+//****************************************************************************
+
+//****************************************************************************
+= LPS Weighing Library Software History (0.2.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2016-07-19
+| Release Label/Tag | 0.2.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Fixed sizeof (gundas1)
+
+Fixed sizeof in function LpsCalInstantWt.
+
+=== Added x86 make file (gundas1)
+
+Added x86 make file.
+
+NOTE: Not all of the dependancies have been represented.
+//****************************************************************************
+
+//****************************************************************************
+= LPS Weighing Library Software History (0.1.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2016-06-30
+| Release Label/Tag | 0.1.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Initial Release With Dependency Documentation (gundas1)
+
+This is an initial release with dependency documentation and an outline
+of the release procedure.  The purpose of this release is mainly to
+provide the initial Ivy descriptors.
+
+NOTE: Not all of the dependancies have been represented.
+//****************************************************************************

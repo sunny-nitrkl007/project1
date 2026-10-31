@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
+>
+  <info module="cat/ess-info/lps_pass_tracker"
+        e:ivydom="ivy-mach_productivity"
+        e:vpath="lib_mach_productivity/lps/pass_tracker/lps_pass_tracker"
+        organisation="com.cat.e"
+        revision="#!RevReplace!#"
+        status="integration"
+  />
+  <configurations defaultconf="rel">
+    <conf description="retrieve only artifacts necessary to use the module"   name="rel"/>
+    <conf description="retrieve only artifacts necessary to debug the module"   name="rel_debug"/>
+    <conf description="retrieve artifacts that are part of this release unit" name="nodep"/>
+    <conf description="retrieve artifacts needed to build this release unit"  name="dev"/>
+  </configurations>
+  <publications>
+    <artifact conf="dev,nodep,rel_debug" ext="xml" name="git-repo" type="git"/>
+  </publications>
+  <dependencies defaultconf="*->@">	
+	<dependency conf="rel,dev,rel_debug->rel"  e:ivydom="ivy-mach_productivity" name="cat/ess-info/lps_pass_tracker_interface"    org="com.cat.e" rev="#!RevReplace!#"/>
+	<!-- lps_app_common -->
+	<dependency conf="dev->dev"  e:ivydom="ivy-mach_productivity" name="cat/ess-info/lps_app_common"     org="com.cat.e" rev="0.3.0"/>
+	<!-- TODO remove rel_debug when create .a file for lps_common -->    
+	<dependency conf="dev,rel_debug->dev"  e:ivydom="ivy-mach_productivity" name="cat/ess-info/lps_common"     org="com.cat.e" rev="0.3.0"/>
+	<!-- platform and tools cluster -->
+	<dependency conf="dev->rel_lib_x5" name="cat/dt/mach_tools_cluster"  rev="6.1.0"	e:ivydom="ivy-ms_makefiles"	     org="com.cat.e"/>
+	<dependency conf="dev->rel_lib"    e:ivydom="ivy-mach"          name="cat/ess-mach/mach_afsw_oel_hal_scl_cluster" org="com.cat.e" rev="10.0.0"/>	  
+  </dependencies>
+</ivy-module>

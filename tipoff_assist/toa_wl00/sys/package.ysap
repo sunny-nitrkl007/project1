@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemArchitect xmlns="http://catelectronics.corp.cat.com/SASchema">
+<Artifact id="40adce2e-9a88-48c4-8ddd-86c66a66a24c" kind="buildPackage" contentGenerator="SystemArchitect" contentGeneratorVersion="2.0.0" version="0.0.0" versionId="1cf7d026-ddd0-4501-8751-e6a4a51b354b" localPath="lib_info_products\toa_wl00\sys\package.ysap" package="0872a24a-c080-4fc6-b4ae-ca15b66271c6" packageName="CAT.E.Information_Manage.lib_system" packageArtifactLocalPath="lib_info_products\ysa_super_packages\lib_system.ysap">
+<Package id="d620b1a2-dbcd-414b-bd12-7df18cf8f270" name="toa00" kind="buildPackage">
+<Package id="1b387dfc-cc3b-4622-8ec3-42aed0b0141b" name="data" kind="buildSubPackage"/>
+</Package>
+</Artifact>
+</SystemArchitect>

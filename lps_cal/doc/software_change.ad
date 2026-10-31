@@ -1,0 +1,114 @@
+:copyright: Copyright (C) 2015-2016 Caterpillar Inc. All Rights Reserved.
+= LPS Calibration Library Software History
+
+//****************************************************************************
+= LPS Calibration Library Software History (0.4.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2017-02-20
+| Release Label/Tag | 0.4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Updated release content (gundas1)
+
+Updated software change and release document.
+
+=== Added girt tool for release (gundas1)
+
+Added girt tool for release
+
+//****************************************************************************
+
+//****************************************************************************
+= LPS Calibration Library Software History (0.3.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2017-01-27
+| Release Label/Tag | 0.3.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Updated release content (gundas1)
+
+Updated software change and release document.
+
+=== Chnaged function LpsCalGetLastPayloadWeight to return last payload wt (gundas1)
+
+Chnaged function LpsCalGetLastPayloadWeight to return last payload wt.
+
+=== Removed NVM last payload weight assignment (gundas1)
+
+Removed NVM last payload weight assignment.
+
+=== Added function LpsCalGetLastPayloadWeight (gundas1)
+
+Added function LpsCalGetLastPayloadWeight.
+
+=== Added full rack check during the calibration (gundas1)
+
+Added full rack check during the calibration. Reset cal weight and cal adjust when full cal success.
+
+=== Moved private defines to public header file since wrapper needs access to them (gundas1)
+
+Moved private defines to public header file since wrapper needs access to them.
+
+//****************************************************************************
+
+//****************************************************************************
+= LPS Calibration Library Software History (0.2.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2016-07-19
+| Release Label/Tag | 0.2.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Updated release content (gundas1)
+
+Updated software change and release document.
+
+=== Removed cal ov interface function (gundas1)
+
+Removed LpsCalAppInfCalOvActive interface function.
+
+=== Changed variable names to new standard (gundas1)
+
+Changed variable names to new standard.
+
+NOTE: Not all of the dependancies have been represented.
+//****************************************************************************
+
+//****************************************************************************
+= LPS Calibration Library Software History (0.1.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2016-07-03
+| Release Label/Tag | 0.1.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Initial Release With Dependency Documentation (gundas1)
+
+This is an initial release with dependency documentation and an outline
+of the release procedure.  The purpose of this release is mainly to
+provide the initial Ivy descriptors.
+
+NOTE: Not all of the dependancies have been represented.
+//****************************************************************************

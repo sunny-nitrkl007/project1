@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemArchitect xmlns="http://catelectronics.corp.cat.com/SASchema">
+<Artifact id="b4132dda-6a21-442c-9de4-21c0d2bd8131" kind="calibrationComponent" contentGenerator="SystemArchitect" contentGeneratorVersion="2.0.0" version="0.0.0" versionId="aa9fca2b-7e1e-45e9-bf18-403e8f6a9b56">
+<VariantIdentity id="dd525b01-0d2c-4819-b44a-60051719590c" name="wl_980_var00" baseVariant="a11e00fe-fe69-4c89-a101-44170ae7cb1a" value="0"/>
+<VariantScope variant="dd525b01-0d2c-4819-b44a-60051719590c"/>
+</Artifact>
+</SystemArchitect>

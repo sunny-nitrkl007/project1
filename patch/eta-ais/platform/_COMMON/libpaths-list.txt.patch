@@ -1,0 +1,11 @@
+diff --git a/platform/_COMMON/libpaths-list.txt b/platform/_COMMON/libpaths-list.txt
+index 33e5497085..3f9de333a1 100644
+--- a/platform/_COMMON/libpaths-list.txt
++++ b/platform/_COMMON/libpaths-list.txt
+@@ -1,5 +1,5 @@
+ ## app specific paths that should take priority
+-include ${APP_PLATFORM_DIR}/${PLATFORM}/libpaths-list.txt
++## PATCHED: Removed circular reference - include ${APP_PLATFORM_DIR}/${PLATFORM}/libpaths-list.txt
+ 
+ ## coretech, machineCommon, platformCommon
+ include ${AIS_MC_PLATFORM_DIR}/${PLATFORM}/libpaths-list.txt

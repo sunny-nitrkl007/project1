@@ -1,0 +1,110 @@
+#
+# Top-Level makefile
+#
+# Copyright 2015-2015 Caterpillar Inc. All Rights Reserved.
+#
+
+#############################################################################
+# Build targets
+#############################################################################
+
+# Default build target
+all : liba ;
+
+#############################################################################
+# Project configuration
+#############################################################################
+
+# Specifies the name of the .a32, .x, .csa, and .fls file.
+APP_NAME_SHORT = lps_cal
+APP_NAME       = lib$(APP_NAME_SHORT)
+
+#Target
+TARGET_NAME    = tgt_diab_5.8.0.0_PPCVLEEF
+
+#Location To Move Archive File To After Build Completed
+A32DIR = ../../$(APP_NAME_SHORT)-a/$(TARGET_NAME)
+
+# Specifies the location of the VOB root directory.
+# If possible, use a relative path (../../..), so that people can build
+# through their M: drive and logical drives. Omit the trailing slash ('/').
+VOB_ROOT = ..\..\..\..\..
+
+# DODIR - Defines the path for all derived objects. The path is relative to the
+# location of the makefile. Omit the trailing slash ('/').
+DODIR = do_$(TARGET_NAME)
+
+# Platform Preprocessor Flag
+# Used to define the hal support
+PLATFORM     = A5M4I1
+
+
+# CTARGET Configuration:
+#
+# DTARGET  = PPCVLE
+# DOBJECT  = E for ELF EABI conventions
+# DFP      = F for 32-bit Hardware/64-bit Software floating point
+#          = G for 32-bit only Hardware floating point (double is treated as float!)
+#          = N for no floating point support
+#          = S for Software floating point emulation
+# DENVIRON = simple to include libchar.a for basic character input/output
+
+# Target CPU
+DTARGET = PPCVLE
+
+# Target Object Format
+DOBJECT = E
+
+# Floating Point Support
+DFP = N
+
+# Standard C Library Support
+DENVIRON = simple
+
+CTARGET = -t$(DTARGET)$(DOBJECT)$(DFP):$(DENVIRON)
+
+# The following line is needed for '.c'
+CFLAGS = -D_DIAB
+
+
+#############################################################################
+# Objects
+#############################################################################
+
+# The VPATH variable specifies the search path to source files. You need
+# to list all sub-directories that contain source files. Directories are
+# seperated with semicolons (Windows) or colons (UNIX).
+VPATH =                                                             \
+    ../src
+    
+# The OBJECTS variable specifies a list of object files that should be
+# build and linked with the a32 or elf file. Object files that should not
+# be re-build can be added to the LIBRARIES variable.
+
+# src_diag
+include obj_list_file.mk
+
+#############################################################################
+# Libraries
+#############################################################################
+
+# The LIBS_LIST_FILE variable specifies the path to the file that contains
+# a list of object and libraries files that are linked with the x file.
+LIBS_LIST_FILE =
+
+#############################################################################
+# Includes
+#############################################################################
+
+# The INCS_LIST_FILE variable specifies the path to the file that contains
+# a list of search paths that are passed to the C compiler.  The search paths
+# need to be prefixed with the -I option.
+#
+INCS_LIST_FILE = incs_list_file.txt
+
+
+#############################################################################
+# Makefiles Includes
+#############################################################################
+include $(VOB_ROOT)/lib_machine/tools/makefile/lib.mk
+include $(VOB_ROOT)/lib_machine/tools/makefile/a5m4.mk

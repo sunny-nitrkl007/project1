@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@arlgitgisp03.ecorp.cat.com:CATE_AIS/hub_filesystem.git
+	branch = HUB_IM4.5_R1.0
+	commit = f297e55b7d6053a7be3de56474de6ce88cedefb5
+	parent = 8a73b96ce35be551dab4ed00c3e840f66f54b2f7
+	cmdver = 0.3.0

@@ -1,0 +1,38 @@
+#lib
+#apps/lib
+${INSTALL_DIR}/lib
+${INSTALL_DIR}/prod/common/version
+
+#== Shared/Common content
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/app_fla/rpa
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/camera_mgr
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/common_oss-a
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/core_telematics/cert_manager
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/core_telematics/ipc
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/core_telematics/log
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/core_telematics/connection_manager
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_a4/hmpl
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_a4/scl
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_csf
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_oel/oel
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_oss/grpc
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_oss/grpc-a
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_oss/pugixml
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_oss/tinyxml
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_scl
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_scl/scl_avtp-a
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_scl_info
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/lib_sys/osa
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/smart_camera_mgr
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/smartcam_service
+${AIS_TLD}/${AIS_PC_INTERPRETER_CONTENT}/ssp-cda/cda-a
+
+#== ECM/Target specific content
+${AIS_PC_TARGET_CONTENT}
+${AIS_PC_TARGET_CONTENT}/core_telematics/connection_manager
+${AIS_PC_TARGET_CONTENT}/lib_a4/hal
+${AIS_PC_TARGET_CONTENT}/lib_a4/hal_common
+${AIS_PC_TARGET_CONTENT}/scl_crypto-a
+
+include ${AIS_TLD}/platform/_COMMON/libpaths-list.txt
+include ${AIS_TLD}/platform/${PLATFORM}/libpaths-list.txt

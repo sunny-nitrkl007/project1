@@ -1,0 +1,91 @@
+TimeStamp,Request Type,Param Identifier,40,f525,c8,f5d9,f4fd,fc2e,d01373,d01375,f533,f604,f477,f428,f82d,ef00,f004,f003,f002,f005,f001,
+10:4:2019 16:41:39,Read_Poll_Request,PID,2
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,8
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,,,,,,,200
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,,,,,,10
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,278
+10:4:2019 16:41:39,Read_Poll_Request,PID,,20
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,,,,10
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,8193
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,,,,,1
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,10
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,,100
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,,,100
+10:4:2019 16:41:39,Read_Poll_Request,PID,,,,,,,,,,,,,RTL11111
+10:4:2019 16:41:47,,Public PGN,,,,,,,,,,,,,,,,,,,|U|||56|
+10:4:2019 16:41:47,,Public PGN,,,,,,,,,,,,,,,,,,zzzzz|4z
+10:4:2019 16:41:47,,Public PGN,,,,,,,,,,,,,,,,,{2345{{{
+10:4:2019 16:41:47,,Public PGN,,,,,,,,,,,,,,,,zz1212zz
+10:4:2019 16:41:47,,Public PGN,,,,,,,,,,,,,,,zzzz12zz
+10:4:2019 16:42:16,Read_Poll_Request,PID,20
+10:4:2019 16:42:17,Read_Poll_Request,PID,,200
+10:4:2019 16:42:18,Read_Poll_Request,PID,,,1024
+10:4:2019 16:42:19,Read_Poll_Request,PID,,,,257
+10:4:2019 16:42:20,Read_Poll_Request,PID,,,,,2778
+10:4:2019 16:42:21,Read_Poll_Request,PID,,,,,,100
+10:4:2019 16:42:22,Read_Poll_Request,PID,,,,,,,200
+10:4:2019 16:42:23,Read_Poll_Request,PID,,,,,,,,200
+10:4:2019 16:42:24,Read_Poll_Request,PID,,,,,,,,,20
+10:4:2019 16:42:25,Read_Poll_Request,PID,,,,,,,,,,32767
+10:4:2019 16:42:26,Read_Poll_Request,PID,,,,,,,,,,,100
+10:4:2019 16:42:27,Read_Poll_Request,PID,,,,,,,,,,,,2000
+10:4:2019 16:42:28,Read_Poll_Request,PID,,,,,,,,,,,,,RTL12345
+10:4:2019 16:42:31,,Public PGN,,,,,,,,,,,,,,,z!zz12zz
+10:4:2019 16:42:32,,Public PGN,,,,,,,,,,,,,,,,z*1212zz
+10:4:2019 16:42:33,,Public PGN,,,,,,,,,,,,,,,,,{1345{{{
+10:4:2019 16:42:34,,Public PGN,,,,,,,,,,,,,,,,,,zAzzz|4z
+10:4:2019 16:42:35,,Public PGN,,,,,,,,,,,,,,,,,,,|UA||56|
+10:4:2019 16:42:37,Read_Poll_Request,PID,40
+10:4:2019 16:42:38,Read_Poll_Request,PID,,400
+10:4:2019 16:42:40,Read_Poll_Request,PID,,,512
+10:4:2019 16:42:40,Read_Poll_Request,PID,,,,2049
+10:4:2019 16:42:41,Read_Poll_Request,PID,,,,,4167
+10:4:2019 16:42:42,Read_Poll_Request,PID,,,,,,200
+10:4:2019 16:42:43,Read_Poll_Request,PID,,,,,,,300
+10:4:2019 16:42:44,Read_Poll_Request,PID,,,,,,,,300
+10:4:2019 16:42:45,Read_Poll_Request,PID,,,,,,,,,100
+10:4:2019 16:42:46,Read_Poll_Request,PID,,,,,,,,,,10
+10:4:2019 16:42:47,Read_Poll_Request,PID,,,,,,,,,,,200
+10:4:2019 16:42:48,Read_Poll_Request,PID,,,,,,,,,,,,4000
+10:4:2019 16:42:49,Read_Poll_Request,PID,,,,,,,,,,,,,RTL54321
+10:4:2019 16:42:52,,Public PGN,,,,,,,,,,,,,,,z"zz12zz
+10:4:2019 16:42:53,,Public PGN,,,,,,,,,,,,,,,,z+1212zz
+10:4:2019 16:42:54,,Public PGN,,,,,,,,,,,,,,,,,{3345{{{
+10:4:2019 16:42:55,,Public PGN,,,,,,,,,,,,,,,,,,zBzzz|4z
+10:4:2019 16:42:56,,Public PGN,,,,,,,,,,,,,,,,,,,|UB||56|
+10:4:2019 16:42:58,Read_Poll_Request,PID,60
+10:4:2019 16:42:59,Read_Poll_Request,PID,,600
+10:4:2019 16:43:0,Read_Poll_Request,PID,,,1032
+10:4:2019 16:43:1,Read_Poll_Request,PID,,,,16385
+10:4:2019 16:43:2,Read_Poll_Request,PID,,,,,5556
+10:4:2019 16:43:3,Read_Poll_Request,PID,,,,,,300
+10:4:2019 16:43:4,Read_Poll_Request,PID,,,,,,,400
+10:4:2019 16:43:5,Read_Poll_Request,PID,,,,,,,,400
+10:4:2019 16:43:6,Read_Poll_Request,PID,,,,,,,,,40
+10:4:2019 16:43:7,Read_Poll_Request,PID,,,,,,,,,,32765
+10:4:2019 16:43:8,Read_Poll_Request,PID,,,,,,,,,,,300
+10:4:2019 16:43:11,Read_Poll_Request,PID,,,,,,,,,,,,6000
+10:4:2019 16:43:11,Read_Poll_Request,PID,,,,,,,,,,,,,RTL44444
+10:4:2019 16:43:13,,Public PGN,,,,,,,,,,,,,,,z#zz12zz
+10:4:2019 16:43:14,,Public PGN,,,,,,,,,,,,,,,,z/1212zz
+10:4:2019 16:43:15,,Public PGN,,,,,,,,,,,,,,,,,{4345{{{
+10:4:2019 16:43:16,,Public PGN,,,,,,,,,,,,,,,,,,zCzzz|4z
+10:4:2019 16:43:17,,Public PGN,,,,,,,,,,,,,,,,,,,|UC||56|
+10:4:2019 16:43:19,Read_Poll_Request,PID,2
+10:4:2019 16:43:20,Read_Poll_Request,PID,,20
+10:4:2019 16:43:21,Read_Poll_Request,PID,,,8
+10:4:2019 16:43:22,Read_Poll_Request,PID,,,,8193
+10:4:2019 16:43:23,Read_Poll_Request,PID,,,,,278
+10:4:2019 16:43:24,Read_Poll_Request,PID,,,,,,10
+10:4:2019 16:43:25,Read_Poll_Request,PID,,,,,,,100
+10:4:2019 16:43:26,Read_Poll_Request,PID,,,,,,,,100
+10:4:2019 16:43:27,Read_Poll_Request,PID,,,,,,,,,10
+10:4:2019 16:43:28,Read_Poll_Request,PID,,,,,,,,,,1
+10:4:2019 16:43:29,Read_Poll_Request,PID,,,,,,,,,,,10
+10:4:2019 16:43:30,Read_Poll_Request,PID,,,,,,,,,,,,200
+10:4:2019 16:43:31,Read_Poll_Request,PID,,,,,,,,,,,,,RTL11111
+10:4:2019 16:43:34,,Public PGN,,,,,,,,,,,,,,,zzzz12zz
+10:4:2019 16:43:35,,Public PGN,,,,,,,,,,,,,,,,zz1212zz
+10:4:2019 16:43:36,,Public PGN,,,,,,,,,,,,,,,,,{2345{{{
+10:4:2019 16:43:37,,Public PGN,,,,,,,,,,,,,,,,,,zzzzz|4z
+10:4:2019 16:43:38,,Public PGN,,,,,,,,,,,,,,,,,,,|U|||56|

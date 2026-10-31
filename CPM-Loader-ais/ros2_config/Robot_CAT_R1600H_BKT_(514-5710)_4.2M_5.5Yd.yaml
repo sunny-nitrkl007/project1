@@ -55,9 +55,9 @@ LpsSaWeighApp:
     # --- WM-02: Weighing params (scalars) ---
     weighing.config_present: true
     weighing.hyd_oil_type: 0
-    weighing.lift_cyl_he_line_loss_2nd_ordr_coeff: 2.34121
+    weighing.lift_cyl_he_line_loss_2nd_ordr_coeff: 2.34121E-06
     weighing.lift_cyl_he_line_loss_1st_ordr_coeff: 4.00077
-    weighing.lift_cyl_re_line_loss_2nd_ordr_coeff: 2.73489
+    weighing.lift_cyl_re_line_loss_2nd_ordr_coeff: 2.73489E-06
     weighing.lift_cyl_re_line_loss_1st_ordr_coeff: 4.00208
     weighing.start_of_weigh: 50.0000
     weighing.end_of_weigh: 65.0000
@@ -136,3 +136,9 @@ LpsSaWeighApp:
     # default_cal_config.full_bkt_slow_raise_spd: 0.0
     # default_cal_config.full_bkt_fast_raise_spd: 0.0
     # default_cal_config.calwt: 0.0
+
+LpsSaJobMgrApp:
+  ros__parameters:
+    internal_msn: "CAT16020"
+    ui_show_feature_config_json_file_path: "${CAT_CONFIG_DIR}/UI_SHOW_FEATURE_CONFIG_UGM.json"
+    auto_store_pass_count_default: 1

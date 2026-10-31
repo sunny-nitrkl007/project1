@@ -1,0 +1,86 @@
+/******************************************************************************
+*** FILE:
+***	slnvm_id_defs.h
+***
+*** COPYRIGHT NOTICE:
+***	Copyright 2011.  Caterpillar Inc.  All Rights Reserved.
+***
+*** DESCRIPTION:
+***	This is the definition include file for the simulink NVM ID's which are
+*** hardcoded and only accessable through the Direct to Flash(trash) model
+******************************************************************************/
+#ifndef SLNVM_ID_DEFS_H_
+#define SLNVM_ID_DEFS_H_
+
+/* Workspace parameter blocks NVM ID's */
+#define SLNVM_WSPARAMETERS_RAW_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 1)
+#define SLNVM_WSPARAMETERS_CS_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 2)
+#define SLNVM_WSPARAMETERS_3CPY_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 3)
+#define SLNVM_WSPARAMETERS_CRC_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 4)
+
+/* Workspace parameter flash over block NVM ID's */
+#define SLNVM_WSPARAMETERSFLASHOVERTABLE_RAW_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 5)
+#define SLNVM_WSPARAMETERSFLASHOVERTABLE_CS_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 6)
+#define SLNVM_WSPARAMETERSFLASHOVERTABLE_3CPY_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 7)
+#define SLNVM_WSPARAMETERSFLASHOVERTABLE_CRC_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 8)
+
+#define SLNVM_FLASHOVERTABLE_BLK_DATA_ID (NVM_MIN_APP_DATA_ID + 9)
+#define SLNVM_FLASHOVERSIG_BLK_DATA_ID   (NVM_MIN_APP_DATA_ID + 18)
+
+/* Unique Service NVM ID's */
+#define SLNVM_SCL_INFO_OBD_ES_NVID (NVM_MIN_APP_DATA_ID + 10)
+#define SLNVM_SCL_INFO_OBD_CRIT_NVID (NVM_MIN_APP_DATA_ID + 11)
+#define SLNVM_SCL_PASSWD_SETUP_NVID (NVM_MIN_APP_DATA_ID + 12)
+#define SLNVM_SCL_PASSWD_TTT_NVID (NVM_MIN_APP_DATA_ID + 13)
+#define SLNVM_PMS_NVID (NVM_MIN_APP_DATA_ID + 14)
+#define SLNVM_SCL_CUM_NVID (NVM_MIN_APP_DATA_ID + 15)
+#define SLNVM_LIB_INFO_EVENT_NVM_NVID (NVM_MIN_APP_DATA_ID + 16)
+#define SLNVM_LIB_INFO_DIAGNOSTIC_NVM_NVID (NVM_MIN_APP_DATA_ID + 17)
+
+
+#define SLNVM_SCL_COREDUMP_NVM_NVID (NVM_MIN_APP_DATA_ID + 19)
+#define SLNVM_RTC_LUTS_NVID (NVM_MIN_APP_DATA_ID + 20)
+
+#define SLNVM_MIN_CAL_DATA_ID    (NVM_MIN_APP_DATA_ID+10000)    /* 75536 */
+#define SLNVM_MAX_CAL_DATA_ID    (SLNVM_MIN_CAL_DATA_ID+10000)  /* 85536 */
+
+#define SLNVM_MIN_HIST_DATA_ID   (SLNVM_MAX_CAL_DATA_ID+1)      /* 85537 */
+#define SLNVM_MAX_HIST_DATA_ID   (SLNVM_MIN_HIST_DATA_ID+500) /* 86037 */
+
+#define SLNVM_MIN_SCL_FPS_TOKEN_NVID (SLNVM_MAX_HIST_DATA_ID+1)	 /* 86038 */
+#define SLNVM_MAX_SCL_FPS_TOKEN_NVID (SLNVM_MIN_SCL_FPS_TOKEN_NVID)	/* 86038 */
+
+#define SLNVM_MIN_SCL_FPS_ONETIMEFREE_NVID (SLNVM_MAX_SCL_FPS_TOKEN_NVID+1)	 /* 86039 */
+#define SLNVM_MAX_SCL_FPS_ONETIMEFREE_NVID (SLNVM_MIN_SCL_FPS_ONETIMEFREE_NVID)	/* 86039 */
+
+#define SLNVM_MIN_SCL_IP_ADDR_NVID (SLNVM_MAX_SCL_FPS_TOKEN_NVID+1)	 /* 86040 */
+#define SLNVM_MAX_SCL_IP_ADDR_NVID (SLNVM_MIN_SCL_FPS_ONETIMEFREE_NVID)	/* 86040 */
+
+#define SLNVM_MIN_UNUSED_NVID (SLNVM_MAX_SCL_IP_ADDR_NVID+1)	 /* 86041 */
+#define SLNVM_MAX_UNUSED_NVID (SLNVM_MAX_SCL_IP_ADDR_NVID + 65535)	/* 151576 */
+
+#define SLNVM_MIN_WSPARAM_FOT_NVID (SLNVM_MAX_UNUSED_NVID + 1)	/* 151577 */
+#define SLNVM_MAX_WSPARAM_FOT_NVID (SLNVM_MAX_UNUSED_NVID + 65535)	/* 217112 */
+
+#define SLNVM_DLINFOHEALTH_1_NVID       (NVM_MIN_APP_DATA_ID + 1000)
+#define SLNVM_DLINFOHEALTH_2_NVID       (NVM_MIN_APP_DATA_ID + 1001)
+#define SLNVM_DLINFOHEALTH_3_NVID       (NVM_MIN_APP_DATA_ID + 1002)
+
+#define SLNVM_MODELCHECKSUM_NVID        (NVM_MIN_APP_DATA_ID + 1200)
+
+typedef struct flash_ovr_tbl_s
+{
+  uint32_t id;
+  uint32_t offset;
+  uint32_t size;
+}
+flash_ovr_tbl_t;
+
+typedef struct param_flash_ovr_tbl_s
+{
+  uint32_t id;
+  uint32_t size;
+}
+param_flash_ovr_tbl_t;
+
+#endif /* SLNVM_ID_DEFS_H_ */

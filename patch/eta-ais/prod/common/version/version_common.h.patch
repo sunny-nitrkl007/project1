@@ -1,0 +1,15 @@
+diff --git a/prod/common/version/version_common.h b/prod/common/version/version_common.h
+index 3e545aa..9a93fc7 100644
+--- a/prod/common/version/version_common.h
++++ b/prod/common/version/version_common.h
+@@ -9,7 +9,7 @@ extern const char softwareGroupReleaseDate[];
+ extern const char softwareGroupDescription[];
+ extern const char softwareNameCode[];
+ 
+-extern const int_least16_t FlashApplicationIdentifier;
++extern int_least16_t FlashApplicationIdentifier;
+ extern const int_least16_t FlashComponentIdentifier;
+ 
+-#endif
+\ No newline at end of file
++#endif

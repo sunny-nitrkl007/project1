@@ -618,6 +618,6 @@ void AppUpdtCalNvmTbl(const LpsCalNvmTbl_t* pCalData);
 ** -- Data Declarations --
 *******************************************************************************/
 // This is the one and only one instance of this task.
-LpsSaWeighApp *temp_thisTask;
+extern LpsSaWeighApp *temp_thisTask;
 
 #endif

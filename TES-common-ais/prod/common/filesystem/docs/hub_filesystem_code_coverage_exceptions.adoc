@@ -1,0 +1,104 @@
+= Hub Filesystem Code Coverage Exceptions
+:toc:
+:numbered:
+
+************************************
+[halign="center", grid="none", frame="none"]
+|===========================================
+|*CATERPILLAR CONFIDENTIAL: YELLOW*
+|*The information contained within this manual is classified as Caterpillar Confidential Information. +
+Any reproduction, dissemination or use of this information is forbidden without the prior express written consent of an
+authorized Caterpillar representative. +
+All rights are reserved by Caterpillar, Inc.*
+|===========================================
+************************************
+
+== Document History ==
+[width="100%",cols="10,10,15,40",options="header"]
+|=======
+|Document Version |Date Revised |Revised By        |Description of Change
+|1.0              |23.12.2022   |Cojocari Adrian   |Initial Document
+|=======
+
+
+== Overview
+
+This document provides an explanation for cases where 100% statement coverage cannot be attained for Hub Filesystem.
+
+
+== Definitions
+
+[width="100%",cols="1,2",options="header"]
+|=======
+|Term               |Definition
+|AIS                |Autonomy Infrastructure Software
+|=======
+
+
+== Code Coverage Generation Procedure
+
+1.  Build the project and get the additional files neeeded to determine the code coverage, using gcov. This is accomplished by executing the following command at the repository head folder:
+
+  make project_gcov JOBS=12
+
+2.  Set the environmental variables to the correct folder. After building the project, change the directory to the build-x86_64-linux-gnu and run changeCatEnvToHere.sh:
+
+  cd build-x86_64-linux-gnu
+  . changeCatEnvToHere.sh
+
+3. Run all the tests for the desired module. A fast way to do this is using the generate_ad.py script:
+
+  cd prod/machineCommon/content/util/test_utils
+  python generate_ad.py 'hub_filesystem_test_procedure.ad'
+
+
+4. In order to see the code coverage, run in ais_app_template folder:
+
+  lcov --capture --directory $CAT_DIR/prod/coretech/hub/filesystem  --output-file ./coverage.info --no-external
+  lcov --remove coverage.info -o coverage_filtered.info \
+   '/usr/*'
+  genhtml coverage_filtered.info --output-directory lcov
+
+
+== Explanation for Uncovered Code
+
+Hub filesystem containt tests only for next classes : path, file
+
+[width="100%",cols="1,4,2",options="header"]
+|=======
+|File
+|Code Snippet
+|Explanation
+
+|
+
+file.cc
+a|
+[source, c++]
+----
+if(bytes_written != source_size)
+{
+    throw hub::base::status_exception("Short write (only %u bytes written out of %u total) for file \"%s\".", bytes_written, source_size, c_str());
+}
+---
+|
+*Defensive code* + 
+Could not force write() function to write a different amount of bytes(bytes_written), other than the desired one (source_size).
+|
+
+file.cc
+a|
+[source, c++]
+----
+if(buffer_size >= std::numeric_limits<size_t>::max())
+{
+    throw hub::base::status_exception("Tried to read a file larger than allowed with the "
+                                        "read_entirely() API.");
+}
+----
+|
+*Defensive code* + 
+Could not create a file with a size of std::numeric_limits<size_t>::max().
+|
+|=======
+

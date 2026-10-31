@@ -1,0 +1,18 @@
+###############################################################################
+## @file      SConscript
+## @author    Josh Struble
+## @date      March 08, 2013
+## @brief     SConscript for the jhm2 application
+###############################################################################
+#!/usr/bin/python
+Import( 'commonEnv' )
+jhm2CommonEnv = commonEnv.Clone();
+jhm2CommonEnv.Append(CPPPATH = ['#prod/common/jhm2']);
+Export( 'jhm2CommonEnv' )
+
+jhm2CommonEnv.buildit( 'Jhm2Ipc', ['suse'] )
+jhm2CommonEnv.buildit( 'Jhm2RequestBuilder', ['suse'] )
+jhm2CommonEnv.buildit( 'Jhm2RequestProcessor', ['suse'] )
+jhm2CommonEnv.buildit( 'Jhm2WebServer', ['suse'] )
+jhm2CommonEnv.buildit( 'jhm2ServerTask', ['suse'] )
+

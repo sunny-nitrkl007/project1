@@ -1,0 +1,94 @@
+Description: This document helps to understand the json file
+{
+
+"Ethernet_ECM_Source_Config":
+ {
+	"ecm_0": {
+		"ecm_name"  : "BMI_CDL_DSE_ADDRESS_ENG", /* NAME - Not used in code, only for understanding */
+		"ecm_fid"   : "0x00010000",              /* ECM Unique ID */
+		"ip_address": "0xA51A4E32",              /* ECM IP Address */
+		"cid"       : 590                        /* This Int value is used to raise diagnostics in ET for FMI 9 and 14 */
+	},
+
+	"ecm_1": {
+		"ecm_name"  : "BMI_CDL_DSE_ADDRESS_TRANS_CHASSIS",  /* NAME - Not used in code, only for understanding */
+		"ecm_fid"   : "0x00020000",                         /* ECM Unique ID */
+		"ip_address": "0xA51A4F19",                         /* ECM IP Address */
+		"cid"	    : 296	                            /* This Int value is used to raise diagnostics in ET for FMI 9 and 14 */
+	}
+ },
+
+"SPN":
+ {
+
+	"Two Speed Axle Switch": {
+
+		"SPN ID"	    :  "0x45",
+		"Data Size(bits)"   :  2,	        /* Data size in Bits */
+		"Data Byte Order"   :  "LSB",	        /* LSB when data byte order is LSB first(Swap bytes) else MSB*/
+		"Request Period(mu)":  10000,	        /* Request period in micro seconds, RANGE is 100 - 100000 */
+		"Source FID"        :  "0x00010000",    /* Always 4 Byte which should be configured in ECM config table*/
+		"Status Conversion" :  true,		/* Status Conversion flag. This should be set to TRUE if the parameter 							  	 supports status. It can be set to true only for parameters with 								 size_in_bits 2, 8, 16 or 32. */
+		"Diag Support"	    :  "Enable",        /*Enable when Diag Support needed else Disable*/
+		"Scaling"           :  2,	        /* Always in float */
+		"Offset"            :  0	        /* Always in float */
+ 	}
+ },
+
+"CDL_PID":
+ {
+	"Actual Engine RPM": {
+
+		"CDL PID"		:   "0x40",
+		"Data Size(bytes)"	:   2,
+		"Data Byte Order"	:   "LSB",	        /* LSB when data byte order is LSB first(Swap bytes) else MSB*/
+		"Request Period(mu)"	:   100,	        /* Request period in micro second, RANGE is 100 - 100000 */
+		"Source FID"		:   "0x00010000",	/*  Always 4 Byte which should be configured in ECM config table*/
+		"Data Type"		:   "signed_16",	/* Signed when Data is of Signed data else unsigned (see below for Data Types)*/
+		"VarLengthDataType" :   0,		        /* VarLengthDataType values are used to reference entries in the m_VarLengthPool*/
+		"Dsi Support"		:   "Enable",	    /*Enable when Dsi Support needed else Disable*/
+		"Diag Support"		:   "Enable",	    /*Enable when Diag Support needed else Disable*/
+		"Scaling"		:   0.5,	        /* Always in float */
+		"Offset"		:   0,		        /* Always in float */
+		"Units"			:   0		        /* Parameter Units in int */
+	}
+ },
+
+"CAT_EXT_ID":
+ {	
+	
+	"ECM BASIC INFORMATION": {		
+				
+		"CAT EXTID"		:  "0xF01A",		
+		"Data Size(bytes)"	:  1,		
+		"Request Period(mu)"	:  100000,	/* Request period in micro second, RANGE is 100 - 100000 */	
+		"Source FID"        	:  "0x00010000",/*  Always 4 Byte which should be configured in ECM config table*/		
+		"Diag Support"	    	:  "Enable"	/*Enable when Dsi Support needed else Disable*/
+		
+	}
+}
+
+
+}
+
+
+Data Types:
+----------
+signed_8	/* Signed Byte */
+signed_16	/* Signed Word */
+signed_32	/* Signed Long */
+unsigned_8	/* Unsigned Byte */
+unsigned_16	/* Unsigned Word */
+unsigned_32	/* Unsigned Long */
+
+
+// From file VarLengthDataLinkParamPool.h
+enum VarLengthParamType
+{
+	NOT_APPLICABLE,
+	GPS,
+	SPL_PID_REV_DATA_BYTE_ORDER, // use this for special pid's to reverse data (ex pid:F5D9)
+	TIME_ZONE,
+	PRODUCT_ID,
+	PGN // Use for Public PGN Data
+};

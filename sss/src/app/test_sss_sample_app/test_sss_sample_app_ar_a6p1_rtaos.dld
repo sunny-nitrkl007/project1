@@ -1,0 +1,160 @@
+/******************************************************************************
+**        COPYRIGHT (C) 2015 CATERPILLAR INC. ALL RIGHTS RESERVED.
+-------------------------------------------------------------------------------
+FILE NAME:      app_os_cfg_csns_test_a6p1_rtaos.dld
+DESCRIPTION:    This file is used to link an A6P1 application.
+NOTE:           All addresses below are part of the *logical* address space.
+                With this platform, the logical address space matches the 
+                physical address space.
+******************************************************************************/
+
+MEMORY
+{
+    /*
+     * MPC5777C Internal ROM (8MB)
+     * 0x00000000--0x000BFFFF Boot File Area (0.75MB)
+     * 0x000C0000--0x007FFFFF Application File Area (7.25MB)
+     *                        Note: The last 1KB of the Application File Area
+     *                              is reserved for the security meta data.
+     */
+
+   /* INTERNAL FLASH ROM 8 MB */
+   token    : org = 0x008C0000, len = 0x00000100 /* application token block     */
+   textv    : org = 0x008D0000, len = 0x0072FC00 /* 7.25MB-1KB application text */
+   resv     : org = 0x00FFFC00, len = 0x00000400 /* 1KB reserved for security meta data */
+
+   /* EXTERNAL STATIC RAM - 512KB */
+   eram     : org = 0x28000400, len = 0x0004FC00 /* application data */
+   /* External SRAM - Application heap, the default heap for oel_malloc. */
+   heap_ext : org = 0x28050000, len = 0x00030000
+
+   /* INTERNAL STATIC RAM  MPC5777C INTERNAL SRAM (512KB)
+    * 0x40000000--0x4007FFFF
+    */
+   stack    : org = 0x40000000, len = 0x00010800 /* 67416 bytes from os_cfg_22 stack usage report */
+   iram     : org = 0x40010800, len = 0x0006D400 /* 437K  Application data */
+   heap_int : org = 0x4007DC00, len = 0x00002000 /* 8K  DMA heap */
+   brc      : org = 0x4007FC00, len = 0x00000400 /* Boot RAM Common area (BRC) */
+}
+
+/*
+ * Internal Flash Physical Memory Allocation
+ *    - Token                               
+ *    - Vector table
+ *    - VLE Text                            
+ *       .text_vle                          
+ *       .rdata                             
+ *       .rodata                            
+ *       .init                              
+ *       .fini                              
+ *       .sdata2 (small constant data)      
+ *    - Initialized values for sData        
+ *    - Initialized values for Data         
+ */
+
+SECTIONS
+{
+    GROUP : {
+        .token (TEXT) : {}
+    } > token
+    
+    GROUP : {
+
+        .vector (TEXT) LOAD(ADDR(textv)) : {
+            *(Os_intvec)
+            *(Os_cpuvec)
+        }
+
+        __TEXT_VLE_ROM = . - ADDR(.vector) + ADDR(textv);
+        .text_vle (TEXT) LOAD(__TEXT_VLE_ROM) : {
+            *(.Os_text_vle)
+            *(.text_vle)
+            *(.rdata)
+            *(.rodata)
+            *(.init)
+            *(.fini)
+        }
+
+        /*
+        ** use a separate section to pad out textv to 8-byte boundary
+        ** (if we insert the padding into .text_vle above, the linker
+        ** emits a bogus warning)
+        */
+        __PAD1_ROM = . - ADDR(.vector) + ADDR(textv);
+        .pad1 (TEXT) LOAD (__PAD1_ROM) : { . = (. + 0x7) & ~ 0x7; }
+
+        __SDATA2_ROM = . - ADDR(.vector) + ADDR(textv);
+        .sdata2(=TEXT) LOAD(__SDATA2_ROM) ALIGN(8) : {}
+
+        __SDATA_ROM = . - ADDR(.vector) + ADDR(textv);
+
+    } > textv
+
+    GROUP : {
+
+        __SDATA_RAM = .;
+        .sdata (DATA) LOAD (__SDATA_ROM) ALIGN(4) : {
+            *(.sdata)
+            . = (. + 0x7) & ~ 0x7;
+        }
+        __SDATA_END = .;
+
+        __SBSS_START = .;
+        .sbss (=BSS) ALIGN(4): {
+            *(.isr_table)
+            *(.sbss)
+        }
+        __SBSS_END = .;
+
+    } > iram
+
+    GROUP : {
+
+        __DATA_ROM = __SDATA_ROM + __SDATA_END - __SDATA_RAM;
+        __DATA_RAM = .;
+        .data (DATA) LOAD (__DATA_ROM) : {
+            *(.data)
+        }
+        __DATA_END = .;
+
+        __BSS_START = .;
+        .bss  (=BSS) : {
+            *(.bss)
+            *(.vectorbss)
+        }
+        __BSS_END = .;
+
+    } > eram  
+
+}
+
+BRC = ADDR(brc);
+
+__SP_INIT   = ADDR(stack) + SIZEOF(stack);
+__SP_END    = ADDR(stack);
+
+__HEAP_START = ADDR(heap_ext);
+__HEAP_END   = ADDR(heap_ext) + SIZEOF(heap_ext);
+
+__HEAP2_START = ADDR(heap_int);
+__HEAP2_END   = ADDR(heap_int) + SIZEOF(heap_int);
+
+/* The following symbols are not used in the code but are useful when         */
+/* reviewing the map file.                                                    */
+__INTERNAL_RAM_USAGE = SIZEOF(.sdata) + SIZEOF(.sbss) + SIZEOF(stack) + SIZEOF(heap_int) + SIZEOF(brc);
+__EXTERNAL_RAM_USAGE = SIZEOF(.data) + SIZEOF(.bss) + SIZEOF(heap_ext);
+__INTERNAL_FLASH_USAGE = SIZEOF(token) + SIZEOF(.vector) + SIZEOF(.text_vle) + SIZEOF(.sdata2) + (__DATA_END - __DATA_RAM) + (__SDATA_END - __SDATA_RAM);
+
+/*
+** The MPC55xx builds an interrupt/exception vector like this:
+**
+**      vector = (IVPR & 0xffff0000) | (IVORxx & 0x0000fff0);
+**
+** This implies that all top level vectors must be linked within a single
+** 64K region; otherwise, the processor core will vector to the wrong place.
+**
+** If the ASSERT below prevents you from linking, try changing the link order.
+** Or, you can add padding in front of oel_rtos_uk_vectors_start.
+*/
+ASSERT(((ADDR(.vector) & 0xffff0000) == ((ADDR(.vector) + SIZEOF(.vector)) & 0xffff0000)),
+    "IVOR overflow - read your linker command file for details")

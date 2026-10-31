@@ -1,0 +1,24 @@
+###############################################################################
+## @file      SConscript
+## @author    Josh Struble
+## @date      March 08, 2013
+## @brief     SConscript for the jhm2CgiApp application
+###############################################################################
+#!/usr/bin/python
+Import( 'jhm2CommonEnv' )
+
+jhm2CgiApp = jhm2CommonEnv.ProgramWrapper(
+        target = 'jhm2CgiApp.cgi',
+        source = 'jhm2CgiApp.cpp',
+        LIBS = ['ais_log',
+                'ais_serialization',
+                jhm2CommonEnv['BOOST_SYSTEM'],
+                jhm2CommonEnv['BOOST_FILESYSTEM'],
+                'jhm2IpcClient',
+                'jhm2RequestBuild',
+                'ais_time',
+                'rt'
+                ]
+    )
+
+jhm2CommonEnv.InstallCgi( jhm2CgiApp )

@@ -1,0 +1,10 @@
+check process LpsWeigh with pidfile /run/lps_weigh.pid
+    start program = "/opt/CPM/scripts/monit_start.sh" with timeout 20 seconds
+    stop program  = "/opt/CPM/scripts/monit_stop.sh" with timeout 20 seconds
+
+    depends on LpsJobMgr
+
+    if does not exist then restart
+    if 5 restarts within 10 cycles then unmonitor
+
+    group lps

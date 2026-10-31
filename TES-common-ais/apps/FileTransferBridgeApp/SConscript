@@ -1,0 +1,69 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @brief     SConscript for the FileTransferBridgeApp application.
+##
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+Import( 'testEnv' )
+import sys
+
+FileTransferBridgeAppEnv = testEnv.Clone()
+
+# Uncomment below to simulate connection with a CDA server
+# FileTransferBridgeAppEnv.Append( CPPDEFINES=[ 'DEBUG_SIM_SERVER' ] )
+
+# Uncomment below to run CDA Client from Virtual Machine (experimental)
+# FileTransferBridgeAppEnv.Append( CPPDEFINES=[ 'DEBUG_FROM_VM' ] )
+ 
+# This app is built for A6N2 Blue-Key. No other ECMs are currently supported
+if not FileTransferBridgeAppEnv[ 'PLATFORM' ] in ['A6N1', 'A6N2']:
+   print("Compiling File Transfer Bridge App failed. '{0}' is not a supported ECM".format(FileTransferBridgeAppEnv[ 'PLATFORM' ]))
+   sys.exit( -1 )
+
+FileTransferBridgeAppEnv.Append( CPPPATH = [ './ReportTrigger/',] )
+
+sourceFiles = [
+   'FileTransferBridgeApp.cpp',
+   'FileTransferBridgeAppQueue.cpp',
+   'FileTransferBridgeAppUtil.cpp',
+   'FileTransferBridgeAppCda.cpp',
+   'FileTransferBridgeAppCdaServerCfg.cpp',
+   'FileTransferBridgeAppLog.cpp',
+   'FileTransferBridgeAppCfg.cpp',
+   'FileTransferBridgeAppThreadTx.cpp',
+   'FileTransferBridgeAppThreadRx.cpp',
+   'ReportTrigger/ReportTrigger.pb.cc',
+]
+
+libs = [
+   'ais_task', 
+   'CDATelematicsTransfer_protobuf',
+   'CDASystemFileTransfer_protobuf',
+   'CDAParameters_protobuf',
+   'CDAIOTHubComms_protobuf',
+   'cert_manager_protobuf',
+   'GetCDAServerDns',
+   'grpc++',
+   'grpc',
+   'protobuf',
+   'app_log',
+   'dbg_log',
+   'fsa',
+#   'ssl',
+   'pugixml',
+]
+
+FileTransferBridgeApp = FileTransferBridgeAppEnv.ProgramWrapper(
+        target = 'FileTransferBridgeApp',
+        source = sourceFiles,
+        LIBS = libs
+)
+
+FileTransferBridgeAppEnv.InstallBinary( FileTransferBridgeApp )
+FileTransferBridgeAppEnv.Alias("FileTransferBridgeApp", "#bin/FileTransferBridgeApp")
+

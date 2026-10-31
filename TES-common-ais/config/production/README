@@ -1,0 +1,4 @@
+AIS requires the use of a scenario in ApplicationTable.rb. Most/all CPM projects use "production", which exists only in the
+eta-ais/config directory.  This version replaces the eta-ais one and assigns the tasks to ecm (A6N2).
+
+If the eta-ais version changes, this file may need to be updated as well.

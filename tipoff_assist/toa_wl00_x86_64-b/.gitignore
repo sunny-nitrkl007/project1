@@ -1,0 +1,29 @@
+#All derived object directories
+do_*/
+
+#EC make files
+.emake/
+emake.data
+*ec_build_output/
+emake.data.bak
+
+# Common forms of back-up files
+*~
+*.bak
+*.bck
+
+#Windows Trash
+thumbs.db
+desktop.ini
+
+#All Girt output
+girt_*
+
+# Simulink projects
+slprj
+
+# Simulink workspace
+*_rtw
+
+# checksum mat file from Simulink CodeGen
+checksummap.mat

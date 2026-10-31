@@ -1,0 +1,37 @@
+#########################################################################
+# Platform Libraries
+#########################################################################
+# LIB_A4
+element \lib_a4\...                     AFSW_2013_3.0
+element \lib_afsw_release\...           AFSW_2013_3.0
+element \lib_a4\proto\boot\...          BOOT_2010_1.0_PROD
+
+# LIB_A4\SCL
+element \lib_a4\scl\...                 AFSW_SCL_2013_6.0
+element \lib_afsw_release\scl\...       AFSW_SCL_2013_6.0
+
+# LIB_A4\HAL
+element \lib_a4\...                 AFSW_HAL_2013_6.1.1
+element \lib_afsw_release\...       AFSW_HAL_2013_6.1.1
+
+# LIB_SCL
+element \lib_scl\...                    AFSW_HAL_2013_6.1.1
+
+# LIB_OEL\OEL
+element \lib_oel\...                    AFSW_OEL_2012_21.0
+
+################################################################################
+# Common A5 Compiler Library
+################################################################################
+element \cots_afsw\...                  COTS_AFSW_2011_2.0_PROD
+element \cots_afsw_cat_sites\...        COTS_AFSW_2011_2.0_PROD
+
+################################################################################
+#DEV Tools
+################################################################################
+element \dev_tools\...                   COMMANDER_TOOLS_2.5
+
+#########################################################################
+# Common Makefiles for compiling and linking
+#########################################################################
+element \lib_machine\...                MACH_TOOLS_3.5.0

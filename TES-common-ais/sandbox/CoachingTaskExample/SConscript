@@ -1,0 +1,46 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Christopher Baker
+## @date      October 22nd, 2010
+## @brief     SConscript for the ExampleWriter example task
+##
+## @attention Copyright (C) 2010
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'testEnv' )
+localEnv = testEnv.Clone()
+coachingTaskDir = localEnv[ 'TES_COMMON_DIR' ] + '/apps/CoachingTask/'
+
+# Update with path(s) to tip model(s)
+tipModelDir1 = localEnv[ 'TES_COMMON_DIR' ] + '/sandbox/CoachingTaskExample/dummyTip1/'
+# tipModelDir2 = localEnv[ 'TES_COMMON_DIR' ] + '/sandbox/CoachingTaskExample/dummyTip2/'
+
+localEnv.Append( CPPPATH = [
+                            coachingTaskDir,
+                            tipModelDir1,
+                            # tipModelDir2
+                           ])
+
+coachingTask = localEnv.ProgramWrapper(
+        target = 'CoachingTaskExample',
+        source = [
+                    coachingTaskDir + 'CoachingTask.cpp',
+                    coachingTaskDir + 'CoachingTaskNvm.cpp',
+                    coachingTaskDir + 'CoachingTaskGps.cpp',
+                    tipModelDir1 + 'dummyTip.c',
+                    tipModelDir1 + 'octip_mach00_out.c',
+                    # tipModelDir2 + 'dummyTip.c',
+                    # tipModelDir2 + 'octip_mach02_out.c',
+                    'CoachingAppSpecificExample.cpp'
+                 ],
+        LIBS = [
+                'ais_task',
+                'crypto',
+                'libversion.a',
+                ]
+        )
+localEnv.InstallBinary( coachingTask )

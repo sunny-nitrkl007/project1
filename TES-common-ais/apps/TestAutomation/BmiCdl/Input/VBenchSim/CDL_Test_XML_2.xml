@@ -1,0 +1,19 @@
+<vbench>	
+	
+	<module name="TRANS_Chassis2" cdl_sid="1B" eddt_version="03" enable="1" j1939_name="" j1939_sid=""  action="create">
+	
+	<cdl_map param="Body Up"        pid="F604" value="1"  enable="1" enable_read="1" enable_write="1"/>
+	<cdl_map param="Ground Speed"   pid="18"   value="1"  enable="1" enable_read="1" enable_write="1"/>
+	<cdl_map param="Just Gear"  	pid="F002" value="1"  enable="1" enable_read="1" enable_write="1"/>
+    
+	</module>
+
+	<module name="Engine2" cdl_sid="24" eddt_version="03" enable="1" j1939_name="" j1939_sid="" action="create">
+
+	<cdl_map param="Fuel rate"    pid="F525" value="1" enable="1" enable_read="1" enable_write="1"/>
+	<cdl_map param="Engine Speed" pid="40"   value="1" enable="1" enable_read="1" enable_write="1"/>
+	<cdl_map param="Total Fuel"   pid="C8"   value="1" enable="1" enable_read="1" enable_write="1"/>
+    
+	</module>
+	
+</vbench>

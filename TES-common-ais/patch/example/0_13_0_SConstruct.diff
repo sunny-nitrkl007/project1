@@ -1,0 +1,113 @@
+diff --git a/SConstruct b/SConstruct
+index 43aca42..1373191 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -50,7 +50,13 @@ sys.path.append( tools )
+ """
+ SCons AIS common imports
+ """
+-import SConsAppInclude
++from SConsAppIncludeV2 import genLintScript
++from SConsAppIncludeV2 import syncBaseEnv
++from SConsAppIncludeV2 import ProgramWrapper
++from SConsAppIncludeV2 import SharedLibraryWrapper
++from SConsAppIncludeV2 import getLibsListFromPath
++from SConsAppIncludeV2 import getLibsList
++from SConsAppIncludeV2 import getLibListFromModule
+ 
+ """
+ pyCommon imports
+@@ -563,34 +569,6 @@ def getPathsFromFile( f ):
+         print( 'WARNING: %s(): file %s not found' % ( callee_name.get(), f ) )
+     return addDirs
+ 
+-# reads libraries from the libs-list subdir of 
+-# the provided path and returns them in a list
+-def getLibsListFromPath( p ):
+-    import os
+-    libsListDir = os.path.join(p, 'libs-list')
+-    libFiles = [ os.path.join(libsListDir, 'common.txt') ]
+-
+-    if ( baseEnv[ 'PLATFORM' ] in [ 'D6XX', ] ):
+-        libFiles.append(os.path.join(libsListDir, 'd6xx.txt'))
+-    elif ( baseEnv[ 'PLATFORM' ] in [ 'A6N1', ] ):
+-        libFiles.append(os.path.join(libsListDir, 'a6nx.txt'))
+-        libFiles.append(os.path.join(libsListDir, 'a6n1.txt'))
+-    elif ( baseEnv[ 'PLATFORM' ] in [ 'A6N2', ] ):
+-        libFiles.append(os.path.join(libsListDir, 'a6nx.txt'))
+-        libFiles.append(os.path.join(libsListDir, 'a6n2.txt'))
+-    elif ( baseEnv[ 'PLATFORM' ] in [ 'PL671', ] ):
+-        libFiles.append(os.path.join(libsListDir, 'pl671.txt'))
+-    else:  # OCS
+-        libFiles.append(os.path.join(libsListDir, 'ocs.txt'))
+-
+-    libList = []
+-
+-    for libFile in libFiles:
+-        if os.path.exists(libFile) and os.path.isfile(libFile):
+-            libList += [line.rstrip('\n') for line in open(libFile)]
+-
+-    return libList
+-
+ ######
+ # This is the default native compile environment
+ # This is applied unless the user forces any
+@@ -843,8 +821,8 @@ ccOptHooks = {
+ # colorgcc users need to relay some of the login environment to the build
+ tools = [ 'default', 'qt' ]
+ qtdir = os.sep.join( [ '', 'usr' ] )
+-builders = { 'ProgramWrapper' : SConsAppInclude.ProgramWrapper,
+-             'SharedLibraryWrapper' : SConsAppInclude.SharedLibraryWrapper,
++builders = { 'ProgramWrapper' : ProgramWrapper,
++             'SharedLibraryWrapper' : SharedLibraryWrapper,
+              'BuildWrapper' : BuildWrapper,
+              'BuildInterfaceWrapper' : BuildInterfaceWrapper,
+              'ShouldBuildWrappers' : ShouldBuildWrappers, }
+@@ -864,6 +842,9 @@ baseEnv = Environment( tools = tools,
+ baseEnv['OS'] = getTarget()
+ baseEnv.buildit = buildit
+ 
++# Give common functions access to the base build environment
++syncBaseEnv(baseEnv)
++
+ AddOption('--only', help='Build only the list of comma separate directories', nargs=1)
+ AddOption('--ice', help='Use /opt/icecream/bin/g++ for builds', nargs=0)
+ AddOption('--gprof', help='turn on GNU profiling', nargs=0)
+@@ -1075,11 +1056,13 @@ for var in [ 'TARGET_ARCH', 'PLATFORM' ]:
+ buildDir = GetOption( 'buildDir' )
+ aisBuildDir = aisDir + '/' + buildDir
+ baseEnv[ 'AIS_BUILD_DIR' ] = aisBuildDir
++machineCommonDir = os.path.join(aisBuildDir + "/prod/machineCommon/content")
+ baseEnv[ 'APP_BUILD_DIR' ] = os.getcwd()
+ baseEnv[ 'APP_DIR' ] = os.path.dirname(os.getcwd())
+ baseEnv[ 'SSP_DIR' ] = os.path.dirname(aisDir)
+ baseEnv[ 'TES_COMMON_DIR' ] = tesCommonDir + '/' + buildDir
+ baseEnv[ 'TES_PLATFORM_DIR' ] = tesPlatformDir
++baseEnv[ 'MACHINE_COMMON_DIR' ] = machineCommonDir
+ 
+ cdaVersion = GetOption ( 'cdaVersion' )
+ if ( None == cdaVersion ):
+@@ -1178,6 +1161,8 @@ baseEnv.InstallWebSiteConfig = InstallWebSiteConfig
+ baseEnv.InstallLibrariesFromList = InstallLibrariesFromList
+ baseEnv.getPathsFromFile = getPathsFromFile
+ baseEnv.getLibsListFromPath = getLibsListFromPath
++baseEnv.getLibListFromModule = getLibListFromModule
++baseEnv.getLibsList = getLibsList
+ baseEnv.RGlob = RGlob
+ 
+ #baseEnv['BuildVersion'] = os.popen( "./scripts/tartanver.pl" ).read( )
+@@ -1387,8 +1372,6 @@ if not ( None == GetOption('branchObjDirs') ):
+ baseEnv.Decider('MD5-timestamp');
+ # Export AFTER configuration above
+ Export('baseEnv')
+-# Give common functions access to the base build environment
+-SConsAppInclude.syncBaseEnv(baseEnv)
+ 
+ #############################################################################
+ # Now define all the directories to build
+@@ -1441,4 +1424,4 @@ while toBuild:
+ 
+ # generate the lint script
+ if not ( None == GetOption( 'lint' ) ):
+-    SConsAppInclude.genLintScript()
++    genLintScript()

@@ -1,0 +1,78 @@
+[submodule "eta-ais"]
+	path = eta-ais
+	url = git@gitgis.ecorp.cat.com:CATE_AIS/apps/app_example.git
+	branch = ssp-CPM_Loaders_int
+[submodule "TES-common-ais"]
+	path = TES-common-ais
+	url = git@git1.corp.cat.com:/cat/ess-info/TES-common-ais
+	branch = tes_common_apps_int
+[submodule "CPM-Loader-ais"]
+	path = CPM-Loader-ais
+	url = git@git1.corp.cat.com:/cat/ess-info/CPM-Loader-ais
+	branch = cpm_1.0_int
+[submodule "CPM_Loader-ais-a"]
+	path = CPM_Loader-ais-a
+	url = git@git1.corp.cat.com:/cat/ess-info/CPM_Loader-ais-a
+[submodule "ais/ais-sdk-a6n2-a"]
+	path = ais/ais-sdk-a6n2-a
+	url = git@git3.corp.cat.com:/mix/ais/ais-sdk-a6n2-a
+[submodule "lps_common"]
+	path = lps_common
+	url = git@git1.corp.cat.com:/cat/ess-info/lps_common
+[submodule "lps_app_common"]
+	path = lps_app_common
+	url = git@git1.corp.cat.com:/cat/ess-info/lps_app_common
+[submodule "lps_pass_tracker"]
+	path = lps_pass_tracker
+	url = git@git1.corp.cat.com:/cat/ess-info/lps_pass_tracker
+[submodule "lps_weighing"]
+	path = lps_weighing
+	url = git@git1.corp.cat.com:/cat/ess-info/lps_weighing
+[submodule "lps_cal"]
+	path = lps_cal
+	url = git@git1.corp.cat.com:/cat/ess-info/lps_cal
+[submodule "cyc_seg_wl_00_x86_64-b"]
+	path = cyc_seg/cyc_seg_wl_00_x86_64-b
+	url = git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/cyc_seg_wl_00_x86_64-b.git
+[submodule "cyc_seg_wl_inf"]
+	path = cyc_seg/cyc_seg_wl_inf
+	url = git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/cyc_seg_wl_inf.git
+[submodule "toa_wl00"]
+	path = tipoff_assist/toa_wl00
+	url = git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00.git
+[submodule "toa_wl00_inf"]
+	path = tipoff_assist/toa_wl00_inf
+	url = git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_inf.git
+[submodule "toa_wl00_x86_64-b"]
+	path = tipoff_assist/toa_wl00_x86_64-b
+	url = git@gitgis.ecorp.cat.com:es-ms-mach-prod/ss/toa_wl00_x86_64-b.git
+[submodule "libsl"]
+	path = libsl
+	url = git@git1.corp.cat.com:/cat/dt/libsl
+[submodule "sss"]
+	path = sss
+	url = git@git1.corp.cat.com:/cat/ess-csf/sss
+[submodule "widgets/dig_timer_wl00"]
+	path = widgets/dig_timer_wl00
+	url = git@gitgis.ecorp.cat.com:/es-ms-mach-prod/ss/dig_timer_wl00
+[submodule "widgets/tire_rev_wl00"]
+	path = widgets/tire_rev_wl00
+	url = git@gitgis.ecorp.cat.com:/es-ms-mach-prod/ss/tire_rev_wl00
+[submodule "mach_prod_pcs-interface"]
+	path = mach_prod_pcs-interface
+	url = git@git1.corp.cat.com:/cat/ess-info/mach_prod_pcs-interface
+[submodule "mach_prod_prodcore"]
+	path = mach_prod_prodcore
+	url = git@git1.corp.cat.com:/cat/ess-info/mach_prod_prodcore
+[submodule "mach_prod_gps-a"]
+	path = mach_prod_gps-a
+	url = git@git1.corp.cat.com:/cat/ess-info/mach_prod_gps-tgt_gcc_5.1.0_a6n2-a
+[submodule "mach_prod_gps-interface"]
+	path = mach_prod_gps-interface
+	url = git@git1.corp.cat.com:/cat/ess-info/mach_prod_gps-interface
+[submodule "ldpayloadui-a"]
+	path = ldpayloadui-a
+	url = git@gitgis.ecorp.cat.com:es-oi-webappui/webapp/ldpayloadui-a.git
+[submodule "lighttpd-a"]
+	path = lighttpd-a
+	url = git@git1.corp.cat.com:/oss/lighttpd-a

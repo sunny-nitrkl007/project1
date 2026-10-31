@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemArchitect xmlns="http://catelectronics.corp.cat.com/SASchema">
+<Artifact id="435825ee-68ee-437d-bc3f-7b67b0957e21" kind="systemComponent" contentGenerator="SystemArchitect" contentGeneratorVersion="2.0.0" version="0.0.0" versionId="1378725e-bb00-4a36-ab9c-f0efe762f15e" scope="partialProcess" process="6115eafb-0f72-4795-9a4c-739f00395aeb">
+<Include artifact="a4858dfd-0e0b-456f-90c1-ef86378fe0ce" localPath="lib_info_products\toa_wl00\pkg\ysa\toa_instspec.ysas"/>
+<Include artifact="b8331848-338c-4474-950f-9973193325a3" localPath="lib_info_products\toa_wl00\sys\ysa\toa_sys.ysa"/>
+<Include artifact="89a8f5de-4d06-48c6-b295-1fd952543951" localPath="lib_info_products\toa_wl00\pkg\ysa\toa_app_id\toa_app_id.ysac"/>
+</Artifact>
+</SystemArchitect>

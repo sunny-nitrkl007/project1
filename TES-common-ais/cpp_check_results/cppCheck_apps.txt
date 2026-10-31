@@ -1,0 +1,14 @@
+[apps/AppRegTest/AppRegTest.cpp:15]: (warning) Member variable 'AppRegTest::AppRegistered' is not initialized in the constructor.
+[apps/AppRegTest/AppRegTest.cpp:15]: (warning) Member variable 'AppRegTest::keyOffTimeOutMSec' is not initialized in the constructor.
+[apps/AppRegTest/AppRegTest.cpp:15]: (warning) Member variable 'AppRegTest::ShutdownRequested' is not initialized in the constructor.
+[apps/AppRegTest/AppRegTest.cpp:15]: (warning) Member variable 'AppRegTest::RegInst' is not initialized in the constructor.
+[prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:200]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:285]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:332]: (warning) Redundant code: Found a statement that begins with numeric constant.
+[apps/RemotePrinterApp/Payload/Payload.pb.h:252] -> [apps/RemotePrinterApp/Payload/Payload.pb.h:250]: (style) Found duplicate branches for 'if' and 'else'.
+[apps/SwitchInputApp/SwitchInputApp.cpp:121]: (portability) scanf without field width limits can crash with huge input data on some versions of libc.
+[apps/VP3FileCreatorSimulatorApp/VP3FileCreationSimulatorApp.cpp:132]: (style) The scope of the variable 'dummy_features' can be reduced.
+[apps/VP3FileCreatorSimulatorApp/VP3FileCreationSimulatorApp.cpp:137]: (style) The scope of the variable 'securityKey' can be reduced.
+[apps/VP3FileCreatorSimulatorApp/VP3FileCreationSimulatorApp.cpp:138]: (style) The scope of the variable 'dummyKey' can be reduced.
+[apps/VP3FileCreatorSimulatorApp/VP3FileCreationSimulatorApp.cpp:13]: (warning) Member variable 'VP3FileCreationSimulatorApp::MaxRecordsToCreateFile' is not initialized in the constructor.
+[apps/testJhmTask/TestJhmTask.cpp:12]: (warning) Member variable 'TestJhmTask::iIncrement' is not initialized in the constructor.

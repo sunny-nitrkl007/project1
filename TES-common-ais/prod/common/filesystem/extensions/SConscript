@@ -1,0 +1,44 @@
+#!/usr/bin/python
+
+import os
+import glob
+
+Import('baseEnv')
+
+myEnv = baseEnv.Clone()
+
+BASE_PATH = '/home/u_subras91/CPM/ssp-CPM_Loader-ais'
+
+for d in glob.glob(BASE_PATH + '/ros2_jazzy_sdk/include/*'):
+    if os.path.isdir(d):
+        myEnv.Append(CPPPATH=[d])
+
+#ros2wrapper
+for d in glob.glob(BASE_PATH + '/CPM-Loader-ais/prod/common/ros2wrapper'):
+    if os.path.isdir(d):
+        myEnv.Append(CPPPATH=[d])
+        
+myEnv.Append(
+    CPPPATH=[
+        BASE_PATH + '/ros2_models/include',
+        '#',
+    ]
+)
+
+myEnv.Append(
+    LIBPATH=[
+        BASE_PATH + '/ros2_jazzy_sdk/lib'
+    ]
+)
+
+nvm_filesystem = myEnv.SharedLibraryWrapper(
+    target='nvm_filesystem',
+    source=[
+        'nvm_directory.cpp',
+        'file.cpp',
+        'filelist.cpp',
+        'nvm.cpp',
+    ],
+)
+
+myEnv.InstallLibrary(nvm_filesystem)

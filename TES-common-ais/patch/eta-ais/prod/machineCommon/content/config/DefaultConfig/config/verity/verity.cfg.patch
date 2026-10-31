@@ -1,0 +1,16 @@
+diff --git a/prod/machineCommon/content/config/DefaultConfig/config/verity/verity.cfg b/prod/machineCommon/content/config/DefaultConfig/config/verity/verity.cfg
+index dc828e761c..5e866905fa 100644
+--- a/prod/machineCommon/content/config/DefaultConfig/config/verity/verity.cfg
++++ b/prod/machineCommon/content/config/DefaultConfig/config/verity/verity.cfg
+@@ -31,9 +31,9 @@
+   },
+   {
+     // AIS application verities
+-    "Name": "appSoftware",
++    "Name": "CPM",
+     "Verities": [
+-      "appSoftware",
++      "CPM",
+       "ossSoftware",
+       "zzzAutostart"
+     ],

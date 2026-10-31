@@ -1,0 +1,60 @@
+###############################################################################
+## @file      SConscript
+## @author    autogen
+##
+## @attention COPYRIGHT (C) 2021 CATERPILLAR INC. ALL RIGHTS RESERVED.
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+
+
+# Build Channel.Input.so
+#ifaceChannelInput = baseEnv.SharedLibraryWrapper(
+#    target='CalMgrCmdReqst.Channel.Input.so',
+#    source='Channel/Input/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel', baseEnv['BOOST_SIGNALS'] ],
+#)
+
+# Build Channel.Output.so
+#ifaceChannelOutput = baseEnv.SharedLibraryWrapper(
+#    target='CalMgrCmdReqst.Channel.Output.so',
+#    source='Channel/Output/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel' ],
+#)
+
+# Build Channel.Output.so
+ifaceChannel = baseEnv.SharedLibraryWrapper(
+    target='CalMgrCmdReqst.Channel.so',
+    source='Channel/channels.cpp',
+    LIBS = ['ais_serialization', 'ais_channel' ],
+)
+
+
+# Build Restorable
+ifaceRestorable = baseEnv.SharedLibraryWrapper(
+    target='CalMgrCmdReqst.Restorable.so',
+    source='Restorable/Restorable.cpp',
+    LIBS = ['ais_serialization'],
+)
+    
+# Build TypeTraits    
+ifaceTypeTraits = baseEnv.SharedLibraryWrapper(
+  target='CalMgrCmdReqst.TypeTraits.so',
+  source=[
+       'TypeTraits/csvable.cpp',
+        'TypeTraits/textWritable.cpp',
+   ],
+   LIBS = ['ais_serialization'],
+)
+
+#baseEnv.InstallLibrary( ifaceChannelInput )
+#baseEnv.InstallLibrary( ifaceChannelOutput )
+baseEnv.InstallLibrary( ifaceChannel )
+baseEnv.InstallLibrary( ifaceRestorable )
+baseEnv.InstallLibrary( ifaceTypeTraits )
+
+#baseEnv.Alias("CalMgrCmdReqst", "#lib/libCalMgrCmdReqst.Channel.Input.so")
+#baseEnv.Alias("CalMgrCmdReqst", "#lib/libCalMgrCmdReqst.Channel.Output.so")
+baseEnv.Alias("CalMgrCmdReqst", "#lib/libCalMgrCmdReqst.Channel.so")
+baseEnv.Alias("CalMgrCmdReqst", "#lib/libCalMgrCmdReqst.Restorable.so")
+baseEnv.Alias("CalMgrCmdReqst", "#lib/libCalMgrCmdReqst.TypeTraits.so")

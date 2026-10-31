@@ -1,0 +1,60 @@
+###############################################################################
+## @file      SConscript
+## @author    autogen
+##
+## @attention COPYRIGHT (C) 2021 CATERPILLAR INC. ALL RIGHTS RESERVED.
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+
+
+# Build Channel.Input.so
+#ifaceChannelInput = baseEnv.SharedLibraryWrapper(
+#    target='CalMgrCmdResp.Channel.Input.so',
+#    source='Channel/Input/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel', baseEnv['BOOST_SIGNALS'] ],
+#)
+
+# Build Channel.Output.so
+#ifaceChannelOutput = baseEnv.SharedLibraryWrapper(
+#    target='CalMgrCmdResp.Channel.Output.so',
+#    source='Channel/Output/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel' ],
+#)
+
+# Build Channel.Output.so
+ifaceChannel = baseEnv.SharedLibraryWrapper(
+    target='CalMgrCmdResp.Channel.so',
+    source='Channel/channels.cpp',
+    LIBS = ['ais_serialization', 'ais_channel' ],
+)
+
+
+# Build Restorable
+ifaceRestorable = baseEnv.SharedLibraryWrapper(
+    target='CalMgrCmdResp.Restorable.so',
+    source='Restorable/Restorable.cpp',
+    LIBS = ['ais_serialization'],
+)
+    
+# Build TypeTraits    
+ifaceTypeTraits = baseEnv.SharedLibraryWrapper(
+  target='CalMgrCmdResp.TypeTraits.so',
+  source=[
+       'TypeTraits/csvable.cpp',
+        'TypeTraits/textWritable.cpp',
+   ],
+   LIBS = ['ais_serialization'],
+)
+
+#baseEnv.InstallLibrary( ifaceChannelInput )
+#baseEnv.InstallLibrary( ifaceChannelOutput )
+baseEnv.InstallLibrary( ifaceChannel )
+baseEnv.InstallLibrary( ifaceRestorable )
+baseEnv.InstallLibrary( ifaceTypeTraits )
+
+#baseEnv.Alias("CalMgrCmdResp", "#lib/libCalMgrCmdResp.Channel.Input.so")
+#baseEnv.Alias("CalMgrCmdResp", "#lib/libCalMgrCmdResp.Channel.Output.so")
+baseEnv.Alias("CalMgrCmdResp", "#lib/libCalMgrCmdResp.Channel.so")
+baseEnv.Alias("CalMgrCmdResp", "#lib/libCalMgrCmdResp.Restorable.so")
+baseEnv.Alias("CalMgrCmdResp", "#lib/libCalMgrCmdResp.TypeTraits.so")

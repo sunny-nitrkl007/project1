@@ -1,0 +1,164 @@
+{
+    "type": "object",
+    "description": "Request from client. Exactly one of paramsRequested or fileRequested should be included inside queryStrings, or the command(s) requested should be included inside the body",
+    "default": {},
+    "examples": [
+        {
+            "queryStrings": {
+                "requestType": "ParameterRequest2",
+                "paramsRequested": [
+                    "TruckInfo",
+                    "PayloadInfo"
+                ]
+            },
+            "wsRequestType": "Add",
+            "rateSec": 5.0
+        },
+        {
+            "queryStrings": {
+                "requestType": "CommandRequest2"
+            },
+            "body": {
+                "TruckInfo_Wr": {
+                    "id": "2",
+                    "name": "Truck Two",
+                    "targetWeight": "300.2"
+                },
+                "MaterialList": [
+                    {
+                        "id": "3",
+                        "name": "Granite",
+                        "density": "44.2"
+                    },
+                    {
+                        "name": "Sand",
+                        "density": "22.2"
+                    }
+                ]
+            }
+        },
+        {
+            "queryStrings": {
+                "requestType": "FileMesage",
+                "fileRequested": "TruckList"
+            }
+        }
+    ],
+    "required": [
+        "queryStrings"
+    ],
+    "properties": {
+        "queryStrings": {
+            "$id": "#/properties/queryStrings",
+            "type": "object",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "requestType": "ParameterRequest2",
+                    "paramsRequested": [
+                        "PayloadInfo"
+                    ]
+                }
+            ],
+            "required": [
+                "requestType"
+            ],
+            "properties": {
+                "requestType": {
+                    "$id": "#/properties/requestType",
+                    "type": "string",
+                    "description": "requestType",
+                    "enum": ["ParameterRequest", "CommandRequest", "FileRequest", "ParameterRequest2", "CommandRequest2"],
+                    "examples": [
+                        "ParameterRequest2"
+                    ]
+                },
+                "paramsRequested": {
+                    "$id": "#/properties/paramsRequested",
+                    "type": "array",
+                    "description": "Parameters requested",
+                    "default": [],
+                    "examples": [
+                        [
+                            "TruckInfo",
+                            "PayloadInfo"
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/paramsRequested/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/paramsRequested/items/anyOf/0",
+                                "type": "string",
+                                "examples": [
+                                    "TruckInfo",
+                                    "PayloadInfo"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "fileRequested": {
+                    "$id": "#/properties/fileRequested",
+                    "type": "string",
+                    "description": "File Requested",
+                    "examples": [
+                        "TruckList"
+                    ]
+                }
+            }
+        },
+        "body": {
+            "$id": "#/properties/body",
+            "type": "object",
+            "description": "Commands requested, key followed by command specific data",
+            "default": {},
+            "examples": [
+                {
+                    "queryStrings": {
+                      "requestType": "CommandRequest2"
+                    },
+                    "body": {
+                      "TruckInfo_Wr": {
+                        "id": "2",
+                        "name": "Truck Two",
+                        "targetWeight": "300.2"
+                      },
+                      "MaterialList": [
+                        {
+                          "id": "3",
+                          "name": "Granite",
+                          "density": "44.2"
+                        },
+                        {
+                          "name": "Sand",
+                          "density": "22.2"
+                        }
+                      ]
+                    }
+                }
+            ]
+        },
+        "wsRequestType": {
+            "$id": "#/properties/wsRequestType",
+            "type": "string",
+            "description": "WebSocket request type, used for ParameterRequest or FileRequest. Add: Handle the request a single time if rateSec is 0 or not included, If rateSec is > 0, set up a periodic request. If rateSec < 0, it is an error. Remove: Stop a periodic read request. rateSec is ignored. In the case of a ParameterRequest, if multiple parameters were added as a group, they must also be Removed as a group. Cancel: Stop all periodic requests. rateSec is ignored.",
+            "enum" : ["Add", "Remove", "Cancel"],
+            "examples": [
+                "Add"
+            ]
+        },
+        "rateSec": {
+            "$id": "#/properties/rateSec",
+            "type": "number",
+            "description": "Update rate of the periodic request. If not included, defaults to 0.0 (i.e. a one-time request)",
+            "default": 0.0,
+            "examples": [
+                1.0
+            ]
+        }
+    },
+    "additionalProperties": true
+}

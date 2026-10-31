@@ -1,0 +1,63 @@
+###############################################################################
+## @file      SConscript
+## @author    autogen
+##
+## @attention COPYRIGHT (C) 2021 CATERPILLAR INC. ALL RIGHTS RESERVED.
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+
+baseEnv.Append( CPPPATH = ['.',
+                             '#/prod/common/interfaces/DataLinkData',
+                            ] )
+
+# Build Channel.Input.so
+#ifaceChannelInput = baseEnv.SharedLibraryWrapper(
+#    target='DataLinkData.Channel.Input.so',
+#    source='Channel/Input/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel', baseEnv['BOOST_SIGNALS'] ],
+#)
+
+# Build Channel.Output.so
+#ifaceChannelOutput = baseEnv.SharedLibraryWrapper(
+#    target='DataLinkData.Channel.Output.so',
+#    source='Channel/Output/channel.cpp',
+#    LIBS = ['ais_serialization', 'ais_channel' ],
+#)
+
+# Build Channel.Output.so
+ifaceChannel = baseEnv.SharedLibraryWrapper(
+    target='DataLinkData.Channel.so',
+    source='Channel/channels.cpp',
+    LIBS = ['ais_serialization', 'ais_channel' ],
+)
+
+
+# Build Restorable
+ifaceRestorable = baseEnv.SharedLibraryWrapper(
+    target='DataLinkData.Restorable.so',
+    source='Restorable/Restorable.cpp',
+    LIBS = ['ais_serialization'],
+)
+    
+# Build TypeTraits    
+ifaceTypeTraits = baseEnv.SharedLibraryWrapper(
+  target='DataLinkData.TypeTraits.so',
+  source=[
+       'TypeTraits/csvable.cpp',
+        'TypeTraits/textWritable.cpp',
+   ],
+   LIBS = ['ais_serialization'],
+)
+
+#baseEnv.InstallLibrary( ifaceChannelInput )
+#baseEnv.InstallLibrary( ifaceChannelOutput )
+baseEnv.InstallLibrary( ifaceChannel )
+baseEnv.InstallLibrary( ifaceRestorable )
+baseEnv.InstallLibrary( ifaceTypeTraits )
+
+#baseEnv.Alias("DataLinkData", "#lib/libDataLinkData.Channel.Input.so")
+#baseEnv.Alias("DataLinkData", "#lib/libDataLinkData.Channel.Output.so")
+baseEnv.Alias("DataLinkData", "#lib/libDataLinkData.Channel.so")
+baseEnv.Alias("DataLinkData", "#lib/libDataLinkData.Restorable.so")
+baseEnv.Alias("DataLinkData", "#lib/libDataLinkData.TypeTraits.so")

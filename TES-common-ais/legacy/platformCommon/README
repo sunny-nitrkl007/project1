@@ -1,0 +1,23 @@
+== BmiEthernet
+
+# lib_csf/libcsf_eth_health.a - revert to older tag, in newer tags csf_eth_health_add_client returns a bad handle
+    repo: git@git1.corp.cat.com:/cat/ess-csf/csf_eth_health-a
+    tag:  CSF_ETH_HEALTH_2019.2.0
+
+
+== FileTransferBridgeApp
+== Older gRPC and CDA version needed until FileTransferBridgeApp is updated to work with CDA_2019+
+
+# ssp-cda
+    repo:   git@git1.corp.cat.com:/cat/ess-csf/cda 
+    tag:    CDA_2018.5.0
+
+    repo:   git@git1.corp.cat.com:/cat/ess-csf/cda-a
+    tag:    CDA_2018.5.0
+
+# lib_oss/grpc
+    repo:   git@git1.corp.cat.com:/oss/grpc
+    tag:    grpc_v1.0.0_2018.1.0
+
+    repo:   git@git1.corp.cat.com:/oss/grpc-a 
+    tag:    grpc_v1.0.0_2018.1.0

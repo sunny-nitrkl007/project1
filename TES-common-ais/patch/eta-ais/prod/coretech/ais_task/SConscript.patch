@@ -1,0 +1,14 @@
+diff --git a/prod/coretech/ais_task/SConscript b/prod/coretech/ais_task/SConscript
+index e87c42f926..c4f0c96854 100644
+--- a/prod/coretech/ais_task/SConscript
++++ b/prod/coretech/ais_task/SConscript
+@@ -28,7 +28,8 @@ aisTaskEnv.InstallHeadersInFolder(os.path.join(aisTaskEnv['CORETECH'], 'ais_task
+ aisTaskEnv.buildit( 'ais/interfaces', ['suse'] )
+ 
+ # build configs
+-aisTaskEnv.InstallConfigsInFolder( 'config', relInstallPath='', recursive=False)
++# PATCHED: configs installed by CPM project; do not install from ais_task
++# aisTaskEnv.InstallConfigsInFolder( 'config', relInstallPath='', recursive=False)
+ 
+ # 8 libraries to build:
+ 

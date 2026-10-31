@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"
+>
+  <info module="es-ms-mach-prod/ss/toa_wl00"
+        e:ivydom="ivy-mach_productivity"
+        e:vpath="lib_info_products/toa_wl00"
+        organisation="com.cat.e"
+        revision="#!RevReplace!#"
+        status="integration"
+  />
+  <configurations defaultconf="rel">
+    <conf description="Retrieve artifacts necessary to use the module." name="rel"/>
+    <conf description="Retrieve artifacts needed to do development."    name="dev"/>
+	<conf description="Retrieve self content only."                     name="nodep"/>
+  </configurations>
+  <publications>
+    <artifact ext="xml" name="git-repo" type="git"/>
+  </publications>
+  <dependencies defaultconf="*->@">
+
+
+    <!-- CycleSegmentation - Lib content. Mach-Prod Lib Common Buildescription set for ALL model development-->                             
+    <dependency conf="dev->rel" e:ivydom="ivy-mach_productivity"  name="es-ms-mach-prod/ss/mach_prod_common_buildescriptions"  org="com.cat.e" rev="1.9.0"/> 
+	
+	<!-- CycleSegmentation - Lib content. Mach-Prod Lib System Architect Super Packages for Mach Productivity -->
+    <dependency conf="dev->rel" e:ivydom="ivy-mach_productivity" name="es-ms-mach-prod/ss/mach_prod_ysa_super_packages" org="com.cat.e" rev="1.5.0"/>
+
+    <!-- Aggregate/Cluster config for: MATLAB SIMULINK LIB_MATH -->
+    <dependency conf="dev->sim" e:ivydom="ivy-dt" name="cat/dt/catutils"  org="com.cat.e" rev="4.6.1"/>
+    
+    <!-- Model Advisor -->
+    <dependency conf="dev->rel" e:ivydom="ivy-dt" name="cat/dt/model_advisor_groups"  org="com.cat.e" rev="0.0.14"/> 
+    
+    <!-- SystemArchitect-->
+    <dependency conf="dev->rel"   e:ivydom="ivy-dt" name="cat/dt/SysArch-a" org="com.cat.e" rev="3.26.0"/>
+	
+    <!-- System Architect Super Packages for CAT -->
+    <dependency conf="dev->rel" e:ivydom="ivy-csf" name="cat/ess-csf/ssas" org="com.cat.e" rev="1.5.0"/>
+    <dependency conf="dev->rel" e:ivydom="ivy-csf" name="cat/ess-csf/msas" org="com.cat.e" rev="1.2.0"/>
+    <dependency conf="dev->rel" e:ivydom="ivy-csf" name="cat/ess-csf/psas" org="com.cat.e" rev="1.0.1"/>
+    <dependency conf="dev->rel" e:ivydom="ivy-csf" name="cat/ess-csf/esas" org="com.cat.e" rev="1.3.5"/>
+	
+    <!-- Common Units AB and SysArch support -->
+    <dependency conf="dev->rel" name="cat/dt/common_units" e:ivydom="ivy-dt" org="com.cat.e" rev="4.0.1"/>
+    <dependency conf="dev->rel" name="cat/ess-mach/ms_common_units" e:ivydom="ivy-mach" org="com.cat.e" rev="2.0.0"/>
+
+    <!-- RPAC -->
+    <dependency conf="dev->nodep" e:ivydom="ivy-dt" name="cat/dt/rpac-a"    org="com.cat.e" rev="RPACV3_1.70_AFSW_2010_2.0_ALPHA_7.2"/>
+	
+    <!-- Standards C Library -->
+    <dependency conf="dev->rel"   e:ivydom="ivy-sids"  name="cat/ess-csf/sids"           org="com.cat.e"  rev="24.0.0"/>
+    <dependency conf="dev->rel"   e:ivydom="ivy-sids"  name="cat/ess-csf/standards_c"    org="com.cat.e"  rev="14.0.0"/>    
+    
+    <!-- MS TOOLS -->
+    <dependency conf="dev-&gt;rel_lib_x5,rel_lib_x6,rel_lib_sim,rel_libdiff,rel_girt_win32" e:ivydom="ivy-ms_makefiles" name="cat/dt/mach_tools_cluster" org="com.cat.e" rev="12.0.0.rc38"/>
+
+  </dependencies>
+</ivy-module>

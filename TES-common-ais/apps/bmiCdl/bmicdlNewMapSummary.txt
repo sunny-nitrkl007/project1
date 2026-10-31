@@ -1,0 +1,46 @@
+BmiCdl: 
+DataLinkData\
+		DataLinkParamInfo class has METADATA
+			Current DataLinkParam will be renamed
+		DataLinkParam class has STATISTICS
+			Inherited from DataLinkParamInfo class
+			Has statistics like lastGoodValue,fault, stale counters, etc..
+			Also has a small vector to store duplicated pid data		
+		DataLinkData is published as SCS object
+			It has a map<string,DataLinkParam> dlDataMap to save pid data
+			Map size should always be equal to number of params
+			clear vector in each entry of map after publish
+
+	BmiCdlWrpper.cpp
+		ApiHandler()
+			Save all data in a local copy of DataLinkParam object
+			Use DataLinkData class API to add this entry in the map
+			UpdateDataLinkParam is API used to handle this
+			
+	BmiCdl.cpp
+		executive()
+			It publishes DataLinkData object as we done previously.
+
+
+
+App Side: 
+	Gets the scs object
+	Gets the dlDataMap from the object
+	Iterate thorugh map to get PID data
+	App can use any of following API's to get param value
+		GetLastValue()
+		GetLastValueEng()
+		GetLastGoodValue()
+		GetLastGoodValueEng()
+	If app needs all instances of that pid data it can get from vector
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

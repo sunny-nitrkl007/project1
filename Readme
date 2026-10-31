@@ -1,0 +1,22 @@
+To clone and initialize the ssp
+
+#setup environment
+
+cd ~
+mkdir bin
+cd bin
+git clone git@git1.corp.cat.com:/cat/edr-git_user
+
+# ---------------  Add the following line to the ~/.bashrc file  ---------------
+PATH=$PATH:$HOME/bin/edr-git_user/scripts
+
+# clone ssp
+git clone git@git1.corp.cat.com:/cat/ess-info/ssp-CPM_Loader-ais
+cd ssp-CPM_Loader-ais
+git checkout origin/cpm_1.0_int
+sp_create #this initializes and updates the submodules
+
+
+
+
+

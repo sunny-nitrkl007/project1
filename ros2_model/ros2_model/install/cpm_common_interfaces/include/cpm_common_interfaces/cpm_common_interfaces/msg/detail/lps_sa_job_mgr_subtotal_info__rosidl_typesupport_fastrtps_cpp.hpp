@@ -1,0 +1,100 @@
+// generated from rosidl_typesupport_fastrtps_cpp/resource/idl__rosidl_typesupport_fastrtps_cpp.hpp.em
+// with input from cpm_common_interfaces:msg/LpsSaJobMgrSubtotalInfo.idl
+// generated code does not contain a copyright notice
+
+#ifndef CPM_COMMON_INTERFACES__MSG__DETAIL__LPS_SA_JOB_MGR_SUBTOTAL_INFO__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
+#define CPM_COMMON_INTERFACES__MSG__DETAIL__LPS_SA_JOB_MGR_SUBTOTAL_INFO__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_
+
+#include <cstddef>
+#include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_typesupport_interface/macros.h"
+#include "cpm_common_interfaces/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h"
+#include "cpm_common_interfaces/msg/detail/lps_sa_job_mgr_subtotal_info__struct.hpp"
+
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wunused-parameter"
+# ifdef __clang__
+#  pragma clang diagnostic ignored "-Wdeprecated-register"
+#  pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
+# endif
+#endif
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
+
+#include "fastcdr/Cdr.h"
+
+namespace cpm_common_interfaces
+{
+
+namespace msg
+{
+
+namespace typesupport_fastrtps_cpp
+{
+
+bool
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+cdr_serialize(
+  const cpm_common_interfaces::msg::LpsSaJobMgrSubtotalInfo & ros_message,
+  eprosima::fastcdr::Cdr & cdr);
+
+bool
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+cdr_deserialize(
+  eprosima::fastcdr::Cdr & cdr,
+  cpm_common_interfaces::msg::LpsSaJobMgrSubtotalInfo & ros_message);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+get_serialized_size(
+  const cpm_common_interfaces::msg::LpsSaJobMgrSubtotalInfo & ros_message,
+  size_t current_alignment);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+max_serialized_size_LpsSaJobMgrSubtotalInfo(
+  bool & full_bounded,
+  bool & is_plain,
+  size_t current_alignment);
+
+bool
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+cdr_serialize_key(
+  const cpm_common_interfaces::msg::LpsSaJobMgrSubtotalInfo & ros_message,
+  eprosima::fastcdr::Cdr &);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+get_serialized_size_key(
+  const cpm_common_interfaces::msg::LpsSaJobMgrSubtotalInfo & ros_message,
+  size_t current_alignment);
+
+size_t
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+max_serialized_size_key_LpsSaJobMgrSubtotalInfo(
+  bool & full_bounded,
+  bool & is_plain,
+  size_t current_alignment);
+
+}  // namespace typesupport_fastrtps_cpp
+
+}  // namespace msg
+
+}  // namespace cpm_common_interfaces
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+ROSIDL_TYPESUPPORT_FASTRTPS_CPP_PUBLIC_cpm_common_interfaces
+const rosidl_message_type_support_t *
+  ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_fastrtps_cpp, cpm_common_interfaces, msg, LpsSaJobMgrSubtotalInfo)();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // CPM_COMMON_INTERFACES__MSG__DETAIL__LPS_SA_JOB_MGR_SUBTOTAL_INFO__ROSIDL_TYPESUPPORT_FASTRTPS_CPP_HPP_

@@ -1,0 +1,30 @@
+diff --git a/Makefile b/Makefile
+index 69daa4dd0b..2ba76c52c9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -341,6 +341,7 @@ FL2_HELPER_TEMP_DIR = fl2HelperTemp
+ RLS_SRC_DIRS  = coordSystem
+ RLS_SRC_DIRS += scripts
+ RLS_SRC_DIRS += config
++RLS_SRC_DIRS += certs
+ RLS_SRC_DIRS += platform
+ 
+ # directories containing binaries for the release
+@@ -476,6 +477,8 @@ RLS_ENGR_ZIP=$(RLS_ZIP:%.zip=%_ENGR.zip)
+ # zip arguments for the main release zip file
+ RLS_ZIP_ARGS  = $(RLS_NOTES)
+ RLS_ZIP_ARGS += prod/common/version/version.cpp
++RLS_ZIP_ARGS += web_init.sh
++RLS_ZIP_ARGS += changeCatEnvToHere.sh
+ RLS_ZIP_ARGS += $(RLS_SRC_DIRS)
+ RLS_ZIP_ARGS += $(RLS_BIN_DIRS)
+ 
+@@ -926,7 +929,7 @@ pre_release_%:
+ 
+ pre_release:
+ ifneq ($(SYSROOT),/)
+-	bash removeBinLibContent_$(PLATFORM).sh
++	bash removeBinLibContent_$(PLATFORM).sh "${BUILD_DIR}"
+ else
+ 	@echo "   Content removal not needed for native build."
+ endif

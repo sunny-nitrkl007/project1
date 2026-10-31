@@ -1,0 +1,11 @@
+diff --git a/platform/_COMMON/includes-list.txt b/platform/_COMMON/includes-list.txt
+index 6ebe49a422..82a96967cb 100644
+--- a/platform/_COMMON/includes-list.txt
++++ b/platform/_COMMON/includes-list.txt
+@@ -1,5 +1,5 @@
+ ## app specific paths that should take priority
+-include ${APP_PLATFORM_DIR}/${PLATFORM}/includes-list.txt
++## PATCHED: Removed circular reference - include ${APP_PLATFORM_DIR}/${PLATFORM}/includes-list.txt
+ 
+ ## coretech
+ include ${AIS_CT_PLATFORM_DIR}/${PLATFORM}/includes-list.txt

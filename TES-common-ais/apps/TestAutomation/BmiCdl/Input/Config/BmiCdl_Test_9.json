@@ -1,0 +1,178 @@
+{
+	"cdl2_cbs_ecm_header_t": {
+		"table_id": "0x00",
+		"table_format_level": "0x01",
+		"enabled": "0x00",
+		"num_table_entries": 3
+	},
+
+	"ecm_0": {
+		"ecm_name" : "BMI_CDL_DSE_ADDRESS_TRANS_CHASSIS",
+		"ecm_id32": "0x1B",
+		"mid": "0x1B",
+		"ecm_control": "0x00",
+		"cid": 296,
+		"periodic_fnc_id32": "0x00",
+		"periodic_interval": 10
+	},
+
+	"ecm_1": {
+		"ecm_name" : "BMI_CDL_DSE_ADDRESS_ENG",
+		"ecm_id32": "0x24",
+		"mid": "0x24",
+		"ecm_control": "0x00",
+		"cid": 590,
+		"periodic_fnc_id32": "0x00",
+		"periodic_interval": 10
+	},
+
+	"ecm_2": {
+		"ecm_name" : "BMI_CDL_DSE_ADDRESS_COMM_GATEWAY_1",
+		"ecm_id32": "0xA1",
+		"mid": "0xA1",
+		"ecm_control": "0x00",
+		"cid": 5806,
+		"periodic_fnc_id32": "0x00",
+		"periodic_interval": 10
+	},
+
+	"cdl2_cbs_parm_header_t": {
+		"table_id": "0x00",
+		"table_format_level": "0x01",
+		"enabled": "0x00",
+		"num_table_entries": 8
+	},
+
+	"parameter_0": {
+		"param_name" : "BMI_CDL_PID_BODY_UP",
+		"cdl2_cbs_parm_cdl_id_t": "0xF604",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x00",
+		"parm_request_type": 0,
+		"parameter_type": 2,
+		"mid": "0x1B",
+		"request_rate": 200,
+		"Scaling": "1.0",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 0,
+		"ParmDataType" : 4,
+		"ParmDataLength" : 2
+	},
+	"parameter_1": {
+		"param_name" : "BMI_CDL_PID_GROUND_SPEED",
+		"cdl2_cbs_parm_cdl_id_t": "0x18",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x00",
+		"parm_request_type": 1,
+		"parameter_type": 0,
+		"mid": "0x1B",
+		"request_rate": 200,
+		"Scaling": "0.5",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 0,
+		"ParmDataType" : 1,
+		"ParmDataLength" : 1
+	},
+	"parameter_2": {
+		"param_name" : "BMI_CDL_PID_GEAR",
+		"cdl2_cbs_parm_cdl_id_t": "0xF002",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x00",
+		"parm_request_type": 1,
+		"parameter_type": 0,
+		"mid": "0x1B",
+		"request_rate": 200,
+		"Scaling": "1.0",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 0,
+		"ParmDataType" : 4,
+		"ParmDataLength" : 1
+	},
+	"parameter_3": {
+		"param_name" : "BMI_CDL_PID_FUEL_RATE",
+		"cdl2_cbs_parm_cdl_id_t": "0xF525",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x00",
+		"parm_request_type": 0,
+		"parameter_type": 2,
+		"mid": "0x24",
+		"request_rate": 200,
+		"Scaling": "0.05",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 0,
+		"ParmDataType" : 3,
+		"ParmDataLength" : 2
+	},
+
+	"parameter_4": {
+		"param_name" : "BMI_CDL_PID_TOTAL_FUEL",
+		"cdl2_cbs_parm_cdl_id_t": "0xC8",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x00",
+		"parm_request_type": 0,
+		"parameter_type": 4,
+		"mid": "0x24",
+		"request_rate": 200,
+		"Scaling": "0.125",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 0,
+		"ParmDataType" : 5,
+		"ParmDataLength" : 4
+	},
+
+	"parameter_5": {
+		"param_name" : "BMI_CDL_PID_ENGINE_SPEED",
+		"cdl2_cbs_parm_cdl_id_t": "0x40",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x00",
+		"parm_request_type": 1,
+		"parameter_type": 1,
+		"mid": "0x24",
+		"request_rate": 200,
+		"Scaling": "0.5",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 0,
+		"ParmDataType" : 2,
+		"ParmDataLength" : 2
+	},
+
+	"parameter_6": {
+		"param_name" : "BMI_CDL_GPS",
+		"cdl2_cbs_parm_cdl_id_t": "0xF84D",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x40",
+		"parm_request_type": 0,
+		"parameter_type": 12,
+		"mid": "0xA1",
+		"request_rate": 1000,
+		"Scaling": "1.0",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 1,
+		"ParmDataType" : 6,
+		"ParmDataLength" : 15
+	},
+
+	"parameter_7": {
+		"param_name" : "BMI_TIME_ZONE_INFO",
+		"cdl2_cbs_parm_cdl_id_t": "0xFA27",
+		"parm_control_req": "0x00",
+		"parm_control_rev": "0x40",
+		"parm_request_type": 0,
+		"parameter_type": 12,
+		"mid": "0xA1",
+		"request_rate": 1000,
+		"Scaling": "1.0",
+		"Offset": "0",
+		"Units": 0,
+		"VarLengthParamType" : 3,
+	        "ParmDataType" : 6,
+		"ParmDataLength" : 19
+	}
+}

@@ -1,0 +1,76 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @brief     SConscript for the bmiJ1939 application.
+##
+## @attention COPYRIGHT (C) 2018 CATERPILLAR INC. ALL RIGHTS RESERVED.
+## @attention
+## @attention Copyright (C) 2015
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+
+# Create environment
+Import( 'testEnv' )
+localEnv = testEnv.Clone();
+
+## Enable below line for automation testing
+##localEnv.Append( CPPDEFINES=[ 'WRITE_AUTOMATION_DATA' ] )
+
+# Add app-specific library and source paths
+localEnv.Prepend( LIBPATH = ['#/apps/lib'] )
+localEnv.Append( CPPPATH = [ '#/apps/include' ])
+
+# Define source files for the build
+sourceFiles = [
+   'BmiJ1939.cpp',
+   'BmiJ1939Read.cpp',
+   'BmiJ1939Task.cpp',
+   'BmiJ1939ExtIdHdlr.cpp',
+   'BmiJ1939TaskInit.cpp',
+   'BmiJ1939DataHandlers.cpp',
+   'BmiJ1939SCS.cpp',
+   'BmiJ1939Config.cpp',
+   'BmiJ1939Map.cpp',
+   'scl_adt_j1939_config.c',
+   'BmiJ1939RestrictedRead.cpp',
+   'app_cdl_mod_globals.c',
+   'BmiJ1939RptInf.cpp'
+       
+]
+
+if 'CPPDEFINES' in localEnv.Dictionary().keys() and 'WRITE_AUTOMATION_DATA' in localEnv[ 'CPPDEFINES' ]:
+   sourceFiles.append('BmiJ1939Automation.cpp')
+
+# Define libraries to link
+libraries = [
+   'ais_task',                                                                         # AIS
+   'scl_health_j39',                                                                   # J1939 health
+   'scl_adt_j1939', 'scl_rw_j1939', 'scl_j1939', 'scl_pgb_j1939',                      # J1939
+   'cdl2_', 'cdl2_pit', 'scl_fm', 'scl_util', 'scl_que',                               # J1939 dependencies
+   'clock_integral', 'clock_', 'libclock_sync', 
+   'hal_canv3', 'hal_boot',                                                          # Hardware Abstraction Layer
+]
+# hal_util and hal_error not available in ssp-linux-is7 (A7H4) and not directly used by bmiJ1939
+if localEnv['PLATFORM'] != 'A7H4':
+   libraries += ['hal_util', 'hal_error']
+libraries += [
+   'commTask', 'oel_u', 'oel_rtos_posix', 'oel_rtos', 'oel_timestamp',                 # OEL
+   '_util', 'dbg_log'                                                                  # Dependencies of dependencies...
+]
+
+# Enable NDEBUG to prevent compilation warnings
+localEnv.Append( CPPDEFINES = [ "NDEBUG" ] )
+
+bmiJ1939Program = localEnv.ProgramWrapper(
+        target = 'bmiJ1939',
+        source = sourceFiles,
+        LIBS = libraries,
+    )
+
+localEnv.InstallBinary( bmiJ1939Program )
+localEnv.Alias("bmiJ1939", "#bin/bmiJ1939")
+
+

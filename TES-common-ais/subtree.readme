@@ -1,0 +1,13 @@
+Third Party source code has been subtree'd into this repo:
+
+---------------------------
+--Simple-Websocket-Server--
+---------------------------
+Initial Add
+$ git subtree add --prefix prod/common/Simple-WebSocket-Server https://gitlab.com/eidheim/Simple-WebSocket-Server v2.0.0-rc2 --squash
+
+Had to patch to get rid of error
+$ git apply patch/Simple-WebSocket-Server.patch
+
+Example Update
+$ git subtree pull --prefix prod/common/Simple-WebSocket-Server https://gitlab.com/eidheim/Simple-WebSocket-Server v2.0.0-rc4 --squash

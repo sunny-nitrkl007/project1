@@ -1,0 +1,12 @@
+// Copyright 2019 Caterpillar, Inc. All Rights Reserved
+// This file contains protobuf message definitions for the payload printer feature
+
+syntax = "proto3";
+package Cat.Payload;
+
+// Filetype 10425
+message PrinterReport
+{
+	uint32 number_of_copies = 1;
+	string raw_text = 2;
+}

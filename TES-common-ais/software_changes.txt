@@ -1,0 +1,1464 @@
+:data-uri:    
+:icons:       
+:toc-title:   Releases
+:toclevels:   1
+:title:       Software History
+:doctype:     book
+:ProductMayNeedModification: Product hardware may need modification before or  +
+                             after installing this software. Such modification +
+                             may prevent re-installation of older software.     
+:MoreServiceInformationAvailable: Additional service information related to    +
+                                  this software may be available online.       +
+                                  Please review this information prior to      +
+                                  installing the software.                      
+:pn:          579-5116-01
+:copyrightdates:  2015-2020
+:copyright: Copyright (C) 2015-2020 Caterpillar Inc. All Rights Reserved.
+= CPM Core Linux a.k.a TES Common Applications
+
+//Dummy part number to generate html file.
+//Change link:#_579_5116_01[579-5116-01] to Release Notes.
+= 579-5116-01
+
+//****************************************************************************
+
+== CPM Core Linux (0.19.0)
+
+|====================================
+| Date              | 2021-09-23
+| Release Label/Tag | 0.19.0
+| AIS Template		| 4.3.0 ALPHA_09
+| Released By       | Subba Gundala/Dave Janik
+|====================================
+
+== Release Summary Information
+
+=== cmpa2875: AIS 4.3 Alpha 8 updates
+=== cmpa2887: updates to CsvToDldApp to support signed 2 byte hex data
+=== cpm_2.0_int updates
+	tp912140: system comms fix, remove patch for platform libs
+	tp904908: imu_fom, IMU test points for data collection
+	
+=== Coaching updates
+	cmpa2874: fix 3x3 enable, don't show Tips turned off by Operator or System
+	cmpa2857: add_diag_to_ShowHide, add flag to ShowHide response for Datalink Diag state
+
+//****************************************************************************
+
+//****************************************************************************
+
+== CPM Core Linux (0.18.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2021-08-16
+| Release Label/Tag | 0.18.0
+| AIS Template		| 4.3.0 ALPHA_03
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== cmpa2814: Integrate AIS 4.3 Alpha 3
+	Remove scl_eth_health and scl_j1939_health patches from apply_patch_ais_all.
+	Added rpaClientTask to zzzAutostart app_init.sh.
+	Update zzzAutostart app_init.sh with a app_lighttpd.conf patch to disable pgt reverse proxy configuration of lighttpd.
+	Updated DataLinkData OCS plugin to display the same parameter from multiple sources.
+	Added machineNameDefault of NOT_SET for Robot.rb.
+
+=== cmpa2796: Integrate AIS 4.3 Alpha 2.
+	Updated eta-ais patches.
+	Updated removeBinLibContent patches for eta-ais 4.3 A02 RC.
+	Changed location of output files to /tmp/outputFiles (RAM) (outputFileDir.txt).
+
+=== Coaching updates
+	2840:Coaching, update WMA, prevent divide by zero.
+	2827:added standAloneUiStatus flag in .rb.
+	2808: coaching code clean up.
+	2799:Coaching, added flag for algorithm selection POISSON vs WMA.
+	2798:Coaching, add WMA tested against spreadsheet.
+	2721:Coaching, add WMA algorithm option.
+	Coaching, added configurable window for WMA algorithm.
+
+//****************************************************************************
+
+//****************************************************************************
+
+== CPM Core Linux (0.17.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2021-06-15
+| Release Label/Tag | 0.17.0
+| AIS Template		| 4.3.0 ALPHA_01
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== cmpa2744 : CPM Core Linux Integration changes for AIS 4 3 Alpha 1.
+
+	- Updated patches for AIS 4.3 ALPHA_1 RC.
+
+	- Updated TES common for AIS 4.3 ALPHA_01 RC.
+
+=== cpma2790: Added GPS parameter read support from CDA.
+
+=== cpma2796: Changed location of output files to /tmp/outputFiles (RAM).
+
+=== cpma2796: Resolved remaining merge issues with AIS 4.3 A02.
+
+=== cmpa2799: Coaching, add flag to indicate Poisson or WMA algorithm to drive Stars and Badges.
+
+=== cpma2796: Updated removeBinLibContent patches for eta-ais 4.3 A02 RC.
+
+=== cmpa2798: Coaching, add WMA algorithm.
+
+=== cmpa2808: Coaching, fix GPS-BAD records for MAP feature.
+
+=== cmpa2795: Coaching, 1st attempt to fix GPS-BAD in MAP feature.
+
+//****************************************************************************
+
+
+//****************************************************************************
+
+== CPM Core Linux (0.16.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2021-06-15
+| Release Label/Tag | 0.16.0
+| AIS Template		| 4.2.0 ALPHA_02
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us877424 : Add cgi error codes so UI can detect errors and fail
+	Return an http error code when there is an error.
+
+=== us875539 : Serial printer crash add logs
+	Log errno is serial port open fails.
+
+=== us877511 : Fixed cgi error response and removed stop cgi functionality
+	Removed stop cgi functionality when jhm is not running for example.
+
+=== us877208 : Strip cgi-bin content also for release - reduce size
+
+=== us890846 : Fixed PWM input period interpolation
+
+=== us885573 : Yellow-key time sync
+	Use re-entrant versions of local time and gmtime for thread-safety.
+
+=== us886056 : Update SwitchInputApp to support debounce
+	Update switch processing to allow separate debounce counts for open vs. closed.
+
+=== us867664 : Support for kgs and lbs
+
+=== us826952 : Updated Bridge App TTI log level
+	Adjust log levels and clear unsupported files from FTB tx file queue.
+
+=== us888931 : Added external IMU bias estimation inhibit option
+
+=== Coaching Common Framework Updates
+
+=== us899941 : Minor updates for DSI
+=== us901095 : Remove TIP records on reset from breadcrumbLog
+=== us900199 : Updates for to use ais-NVM utilities
+=== us887662 : Fix PSR, name & Category flipped
+=== us896740 : Fix again SEA behavior for new UI
+=== us889942 : Ran cpp check and added suprressions for new false warnings
+=== us896740 : Add Temp Install PIDs
+=== us896815 : Check safeState when updating TipViewCounter
+
+//****************************************************************************
+
+//****************************************************************************
+
+== CPM Core Linux (0.15.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2021-01-08
+| Release Label/Tag | 0.15.0
+| AIS Template		| 4.2.0 ALPHA_01
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us887248 : CAN over UDP & CPOP
+	Add support for CAN over UDP & CPOP to
+	DatalinkMgrToDld (Configurable Periodic Output Protocol).
+
+=== us888141 Remove `require interfaces_Coaching.rb`
+	Remove `require interfaces_Coaching.rb`from
+	XcpServerTask.rb. NOTE: AT/LWL Coaching will need to
+	add this to their XcpServerTask_aux.rb.
+
+=== us855859 TPMS2: GPS Data
+	Read GPS Data (including Northing, Easting, and
+	Elevation) over CDA.
+
+=== us838474 : LMT OEA TKPH MineStar TMAC Message.
+
+//****************************************************************************
+
+//****************************************************************************
+
+== CPM Core Linux (0.14.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2020-11-19
+| Release Label/Tag | 0.14.0
+| AIS Template		| 4.1.0 ALPHA_16
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us878209 : DataLinkData SCS channel and DatalinkMgrToDld
+	Updated DataLinkData SCS channel and DatalinkMgrToDld TaskPlugin
+	to support multiple source IDs for the same parameter.
+	IMPORTANT: This required an interface change to the DataLinkData STL
+	container of parameters. The unordered_map<key, DataLinkParam> was
+	converted to a unordered_map<key, std::list<DataLinkParam>>, where
+	the inner list contains one or more DataLinkParams with identical
+	DataLinkParamInfo metadata with the exception of SourceId and/or
+	DataLinkType.
+
+=== us883232 : Jhm2WsServer to support converting WebSocket
+	Add Jhm2WsServer to support converting WebSocketrequests into
+	Jhm2ParamMsgRequest for use by the AisJhm2DataServer. Currently
+	supports ParameterRequest(2), FileRequest, and CommandRequest(2).
+	Parameter and File requests can be one-time or periodic.
+
+	Moved the majority of jhm2 to legacy in favor of the AIS version.
+	Only jhm2CgiApp remains since the AIS version is incompatible with MWL
+	See prod/common/jhm2WsServer/README.md for more details
+
+=== us882913 : TES-Common-ais for compatibility with eta-ais
+	Updated TES-Common-ais for compatibility with eta-ais ALPHA_16.
+	DatalinkManager interface has changed to support split Rx/Tx
+	parameters, and the same parameter from a different SourceId
+	/DataLinkProtocol.
+
+	Added platform/common for common includes/libraries, and updated
+	tes_platform.py.
+
+=== us875060, us882913: CoachingTipHistory
+	Added CoachingTipHistory and $CA11 (Application History PSR)
+	BDT support.
+
+=== u879877: String to Show-Hde
+	Add software version string to Show-Hde response.
+
+=== us876725: Add getter for pwm last sample time.
+
+=== us879573: Updates to support images.
+
+=== us856259: Add csvToDldApp to sandbox.
+
+=== us875539: Fix serial printer crash.
+
+=== us878625: Clean up DatalinkMgrToDld plugin.
+
+=== us873299: Reset breadcrumb on reset command.
+
+=== us828924: Patches for latest ACD2
+	Updated patches for latest ACD2 develop branch e28baa.
+	Updated Makefile.patch for latest acd2 develop branch. fix memory
+	leak when in DEBUG.
+
+=== us877084: AFSW_SCL_2020.4.0.rc8 tag for health
+	Pick up AFSW_SCL_2020.4.0.rc8 tag for health, dlinfo
+	and dlinfo_mager libs
+
+=== Integration Information
+
+To use ACD2, need to update the CPM project level SConstruct
+to use some new functions from eta-ais. The diff from LWL
+Coaching as a reference archieved in Core Linux 0.13.0 release.
+\TES-common-ais\patch\example\0_13_0_SConstruct.diff
+
+One another change to make at the project level is to remove the
+const qualifier from app_oel_rtos_posix_config. This was done to
+support runtime configurable OEL tasks in OelTaskManager (used by ACD2).
+There is no functional impact on the existing code.
+
+//****************************************************************************
+
+//****************************************************************************
+
+== CPM Core Linux (0.13.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2020-08-17
+| Release Label/Tag | 0.13.0
+| AIS Template		| 4.1.0 ALPHA_14
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== updated ethernet port stats config file to fix build (gulamhs)
+
+=== us861224: Updates for AIS ALPHA_14 (machas3)
+
+=== us828924: Resolved segfaults in DatalinkMgtToDld (machas3)
+
+=== us870036:updates to work with latest ACD2 branch in eta-ais (janikdc)
+
+=== us868546:update DatalinkMgrToDld plugin and CoachTask (janikdc)
+
+=== us867685:updates for PID F0B2 (janikdc)
+
+=== us867978:fix OpID F0B2 (janikdc)
+
+=== us860760:added CoachingSummaryDataForAcd2 plugin (janikdc)
+
+=== us860760:update DatalinkMgrToDld plugin (janikdc)
+
+=== us860760:add DatalinkMgrToDld plugin, minor Coaching updates (janikdc)
+
+=== us858314:tip trigger to csv (janikdc)
+
+=== us861049:updated badge logic removed logging (janikdc)
+
+=== us861049:updated badge logic (janikdc)
+
+=== us861376:Zero at startup (janikdc)
+
+=== us853469:add PID D02922 (janikdc)
+
+=== us842786:add ability to set sysTipEnableStateStatus dynamically (janikdc)
+
+=== us861039: update to use TipViewed command (janikdc)
+
+=== us867978:fix cppcheck warnings (janikdc)
+
+=== us860760:cleanup plugins (janikdc)
+
+=== 828924:minor updates tested on AT Test Bench (janikdc)
+
+=== us867685:wip updates (janikdc)
+
+=== 828924: minor log updates (janikdc)
+
+=== us869302:minor updates (janikdc)
+
+=== us860760:minor updates (janikdc)
+
+=== us867685:minor updates (janikdc)
+
+
+=== Integration Information
+
+To use ACD2, need to update the CPM project level SConstruct
+to use some new functions from eta-ais. The diff from LWL
+Coaching as a reference archieved in Core Linux 0.13.0 release.
+\TES-common-ais\patch\example\0_13_0_SConstruct.diff
+
+One another change to make at the project level is to remove the
+const qualifier from app_oel_rtos_posix_config. This was done to
+support runtime configurable OEL tasks in OelTaskManager (used by ACD2).
+There is no functional impact on the existing code.
+
+
+//****************************************************************************
+
+== CPM Core Linux (0.12.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2020-08-17
+| Release Label/Tag | 0.12.0
+| AIS Template		| 4.1.0 ALPHA_13
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Resolved merge issue with m_j1939TaskPriority (machas3)
+
+=== us858926: Fixed erroneous CONTROL_BITFIELD dropdown in bmi autogen ods (machas3)
+
+=== us858926: remove csf_pgt_client patch (machas3)
+
+=== us858926: Add CSF_ETH_HEALTH_2019.2.0 patch. Remove unneded A6N1 libraries (machas3)
+
+=== us846641: Changed ReadLCTask's ExitOnCompletion default option to 'false' to avoid TaskCrashed diagnostic (machas3)
+
+=== us846641: Updated OCS configs for ALPHA 12 (machas3)
+
+=== us841726: Changed default name of EthernetPgtServer json to match autogen format (machas3)
+
+=== ms841707: Resolved DataLinkData merge conflict (machas3)
+
+=== Added MachineSleep autonomy condition patch from MWL (machas3)
+
+=== us846641: Update TES common to AIS ALPHA 12 RC (machas3)
+
+=== Replaced hard coded constants with #define (gundas1)
+
+=== Restore nvm.hpp from previous commit 928a88f5915a95254529cf0d952878679d4342a1 (gundas1)
+
+=== Undo change EthernetPortStatistics cycleRate_hz from 4 to 1 (gundas1)
+
+=== Optimize cleanup function, so while loop do not take more cpu time (gundas1)
+
+=== us856971:Cadet & .html working for web page id (janikdc)
+
+=== us785774:add language path to show-hide, no videoUrl when no associated video in UI response (janikdc)
+
+=== us847093:add badge count and Op ID to ShowHide response, update UI tip increment so it logs (janikdc)
+
+=== us847206:Segment logging into breadcrumb (janikdc)
+
+=== us859391:update breadcrumb configurations in .rb (janikdc)
+
+=== us847179:updates for Coaching CycleID  (janikdc)
+
+=== us856658:add UI config for Time and Distance triggers for GPS records in breadcrumb  (janikdc)
+
+=== us846641:fix Makefile for AIS_Alpha_12 (janikdc)
+
+=== us848935:update XCP response to keep tips in order (janikdc)
+
+=== us849441:update BmiEthernet.rb config parameter (janikdc)
+
+=== us843066:fix logic bug to calc % good (janikdc)
+
+=== us859391:update CoachingTaskGps processing for breadcrumbs (janikdc)
+
+=== us847093:add badge count and Op ID to ShowHide response, update UI tip increment so it logs (janikdc)
+
+=== TP823395: Revert logger threshold back to error (maleken)
+
+=== Fixed bug with serial printer parity bit setting (shattar)
+
+=== Fixed static constexpr member variable issue (shattar)
+
+=== Report proper http status code 503 when jhm is down (shattar)
+
+=== Close socket before resetting socket descriptor (shattar)
+
+=== Cancel pending grpc read on cleanup (shattar)
+
+=== Fixed merge issue in DataLinkData.h for uint32_t mid (shattar)
+
+=== Fixed UIDs for new VP3 record entries, moved tag default to application (shattar)
+
+=== us846641: Fixed issue with ReadLCTask_aux.rb, patch PcmTaskBase.cpp to remove core temperature spam (shattar)
+
+=== us846641: More updates for AIS ALPHA 12 (shattar)
+
+=== Handle null string terminator handling in security id description (shattar)
+
+=== Clean up BmiJ1939 log levels and fixed var length data types to remove unused and match csv file (shattar)
+
+=== Add newline at end of file if it is missing for print (shattar)
+
+=== Fix remote printer issues (shattar)
+
+=== Fix assignment operator for datalink param and fix constructors (shattar)
+
+=== WIP fix J1939 restricted reads and parsing of security id (shattar)
+
+=== Changed bdt string length and status record truck name length  (gulamhs / pavan)
+
+=== Don't return false if we have zero parameters (gulamhs / pavan)
+
+=== FTB stall on key-on (gulamhs / pavan)
+
+=== Added custom list names and truck ticket number to loadrecord in VP3 files (gulamhs / pavan)
+
+=== Stop cgi requests when jhm is not running (gulamhs / pavan)
+
+
+//****************************************************************************
+
+== CPM Core Linux (0.11.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2020-03-11
+| Release Label/Tag | 0.11.0
+| AIS Template		| 4.1
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us805718 - BmiJ1939 health integration for FMI9/14 support (gundas1)
+
+Added support for data link and node based diagnostics. FMI 9 and FMI 14 reported
+for PID, PGN, ADT protocols. These are reported in the DataLinkData diagnostics.
+Note: This implementation will change new data link strategy in the future release.
+i.e., only FMI9 raised per data link. ET would request BDT file for the parameter
+diagnostics information.
+
+=== us827224 - A6N2/N1 Analysis ECM Ethernet PGT server support (Part 1 PID) (machas3)
+
+Add EthernetPgtServer plugin that can be integrated into the ACD or a standlone
+app (sandbox/EthernetPgtServerTest as an example). A project specific plugin
+must be created to feed the server
+(sandbox/EthernetPgtServerTest/EthernetPgtServerTestDataProducer.hpp
+as an example).
+
+Improved DataLinkData logging info. Note that the Parameter Name string is only
+included if the logging level is DEBUG.
+
+SPN/CAT EXT ID support will be added in a later story.
+
+=== us834233 - Fix memory leak in BmiEthernet  (machas3)
+
+The csf_pgt_client library version 2018.2.0 has a memory leak. Add patch to use
+version 2019.4.0 of csf_pgt_client library.
+
+=== us826802 - Improve DataLinkData (Part 2)  (machas3)
+
+Simplified the STL container to allow more efficient retrieval using only
+Parameter ID and ParameterIdentifierType (PID, CAT EXT ID, etc).
+If the same PID is sourced from multitple SIDs and/or DataLinkTypes, the
+producer must create multiple DataLinkData objects to publish.
+
+Replace DlDataMap with an unordered_map, remove DlPidMap (NOTE: may
+require a minor change to the CPM project code if the iterator
+type returned by GetDataLinkDataMapPtr is hard coded.
+
+Remove DataLinkType from DataLinkParamInfo in favor of DataLinkData's version
+(NOTE: might require a CPM project code change for producers of DataLinkData).
+
+Add a source field so that a producer can avoid consuming its own DataLinkData.
+
+Delete deprecated GetXXXParamInfoXXX functions.
+
+=== us832682 - bmiEthernet, all ParamType are 0 in DataLinkData  (machas3)
+
+Fix bug caused by confusion between ParameterType and ParameterIdentifierType
+
+=== us829539 - Fix app_init.sh, Standardize ActiveTasks and ProductionLogger  (machas3)
+
+Fix bug in app_int.sh where robot file is not being created if it doesn't exist
+
+Improve ActiveTasks to load CPM specific task files in production scenario.
+Add instructions for how to use scenarios.
+
+ProductionLogger_*.rb does not need all in the CPM interfaces. Remove
+ProductionLogger_CpmCommon.rb and update the example to override the
+ProductionLogger paramters only.
+
+=== us832482 - add DataLinkData-OCS plugin  (machas3)
+
+Added DataLinkData Monitor OCS plugin.
+
+=== us832745 investigate/fix xcp server on VM  (machas3)
+
+Updated XCP Server allow IP Address to be configurable from ruby to support
+debugging on VM (default is still 165.26.79.19).
+
+To take advantage of this change, see app/xcp_server/README
+
+=== us832716 -  Merge COACHING_INT updates into TES Common 0.11.0  (machas3)
+
+us723169 - Sync with AIS ALPHA 11. Added A6N1 build support. Removed
+rapidjson 1.1.0. Added A6NX platform with common includes and libs, this
+allows the CPM build process to be decoupled from AIS/TES common
+platformCommon changes (see doc/ssp_setup/app/SConstruct for details).
+Added tes_platform.py module to handle importing of libraries/includes.
+Added build targets for patching eta-ais files. Downgraded to
+CSF_ETH_HEALTH_2019.2.0 to resolve A6N1 issue with BmiEthernet.
+
+us818875 - Update productionActiveTasks.rb to load project specific
+ActiveTask_* files. Converted CoachingShowHideStatus to an SCS
+channel, added coachingEnabled, coachingInstalled, machineInSafeState.
+
+=== us786115 - Add coachingSystemEnabled to CoachingTask, set based on InternalMsn  (machas3)
+
+=== us829404 - Add support for variant build directories (needed by MWL for SA/AU2020)  (machas3)
+
+=== us825219 - Fix UI Reset in CoachingSummaryData and Coaching3x3Data  (machas3)
+
+=== us829018 - Add .rb default config for Installed and Enabled  (machas3)
+
+=== us837288 - Update to 4 Poisson thresholds for scoring tips.
+
+=== us710280 - VP3Record.h - added new add_data_to_record template for string data  (machas3)
+
+Added to support MG.
+
+=== us812418 - SerialPrinter app stalls  (shattar)
+
+Fix issue where printer app would stall when printing large tickets.
+
+=== us822921 - VP3 cycle segmentation data issues  (shattar)
+
+Make sure VP3 file starts with status record.  Fix memory leak in VP3FileCreationApp.
+
+=== us829404 - Separate build directories for different target variants  (shattar)
+
+Support separate build directories for different build variants and targets.
+
+=== us829147 - Add deadlines to grpc calls in CdaIoTHubComms  (shattar)
+
+Add deadlines (timeouts) to IoT hub related gRPC calls so they don’t block forever.
+
+=== us818962 - single mal-named VP3 file halts all files being sent to back office  (shattar)
+
+Skip FTB file transfers with bad file names that were clogging the tx queue.
+
+=== us831538 - Limit number of vp3 files held for local download  (shattar)
+
+Add configurable maximum number of files kept for VP3 local download.
+
+=== us826967 - Update offboard message interface  (shattar)
+
+Add support for “one-shot” IoTHub messages where it will try once and discard on fail.
+
+=== us758750 - ListMgr update csv file import and export format  (shattar)
+
+Updated csv file format for truck and material lists to match the back office format.
+
+=== us832902 - VP3FileCreatorApp status record - revisit  (shattar)
+
+Added default status record for VP3 files, and make the requirement of a status record optional/configurable.
+
+=== us821961 - Print tickets to YK over CDA-SFT  (shattar)
+
+Add remote printer app.
+
+=== us833488 - PWM inputs not reporting correct faults  (shattar)
+
+Add input state and timeout support to PWM inputs.
+
+=== us831099 - Reduce vp3 creation rate to increase file size  (shattar)
+
+Support “Triggered” VP3 file creation as triggered by product link through FTB, minor
+fixed to get it to work.
+Minor updates to AppReg.h, nvm.hpp, CreateFileRequest.h, and PartNumbers.h
+
+=== us841165 - VP3 header records must be at beginning and FTB fixes  (shattar)
+
+Fix the order of records in the VP3 file so that the header records are first.  Removed config
+part num from header.
+Fixed thread deadlock (stalled) issue in FTB by adding deadlines (timeouts) to CDA
+transmits.
+Fixed issue in FTB ConnectToCDAServer where it would connect, then disconnect, then
+connect again instead of just connecting once.
+
+=== us841184 – BmiJ1939 now using “instance name”  (shattar)
+
+BmiJ1939 now using “instance name” as AppReg name so that apps can register to more that one
+instance of BmiJ1939.
+Changed key off timeout to 32 minutes for FTB and VP3 Creator.  This is so that we can stay
+alive longer than the engine (max 30 minutes) and record those segment records.
+
+=== us829545 – BmiJ1939 fixes  (shattar)
+
+Fixed BmiJ1939 app crashes when PGN times out.
+Fixed BmiJ1939 runs at 100% CPU in clean up.
+
+=== Integration Information
+
+1. eta-ais AIS_APP_TEMPLATE_4.1.0_ALPHA_11 is required.
+2. The ssp Makefile must be updated to build the apply_ais_patch_all target in TES-common-ais:
+
+# Prefix for the application verity file.  Used in zzzAutostart.
+APP_VERITY_PREFIX=CPM
+
+    # Patch AIS files. See TES-common-ais Makefile for details
+	make apply_patch_ais_all APP_VERITY_PREFIX=${APP_VERITY_PREFIX} -C ${TES_DIR}
+
+3. The CPM project SConstruct should be updated to include the PLATFORM in the build flags:
+
+baseEnv.Append(
+    CCFLAGS = [
+        ...
+        '-DRAPIDJSON_HAS_STDSTRING=1',
+        ('-D%s=' %(baseEnv['PLATFORM']).replace('-', '_')), # Add PLATFORM to build flags, hyphens not permitted
+    ]
+
+4. Any apps using the GetDataLinkDataMapPtr interface of DataLinkData may have to update iterator handling code.
+
+5. Any apps getting/setting the DataLinkType of DataLinkParam will have to instead get/set from the DataLinkData object.
+
+
+//****************************************************************************
+
+== CPM Core Linux (0.10.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-11-11
+| Release Label/Tag | 0.10.0
+| AIS Template		| 4.1
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us823378 - Update DLD output channel publish to call HandleDataLinkDataMap and ClearDlpDiagInfo (machas3)
+
+Updated DataLinkDataOutputChannel::publish to call HandleDataLinkDataMap and ClearDlpDiagInfo.
+Updated Bmi apps to remove these function calls.
+
+=== us788956, us826338 - Remove custom lighttpd configs, instead use ServiceDashboard's defaults (machas3)
+
+Removed custom lighttpd configs, instead ServiceDashboard's defaults will be used  Added custom
+app_init.sh and restart_mon.sh for zzzAutostart and updated example ssp Makefile for their use.
+
+=== us822801 - Optimize FileTransferBridgeApp memory usage (gulamhs)
+
+Fixed ssl lib usage memory leak in FileTransferBridgeApp.
+
+=== us828299 - Increase canv3 buffer size in BmiJ1939 (gulamhs)
+
+Increased canv3 buffer size in BmiJ1939 from {150, 350} to {1000, 1000}.
+
+=== us820538 - Add config/production/ActiveTasks.rb to run ProductionLogger by default (machas3)
+
+Added config/production/ActiveTasks.rb to run ProductionLogger by default.  Usage instructions:
+1. Copy DOC_DIR/app/config/DataTypeTable_CPM.rb (suffix must match DATATYPETABLE in the ssp Makefile).
+   Add any CPM Project specific scs channels.
+2. Create a CPM_DIR/config/ProductionLogger_CPM.rb with these SCS channels
+   (use config/ProductionLogger_CpmCommon.rb as a reference).
+
+=== us820782 - Create TaskPlugin and TaskPluginMgr classes to support the sharing of modular plugins (machas3, gundas1)
+
+Created TaskPlugin and TaskPluginMgr classes to support the sharing of modular plugins between
+projects that have similar needs.  Usage instructions are in prod/infrastructure/plugins/TaskPlugin/README.
+
+Created EthernetPortStatistics ACD plugin to provide a BDT to ET.  Usage instructions are in
+prod/infrastructure/plugins/EthernetPortStatistics/README.
+
+=== us812368 - Create DataLinkDataReceiver plugin (machas3)
+
+Created DataLinkDataReceiver plugin.  This plugin is used to allow multiple other plugins to
+share a single DataLinkData scs input channel.  Usage instructions are in
+prod/infrastructure/plugins/DataLinkDataReceiver/README.
+
+Updated DataLinkData diagnostics to store based on cid and mid.  This change should be transparent
+to the producer/consumer.
+
+Added DataLinkType to DataLinkData class.  This can be used by the consumer to use/ignore an entire
+DataLinkData object based on DataLinkType (such as when used for reporting FMI diagnostics).
+
+Updated BmiJ1939 to set CAN1/CAN2 in DataLinkData based on ruby config.
+
+=== us812328 - Create DataLinkDataPublisher plugin (machas3)
+
+Created DataLinkDataPublisher plugin.  This plugin is used to allow multiple other plugins to
+share a single DataLinkData scs output channel.  Usage instructions are in
+prod/infrastructure/plugins/DataLinkDataPublisher/README.
+
+Updated jhm2 version of rapidjson to 1.1.0.  Moved to local machineCommon until AIS updates.
+To use, add the following to platform/A6N2/includes-list.txt:
+
+    #../../TES-common-ais/build-A6N2/prod/machineCommon/content/prod/common
+
+If there are any CPM project apps that use rapidjson:
+
+    - Replace all cases of "include <jhm2/rapidjson" with "#include <rapidjson".
+
+    - Remove all cases of
+
+        #define RAPIDJSON_NAMESPACE rapidjson110
+        #define RAPIDJSON_HAS_STDSTRING 1
+
+    - Replace all "rapidjson110" references with "rapidjson"
+
+    - Add the following to CCFlags in SConstruct
+
+    '-DRAPIDJSON_HAS_STDSTRING=1',
+
+Added DataLinkData::GetLastPIDValueIfReceived.  Updated DataLinkParam to set PIDDataReceived to
+true if value is updated.
+
+Added displayRequired to CoachingSummaryData.
+
+=== us817647 - Add GetLastPIDValueIfGood and GetLastPIDValueEngIfGood functions (machas3)
+
+Added GetLastPIDValueIfGood and GetLastPIDValueEngIfGood functions to DataLinkParam to reduce
+duplication in consumer code.
+
+=== us812734, us816321, us816641 - Add BreadcrumbLog scs channel to support logging of events to hlog and xcp with GPS location (machas3)
+
+Added BreadcrumbLog scs channel to support logging of events to hlog and xcp with GPS location.
+Currently supported breadcrumb events are:
+- UI Commands
+- Keyswitch On/Off
+- Coaching Tip Trigger
+
+=== us815125 - Move xcp_server library to TES Common (machas3)
+
+Moved xcp_server library to TES Common, incorporating CPM 2.0/AU2020 enhancements.  Usage
+instructions are in /apps/xcp_server/README.
+
+Created xcpable interface to allow the scs channels to populate the xcp ParameterDB rather
+than aisXcpServer.  Usage example is in
+prod/common/interfaces/CoachingSummaryData/CoachingSummaryData.h
+
+Coaching: Added tipStatus to CoachingTipResult_t
+
+=== us812338 - Create jsonable interface to simplify websocket responses (machas3)
+
+Created jsonable interface to simplify websocket responses by allowing scs channels to generate
+their own json.  jsonable is defined in prod/common/interfaces/JSON/jsonable.h.  Updated
+BreadcrumbLog to implement jsonable.
+
+Coaching: Added CoachingShowHideStatus.  Updated Coaching3x3Data and CoachingSummaryData to
+implement jsonable.
+
+=== us786562 - Create Security System Current Security ID (CAT EXT $F0B2) VarLengthDataLinkParam (machas3)
+
+Created Security System Current Security ID (CAT EXT $F0B2) VarLengthDataLinkParam.
+Added to CoachingTask
+
+=== us817691 - Fix GetParamByID issue when receive multiple DataLinkData objects (machas3)
+
+Fixed segmentation fault issue in GetParamByID when multiple DataLinkData
+objects are received in the same executive cycle.
+
+=== us813799 - Add videoUrl to 3x3 (machas3)
+
+Coaching: Added videoUrl to 3x3.  Fixed bug with UI Reset clearing operatorName.
+
+=== us812409 - Replaced NAN with 1.0 in CoachingSummaryData (machas3)
+
+Coaching: Replaced NAN with 1.0 in CoachingSummaryData
+
+=== us756955 - Add coachingEnabled flag to CoachingSummaryData and Coaching3x3Data (machas3)
+
+Coaching: Added coachingEnabled flag to CoachingSummaryData and Coaching3x3Data
+
+=== us817343 - Fix bug with UI Reset clearing the cycleRate_hz in scs channels (machas3)
+
+Coaching: Fixed bug with UI Reset clearing the cycleRate_hz in scs channels.  Fix
+Coaching3x3Data to always updated time and severity total update.
+
+=== us782417 - Update migration docs with AU2020/CPM 2.0 SA lessons learned (machas3)
+
+Updated 4.1 migration docs with AU2020/CPM 2.0 SA lessons learned.  Delete old verities
+before creating new ones.
+
+=== us827799 - Update 4.1 migration docs with AT Haul lessons learned (machas3)
+
+Updated 4.1 migration docs with AT Haul lessons learned.  Updated ssp_setup/app/SConstruct
+to load default include and library paths from TES Common.
+
+
+//****************************************************************************
+
+== CPM Core Linux (0.9.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-08-16
+| Release Label/Tag | 0.9.0
+| AIS Template		| 4.1
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us709871 - Upgrade from ais 4.0 to 4.1 for CPM projects   (machas3)
+
+Updated TES Common to use eta-ais template app 4.1.  This was primarily tested with
+AIS_APP_TEMPLATE_4.1.0_ALPHA_08, but should be compatible with AIS_APP_TEMPLATE_4.1.0_ALPHA_10.
+
+The major features of 4.1 are:
+	-	Access to latest AIS content (4.0 app is deprecated and is only updated with critical
+		content).
+
+	-	The ability to build for multiple targets at once (e.g. ‘make project_a6n2’ will not
+		overwrite the output from ‘make project_ocs’ and vice versa).
+
+	-	Dramatically improved build time for ‘make release’.
+
+	-	Improved syncSoftware.  ‘make verity_all_a6n2’ now creates 4 total verities: CPM,
+		zzzAutostart, ossSoftware, DefaultConfig.  syncSoftware will transfer the latter
+		3 verities to the ECM and will copy the CPM specific bin/lib/config directories
+		to /opt as r/w so they can be overwritten as needed.  This makes it a much
+		quicker and versatile option for debugging than making a verity for the CPM
+		content.
+
+==== Note:
+Instructions for updating existing/creating new CPM super projects can be found in
+doc/ssp_setup (ais_4.1_migration.txt and new_ssp_setup.txt, respectively).  Updated build
+commands are in doc/build_commands.txt
+
+=== us791997 - Update FileTransferBridgeApp to use cert_manager_protobuf lib in AIS 4.1   (machas3)
+
+Compiled FileTransferBridgeApp using libcert_manager_protobuf.a for CDA 2019.5.0
+
+==== Note:
+By default, FileTransferBridgeApp is compiled using CDA_2018.5.0.  It can be compiled
+using CDA_2019.5.0, but as of this release it will not communicate with the Telematics
+Yellow Key to send VP3 files.
+
+=== us808085 - AT Coaching: use bmi_J1939 to request Lat-Long    (machas3)
+
+In GPSDataLinkParam added option for GetGpsLatitude/Longitude to return 0-180/0-360 ranges
+per CDL PID $F84D.
+
+=== us786826, us794229, us794515, us795396, us796556, us796569, us799453, us799669, us800895,
+us801042, us801044, us805350, us805512, - Create CoachingTask (machas3)
+
+Created CoachingTask and related SCS channels.  Use by copying sandbox/CoachingTaskExample
+folder to the CPM project apps directory and updating it for the specific application.
+
+Added the following functions to prod/common/fileio:
+
+-	tes_common_ais::directory::copy - Copies all files and folders in the source to dest.
+-	tes_common_ais::nvm::read, store - Added support for serializing multiple objects to
+	a single file.
+-	tes_common_ais::nvm::count - Returns the number of nvm records stored in the provided
+	path.
+-	tes_common_ais::nvm::deleteOldest - Deletes the oldest nvm records stored in the
+	provided path.
+
+=== Merged TES Common 0.8.1 updates (gundas1)
+    Merged TES Common 0.8.1 release updates into 0.9.0 release.
+
+==== Note:
+- 0.9.0 updated to use AIS eta-ais template app 4.1.
+- 0.8.1 using AIS eta-ais template app 4.0 in maintenance mode.
+Only critical updates will be added in the future.
+
+//****************************************************************************
+
+//****************************************************************************
+
+== TES Common Applications (0.8.1)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-08-16
+| Release Label/Tag | 0.8.1
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us803653 - CPM 2.0 SA: TMAC/Telemetry data to Telematics using SFT (machas3)
+
+Added PCS/Loader Cycle TMAC/Telemetry data to FileTransferBridgeApp.
+
+=== us792913 - Improve/Simplify DataLinkData  (machas3)
+
+Refactored DataLinkParam and DataLinkParamInfo to move all "static" metadata to
+DataLinkParamInfo and variable data to DataLinkParam.  Made the following
+client-side changes:
+
+	- DataLinkData::GetParams - Allows iteration through the internal container
+	  using C++11 range-based for loops.  Usage (const is optional):
+        for (const DataLinkParam& dlParam : dataLinkData.GetParams())
+            {
+                switch (dlParam.GetParamId())
+                    { ...
+	- DataLinkData::AddDataLinkParam - Now returns false if all necessary metadata
+	  for the parameter has not been set.
+	- DataLinkData::UpdateDataLinkParam - Now returns false if the update failed.
+	- DataLinkData::GetParamByID - New function that provides a pointer to the
+	  DataLinkParam with the provided PID and ParameterIdType.  Overloads are
+	  provided if the Parameter comes from another source (i.e. SID/Source Address
+	  and DataLinkType)
+	- DataLinkData::GetParamValueIndexByName, GetParamValueIndexByPID - Deleted,
+	  they were poorty implemented functions that returned 0 ( a valid index) if
+	  the parameter was not found.
+	- DataLinkParam::SetLastValue - Can take either a vector<unsigned_8> or
+	  uint32_t for fixed length PIDs.  In either case, lastValue should be the raw,
+	  unpacked value read from the datalink.  DSI is required, i.e. lastValue
+	  cannot be set without the DSI and vice versa.
+	- DataLinkParam::SetLastValueDsi – Removed per changes to SetLastValue
+	- DataLinkParam::SetVarLengthParamValue - Sets the lastValue for variable
+	  length PIDs.  Can take either a vector or uint8_t array.
+	- DataLinkParam::SetLastValueEng - New function that allows the engineering
+	  value to be directly set for fixed length PIDs.  Raw value is computed
+	  based on Scaling and Offset and stored internally.  Simplifies internal
+	  publish of DataLinkData.
+	- DataLinkParamInfo::GetDataLinkTypeString, GetParamIdTypeString,
+	  GetParameterTypeString, GetUnitsString, VarLengthDataLinkParamFactory::
+	  GetVarLengthParamTypeString - New functions to get std::string representations
+	  for the corresponding data.  Used for OCS plugin that will eventually appear
+	  in eta-ais, can also be used for debugging.
+
+===  us808416 - Fix unsupported JSON parser special characters and symbols (machas3)
+
+Updated Bmi Autogen to replace . and \ characters in JSON keys with spaces.
+
+=== us783857 - AU2020 L2: Configure weighing app to use datalink inputs (machas3)
+
+Extended PwmInputChannels to allow direct access to the PWM Inputs.
+
+===  us805716 - Make preferred J1939 address configurable through ruby (divyaa)
+
+Supported for configuring the J1939 Preferred address through j1939 ruby file instead of
+configuring through application.
+
+=== us807412 - Review log statements in BmiJ1939 (divyaa)
+
+Removed unnecessary logs from J1939 and changed logging to appropriate log level.
+
+=== us807762 - Support parameter types in one J1939 JSON config (divyaa)
+
+Support PIDs and PGNs in one JSON config file. Each parameter type has separate tag for
+PID’s, PGN’s and CAT EXT ID’s. Application needs to look for key
+BMI_J1939_CONFIG_JSON_FILE_PATH in ruby file instead of 2 or 3 JSON file paths such as
+BMI_J1939_PGN_CONFIG_JSON_FILE_PATH and BMI_J1939_CDL_PID_CONFIG_JSON_FILE_PATH in
+machine specific robot file. Update Automation scripts as well for combined PID and
+PGN in one J1939 config JSON file. J1939 App would exit with proper error messages
+if JSON parsing fails and as well if required PROP-A PGN is not added under PGN
+section in JSON config file.
+
+=== us800941 Verify PGN, MAP, CAT EXT ID with Variable length (divyaa)
+
+Updated BmiJ1939 to support variable length params such PGN’s, PID’s through MAP and CAT Ext ID’s.
+
+=== us804666 Add support for CAT Ext Ids in BmiEthernet app (gundas1)
+
+Added support for CAT Ext ids in BmiEthernet app. Found a CSNS bug that's not
+passing data status in the handler. So, BmiEthernet app doesn't communicate
+data status properly. We will have fix in next release 0.10.0 assuming
+CSNS would have fix by then.
+
+//****************************************************************************
+
+//****************************************************************************
+
+== TES Common Applications (0.8.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-25-07
+| Release Label/Tag | 0.8.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us770573 - FileTransferBridgeAppCda::SendDataFile incorrectly handles return codes (shattar)
+
+Currently, every TransferReturnMessage return code other than QUEUED_SUCCESS is treated the same.
+Updated SendDataFile function to handle all return codes correctly received from TransferReturnMessage.
+
+Updated FileTransferBridgeRequestStorage::GenerateFileNamev2 to allow only characters in a portable
+file name character set should be allowed [A-Za-z0-9._-].
+
+=== us783715 - Remove DataType from DataLinkData (machas3)
+
+Removed DataType attribute in DataLinkParamInfo.
+
+=== us784041 J1939 App Registration (kamals2)
+
+Added app registration support to BmiJ1939
+
+=== us734864 BMI-J1939, update to arbitrate source address (ravadm)
+
+Added arbitrate source address claim support to BmiJ1939.
+
+=== us785000 Remove obsolete macros from bmi_autogen spreadsheet (machas3)
+
+Removed the macros from Sheet1 of bmi_autogen_v1.ods.  They are obsolete,
+per bmi_autogen_readme.txt the bmi_autogen_lib macros should be used instead.
+Also provide an 'exportBmi_common' sub that can be used inside LibreOffice,
+it will not auto-close the workbook after running.
+
+=== us789241 WOA iOT communications (shattar)
+
+Added support for work order assist required file types.
+
+=== us787224 GPS PID: Add access functions for engineering latitude and longitude values (machas3)
+
+Added access functions to the GPSDataLinkParam class to provide the latitude and longitude.
+
+=== us779460 Add restricted read param support to J1939 app (divyaa)
+
+Added support for restricted read PIDs based on ADT param.
+
+=== us790311 Change VarLengthParamBlock from fixed array to vector (shattar)
+
+Changed VarLengthParamBlock from fixed array to vector.
+
+=== us792511 Update bmi_autogen spreadsheet for 0.8.0 (machas3)
+
+Updated bmi autogen spreadsheet and scripts to support CAT EXT IDS.
+
+=== us792889 BmiJ1939: ADT for more than 1 parameter is not working (divyaa)
+
+Fixed issue with J1939 app when reading more than one ADT parameter.
+
+=== us794234 Add handshake to calibration UI interfaces (shattar)
+
+Added handshake number to calibration UI request and response interfaces.
+
+//****************************************************************************
+
+//****************************************************************************
+
+== TES Common Applications (0.7.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-05-06
+| Release Label/Tag | 0.7.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us777873 - Resolve VP3Record compile warnings (gundas1)
+
+Resolved compile warnings in VP3Record that are elevated to errors if -Werror flag is used
+
+=== us770211 - Add Bmi Support for unsupported/generic variable length PIDs (gundas1)
+
+Previously, BmiCdl and BmiJ1939 only supported specific variable length PIDs (GPS, TIME_ZONE, PRODUCT_ID)
+that had their own entries in VarLengthDataLinkParamParamPool.  With this release, if the
+VarLengthDataType (BmiJ1939) or VarLengthParamType (BmiCdl) is set to UNSUPPORTED, the received
+data will be stored in DataLinkParmInfo.  It is the client's responsibility to interpret/decode the "raw"
+data array returned by GetVarParamBlock().
+
+=== us756006 - Add spreadsheet to generate BmiJ1939/BmiCdl/BmiEthernet json files (gundas1)
+
+Instead of manually generating the bmi json files, the desired parameters can be added to one or more
+spreadsheets that will autogenerate the files.  If desired, this autogeneration can be done at application
+compile time.  Note that it is necessary to install LibreOffice in the Virtual Machine to use this feature.
+
+The instructions are documented in config/bmi_autogen_readme.txt
+
+=== us722372 - Add Security System Current Key (gundas1)
+
+To support the "OperatorIDCsv" feature, a VariableDatatLinkParam was added for Security System Current Key.
+CPMOperatorIdList was also added to support csv upload/download and json responses to the UI.
+
+=== us748445 – BMI CDL app Automated regression test (gundas1)
+
+Developed Python scripts to Automate the test of BMI CDL app through Vbench. Various test JSON files with all combinations of the protocol are used to test. Note that it is necessary to enable the automation testing in the BMI CDL app SConscript. The Instructions are documented in  apps/TestAutomation /BmiCdl/Manual_BMI_CDL_Automation_Test.docx.
+
+=== us748445 – BMI CDL app Automated regression test (gundas1)
+
+Developed Python scripts to Automate the test of BMI J1939 app through Vbench. Various test JSON files with all combinations of the protocol are used to test. Note that it is necessary to enable the automation testing in the BMI J1939 app SConscript. The Instructions are documented in  apps/TestAutomation /BmiJ1939/Manual_BMI_J1939_Automation_Test.docx.
+
+=== us777835 - Support VP3 file local download (gundas1)
+
+Added vp3 file local download support and fixed some file transfer bridge file system error handling.
+
+=== us773707 - Add SPN support to BmiEthernet App (gundas1)
+
+BmiEthernet support publishing raw data for requested SPN.
+Note: there was no simulator available to verify this functionality. This will be fully validated in the future release as soon simulation is ready.
+
+//****************************************************************************
+
+//****************************************************************************
+== TES Common Applications (0.6.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-04-09
+| Release Label/Tag | 0.6.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== us770238 - PID data acquisition over Ethernet (gundas1)
+
+Added support for PID data acquisition (PGT) over ethernet.
+
+//****************************************************************************
+
+//****************************************************************************
+== TES Common Applications (0.5.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-02-11
+| Release Label/Tag | 0.5.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+== Required eta-ais version (gundas1)
+
+AIS_APP_TEMPLATE_4.0.0_ALPHA_31
+
+== Add BmiJ1939 app (gundas1)
+
+Added new BmiJ1939 Rx app that is configurable using JSON.
+The following Rx services are supported:
+ - CDL PID over J1939 (SPB, PGB, Real Poll, Map, ADT)
+ - PGN
+
+== Add app registration to BmiCdl and PwmInputApp (gundas1)
+
+Updated BmiCdl and PwmInputApp to support app registration through
+the AppRegInput interface.
+
+== Create PartNumbers channel (gundas1)
+
+Removed TES Common version of ShmClock.  The part numbers and product id
+were added to a new PartNumbers channel.  Updated VP3FileCreationApp to
+use the new PartNumbers channel.
+
+== Add Product ID support (gundas1)
+
+Updated DataLinkData to support the variable length Product ID parameter.
+
+== Add TMAC file support (gundas1)
+
+Updated FileTransferBridgeApp to support TMAC files.
+
+== Fix VP3 header timestamp (gundas1)
+
+Updated VP3FileCreationApp correctly to use the timezone offset provided by ShmClock.
+Added get_tz_struct and get_tz_data helper functions to directly get/set timezone
+information from/to an ShmClock object.
+
+== Add common NVM store/read functions (gundas1)
+
+Added nvm::store and nvm::read template functions for any
+object that implements boost::serialize.  Contained in <fileio/nvm.hpp>
+
+Added directory::create to provide a standard exception handling function for
+creating directories.  Contained in <fileio/directory.hpp>
+
+== Change iflocker to use a shared lock (gundas1)
+
+Changed iflocker to use a shared lock for reading instead of an exclusive write lock.
+
+== Add a ISO8601UTC time parsing (gundas1)
+
+Added a ISO8601UTC time parsing utility in print.hpp.
+
+== Add IoTHubComms to file transfer bridge app (gundas1)
+
+Added the IoTHubComms to file transfer bridge app.
+NOTE: Commented out the code that started that service.
+
+== Fix remaining bytes to read is decremented twice for a single read (gundas1)
+
+In "boost/cgi/cgi/request_service.hpp" in parse_post_vars(), the remaining bytes
+to read is decremented twice for a single read. Once in the client read_some,
+and once in the request service parst_post_vars. This is because a reference
+to the client bytes_left is used rather than a copy of the bytes left.
+
+std::size_t& bytes_left (impl.client_.bytes_left_);
+
+Should be
+std::size_t bytes_left (impl.client_.bytes_left_);
+
+For content lengths that are not multiples of 128, the double decrement rolls
+over and the post data is read until the eof is encountered, possibly greater
+than the content length.
+
+//****************************************************************************
+
+//****************************************************************************
+== TES Common Applications (0.4.1)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-01-15
+| Release Label/Tag | 0.4.1
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Auto detect cpp check install status (gundas1)
+
+Auto detect cpp check install status. If cpp check not found
+run cpp check installer. User still need to respond to prompts
+during the installation.
+
+=== Fix compile warning (gundas1)
+
+Fixed compiler warning that may show as error for applications
+using Werror.
+
+//****************************************************************************
+
+
+//****************************************************************************
+== TES Common Applications (0.4.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2019-01-09
+| Release Label/Tag | 0.4.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Integrate CPP check with TES COMMON apps (gundas1)
+
+Integrated CPP check with make file. When TES common apps are compiled,
+CPP check results are generated.
+
+=== Updates for UI calibrations (gundas1)
+
+Updated for UI calibrations, move scs objects to TES Common.
+
+=== Add new file type(10087) support for FTB (gundas1)
+
+Added new file type(10087) to support list sync config hash responses in FileTransferBridgeApp.
+
+=== Update Registration check in VP3CreatorApp (gundas1)
+
+Updated to fix app registration between FileTransferBridgeApp and VP3FileCreatorApp.
+
+=== Default values for SHM clock (gundas1)
+
+Added Default values for SHM clock.
+
+=== Time Zone handling in VP3FileCreationApp (gundas1)
+
+Fixed timezone handling in VP3FileCreationApp.
+
+Fixed logging for vp3 app.
+
+=== Add sync lock (gundas1)
+
+Acquired lock before adding data link param to data link data interface object.
+
+NOTE: Not all of the dependancies have been represented.
+//****************************************************************************
+
+//****************************************************************************
+== TES Common Applications (0.3.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2018-10-22
+| Release Label/Tag | 0.3.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Add OutputApp (gundas1)
+
+Added udpated OutputApp to TES Common Apps.
+
+=== Add OutputAppTest (gundas1)
+
+Added OutputAppTest to run automated test.
+
+=== Add support for CDL Diagnostics (gundas1)
+
+Added Support for FMI-9 and FMI-14 CDL Diagnostics.
+
+=== Update CDL Test App (gundas1)
+
+Updated CDL Test App to verify diagnostics.
+
+=== Add TMAC Telemetry Transfer Support (gundas1)
+
+Added TMAC Telemetry Transfer proto file and Generated code.
+
+NOTE: Not all of the dependancies have been represented.
+//****************************************************************************
+
+//****************************************************************************
+== TES Common Applications (0.2.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2018-09-04
+| Release Label/Tag | 0.2.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Add GenerateFileNamev2 function(gundas1)
+
+Added GenerateFileNamev2 to generate Telematics compliance file name.
+
+=== Update GenerateFileNamev2 references(gundas1)
+
+Updated GenerateFileNamev2 references to call udpated API.
+
+=== Update VP3Sim ruby file(gundas1)
+
+Updated VP3Sim ruby file.
+
+NOTE: Not all of the dependancies have been represented.
+//****************************************************************************
+
+//****************************************************************************
+== TES Common Applications (0.1.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2018-07-31
+| Release Label/Tag | 0.1.0
+| AIS Template		| 4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Applications (gundas1)
+
+==== bmiCdl
+==== FileTransferBridgeApp
+==== PwmInputApp
+==== SerialPrinterApp
+==== SwitchInputApp
+==== VP3FileCreatorApp
+
+=== Interfaces (gundas1)
+
+==== AppReg
+==== CreateFileRequest
+==== DataLinkData
+==== FileTransferBridgeIndication
+==== FileTransferBridgeRequest
+==== FileTransferBridgeResponse
+==== PwmInputChannels
+==== SerialPrinter
+==== ShmClock
+==== SwitchInputScs
+==== VP3Record
+
+NOTE: Not all of the dependencies have been represented.
+//****************************************************************************
+

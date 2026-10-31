@@ -1,0 +1,15 @@
+#
+# makefile build option specifications
+#
+# Copyright 2003-2019 Caterpillar Inc. All Rights Reserved.
+# This work contains Caterpillar's proprietary information which
+# may constitute a trade secret and/or be confidential.  Copyright
+# notice is precautionary only and does not imply publication.
+#
+
+# Use GNU compatiblity mode.
+# This allows gnu compatible makefiles to be used.
+CCASE_MAKE_COMPAT = gnu
+
+# Allow sharings of DOs.
+CCASE_BLD_UMASK = 2

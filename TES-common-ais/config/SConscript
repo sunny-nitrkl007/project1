@@ -1,0 +1,50 @@
+#!/usr/bin/python
+Import('baseEnv')
+import os
+import glob as pyglob
+import shutil
+
+configEnv = baseEnv.Clone()
+
+configDir = configEnv['CONFIG_SOURCE_DIR']
+installConfigDir = str(configEnv['INSTALL_CONFIGDIR'])
+
+# File extension types that must be synced
+configFileTypes = [
+    'conf',
+    'csv',
+    'json',
+    'mwf',
+    'rb',
+    'txt',
+    'xml',
+]
+
+# Collect config files from the TES config source directory using os.glob
+# (SCons RGlob cannot see outside the build tree)
+configFiles = []
+for fileType in configFileTypes:
+    pattern = os.path.join(str(configDir), '*.' + fileType)
+    configFiles += pyglob.glob(pattern)
+
+# Manually add exceptions (no extension)
+machineNameDefault = os.path.join(str(configDir), 'machineNameDefault')
+if os.path.exists(machineNameDefault):
+    configFiles.append(machineNameDefault)
+
+# Copy config files into the install config directory
+for src in configFiles:
+    dst = os.path.join(installConfigDir, os.path.basename(src))
+    if not os.path.exists(installConfigDir):
+        os.makedirs(installConfigDir)
+    shutil.copy2(src, dst)
+
+# Install lighttpd config files into config/lighttpd/ (expected by app_init.sh)
+lighttpdSrcDir = os.path.join(str(configDir), 'lighttpd_conf')
+lighttpdDstDir = os.path.join(installConfigDir, 'lighttpd')
+if os.path.isdir(lighttpdSrcDir):
+    if not os.path.exists(lighttpdDstDir):
+        os.makedirs(lighttpdDstDir)
+    for f in pyglob.glob(os.path.join(lighttpdSrcDir, '*')):
+        shutil.copy2(f, os.path.join(lighttpdDstDir, os.path.basename(f)))
+

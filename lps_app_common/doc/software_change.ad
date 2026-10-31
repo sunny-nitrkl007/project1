@@ -1,0 +1,86 @@
+:copyright: Copyright (C) 2016 Caterpillar Inc. All Rights Reserved.
+= LPS Common Library Software History
+
+//****************************************************************************
+= LPS Common Library Software History (0.4.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2017-02-16
+| Release Label/Tag | 0.4.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Added LoaderBktPayldTrgtWt to NVM structure (gundas1)
+
+Added LoaderBktPayldTrgtWt to NVM structure.
+
+=== Added girt tool for release (gundas1)
+
+Added girt tool for release
+
+//****************************************************************************
+
+//****************************************************************************
+= LPS Common Library Software History (0.3.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2017-01-24
+| Release Label/Tag | 0.3.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== NVM structure changed (gundas1)
+
+Added LifeTimeTotalPassCount, LifeTimeTotalPayloadWeight and LastPayloadWeight  to NVM structure.
+
+=== Added Start Of weigh and End of Weigh to NVM structure (gundas1)
+
+Added Start Of weigh and End of Weigh to NVM structure.
+
+//****************************************************************************
+
+//****************************************************************************
+= LPS Common Library Software History (0.2.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2016-07-19
+| Release Label/Tag | 0.2.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Added cal ov active status flag interface (gundas1)
+
+Added LpsCalAppInfCalOvActive interface function to LpsCalAppPublic header file.
+
+//****************************************************************************
+
+//****************************************************************************
+= LPS Common Library Software History (0.1.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2016-06-30
+| Release Label/Tag | 0.1.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Initial Release (gundas1)
+
+This is an initial release with dependency documentation and and the release procedure.
+
+//****************************************************************************

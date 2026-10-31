@@ -1,0 +1,178 @@
+/******************************************************************************
+**        COPYRIGHT (C) 2009 CATERPILLAR INC. ALL RIGHTS RESERVED.
+-------------------------------------------------------------------------------
+FILE NAME:      test_bdt_regression_a5m4_oeluk.dld
+DESCRIPTION:    This file is used to link an A5M4 application for WindRiver.
+NOTE:           All addresses below are part of the *logical* address space.
+******************************************************************************/
+
+MEMORY
+{
+    /*
+     * MPC5674F Internal ROM / Boot File Area (128KB)
+     * 0x01000000--0x01020000
+     */
+
+    /*
+     * MPC5674F Internal ROM / Application File Area (3938KB)
+     * 0x01020000--0x013fffff
+     */
+
+    /* INTERNAL FLASH ROM */
+    token   : org = 0x01020000, len = 0x00000100 /* application token block */
+    text    : org = 0x01020100, len = 0x003dff00 /* application text */
+
+    /* INTERNAL FLASH ROM ALIAS-VLE */
+/*    textv   : org = 0x01820100, len = 0x003dff00 */ /* application vtext */
+      textv   : org = 0x01820100, len = 0x003dff00 /* application vtext */
+    /* EXTERNAL STATIC RAM */
+    brc     : org = 0x28000000, len = 0x00000400 /* Boot RAM Common area (BRC) */
+    eram    : org = 0x28000400, len = 0x0006ec00 /* application data */
+
+    /* External SRAM - Application heap, the default heap for oel_malloc. */
+    heap_ext : org = 0x2806F000, len = 0xFFA0
+
+    test_exe:  org = 0x2807EFA0, len = 0x00000060  /* Execution Framework */
+
+    /* INTERNAL STATIC RAM 
+     * MPC5674F INTERNAL SRAM (192KB)
+     * 0x41000000--0x4102FFFF
+     */
+    iram     : org = 0x41000000, len = 0x00029000 /* application data (164k) */
+    heap_int : org = 0x41029000, len = 0x00006C00 /* Application heap, typically task stacks (27k) */
+    stack    : org = 0x4102FC00, len = 0x00000400 /* application stack (1k) */    
+
+}
+
+/*
+ * Internal Flash Physical Memory Allocation
+ *    - Token                               
+ *    - Vector table
+ *    - VLE Text                            
+ *       .text_vle                          
+ *       .rdata                             
+ *       .rodata                            
+ *       .init                              
+ *       .fini                              
+ *    - Initialized values for sData        
+ *    - Initialized values for Data         
+ *    - PPC Text                            
+ *       .text                              
+ *       .sdata2 (small constant data)      
+ */
+
+SECTIONS
+{
+    GROUP : {
+        .token (TEXT) : {}
+    } > token
+    
+    GROUP : {
+        .vector (TEXT) LOAD(ADDR(text)) ALIGN(8) : {
+            *(.vector)
+        }
+
+        .text_vle (TEXT) LOAD(ADDR(text) + SIZEOF(.vector)) ALIGN(8) : {
+            *(.text_vle)
+            *(.rdata)
+            *(.rodata)
+            *(.init)
+            *(.fini)
+        }
+
+        /*
+        ** use a second subsection to pad out textv to 8-byte boundary
+        ** (if we insert the padding into .text_vle above, the linker
+        ** emits a bogus warning)
+        */
+        .pad1 (TEXT) LOAD (ADDR(.pad1) - ADDR(.vector) + ADDR(text)) ALIGN(8) : {
+            . = (. + 0x7) & ~ 0x7;
+        }
+
+        __SDATA_ROM = . - ADDR(.vector) + ADDR(text); 
+
+    } > textv
+
+    GROUP : {
+
+        __SDATA_RAM = .;
+        .sdata (DATA) LOAD (__SDATA_ROM) ALIGN(4) : {
+            *(.sdata)
+            . = (. + 0x7) & ~ 0x7;
+        }
+        __SDATA_END = .;
+
+        __SBSS_START = .;
+        .sbss (=BSS) ALIGN(4): {
+            *(.isr_table)
+            *(.sbss)
+        }
+        __SBSS_END = .;
+
+    } > iram
+
+    GROUP : {
+
+        __DATA_ROM = __SDATA_ROM + __SDATA_END - __SDATA_RAM;
+        __DATA_RAM = .;
+        .data (DATA) LOAD (__DATA_ROM) : {
+            *(.data)
+        }
+        __DATA_END = .;
+
+        __BSS_START = .;
+        .bss  (BSS) : {
+            *(.bss)
+            *(.vectorbss)
+        }
+        __BSS_END = .;
+
+    } > eram  
+
+    GROUP : {
+        .text (TEXT) ALIGN(8) : {}
+
+        .sdata2 (=TEXT) ALIGN(8) : {
+            *(.sdata2)
+        }
+
+    } > text
+
+}
+
+BRC = ADDR(brc);
+
+__SP_INIT   = ADDR(stack) + SIZEOF(stack);
+__SP_END    = ADDR(stack);
+
+__HEAP_START = ADDR(heap_ext);
+__HEAP_END   = ADDR(heap_ext) + SIZEOF(heap_ext);
+
+__HEAP2_START = ADDR(heap_int);
+__HEAP2_END   = ADDR(heap_int) + SIZEOF(heap_int);
+
+/* The following symbols are not used in the code but are useful when         */
+/* reviewing the map file.                                                    */
+__INTERNAL_RAM_USAGE = SIZEOF(.sdata) + SIZEOF(.sbss) + SIZEOF(stack) + SIZEOF(heap_int);
+__EXTERNAL_RAM_USAGE = SIZEOF(.data) + SIZEOF(.bss) + SIZEOF(brc) + SIZEOF(heap_ext);
+__INTERNAL_FLASH_USAGE = SIZEOF(token) + SIZEOF(.vector) + SIZEOF(.text_vle) + SIZEOF(.text) + SIZEOF(.sdata2) + (__DATA_END - __DATA_RAM) + (__SDATA_END - __SDATA_RAM);
+
+/* Define a symbol for the Automated Test Function Execution area */
+__FUNCEXEC = ADDR(test_exe);
+__FUNCEXEC_SIZE = SIZEOF(test_exe);
+
+
+
+/*
+** The MPC55xx builds an interrupt/exception vector like this:
+**
+**      vector = (IVPR & 0xffff0000) | (IVORxx & 0x0000fff0);
+**
+** This implies that all top level vectors must be linked within a single
+** 64K region; otherwise, the processor core will vector to the wrong place.
+**
+** If the ASSERT below prevents you from linking, try changing the link order.
+** Or, you can add padding in front of oel_rtos_uk_vectors_start.
+*/
+ASSERT(((ADDR(.vector) & 0xffff0000) == ((ADDR(.vector) + SIZEOF(.vector)) & 0xffff0000)),
+    "IVOR overflow - read your linker command file for details")

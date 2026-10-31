@@ -1,0 +1,89 @@
+#!/usr/bin/python
+#*****************************************************************************
+# @file      SConscript
+# @author    Jason Ziglar
+# @date      09/09/2006
+#
+# @attention Copyright (C) 2006 CMU. All rights reserved.
+#*****************************************************************************
+
+Import( 'machineOCSEnv' )
+import os.path;
+
+###
+
+## A ##
+
+
+## B ##
+
+
+## C ##
+
+
+## D ##
+dataLinkData_widget = machineOCSEnv.SharedLibraryWrapper(
+    target = 'DataLinkDataPlugin',
+    source = ['DataLinkDataPlugin.cpp', 'DataLinkDataWidget.cpp'],
+    LIBS = [  'WidgetSupport','widgets','flu'],
+)
+
+## F ##
+
+
+## G ##
+
+
+## H ##
+
+
+## I ##
+
+
+## L ##
+
+
+## M ##
+
+
+## N ##
+
+
+## O ##
+
+
+## P ##
+pwmInput_widget = machineOCSEnv.SharedLibraryWrapper(
+    target='PWMInputPlugin',
+    source=['PWMInputTab.cpp','PWMInputPlugin.cpp'],
+    LIBS = ['WidgetSupport'],
+)
+## R ##
+
+
+## S ##
+
+
+## T ##
+
+
+## V ##
+
+
+## Z ## 
+
+##################################
+### !!! PLEASE ALPHABETIZE !!! ###
+##################################
+
+### ^^^ Add new plugin build definitions before this line
+
+#machineOCSEnv.InstallLibrary( widgetSupportLib)
+#machineOCSEnv.InstallLibrary( colorChooser )
+
+#machineOCSEnv.Install("pwmInput_widget", machineOCSEnv[ 'AIS_BUILD_DIR' ] + "/lib")
+machineOCSEnv.InstallInterfaces([
+    dataLinkData_widget,
+    pwmInput_widget,
+])
+

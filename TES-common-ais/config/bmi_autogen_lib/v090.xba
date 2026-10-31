@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="v090" script:language="StarBasic">Rem Attribute VBA_ModuleType=VBADocumentModule
+Option VBASupport 1
+Option Explicit
+
+Dim MaxKeyLen As Long
+Public const TypedefsHeaderRow as Integer = 3 &apos; Row number on the _Typedefs sheet
+
+&apos; Export tabs and then close the workbook (used from the command line)
+Sub exportBmi()
+    exportBmi_common
+    &apos; Close the workbook
+    ThisComponent.Close (True)
+    Wait 400
+    starDesktop.Terminate
+end Sub
+
+&apos; Export all tabs to json
+Sub exportBmi_common()
+    Dim sPath As String, sWildcard As String, sMacro As String
+    Dim ws, oDoc, oSheets
+    
+    Dim i As Long, numEcms As Integer
+    Dim keypair(1)
+
+    Dim filePath As String, typedefValuesCsv As String, basePath As String
+    Dim fso As Object, iStream As Object, iFile As Object
+    Dim arr() As String, key As String, suffix As String
+    Dim hasCatExtIds As Boolean
+    Dim catExtWsName as String
+    
+    Dim nl As String
+    nl = Chr(10)
+    
+    oDoc = ThisComponent
+    oSheets = oDoc.Sheets
+    BasicLibraries.loadLibrary (&quot;Tools&quot;)
+    basePath = DirectoryNameoutofPath(oDoc.getUrl(), &quot;/&quot;)
+
+    &apos; Read in typedefValues csv, global Collection does not seem to work
+    Dim typedefValues As Collection
+    Set typedefValues = New Collection
+    
+    filePath = basePath &amp; &quot;/&quot; &amp; oDoc.namedRanges.getByName(&quot;TypedefValuesCsv&quot;).referredCells().getString()
+    Set fso = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+    If fso.exists(filePath) Then
+        iStream = fso.openFileRead(filePath)
+        iFile = createUNOService(&quot;com.sun.star.io.TextInputStream&quot;)
+        iFile.setInputStream (iStream)
+        typedefValuesCsv = iFile.ReadLine &apos; Skip Header
+        typedefValuesCsv = iFile.ReadLine
+        While Len(typedefValuesCsv) &gt; 0
+            arr = Split(typedefValuesCsv, &quot;,&quot;)
+            typedefValues.add(cleanString(arr(2)), cleanString(arr(0) &amp; arr(1)))
+
+            typedefValuesCsv = iFile.ReadLine
+        Wend
+    Else
+        MsgBox &quot;File not found: &quot; + nl + nl + filePath
+        GoTo endsub
+    End If
+    iFile.CloseInput()
+    
+    &apos; Read in TypedefMapCsv
+    Dim typedefMap As Collection
+    Set typedefMap = New Collection
+    Dim typedefMapCsv As String
+
+    filePath = basePath &amp; &quot;/&quot; &amp; ThisComponent.namedRanges.getByName(&quot;TypedefMapCsv&quot;).referredCells().getString()
+    
+    Set fso = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+    If fso.exists(filePath) Then
+        iStream = fso.openFileRead(filePath)
+        iFile = createUNOService(&quot;com.sun.star.io.TextInputStream&quot;)
+        iFile.setInputStream (iStream)
+        typedefMapCsv = iFile.ReadLine &apos; Skip Header
+        typedefMapCsv = iFile.ReadLine
+        While Len(typedefMapCsv) &gt; 0
+        
+            arr = Split(typedefMapCsv, &quot;,&quot;)
+            key = cleanString(arr(0) &amp; arr(1))
+            typedefMap.Add Array(key, cleanString(arr(2))), key
+
+            typedefMapCsv = iFile.ReadLine
+        Wend
+    Else
+        MsgBox &quot;File not found: &quot; + nl + nl + filePath
+        GoTo endsub
+    End If
+    iFile.CloseInput()
+   
+   &apos; Iterate through all sheets
+   For i = oSheets.getCount() - 1 To 0 Step -1
+        ws = oSheets.getByIndex(i)
+        Dim wsName As String
+        wsName = ws.Name
+        
+        Dim oStream As Object, oFile As Object
+        Dim lastRow As Long, lastCol As Long
+        Dim row As Long, col As Long
+        Dim comma As Boolean
+        Dim entry As String, header As String
+        Dim oCell
+        
+        &apos; Write BmiJ1939 PID sheets
+        If Left(wsName, 12) = &quot;BmiJ1939_PID&quot; Then
+            MaxKeyLen = 21
+            
+            &apos; Check for CAT_EXT_ID tab.  Also support legacy CAT_EXT_IDS tab
+            suffix = Right(wsName, Len(wsName) - Len(&quot;BmiJ1939_PID&quot;))
+            If oSheets.hasByName(&quot;BmiJ1939_CAT_EXT_ID&quot; &amp; suffix) Then
+                hasCatExtIds = True
+                catExtWsName = &quot;BmiJ1939_CAT_EXT_ID&quot; &amp; suffix
+            Elseif oSheets.hasByName(&quot;BmiJ1939_CAT_EXT_IDS&quot; &amp; suffix) Then
+                hasCatExtIds = True
+                catExtWsName = &quot;BmiJ1939_CAT_EXT_IDS&quot; &amp; suffix
+            Else
+                hasCatExtIds = False
+            End If
+            
+            filePath = basePath &amp; &quot;/&quot; &amp; &quot;BmiJ1939&quot; &amp; suffix &amp; &quot;.json&quot;
+           
+            Set fso = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+            If fso.exists(filePath) Then
+               fso.Kill (filePath) &apos;if file exists, delete it
+            End If
+
+            oStream = fso.openFileWrite(filePath)
+            oFile = createUNOService(&quot;com.sun.star.io.TextOutputStream&quot;)
+            oFile.setOutputStream (oStream)
+            
+            &apos; Get last row &amp; column
+            oCell = getLastCell(ws)
+            lastRow = oCell.CellAddress.row
+            lastCol = oCell.CellAddress.Column
+            oFile.WriteString &quot;{&quot; + nl + nl
+            oFile.WriteString &quot;&quot;&quot;CDL_PID&quot;&quot;:&quot; + nl
+            oFile.WriteString &quot;{&quot; + nl
+
+            For row = 1 To lastRow
+                oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;&quot; &amp; formatJsonKey(ws.GetCellByPosition(0, row).String) &amp; &quot;&quot;&quot;: {&quot; + nl
+                For col = 1 To lastCol
+                    If col = lastCol Then
+                        comma = False
+                    Else
+                        comma = True
+                    End If
+                    &apos; Must be in the order Signed Type, DSI Used, lsb First
+                    If ws.GetCellByPosition(col, 0).String = &quot;Signed Type&quot; Then
+                        oFile.WriteString formatBmiJ1939Attributes(ws, row, col) + nl &apos; Attributes
+                        col = col + 2
+                    Else
+                        entry = ws.GetCellByPosition(col, row).String
+                        &apos; Convert entry to enum value if applicable
+                        key = &quot;BmiJ1939_PID&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                        For Each keypair In typedefMap
+                            If keypair(0) = key Then
+                                If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                    entry = typedefValues(keypair(1) &amp; entry)
+                                End If
+                                Exit For
+                            End If
+                        Next
+
+                        oFile.WriteString formatField(ws, entry, col, comma) + nl &apos;
+                    End If
+                Next
+                If row = lastRow Then
+                    oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                Else
+                    oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl
+                End If
+                oFile.WriteString &quot;&quot; + nl
+            Next
+
+            oFile.WriteString &quot;},&quot; + nl + nl
+            
+            &apos; Extract CAT EXT ID
+            If hasCatExtIds and oSheets.hasByName(catExtWsName) Then
+                MaxKeyLen = 23
+                ws = oSheets.getByName(catExtWsName)
+                
+                &apos; Get last row &amp; column
+                oCell = getLastCell(ws)
+                lastRow = oCell.CellAddress.row
+                lastCol = oCell.CellAddress.Column
+                
+                oFile.WriteString &quot;&quot;&quot;CAT_EXT_ID&quot;&quot;:&quot; + nl
+                oFile.WriteString &quot;{&quot; + nl
+                For row = 1 To lastRow
+                    oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;&quot; &amp; formatJsonKey(ws.GetCellByPosition(0, row).String) &amp; &quot;&quot;&quot;: {&quot; + nl
+                    For col = 1 To lastCol
+                        If col = lastCol Then
+                            comma = False
+                        Else
+                            comma = True
+                        End If
+
+                        entry = ws.GetCellByPosition(col, row).String
+                        &apos; Convert entry to enum value if applicable
+                        key = &quot;BmiJ1939_CAT_EXT_ID&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                        For Each keypair In typedefMap
+                            If keypair(0) = key Then
+                                If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                    entry = typedefValues(keypair(1) &amp; entry)
+                                End If
+                                Exit For
+                            End If
+                        Next
+
+                        oFile.WriteString formatField(ws, entry, col, comma) + nl
+                    Next
+                    If row = lastRow Then
+                        oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                    Else
+                        oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+                    End If
+                Next
+                
+                oFile.WriteString &quot;},&quot; + nl + nl
+            End If
+            
+            &apos; Extract BmiJ1939 PGN
+            If Not oSheets.hasByName(&quot;BmiJ1939_PGN&quot; &amp; suffix) Then
+                MsgBox &quot;PGN sheet not found: &quot; + nl + nl + &quot;BmiJ1939_PGN&quot; &amp; suffix
+                goto endsub
+            End If 
+            
+            MaxKeyLen = 18
+           
+            ws = oSheets.getByName(&quot;BmiJ1939_PGN&quot; &amp; suffix)
+            
+            &apos; Get last row &amp; column
+            oCell = getLastCell(ws)
+            lastRow = oCell.CellAddress.row
+            lastCol = oCell.CellAddress.Column
+            
+            oFile.WriteString &quot;&quot;&quot;PGN&quot;&quot;:&quot; + nl
+            oFile.WriteString &quot;{&quot; + nl
+            
+            For row = 1 To lastRow
+                oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;&quot; &amp; formatJsonKey(ws.GetCellByPosition(0, row).String) &amp; &quot;&quot;&quot;: {&quot; + nl
+                For col = 1 To lastCol
+                    If col = lastCol Then
+                        comma = False
+                    Else
+                        comma = True
+                    End If
+
+                    entry = ws.GetCellByPosition(col, row).String
+                    &apos; Convert entry to enum value if applicable
+                    key = &quot;BmiJ1939_PGN&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                    For Each keypair In typedefMap
+                        If keypair(0) = key Then
+                            If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                entry = typedefValues(keypair(1) &amp; entry)
+                            End If
+                            Exit For
+                        End If
+                    Next
+
+                    oFile.WriteString formatField(ws, entry, col, comma) + nl
+                Next
+                If row = lastRow Then
+                    oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                Else
+                    oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl
+                End If
+                oFile.WriteString &quot;&quot; + nl
+            Next    
+            oFile.WriteString &quot;}&quot; + nl 
+            
+            
+            oFile.WriteString &quot;}&quot; + nl
+            oFile.closeOutput()
+        &apos; Write BmiCdl sheets
+        ElseIf Left(wsName, 10) = &quot;BmiCdl_ECM&quot; Then
+            MaxKeyLen = 23
+            suffix = Right(wsName, Len(wsName) - Len(&quot;BmiCdl_ECM&quot;))
+           
+            &apos; Extract ECM table
+            filePath = basePath &amp; &quot;/&quot; &amp; &quot;BmiCdl&quot; &amp; suffix &amp; &quot;.json&quot;
+            
+            Set fso = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+            If fso.exists(filePath) Then
+               fso.Kill (filePath) &apos;if file exists, delete it
+            End If
+
+            oStream = fso.openFileWrite(filePath)
+            oFile = createUNOService(&quot;com.sun.star.io.TextOutputStream&quot;)
+            oFile.setOutputStream (oStream)
+            
+            &apos; Get last row &amp; column
+            oCell = getLastCell(ws)
+            lastRow = oCell.CellAddress.row
+            lastCol = oCell.CellAddress.Column
+            
+            numEcms = lastRow
+            
+            &apos; Write ecm header table
+            oFile.WriteString &quot;{&quot; + nl
+            oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;cdl2_cbs_ecm_header_t&quot;&quot;  : {&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;table_id&quot;&quot;               : &quot;&quot;0x00&quot;&quot;,&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;table_format_level&quot;&quot;     : &quot;&quot;0x01&quot;&quot;,&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;enabled&quot;&quot;                : &quot;&quot;0x00&quot;&quot;,&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;num_table_entries&quot;&quot;      : &quot; &amp; numEcms &amp; nl
+            oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+            
+            For row = 1 To lastRow
+                oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;ecm_&quot; &amp; (row - 1) &amp; &quot;&quot;&quot;: {&quot; + nl
+                For col = 0 To lastCol
+                    If col = lastCol Then
+                        comma = False
+                    Else
+                        comma = True
+                    End If
+
+                    entry = ws.GetCellByPosition(col, row).String
+                    &apos; Convert entry to enum value if applicable
+                    key = &quot;BmiCdl_ECM&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                    For Each keypair In typedefMap
+                        If keypair(0) = key Then
+                            If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                entry = typedefValues(keypair(1) &amp; entry)
+                            End If
+                            Exit For
+                        End If
+                    Next
+
+                    oFile.WriteString formatField(ws, entry, col, comma) + nl
+                Next
+
+                oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+            Next
+            
+            &apos; Extract PIDs
+            MaxKeyLen = 23
+            ws = oSheets.getByName(&quot;BmiCdl_PID&quot; &amp; suffix)
+            
+            &apos; Get last row &amp; column
+            oCell = getLastCell(ws)
+            lastRow = oCell.CellAddress.row
+            lastCol = oCell.CellAddress.Column
+            
+            Dim numPids As Integer
+            numPids = lastRow
+            
+            &apos; Write pid header table
+            oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;cdl2_cbs_parm_header_t&quot;&quot; : {&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;table_id&quot;&quot;               : &quot;&quot;0x00&quot;&quot;,&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;table_format_level&quot;&quot;     : &quot;&quot;0x01&quot;&quot;,&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;enabled&quot;&quot;                : &quot;&quot;0x00&quot;&quot;,&quot; + nl
+            oFile.WriteString Space$(8) &amp; &quot;&quot;&quot;num_table_entries&quot;&quot;      : &quot; &amp; numPids &amp; nl
+            oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+            
+            For row = 1 To lastRow
+                oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;parameter_&quot; &amp; (row - 1) &amp; &quot;&quot;&quot;: {&quot; + nl
+                For col = 0 To lastCol
+                    If col = lastCol Then
+                        comma = False
+                    Else
+                        comma = True
+                    End If
+
+                    entry = ws.GetCellByPosition(col, row).String
+                    &apos; Convert entry to enum value if applicable
+                    key = &quot;BmiCdl_PID&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                    For Each keypair In typedefMap
+                        If keypair(0) = key Then
+                            If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                entry = typedefValues(keypair(1) &amp; entry)
+                            End If
+                            Exit For
+                        End If
+                    Next
+
+                    oFile.WriteString formatField(ws, entry, col, comma) + nl
+                Next
+                If row = lastRow Then
+                    oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                Else
+                    oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl
+                End If
+            Next
+            
+            oFile.WriteString &quot;}&quot; + nl
+            oFile.closeOutput()
+            
+        &apos; Write BmiEth sheets
+        ElseIf Left(wsName, 10) = &quot;BmiEth_ECM&quot; Then
+            MaxKeyLen = 14
+
+            suffix = Right(wsName, Len(wsName) - Len(&quot;BmiEth_ECM&quot;))
+           
+            &apos; Check for PID, SPN, CAT EXT IDS tabs.  Also support legacy CAT_EXT_IDS tab
+            Dim hasPids As Boolean, hasSpns As Boolean
+            If oSheets.hasByName(&quot;BmiEth_PID&quot; &amp; suffix) Then
+                hasPids = True
+            Else
+                hasPids = False
+            End If
+            If oSheets.hasByName(&quot;BmiEth_SPN&quot; &amp; suffix) Then
+                hasSpns = True
+            Else
+                hasSpns = False
+            End If
+            
+            If oSheets.hasByName(&quot;BmiEth_CAT_EXT_ID&quot; &amp; suffix) Then
+                hasCatExtIds = True
+                catExtWsName = &quot;BmiEth_CAT_EXT_ID&quot; &amp; suffix
+            Elseif oSheets.hasByName(&quot;BmiEth_CAT_EXT_IDS&quot; &amp; suffix) Then
+                hasCatExtIds = True
+                catExtWsName = &quot;BmiEth_CAT_EXT_IDS&quot; &amp; suffix
+            Else
+                hasCatExtIds = False
+            End If          
+           
+            filePath = basePath &amp; &quot;/&quot; &amp; &quot;BmiEth&quot; &amp; suffix &amp; &quot;.json&quot;
+            
+            Set fso = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+            If fso.exists(filePath) Then
+               fso.Kill (filePath) &apos;if file exists, delete it
+            End If
+
+            oStream = fso.openFileWrite(filePath)
+            oFile = createUNOService(&quot;com.sun.star.io.TextOutputStream&quot;)
+            oFile.setOutputStream (oStream)
+            
+            &apos; Extract ECM table
+            &apos; Get last row &amp; column
+            oCell = getLastCell(ws)
+            lastRow = oCell.CellAddress.row
+            lastCol = oCell.CellAddress.Column
+            
+            numEcms = lastRow
+            
+            &apos; Write ecm header table
+            oFile.WriteString &quot;{&quot; + nl + nl
+            
+            oFile.WriteString &quot;&quot;&quot;Ethernet_ECM_Source_Config&quot;&quot;:&quot; + nl
+            oFile.WriteString &quot;{&quot; + nl
+            For row = 1 To lastRow
+                oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;ecm_&quot; &amp; (row - 1) &amp; &quot;&quot;&quot;: {&quot; + nl
+                For col = 0 To lastCol
+                    If col = lastCol Then
+                        comma = False
+                    Else
+                        comma = True
+                    End If
+
+                    entry = ws.GetCellByPosition(col, row).String
+                    &apos; Convert entry to enum value if applicable
+                    key = &quot;BmiCdl_ECM&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                    For Each keypair In typedefMap
+                        If keypair(0) = key Then
+                            If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                entry = typedefValues(keypair(1) &amp; entry)
+                            End If
+                            Exit For
+                        End If
+                    Next
+
+                    oFile.WriteString formatField(ws, entry, col, comma) + nl
+                Next
+                If row &lt;&gt; lastRow Then
+                    oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+                Else
+                    oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                End If
+            Next
+            oFile.WriteString &quot;},&quot; + nl + nl
+            
+            &apos; Extract SPN
+            If hasSpns Then
+                MaxKeyLen = 23
+                ws = oSheets.getByName(&quot;BmiEth_SPN&quot; &amp; suffix)
+                
+                &apos; Get last row &amp; column
+                oCell = getLastCell(ws)
+                lastRow = oCell.CellAddress.row
+                lastCol = oCell.CellAddress.Column
+                
+                oFile.WriteString &quot;&quot;&quot;SPN&quot;&quot;:&quot; + nl
+                oFile.WriteString &quot;{&quot; + nl
+                For row = 1 To lastRow
+                    oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;&quot; &amp; formatJsonKey(ws.GetCellByPosition(0, row).String) &amp; &quot;&quot;&quot;: {&quot; + nl
+                    For col = 1 To lastCol
+                        If col = lastCol Then
+                            comma = False
+                        Else
+                            comma = True
+                        End If
+
+                        entry = ws.GetCellByPosition(col, row).String
+                        &apos; Convert entry to enum value if applicable
+                        key = &quot;BmiEth_SPN&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                        For Each keypair In typedefMap
+                            If keypair(0) = key Then
+                                If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                    entry = typedefValues(keypair(1) &amp; entry)
+                                End If
+                                Exit For
+                            End If
+                        Next
+
+                        oFile.WriteString formatField(ws, entry, col, comma) + nl
+                    Next
+                    If row = lastRow Then
+                        oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                    Else
+                        oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+                    End If
+                Next
+                
+                If hasPids or hasCatExtIds Then
+                    oFile.WriteString &quot;},&quot; + nl + nl
+                Else
+                    oFile.WriteString &quot;}&quot; + nl
+                End If
+            End If
+   
+            &apos; Extract PIDs
+            If hasPids Then
+                MaxKeyLen = 23
+                ws = oSheets.getByName(&quot;BmiEth_PID&quot; &amp; suffix)
+                
+                &apos; Get last row &amp; column
+                oCell = getLastCell(ws)
+                lastRow = oCell.CellAddress.row
+                lastCol = oCell.CellAddress.Column
+                
+                oFile.WriteString &quot;&quot;&quot;CDL_PID&quot;&quot;:&quot; + nl
+                oFile.WriteString &quot;{&quot; + nl
+                For row = 1 To lastRow
+                    oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;&quot; &amp; formatJsonKey(ws.GetCellByPosition(0, row).String) &amp; &quot;&quot;&quot;: {&quot; + nl
+                    For col = 1 To lastCol
+                        If col = lastCol Then
+                            comma = False
+                        Else
+                            comma = True
+                        End If
+
+                        entry = ws.GetCellByPosition(col, row).String
+                        &apos; Convert entry to enum value if applicable
+                        key = &quot;BmiEth_PID&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                        For Each keypair In typedefMap
+                            If keypair(0) = key Then
+                                If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                    entry = typedefValues(keypair(1) &amp; entry)
+                                End If
+                                Exit For
+                            End If
+                        Next
+
+                        oFile.WriteString formatField(ws, entry, col, comma) + nl
+                    Next
+                    If row = lastRow Then
+                        oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                    Else
+                        oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+                    End If
+                Next
+                
+                If hasCatExtIds Then
+                    oFile.WriteString &quot;},&quot; + nl + nl
+                Else
+                    oFile.WriteString &quot;}&quot; + nl
+                End If
+            End If
+            
+            &apos; Extract CAT EXT IDS
+            If hasCatExtIds And oSheets.hasByName(catExtWsName) Then
+                MaxKeyLen = 23
+                ws = oSheets.getByName(catExtWsName)
+                
+                &apos; Get last row &amp; column
+                oCell = getLastCell(ws)
+                lastRow = oCell.CellAddress.row
+                lastCol = oCell.CellAddress.Column
+                
+                oFile.WriteString &quot;&quot;&quot;CAT_EXT_ID&quot;&quot;:&quot; + nl
+                oFile.WriteString &quot;{&quot; + nl
+                For row = 1 To lastRow
+                    oFile.WriteString Space$(4) &amp; &quot;&quot;&quot;&quot; &amp; formatJsonKey(ws.GetCellByPosition(0, row).String) &amp; &quot;&quot;&quot;: {&quot; + nl
+                    For col = 1 To lastCol
+                        If col = lastCol Then
+                            comma = False
+                        Else
+                            comma = True
+                        End If
+
+                        entry = ws.GetCellByPosition(col, row).String
+                        &apos; Convert entry to enum value if applicable
+                        key = &quot;BmiEth_CAT_EXT_ID&quot; &amp; ws.GetCellByPosition(col, 0).String &apos; Prefix &amp; header
+                        For Each keypair In typedefMap
+                            If keypair(0) = key Then
+                                If HasKey(typedefValues, keypair(1) &amp; entry) then
+                                    entry = typedefValues(keypair(1) &amp; entry)
+                                End If
+                                Exit For
+                            End If
+                        Next
+
+                        oFile.WriteString formatField(ws, entry, col, comma) + nl
+                    Next
+                    If row = lastRow Then
+                        oFile.WriteString Space$(4) &amp; &quot;}&quot; + nl
+                    Else
+                        oFile.WriteString Space$(4) &amp; &quot;},&quot; + nl + nl
+                    End If
+                Next
+                oFile.WriteString &quot;}&quot; + nl
+            End If
+            oFile.WriteString &quot;}&quot; + nl
+            oFile.closeOutput()
+        End If
+    Next
+endsub:
+End Sub
+
+&apos; Update the _TypeDefs tab for data validation
+Sub updateTypedefs()
+    &apos; Read in enum values from typedefs csv
+    Dim ws
+    Dim filePath As String, typedefsCsv As String, basePath As String
+    Dim fso As Object, iStream As Object, iFile As Object
+    Dim oDoc, oSheets
+    
+    oDoc = ThisComponent
+    oSheets = oDoc.Sheets
+
+    Set ws = oSheets.getByName(&quot;_TypeDefs&quot;)
+
+    BasicLibraries.loadLibrary (&quot;Tools&quot;)
+    basePath = DirectoryNameoutofPath(ThisComponent.getUrl(), &quot;/&quot;)
+    
+    filePath = basePath &amp; &quot;/&quot; &amp; ThisComponent.namedRanges.getByName(&quot;TypedefValuesCsv&quot;).getReferredCells.String
+    
+    Set fso = createUNOService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+    If fso.exists(filePath) Then
+        iStream = fso.openFileRead(filePath)
+        iFile = createUNOService(&quot;com.sun.star.io.TextInputStream&quot;)
+        iFile.setInputStream (iStream)
+        typedefsCsv = iFile.ReadLine &apos; Skip Header
+        typedefsCsv = iFile.ReadLine
+        Dim enumName As String
+        Dim col As Integer
+        Dim row As Integer
+        col = -1
+        row = TypedefsHeaderRow + 1
+
+        While Len(typedefsCsv) &gt; 0
+            Dim arr() As String, member As String
+        
+            arr = Split(typedefsCsv, &quot;,&quot;)
+            Dim enumNameNew As String
+            enumNameNew = arr(0)
+            member = arr(1)
+            If enumNameNew &lt;&gt; enumName Then
+                &apos; Delete old range data
+                clearRange enumNameNew
+                            
+                &apos; Resize old range if it exists
+                If Len(enumName) &gt; 0 Then
+                    updateNamedRange enumName, col, row - 1
+                End If
+                
+                &apos; Start next enum
+                enumName = enumNameNew
+                col = col + 1
+                row = TypedefsHeaderRow + 1
+                ws.GetCellByPosition(col, TypedefsHeaderRow).String = enumName
+            End If
+            ws.GetCellByPosition(col, row).String = member
+            row = row + 1
+
+            &apos; Read next line
+            typedefsCsv = iFile.ReadLine
+        Wend
+    Else
+        GoTo endsub
+    End If
+    &apos; Update last range
+    updateNamedRange enumName, col, row - 1
+    iFile.CloseInput()
+    &apos; Save and Close the workbook
+    ThisComponent.store()
+    ThisComponent.Close (True)
+    Wait 400
+    starDesktop.Terminate
+    
+endsub:
+End Sub
+
+
+&apos; Extract the BmiJ1939 Attributes from the columns
+Private Function formatBmiJ1939Attributes(ws As Worksheet, row As Long, col As Long) As String
+    Dim attrib As String
+    If Len(ws.GetCellByPosition(col, row).String) &gt; 0 Then &apos; Signed Type
+        attrib = &quot;signed type&quot;
+    End If
+    
+    If Len(ws.GetCellByPosition(col + 1, row).String) &gt; 0 Then &apos; DSI Used
+        If Len(attrib) &gt; 0 Then
+            attrib = attrib &amp; &quot;, dsi used&quot;
+        Else
+            attrib = &quot;dsi used&quot;
+        End If
+    End If
+    
+    If Len(ws.GetCellByPosition(col + 2, row).String) &gt; 0 Then &apos; Swap Bytes
+        If Len(attrib) &gt; 0 Then
+            attrib = attrib &amp; &quot;, swap bytes&quot;
+        Else
+            attrib = &quot;swap bytes&quot;
+        End If
+    End If
+
+    Dim pad As Long
+    pad = MaxKeyLen - Len(&quot;Attributes&quot;)
+    
+    formatBmiJ1939Attributes = Space$(8) &amp; &quot;&quot;&quot;Attributes&quot;&quot;&quot; &amp; Space$(pad) &amp; &quot;: &quot; &amp; &quot;&quot;&quot;&quot; &amp; attrib &amp; &quot;&quot;&quot;&quot; &amp; &quot;,&quot;
+    
+End Function
+
+&apos; Remove trailing non-ASCII characters from inputString
+Private Function cleanString(inputString As String) As String
+    Dim lastChar
+    cleanString = inputString
+    lastChar = Asc(Right(cleanString, 1))
+    If lastChar &lt; 32 Then
+        cleanString = Left(cleanString, Len(cleanString) - 1)
+    End If
+End Function
+
+&apos; Get the bottom right cell in the provided sheet
+Private Function getLastCell(ws As Object) As Object
+     getLastCell = ws.GetCellByPosition(0, 0)
+     getLastCell = MoveCursorToEnd(getLastCell, &quot;xlToRight&quot;)
+     getLastCell = MoveCursorToEnd(getLastCell, &quot;xlDown&quot;)
+End Function
+
+&apos; Moves the cursor to the end of pDirection
+Private Function MoveCursorToEnd(pCellRange As Object, _
+  pDirection As String) As Object
+    Dim StartContentType As Long, nRow As Long, nColumn As Long
+    Dim ThisSheet As Object, StartRow As Long, StartColumn As Long
+    Dim oCell As Object
+    Dim EMPTYCELLTYPE
+
+    ThisSheet = pCellRange.SpreadSheet
+    nRow = pCellRange.CellAddress.row
+    StartRow = nRow
+    nColumn = pCellRange.CellAddress.Column
+    StartColumn = nColumn
+
+    StartContentType = pCellRange.getType()
+    EMPTYCELLTYPE = com.sun.star.table.CellContentType.EMPTY
+
+    Select Case pDirection
+    &apos;&apos;&apos;find last cell in the current row
+    Case &quot;xlToRight&quot;
+        nColumn = nColumn + 1
+        Do While nColumn &lt;= 255
+            If (StartContentType &lt;&gt; EMPTYCELLTYPE And _
+              ThisSheet.GetCellByPosition(nColumn, nRow).getType() _
+              = EMPTYCELLTYPE) Then
+                nColumn = nColumn - 1
+                Exit Do
+            ElseIf (StartContentType = EMPTYCELLTYPE And _
+             ThisSheet.GetCellByPosition(nColumn, nRow).getType() _
+              &lt;&gt; EMPTYCELLTYPE) Then
+                Exit Do
+            End If
+            nColumn = nColumn + 1
+        Loop
+
+    &apos;&apos;&apos;find first cell in current row
+    Case &quot;xlToLeft&quot;
+        nColumn = nColumn - 1
+        Do While nColumn &gt;= 0
+            If (StartContentType &lt;&gt; EMPTYCELLTYPE And _
+              ThisSheet.GetCellByPosition(nColumn, nRow).getType() _
+              = EMPTYCELLTYPE) Then
+                nColumn = nColumn + 1
+                Exit Do
+            ElseIf (StartContentType = EMPTYCELLTYPE And _
+              ThisSheet.GetCellByPosition(nColumn, nRow).getType() _
+              &lt;&gt; EMPTYCELLTYPE) Then
+                Exit Do
+            End If
+            nColumn = nColumn - 1
+        Loop
+
+    &apos;&apos;&apos;find last (bottom) cell in current column
+    Case &quot;xlDown&quot;
+        nRow = nRow + 1
+        Do While nRow &lt;= 31999
+            If (StartContentType &lt;&gt; EMPTYCELLTYPE And _
+              ThisSheet.GetCellByPosition(nColumn, nRow).getType() = _
+              EMPTYCELLTYPE) Then
+                nRow = nRow - 1
+                Exit Do
+            ElseIf (StartContentType = EMPTYCELLTYPE And _
+              ThisSheet.GetCellByPosition(nColumn, nRow). _
+              getType() &lt;&gt; EMPTYCELLTYPE) Then
+                Exit Do
+            End If
+            nRow = nRow + 1
+        Loop
+        
+    &apos;&apos;&apos;find first (top) cell in current column
+    Case &quot;xlUp&quot;
+        nRow = nRow - 1
+        Do While nRow &gt;= 0
+            If (StartContentType &lt;&gt; EMPTYCELLTYPE And _
+              ThisSheet.GetCellByPosition(nColumn, nRow).getType() _
+              = EMPTYCELLTYPE) Then
+                nRow = nRow + 1
+                Exit Do
+            ElseIf (StartContentType = EMPTYCELLTYPE And _
+              ThisSheet.GetCellByPosition(nColumn, nRow).getType() _
+              &lt;&gt; EMPTYCELLTYPE) Then
+                Exit Do
+            End If
+            nRow = nRow - 1
+        Loop
+
+    End Select
+    
+    &apos;&apos;&apos;make sure we are in bounds
+    If nColumn &gt; 255 Then
+        nColumn = 255
+    End If
+    If nColumn &lt; 0 Then
+        nColumn = 0
+    End If
+    If nRow &gt; 31999 Then
+        nRow = 31999
+    End If
+    If nRow &lt; 0 Then
+        nRow = 0
+    End If
+    MoveCursorToEnd = ThisSheet.GetCellByPosition(nColumn, nRow)
+
+End Function
+
+
+&apos; comma: False for the last field, True otherwise
+Private Function formatField(ws As Worksheet, fieldText As String, col As Long, comma As Boolean) As String
+        
+    Dim pad As Long
+    pad = MaxKeyLen - Len(ws.GetCellByPosition(col, 0).String)
+    Dim quo As String
+    Dim cellText
+    quo = &quot;&quot;&quot;&quot;
+    
+    cellText = ws.GetCellByPosition(col, 0).String
+
+    formatField = Space$(8) &amp; &quot;&quot;&quot;&quot; &amp; ws.GetCellByPosition(col, 0).String &amp; &quot;&quot;&quot;&quot; &amp; Space$(pad) &amp; &quot;: &quot; &amp; quo &amp; fieldText &amp; quo
+    
+    If comma Then
+        formatField = formatField &amp; &quot;,&quot;
+    End If
+            
+End Function
+
+Private Function formatJsonKey(key As String) As String
+    &apos; Add any other unsupported characters
+    formatJsonKey = Replace(key, &quot;.&quot;, &quot; &quot;)
+    formatJsonKey = Replace(formatJsonKey, &quot;\&quot;, &quot; &quot;)
+End Function
+
+&apos; Delete everything in the provided range
+Private Sub clearRange(rangeName As String)
+    Dim namedRanges
+    namedRanges = ThisComponent.namedRanges
+
+    If namedRanges.hasByName(rangeName) &lt;&gt; True Then
+        GoTo endsub
+    End If
+    Dim oldRange, referredCells, flags
+    oldRange = namedRanges.getByName(rangeName)
+    referredCells = oldRange.getReferredCells
+    flags = 23
+    referredCells.ClearContents (flags)
+endsub:
+End Sub
+
+&apos; Replace a named range with the new on
+Private Sub updateNamedRange(itemName As String, col As Integer, lastRow As Integer)
+    Dim namedRanges
+    namedRanges = ThisComponent.namedRanges
+    
+    Dim oldRange, newRange
+    newRange = ThisComponent.getSheets().getByName(&quot;_TypeDefs&quot;).getCellRangeByPosition(col, TypedefsHeaderRow + 1, col, lastRow)
+    Dim found
+    found = namedRanges.hasByName(itemName)
+    If found Then
+        oldRange = namedRanges.getByName(itemName)
+        oldRange.setContent (newRange.AbsoluteName)
+    Else
+        namedRanges.addNewByName(itemName, newRange.AbsoluteName, newRange.GetCellByPosition(0,0).CellAddress, 0)
+    End If
+End Sub
+
+&apos; Check if collection contains a key
+Private Function HasKey(coll As Collection, strKey As String) As Boolean
+    Dim var As Variant
+    On Error Resume Next
+    var = coll(strKey)
+    HasKey = (Err.Number = 0)
+    Err.Clear
+End Function
+</script:module>

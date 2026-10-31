@@ -1,0 +1,12 @@
+diff --git a/prod/machineCommon/content/tools/build_tools/platform/A6N2/rpaths.txt b/prod/machineCommon/content/tools/build_tools/platform/A6N2/rpaths.txt
+index 1e21bada63..88bbdd0b9b 100644
+--- a/prod/machineCommon/content/tools/build_tools/platform/A6N2/rpaths.txt
++++ b/prod/machineCommon/content/tools/build_tools/platform/A6N2/rpaths.txt
+@@ -1,5 +1,5 @@
+-/opt/appSoftware/lib
+-/opt/appSoftware/lib/python
++/opt/CPM/lib
++/opt/CPM/lib/python
+ /opt/ossSoftware/lib
+ /opt/ossSoftware/usr/lib
+ /opt/ossSoftware/usr/lib/ruby/1.8/x86_64-linux

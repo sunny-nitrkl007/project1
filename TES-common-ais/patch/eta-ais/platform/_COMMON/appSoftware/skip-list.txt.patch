@@ -1,0 +1,14 @@
+diff --git a/platform/_COMMON/appSoftware/skip-list.txt b/platform/_COMMON/appSoftware/skip-list.txt
+index 11c9e7d917..a507a0adf4 100644
+--- a/platform/_COMMON/appSoftware/skip-list.txt
++++ b/platform/_COMMON/appSoftware/skip-list.txt
+@@ -8,3 +8,9 @@ prod/machineCommon/content/prod/infrastructure/ddsBridgeTask
+ prod/machineCommon/content/prod/infrastructure/ddsGpsSimTask
+ prod/machineCommon/content/prod/infrastructure/vhs
+ prod/machineCommon/content/sandbox/templateAutonomyTask
++
++prod/infrastructure/acd2Task
++prod/infrastructure/aisJhm
++prod/machineCommon/content/prod/common/jhm2
++prod/machineCommon/content/prod/infrastructure/jhm2
++prod/machineCommon/content/prod/infrastructure/jhm2/jhm2DataServerTemplate

@@ -1,0 +1,28 @@
+//******************************************************************************
+// Copyright 2018 Caterpillar Inc. All rights reserved.
+// -----------------------------------------------------------------------------
+// File name: ReportTrigger.proto
+//
+// Description:
+// Message structure for triggering report actions
+//******************************************************************************/
+syntax = "proto3";
+
+package CAT.FileTransfer;
+
+message ReportTrigger
+{
+	enum COMMAND
+	{
+		CREATE = 0;
+		CREATE_RESET = 1;
+		RESET = 2;	
+	}
+	uint32 file_type = 1;
+	COMMAND command = 2; //Create, CreateReset, Reset
+	uint32 trigger = 3; //WebPage(79), CommunicatorScheduler(80), ProductLinkScheduler(81), BackOffice(68) , VIMSPc(128) , TMAC(127)
+	uint32 message_id = 4;
+
+}
+
+

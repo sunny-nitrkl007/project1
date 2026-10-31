@@ -1,0 +1,23 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+# Please people, stop creating so many warnings!
+myEnv.Append(CCFLAGS = ['-Werror'])
+
+sourceFiles = [ 
+    'RemotePrinterApp.cpp',
+    'Payload/Payload.pb.cc',
+]
+
+RemotePrinterApp = myEnv.Program( 
+    target = 'RemotePrinterApp',
+    source = sourceFiles,
+    LIBS = [ 'ais_task',
+             'ais_config',
+             'ais_log',
+             'protobuf'
+    ]
+)
+
+myEnv.InstallBinary(RemotePrinterApp)
+myEnv.Alias("RemotePrinterApp", "#bin/RemotePrinterApp")

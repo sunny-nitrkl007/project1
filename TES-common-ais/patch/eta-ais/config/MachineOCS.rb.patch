@@ -1,0 +1,13 @@
+diff --git a/config/MachineOCS.rb b/config/MachineOCS.rb
+index 8083fd5..5d0b76a 100644
+--- a/config/MachineOCS.rb
++++ b/config/MachineOCS.rb
+@@ -27,7 +27,7 @@ Interfaces.update( {
+   "CameraStatsInput" => InterfaceDefs::CameraStatsInput,
+   "DiagnosticStatusInput" => InterfaceDefs::DiagnosticStatusInput,
+   "FullSizeCameraImageInput" => InterfaceDefs::CameraImageInput,
+-  "GPSTime1Input" => InterfaceDefs::GPSTime1Input,
++  "GPSTime1Input" => InterfaceDefs::GPSTimeInput,
+   "LoggerStatusInput" => InterfaceDefs::LoggerStatusInput,
+   "LogStartOutput" => InterfaceDefs::LogStartOutput,
+   "LogStopOutput" => InterfaceDefs::LogStopOutput,

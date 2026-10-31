@@ -1,0 +1,22 @@
+:copyright: Copyright (C) 2016 Caterpillar Inc. All Rights Reserved.
+= LPS Common Library Software History
+
+
+//****************************************************************************
+= LPS Common Library Software History (0.1.0)
+
+.Release Information
+[width="30%"]
+|====================================
+| Date              | 2016-06-30
+| Release Label/Tag | 0.1.0
+| Released By       | Subba Gundala
+|====================================
+
+== Release Summary Information
+
+=== Initial Release (gundas1)
+
+This is an initial release with dependency documentation and and the release procedure.
+
+//****************************************************************************

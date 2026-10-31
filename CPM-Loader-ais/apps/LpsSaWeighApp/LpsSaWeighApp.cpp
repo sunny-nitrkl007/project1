@@ -63,7 +63,7 @@ bool CalNVMReinitFlag = false;
 
 // parseLegacyInstanceName() and the ROS2Logger::SetFeatureName() call now
 // live in Ros2TaskWrapper::run() (base class), shared across apps.
-
+LpsSaWeighApp *temp_thisTask = nullptr;
 static float extractValFromString(const std::string& str);
 
 /******************************************************************************
@@ -211,6 +211,12 @@ RETURN VALUE:
 *******************************************************************************/
 bool LpsSaWeighApp::initialize( )
 {
+    {
+        declare_parameter<std::string>("logger_threshold", "error");
+        std::string const loggerThreshold = get_parameter("logger_threshold").as_string();
+        ROS2Logger::Instance().SetLogLevel(loggerThreshold);
+    }
+    
     { // Default matches config/LpsSaWeighApp.rb: "scheduler" => "SCHED_RR", "schedulerPriority" => 19.
         declare_parameter<std::string>("scheduler", "SCHED_RR");
         declare_parameter<int>("scheduler_priority", 19);
@@ -2318,14 +2324,5 @@ LpsSaWeighTxChannel::AudibleAnnunciationPriority_t LpsSaWeighApp::getAudibleComm
 
 int main(int argc, char** argv)
 {
-    // Configure ROS2 log output path and format (rcl_logging_interface env).
-    // Pattern replicated from ScsToRos2Bridge (commit 9972fa8f).
-    {
-        std::string const rosLogDir = "/tmp/appdata/CPM/log";
-        std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
-        setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
-        setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
-    }
-
     return ros2_wrapper::Ros2TaskWrapper::run<LpsSaWeighApp>(argc, argv);
 }

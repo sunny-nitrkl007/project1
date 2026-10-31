@@ -1,0 +1,3 @@
+*.cmake.state
+*.abe.state*
+*.data

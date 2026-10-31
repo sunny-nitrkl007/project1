@@ -1,0 +1,17 @@
+// For a list of possible errors
+//  cppcheck --errorlist > cppcheck_errorlist.xml
+
+*:prod/common/jhm2/Jhm2WebServer/mongoose/*
+*:prod/common/Simple-WebSocket-Server/*
+
+// Incorrectly warning about uninitialized member variable for a function
+uninitMemberVar:prod/common/interfaces/DataLinkData/GPSDataLinkParam.h:39
+uninitMemberVar:prod/common/interfaces/DataLinkData/GPSDataLinkParam.h:41
+
+// Incorrectly warning about Redundant code: Found a statement that begins with numeric constant.
+constStatement:prod/infrastructure/machineOCS/plugins/DataLinkDataPlugin.cpp:106
+constStatement:prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:198
+constStatement:prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:199
+constStatement:prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:284
+constStatement:prod/common/interfaces/CoachingTipHistory/CoachingTipHistory.h:331
+constStatement:prod/common/interfaces/DataLinkData/DataLinkData.h:418

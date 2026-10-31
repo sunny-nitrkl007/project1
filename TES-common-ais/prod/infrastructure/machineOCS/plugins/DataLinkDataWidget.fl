@@ -1,0 +1,55 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0302 
+header_name {.h} 
+code_name {.cpp}
+widget_class DataLinkDataWidget {open
+  xywh {1580 248 335 290} type Double box PLASTIC_THIN_UP_BOX color 55 selection_color 55
+  code0 {\#include <FLU/Flu_Collapsable_Group.h>}
+  class Flu_Collapsable_Group visible
+} {
+  Fl_Group {} {
+    label Status open
+    xywh {5 40 325 247} box PLASTIC_THIN_UP_BOX color 68 labelfont 1 align 5
+  } {
+    Fl_Output paramId {
+      label {Parameter ID:}
+      xywh {120 43 200 20} color 49 selection_color 55 labelsize 12
+    }
+    Fl_Value_Output lastValueEng {
+      label {Last Value (Eng):}
+      xywh {120 68 200 20} selection_color 55 labelsize 12
+    }
+    Fl_Output units {
+      label {Units:}
+      xywh {120 92 200 20} color 49 selection_color 55 labelsize 12
+    }
+    Fl_Output lastValueRaw {
+      label {Last Value (Raw):}
+      xywh {120 116 200 20} color 49 selection_color 55 labelsize 12
+    }
+    Fl_Value_Output dsi {
+      label {DSI:}
+      xywh {120 140 200 20} selection_color 55 labelsize 12
+    }
+    Fl_Output sid {
+      label {SID:}
+      xywh {120 164 200 20} color 49 selection_color 55 labelsize 12
+    }
+    Fl_Output paramIdType {
+      label {Param ID Type:}
+      xywh {120 188 200 20} color 49 selection_color 55 labelsize 12
+    }
+    Fl_Output dlType {
+      label {DataLink Type:}
+      xywh {120 212 200 20} color 49 selection_color 55 labelsize 12
+    }
+    Fl_Output paramType {
+      label {Param Type:}
+      xywh {120 236 200 20} color 49 selection_color 55 labelsize 12
+    }
+    Fl_Output varLengthParamType {
+      label {Var Length Type:}
+      xywh {120 260 200 20} color 49 selection_color 55 labelsize 12
+    }
+  }
+} 

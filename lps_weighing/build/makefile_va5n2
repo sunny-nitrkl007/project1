@@ -1,0 +1,36 @@
+CC=arm-linux-g++
+AR=ar
+ CFLAGS=-g -fPIC -Wall -Wmissing-declarations -Wredundant-decls -Wundef -Wshadow -Wlogical-op -Wcast-align -Woverloaded-virtual
+EXEC=weighing
+EXEC_PREFIX=liblps_
+EXEC_EXT=.a
+EXEC_OUT_PATH= ../../lps_weighing-a/tgt_gcc_4.8.0_a5n2/$(EXEC_PREFIX)$(EXEC)$(EXEC_EXT)
+RM=rm
+
+ 
+SOURCES = LpsInit.c LpsUpdate.c LpsUtility.c LpsProcess.c LpsWeighLlw.c LpsWeighRangeWeigh.c \
+		  LpsWeighBestBktWt.c LpsZeroing.c LpsWeighDigDetect.c LpsWeighDumpState.c \
+		  LpsWeighDumpWtChange.c LpsWeighLiveWeigh.c
+
+COMMON_SOURCES = LpsCommonLookUpTblUtility.c
+
+SOURCE_PATH  = $(addprefix ../src/,$(SOURCES))
+SOURCE_PATH += $(addprefix ../../../lps_common/src/,$(COMMON_SOURCES))
+
+OBJS	= $(SOURCES:.c=.o)
+OBJS   += $(COMMON_SOURCES:.c=.o)
+
+INCLUDES= -I ../include \
+		  -I ../../../lps_common/include \
+		  -I ../../../lps_app_common/include \
+		  -I ../../lps_weighing_interface/include \
+		  -I ../../lps_cal_interface/include \
+		  -I ../../../../filters/cpm_filters_interface/include
+
+
+all:  $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT)
+
+$(EXEC_PREFIX)$(EXEC)$(EXEC_EXT):
+	$(CC) $(SOURCE_PATH) $(INCLUDES) $(CFLAGS) -s -c
+	$(AR) rcs $(EXEC_OUT_PATH) $(OBJS)
+	$(RM) $(OBJS)

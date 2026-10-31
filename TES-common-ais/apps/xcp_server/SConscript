@@ -1,0 +1,32 @@
+#!/usr/bin/python
+###############################################################################
+## @file      SConscript
+## @author    Christopher Baker
+## @date      October 22nd, 2010
+## @brief     SConscript for the Null example task
+##
+## @attention Copyright (C) 2010
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+Import( 'appEnv' )
+
+localEnv = appEnv.Clone()
+
+localEnv.Append( CPPPATH = [ '#apps/xcp_server/linux', ] )
+
+sourceFiles = [
+    'XCPServer.c',
+    'XCPServer_mem.c',
+    'db/XCPServerDb.cpp',
+    'linux/XCPHal.c',
+]
+
+aisXcpServer = localEnv.SharedLibraryWrapper(
+        target = 'xcp_server',
+        source = sourceFiles,
+    )
+
+localEnv.InstallLibrary(aisXcpServer)

@@ -1,0 +1,12 @@
+To use javascript_client_coaching.html with an ECM:
+    in javascript_client_coaching.html, make sure line 14 is not commented out and line 15 is commented out:
+        ws = new WebSocket("ws://165.26.79.19:55566/coaching");         // A6N2
+    //  ws = new WebSocket("ws://10.0.2.15:55566/coaching");            // VM  replace 10.0.2.15 with your ip address (inet)
+
+
+To use javascript_client_coaching.html with a VM:
+    in javascript_client_coaching.html, replace the given IP address with your VM's IP (inet) address
+    also make sure line 14 is commented out and line 15 is not commented out:
+    //  ws = new WebSocket("ws://165.26.79.19:55566/coaching");         // A6N2
+        ws = new WebSocket("ws://10.0.2.15:55566/coaching");            // VM  replace 10.0.2.15 with your ip address (inet)
+    

@@ -1,0 +1,19 @@
+#!/usr/bin/python
+#*****************************************************************************
+# @file      SConscript
+# @author    Steve Machan
+#
+# @attention Copyright (C) 2020 Caterpillar Inc. All rights reserved.
+#*****************************************************************************
+Import( 'commonEnv' )
+
+jhm2WsServer = commonEnv.SharedLibraryWrapper(
+        target = 'jhm2WsServer',
+        source = 'Jhm2WsServer.cpp',
+        LIBS = [
+            'ais_log',
+            'crypto',
+        ]
+    )
+
+commonEnv.InstallLibrary( jhm2WsServer )

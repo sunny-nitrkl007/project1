@@ -1,0 +1,23 @@
+# ~/ replacement
+~/tmp/fileListUnitTest/file1
+#~/tmp/fileListUnitTest/file2
+~/tmp/fileListUnitTest/dir1
+#~/tmp/fileListUnitTest/dir2
+
+# Delete a directory, with or without trailing slash
+/tmp/fileListUnitTest/dirNoSlash
+/tmp/fileListUnitTest/dirSlash/
+
+# Delete specific files
+/tmp/fileListUnitTest/files/file1.txt
+#/tmp/fileListUnitTest/files/file2.txt
+/tmp/fileListUnitTest/files/file3.txt
+
+# Delete using wildcard
+/tmp/fileListUnitTest/wildcards/*.txt
+/tmp/fileListUnitTest/wildcards/prefix*
+#/tmp/fileListUnitTest/wildcards/inside.in
+/tmp/fileListUnitTest/wildcards/ins*.out
+
+# Missing directory
+/tmp/fileListUnitTest/missingDir

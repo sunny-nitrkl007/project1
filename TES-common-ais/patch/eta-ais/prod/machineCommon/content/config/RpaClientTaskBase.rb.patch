@@ -1,0 +1,13 @@
+diff --git a/prod/machineCommon/content/config/RpaClientTaskBase.rb b/prod/machineCommon/content/config/RpaClientTaskBase.rb
+index fff3001..d035139 100644
+--- a/prod/machineCommon/content/config/RpaClientTaskBase.rb
++++ b/prod/machineCommon/content/config/RpaClientTaskBase.rb
+@@ -47,7 +47,7 @@ Parameters.update( {
+   "requireGPSTimeSynchronizationOnStart" => false, # timeSync is not required to start RpaClientTask
+   "cycleRate_hz" => 1,
+ 
+-  "loggerThreshold" => Logger::NOTICE,
++  "loggerThreshold" => Logger::ERROR,
+ 
+   # Configurable list of content to remove before a flash
+   # If empty or not configured, no files will be removed

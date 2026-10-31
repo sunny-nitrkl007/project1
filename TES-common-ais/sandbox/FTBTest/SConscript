@@ -1,0 +1,14 @@
+Import( 'testEnv' )
+myEnv = testEnv.Clone();
+
+sourceFiles = [
+    'main.cpp'
+]
+
+FTBFileCreator = myEnv.Program(
+        target = 'FTBFileCreator',
+        source = sourceFiles
+    )
+
+myEnv.InstallBinary(FTBFileCreator)
+myEnv.Alias("FTBFileCreator", "#bin/FTBFileCreator")

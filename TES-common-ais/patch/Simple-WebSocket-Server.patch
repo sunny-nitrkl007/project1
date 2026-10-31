@@ -1,0 +1,13 @@
+diff --git a/prod/common/Simple-WebSocket-Server/crypto.hpp b/prod/common/Simple-WebSocket-Server/crypto.hpp
+index c57d2c8..bd2e7c4 100644
+--- a/prod/common/Simple-WebSocket-Server/crypto.hpp
++++ b/prod/common/Simple-WebSocket-Server/crypto.hpp
+@@ -68,7 +68,7 @@ namespace SimpleWeb {
+ 
+         b64 = BIO_new(BIO_f_base64());
+         BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+-        bio = BIO_new_mem_buf(&base64[0], static_cast<int>(base64.size()));
++        bio = BIO_new_mem_buf(const_cast<char*>(&base64[0]), static_cast<int>(base64.size()));
+         bio = BIO_push(b64, bio);
+ 
+         int decoded_length = BIO_read(bio, &ascii[0], static_cast<int>(ascii.size()));

@@ -1,0 +1,39 @@
+CC=../../ais/ais-sdk-a6n2-a/amd64/host/usr/bin/x86_64-linux-g++
+CP=cp
+AR=ar
+ CFLAGS=-g -fPIC -Wall -Wmissing-declarations -Wredundant-decls -Wundef -Wshadow -Wlogical-op -Wcast-align -Woverloaded-virtual
+EXEC=weighing
+EXEC_PREFIX=liblps_
+EXEC_EXT=.a
+LPS_WEIGHING_ROOT= ../..
+RM=rm
+
+ 
+SOURCES = LpsInit.c LpsUpdate.c LpsUtility.c LpsProcess.c LpsWeighLlw.c LpsWeighRangeWeigh.c \
+		  LpsWeighBestBktWt.c LpsZeroing.c LpsWeighDigDetect.c LpsWeighDumpState.c \
+		  LpsWeighDumpWtChange.c LpsWeighLiveWeigh.c
+		  
+COMMON_SOURCES = LpsCommonLookUpTblUtility.c cpm_filter.c
+
+SOURCE_PATH  = $(addprefix ../src/,$(SOURCES))
+SOURCE_PATH += $(addprefix ../../lps_common/src/,$(COMMON_SOURCES))
+
+OBJS	= $(SOURCES:.c=.o)
+OBJS   += $(COMMON_SOURCES:.c=.o)
+
+INCLUDES= \
+		  -I ./ \
+		  -I ../include \
+		  -I ../../lps_common/include \
+		  -I ../../lps_app_common/include
+
+$(EXEC_PREFIX)$(EXEC)$(EXEC_EXT):
+	@echo $(EXEC_PREFIX)	
+	$(CC) $(SOURCE_PATH) $(INCLUDES) $(CFLAGS) -s -c
+	$(AR) rcs $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT) $(OBJS)
+ifneq ($(wildcard $(LPS_WEIGHING_ROOT)/lps_weighing-tgt_gcc_4.8.3_a6n2-a/.),)
+	$(CP) $@ $(LPS_WEIGHING_ROOT)/lps_weighing-tgt_gcc_4.8.3_a6n2-a/$@
+else
+	@echo Not able to copy into lps_weighing-tgt_gcc_4.8.3_a6n2-a repo.
+endif
+	$(RM) $@

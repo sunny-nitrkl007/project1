@@ -1,0 +1,31 @@
+###############################################################################
+## @file      SConscript
+## @author    Josh Struble
+## @date      April 1, 2016
+## @brief     SConscript for the jhm2ServerTask application
+###############################################################################
+#!/usr/bin/python
+Import( 'jhm2CommonEnv' )
+
+sourceFiles = [
+    'jhm2ServerTask.cpp'
+]
+
+jhm2ServerTask = jhm2CommonEnv.ProgramWrapper(
+        target = 'jhm2ServerTask',
+        source = sourceFiles,
+        LIBS = [
+                'ais_task', 
+                'ais_config', 
+                'ais_log', 
+                'ais_time', 
+                'ais_simpleComms', 
+                jhm2CommonEnv['BOOST_SIGNALS'],
+                jhm2CommonEnv['BOOST_SERIALIZATION'],
+                jhm2CommonEnv['BOOST_SYSTEM'],  
+                jhm2CommonEnv['RUBY'],
+                'jhm2WebServer',
+                ]
+    )
+
+jhm2CommonEnv.InstallBinary( jhm2ServerTask )

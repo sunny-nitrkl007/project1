@@ -1,0 +1,45 @@
+CC=../../ais/ais-sdk-a6n2-a/amd64/host/usr/bin/x86_64-linux-g++
+CP=cp
+AR=ar
+CFLAGS=-g -fPIC -Wall -Wmissing-declarations -Wredundant-decls -Wundef -Wshadow -Wlogical-op -Wcast-align -Woverloaded-virtual
+EXEC=cal
+EXEC_PREFIX=liblps_
+EXEC_EXT=.a
+LPS_CAL_ROOT= ../..
+SRC_PATH = ../src/
+
+SOURCES = $(wildcard $(SRC_PATH)*.c)
+
+OBJS =  *.o
+
+INCLUDES= \
+		  -I ./ \
+		  -I ../include \
+		  -I ../../lps_common/include \
+		  -I ../../lps_app_common/include \
+		  -I $(LPS_CAL_ROOT)/eta-ais/prod/platformCommon/content/tgt_gcc_5.1.0_a6n2/lib_oel/oel/include \
+		  -I $(LPS_CAL_ROOT)/eta-ais/prod/infrastructure/autonomyConditionDiagnostics/include/lib_a4/scl \
+		  -I $(LPS_CAL_ROOT)/eta-ais/prod/platformCommon/content/tgt_gcc_5.1.0_a6n2/lib_a4/scl/include \
+		  -I $(LPS_CAL_ROOT)/eta-ais/prod/platformCommon/content/tgt_gcc_5.1.0_a6n2/lib_a4/hal/include
+
+
+all: clean $(SOURCES) $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT) $(EXEC_PREFIX)$(EXEC)$(DEBUG)$(EXEC_EXT) end
+
+$(EXEC_PREFIX)$(EXEC)$(EXEC_EXT):
+	@echo $(EXEC_PREFIX)	
+	$(CC) $(SOURCES) $(INCLUDES) $(CFLAGS) -s -c
+	$(AR) rcs $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT) $(OBJS)
+ifneq ($(wildcard $(LPS_CAL_ROOT)/lps_cal-tgt_gcc_4.8.3_a6n2-a/.),)
+	$(CP) $@ $(LPS_CAL_ROOT)/lps_cal-tgt_gcc_4.8.3_a6n2-a/$@
+else
+	@echo Not able to copy into lps_cal-tgt_gcc_4.8.3_a6n2-a repo.
+endif
+	$(RM) $@
+
+clean:
+	@echo "---------------------make begin a5n2----------------------"
+	@echo "Clean rebuild: Deleting compiled objects and libs"
+	rm -rf *.o  $(EXEC_PREFIX)$(EXEC)$(EXEC_EXT) $(EXEC_PREFIX)$(EXEC)$(DEBUG)$(EXEC_EXT)
+
+end:
+	@echo "-------------------------make end------------------------------"

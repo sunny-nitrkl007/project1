@@ -1,0 +1,26 @@
+Import( 'testEnv' )
+sourceFiles = [ 
+    'SerialPrinterApp.cpp'
+]
+
+SerialPrinterApp = testEnv.Program( 
+        target = 'SerialPrinterApp',
+        source = sourceFiles,
+        LIBS = [ 'ais_task',
+                 'ais_config',
+                 'ais_log'
+         ]
+    )
+
+testEnv.InstallBinary( SerialPrinterApp )
+testEnv.Alias("SerialPrinterApp", "#bin/SerialPrinterApp")
+
+testEnv.InstallUnitTest(
+    testEnv.Program(
+        target = 'SerialPrinterTestApp',
+        source = ['test/SerialPrinterTestApp.cpp'],
+        LIBS = ['ais_task', 'ais_config', 'ais_log']
+    ),
+    # add_to_run_list = False
+)
+testEnv.Alias('SerialPrinterTestApp', '#bin/unit_test/SerialPrinterTestApp')

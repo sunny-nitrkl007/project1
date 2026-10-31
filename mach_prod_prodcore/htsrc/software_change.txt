@@ -1,0 +1,61 @@
+:copyright: Copyright (C) 2017 - 2019 Caterpillar Inc. All Rights Reserved.
+:toc:
+:toclevels: 1
+:summary_latest: Updated packed struct
+= prodcore Software History
+
+//****************************************************************************
+== prodcore (4.0.0.rc9)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2019-04-09
+| Release Label/Tag | 4.0.0.rc9
+| Released By       | Subba Gundala
+|====================================
+
+=== Release Summary Information
+
+1. Adds validated 4.0.1.rc8 maintenance rel.
+   
+//****************************************************************************
+
+//****************************************************************************
+== prodcore (4.0.1.rc8)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2019-01-07
+| Release Label/Tag | 4.0.1.rc8
+| Released By       | Subba Gundala
+|====================================
+
+=== Release Summary Information
+
+1. Add necessary macros so packed structures are defined correctly
+   on both diab and gcc targets.
+   
+//****************************************************************************
+
+//****************************************************************************
+== prodcore (4.0.0.rc8)
+
+.Release Information
+[frame="none"  caption=""]
+|====================================
+| Date              | 2018-07-05
+| Release Label/Tag | 4.0.0.rc8
+| Released By       | Emelia Malek
+|====================================
+
+=== Release Summary Information
+
+1. When I did rc7, it picked up the changes on prod_core_public.h made
+   on gorrek_gps_a6n2_build branch which caused build error for other
+   cpm libraries that uses prod_core_public.h since the compiler 
+   does not understand the meaning of "attribute".
+   
+   
+//****************************************************************************

@@ -1,0 +1,24 @@
+###############################################################################
+## @file      SConscript
+## @author    Bryan Salesky (bsalesky@rec.ri.cmu.edu)
+## @date      May 16, 2008
+## @brief     SConscript for interfaces.
+##
+## @attention Copyright (C) 2008
+## @attention National Robotics Engineering Center
+## @attention Carnegie Mellon University
+## @attention All rights reserved
+## @attention Carnegie Mellon Proprietary
+###############################################################################
+#!/usr/bin/python
+Import( 'baseEnv' )
+
+#myEnv.Alias('CPMOperatorIdList', '#bin/CPMOperatorIdList')
+
+CPMOperatorIdList = baseEnv.SharedLibraryWrapper(
+        target = 'CPMOperatorIdList',
+        source = ['CPMOperatorIdList.cpp'],
+        LIBS = [ 'ais_config', 'ais_task','ais_log'],
+    )
+
+baseEnv.InstallLibrary( CPMOperatorIdList )

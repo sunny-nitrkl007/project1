@@ -1,0 +1,13 @@
+diff --git a/prod/machineCommon/content/prod/common/autonomyConditions/conditions/MachineSleep.h b/prod/machineCommon/content/prod/common/autonomyConditions/conditions/MachineSleep.h
+index 677bd4e..e46247c 100644
+--- a/prod/machineCommon/content/prod/common/autonomyConditions/conditions/MachineSleep.h
++++ b/prod/machineCommon/content/prod/common/autonomyConditions/conditions/MachineSleep.h
+@@ -21,7 +21,7 @@ public:
+ 
+   static std::string getConditionTypeString() {return "MachineSleep";}
+   static const unsigned int activationDebounce_ms = 0;
+-  static const unsigned int deactivationDebounce_ms = 30000; // Booting time for Machine ECMs
++  static const unsigned int deactivationDebounce_ms = 60000; // 60 second delay for re-enabling diagnostics after a DM13 wakeup
+   static const unsigned int timeToLive_ms = 86400000;
+ 
+   MachineSleep():

@@ -1,0 +1,56 @@
+#!/usr/bin/python
+Import('baseEnv')
+import os
+
+configEnv = baseEnv.Clone();
+
+configDir = configEnv['CONFIG_SOURCE_DIR']
+
+# File extention types that must be synced
+configFileTypes = [
+    'conf',
+    'csv',
+    'json',
+    'mwf',
+    'rb',
+    'txt',
+    'xml',
+]
+
+# Add all file types with relative paths to configFiles
+configFiles = []
+
+# Debugging
+# for configFile in configFiles:
+#     print(configFile)
+
+target_app_variant = configEnv.get('TARGET_APP_VARIANT', None)
+
+# Copy config files including subdirctories
+if target_app_variant is None:
+    flatten = False
+    for fileType in configFileTypes:
+        configFiles += configEnv.RGlob('*.' + fileType, configDir, followlinks=False)
+
+# Copy only base and variant directory 
+else:
+    flatten = True
+    configFiles += \
+        Glob('*.csv', strings=True) + \
+        Glob('*.rb', strings=True) + \
+        Glob('*.json', strings=True) + \
+        Glob('*.conf', strings=True) + \
+        Glob('*.xml', strings=True)
+
+    # These files must be uniquely named from those in the base dir or scons will throw
+    configFiles += \
+        Glob(target_app_variant + '/*.csv', strings=True) + \
+        Glob(target_app_variant + '/*.rb', strings=True) + \
+        Glob(target_app_variant + '/*.json', strings=True) + \
+        Glob(target_app_variant + '/*.conf', strings=True) + \
+        Glob(target_app_variant + '/*.xml', strings=True)
+
+# Manually add exceptions
+# configFiles.append("machineNameDefault")
+
+configEnv.InstallConfigs(configDir, configFiles, flatten=flatten)

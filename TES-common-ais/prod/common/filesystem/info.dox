@@ -1,0 +1,10 @@
+/**
+@defgroup hub_filesystem [hub::filesystem] Low level filesystem manipulation library
+@ingroup Hub
+
+@brief
+A library meant to help with working with filesystem paths and I/O.
+
+@section tp_list_filesystemapp Hub Filesystem Library Test Procedures
+For AIS \ref test_hub_filesystem
+*/

@@ -1,0 +1,21 @@
+#*****************************************************************************
+# @file      SConscript for jhm2WebServer module
+# @author    Josh Struble
+# @date      4/1/2016
+#
+# @attention Copyright (C) 2016 Caterpillar Inc. All rights reserved.
+#*****************************************************************************
+#!/usr/bin/python
+Import( 'jhm2CommonEnv' )
+
+jhm2WebServer = jhm2CommonEnv.SharedLibraryWrapper(
+        target = 'jhm2WebServer',
+        source = ['mongoose/mongoose.c',
+                  'Jhm2WebSocketHandler.cpp',
+                  'Jhm2WebSocketProcessor.cpp', 
+                  'Jhm2WebServer.cpp'],
+        LIBS = ['ais_log', 'ais_config', 'ais_time', 'jhm2RequestProc']
+    )
+
+jhm2CommonEnv.InstallLibrary( jhm2WebServer )
+
