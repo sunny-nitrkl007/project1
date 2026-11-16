@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -14,7 +15,7 @@
 /*
  * Add a new simple cal entry from a load record.
  */
-void LpsSaJobMgrSimpleCal::addEntry(const LpsSaLoadRecordChannelStorage& loadRecord) {
+void LpsSaJobMgrSimpleCal::addEntry(const jobmgr_data::LpsSaLoadRecordChannelStorage& loadRecord) {
     const auto& lastSubtotal = loadRecord.getCurrentSubtotal();
     Entry entry;
 
@@ -68,19 +69,19 @@ void LpsSaJobMgrSimpleCal::eraseEntry(const std::string& timestamp) {
 /*
  * Fill in a deque with all of the simple cal data
  */
-void LpsSaJobMgrSimpleCal::getSimpleCalData(std::deque<SimpleCalData_t>& simpleCalData) const {
+void LpsSaJobMgrSimpleCal::getSimpleCalData(std::deque<jobmgr_data::SimpleCalData_t>& simpleCalData) const {
     simpleCalData.clear();
     std::transform(queue_.cbegin(), queue_.cend(), std::back_inserter(simpleCalData),
-            [](const Entry& e) -> const SimpleCalData_t& { return e.simpleCalData; });
+            [](const Entry& e) -> const jobmgr_data::SimpleCalData_t& { return e.simpleCalData; });
 }
 
 /*
  * Fill in a vector with all of the simple cal data
  */
-void LpsSaJobMgrSimpleCal::getSimpleCalData(std::vector<SimpleCalData_t>& simpleCalData) const {
+void LpsSaJobMgrSimpleCal::getSimpleCalData(std::vector<jobmgr_data::SimpleCalData_t>& simpleCalData) const {
     simpleCalData.clear();
     std::transform(queue_.cbegin(), queue_.cend(), std::back_inserter(simpleCalData),
-            [](const Entry& e) -> const SimpleCalData_t& { return e.simpleCalData; });
+            [](const Entry& e) -> const jobmgr_data::SimpleCalData_t& { return e.simpleCalData; });
 }
 
 /*

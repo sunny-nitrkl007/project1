@@ -13,12 +13,12 @@
 
 #include "ROS2Logger.hpp"
 
-#include <fileio/directory.hpp>
+#include <filesystem/extensions/nvm.h>
 
 #include "LpsSaWeighAppTestFixture.h"
 
 enum COLUMN_IDX {
-    TIME = 0,
+    COL_TIME = 0,
     LIFT_HE_PRESS,
     LIFT_RE_PRESS,
     LIFT_POS_DC,
@@ -79,7 +79,7 @@ bool LpsSaWeighAppTestFixture::recordTestPlan(const boost::filesystem::path& fil
     try {
         //boost::system::error_code ec;
         boost::filesystem::remove(filePath);
-        tes_common_ais::directory::create(filePath.parent_path());
+        ros2_nvm::filesystem::nvm_dir::create(filePath.parent_path());
         fs_.open(filePath.string(), std::ios_base::out | std::ios_base::trunc);
         if (fs_) {
             fs_ << COLUMN_NAMES[0];
@@ -127,7 +127,7 @@ bool LpsSaWeighAppTestFixture::runTestPlan(const boost::filesystem::path& filePa
     recordStep_ = Step();
 
     try {
-        tes_common_ais::directory::create(filePath.parent_path());
+        ros2_nvm::filesystem::nvm_dir::create(filePath.parent_path());
         if (boost::filesystem::exists(filePath)) {
             fs_.open(filePath.string(), std::ios_base::in);
             if (fs_) {
@@ -522,7 +522,7 @@ void LpsSaWeighAppTestFixture::parseNextStep(const std::string& line) {
     // Fill in new info
     try {
         // Time
-        int fieldIdx = COLUMN_IDX_MAP[COLUMN_IDX::TIME];
+        int fieldIdx = COLUMN_IDX_MAP[COLUMN_IDX::COL_TIME];
         if ((fieldIdx >= numFields) || (fieldIdx < 0) || (fields[fieldIdx].empty())) {
             // Start immediately on the next update.
             nextStep_.startTime = std::chrono::steady_clock::time_point::min();

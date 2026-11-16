@@ -14,7 +14,6 @@
 #include <boost/filesystem/fstream.hpp>
 
 #include "rclcpp/rclcpp.hpp"
-#include <ais/util/taskUtils.hpp>
 #include <hub/base/export.hh>
 #include <hub/utility/string.hh>
 
@@ -41,25 +40,35 @@ export_object FileList get(const boost::filesystem::path& fileListLocation)
     if (file::read(fileListLocation, fileContents))
     {
         std::string filePath;
-        auto homeDir = getHomeDirectory();
+
+        const char* home = std::getenv("HOME");
+        std::string homeDir = (home != nullptr) ? home : "";
+
+        if (!homeDir.empty() && homeDir.back() != '/')
+        {
+            homeDir += '/';
+        }
+
         while (std::getline(fileContents, filePath))
         {
             boost::trim(filePath);
+
             // Skip empty lines and comments
-            if (!filePath.empty() && (filePath.at(0) != '#'))
+            if (!filePath.empty() && filePath[0] != '#')
             {
                 // Replace ~/ with absolute path
-                if (filePath.substr(0, 2) == "~/")
+                if (filePath.rfind("~/", 0) == 0)
                 {
-                    filePath = homeDir + filePath.substr(1);
+                    filePath = homeDir + filePath.substr(2);
                 }
+
                 fileList.push_back(filePath);
             }
         }
     }
+
     return fileList;
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief Deletes a list of files from the file in the provided filePath
 /// @param fileList List of files/directories to be deleted. The "*" wildcard is

@@ -64,7 +64,6 @@ if(BUILD_TESTING)
     # Common test libraries
     set(FILESYSTEM_TEST_LIBS
         ${MODULE_NAME}
-        ais_log
         Boost::unit_test_framework
         Boost::filesystem
         Boost::thread

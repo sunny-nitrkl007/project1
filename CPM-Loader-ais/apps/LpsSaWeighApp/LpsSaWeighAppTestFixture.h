@@ -15,13 +15,14 @@
 
 #include <boost/filesystem.hpp>
 
-#include <interfaces/LpsSaWeighTxChannel/LpsSaWeighTxChannel.h>
+#include "ProtocolTypes.h"
+#include <vector>
 
 #include <imu/imu.hpp>
 
 class LpsSaWeighAppTestFixture {
 public:
-    using TestStatus_t = LpsSaWeighTxChannel::TestStatus_t;
+    using TestStatus_t = weigh_data::LpsSaWeighTxChannel::TestStatus_t;
 
     LpsSaWeighAppTestFixture() :
         testStatus_(TestStatus_t::INACTIVE),

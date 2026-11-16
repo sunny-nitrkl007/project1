@@ -17,7 +17,6 @@ SystemTasks.update ({
   "baseMachineInterface"               => Machines::MachineMap["ecm"],
   "BmiCdl"                             => Machines::MachineMap["ecm"],
   "FileTransferBridgeApp"              => Machines::MachineMap["ecm"],
-  "OutputApp"                          => Machines::MachineMap["ecm"],
   "Tpms2CycleSegApp"                   => Machines::MachineMap["ecm"],
   "VP3FileCreationApp"                 => Machines::MachineMap["ecm"],
   "XcpServerTask"                      => Machines::MachineMap["ecm"],

@@ -23,10 +23,6 @@ if(NOT SSP_DIR)
     message(FATAL_ERROR "Set SSP_DIR to the root of the SSP source tree")
 endif()
 
-if(NOT TES_COMMON_DIR)
-    message(FATAL_ERROR "Set TES_COMMON_DIR to the TES-common-ais source tree")
-endif()
-
 #
 # Validate AIS variables
 #
@@ -212,6 +208,7 @@ target_include_directories(LpsSaJobMgrApp PRIVATE
     "${SSP_DIR}/eta-ais/prod/machineCommon/content/include"
 
     "${SSP_DIR}/eta-ais/prod/platformCommon/content/include"
+    "${SSP_DIR}/eta-ais/prod/machineCommon/content/prod/common/hub/lib_module"
 
     "${CMAKE_SOURCE_DIR}/include"
 )
@@ -242,31 +239,6 @@ target_link_directories(LpsSaJobMgrApp PRIVATE
 )
 
 target_link_libraries(LpsSaJobMgrApp PRIVATE
-
-    #
-    # AIS
-    #
-    #ais_task
-    ais_config
-    ais_log
-    ais_channel
-    #ais_task_core
-    ais_simpleComms
-    ais_time
-    ais_heartbeat
-    ais_executive
-    ais_sigcatch
-    ais_monitor
-    ais_configSection
-    ais_filesystem
-    ais_interfaces
-    ais_serialization
-
-    #
-    # Factory
-    #
-    AisPluginProcessor
-
     #
     # HUB
     #
@@ -376,7 +348,6 @@ target_link_options(LpsSaJobMgrApp PRIVATE
 
 target_compile_definitions(LpsSaJobMgrApp PRIVATE
     RAPIDJSON_HAS_STDSTRING=1
-    AIS_SERIALIZATION_INCLUDE_BOOST_ARCHIVE
 )
 
 #

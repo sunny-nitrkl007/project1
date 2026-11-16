@@ -13,8 +13,6 @@
  *******************************************************************************/
 #include <stdint.h>
 
-#include <CANBase/CanPacket.h>
-
 /******************************************************************************/
 
 /*******************************************************************************
@@ -54,11 +52,20 @@ public:
     int dropped;
 
 protected:
+    struct CanPacket {
+        uint32_t msgId = 0;
+        bool extendedId = false;
+        bool remoteFrame = false;
+        bool errorFrame = false;
+        uint32_t length = 0;
+        unsigned char payload_[8] = {};
+    };
+
     bool getPacket(CanPacket& m, int timeout_ms);
 
 private:
-    bool unpack734Data(const CanPacketStorage& packet);
-    bool unpack733Data(const CanPacketStorage& packet);
+    bool unpack734Data(const CanPacket& packet);
+    bool unpack733Data(const CanPacket& packet);
 
     int socket_; // Socket for the CAN interface
     bool init_flag_;

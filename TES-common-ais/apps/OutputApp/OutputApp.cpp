@@ -9,7 +9,9 @@ DESCRIPTION:
 ** -- #Include's --
 *******************************************************************************/
 #include "OutputApp.h"
+#include "ROS2Logger.hpp"
 
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -30,14 +32,6 @@ DESCRIPTION:
 ** -- #Define, Struct's, Typedef's, Enum's --
 *******************************************************************************/
 
-using namespace task;
-
-AbstractTaskCore* task::getTaskImplementation(void)
-{
-   static OutputApp thisTask("OutputApp");
-   return dynamic_cast<Task *>(&thisTask);
-}
-
 /******************************************************************************
 FUNCTION NAME:Output constructor
 DESCRIPTION: Output constructor for initializes an instance of its class
@@ -45,8 +39,8 @@ PARAMETER DESCRIPTION:  task name is passed
 RETURN VALUE:  No return Value form constructor
 *******************************************************************************/
 OutputApp::OutputApp( const std::string& taskName ):
-    Task( taskName ),
-    OutputAppInput(NULL),
+    ros2_wrapper::Ros2TaskWrapper(taskName),
+    outputChannelRosIn_(nullptr),
     Config{}
 {
 }
@@ -59,6 +53,8 @@ RETURN VALUE:   No return Value form destructor
 *******************************************************************************/
 OutputApp::~OutputApp( )
 {
+   delete outputChannelRosIn_;
+   outputChannelRosIn_ = nullptr;
 }
 
 /******************************************************************************
@@ -87,13 +83,13 @@ void OutputApp::UpdateOutputPortSinkFile( int portIndex, OutputChannel::State po
    FILE* gpioFile = fopen(gpioPath.c_str(), "w") ;
    if(gpioFile != NULL)
    {
-      AIS_LOG_INFO("Val written to gpio %d = %d", portIndex, portState);
+      RCLCPP_INFO(get_logger(), "Val written to gpio %d = %d", portIndex, static_cast<int>(portState));
       fprintf(gpioFile,"%d",portState);
       Config[portIndex].PortCurrentState = portState;
    }
    else
    {
-      AIS_LOG_WARN("Failed to open %s. \n",gpioPath.c_str());
+      RCLCPP_WARN(get_logger(), "Failed to open %s", gpioPath.c_str());
    }
    fclose(gpioFile) ;
 }
@@ -107,22 +103,25 @@ RETURN VALUE:  Boolean
 bool OutputApp::initialize( )
 {
 
-   /* Initialsing SCS interface */
-   OutputAppInput = dynamic_cast<OutputChannelInput*>( InterfaceDb::fetch( "OutputChannelInput" ) );
+   declare_parameter<double>("cycle_rate_hz", 4.0);
+   declare_parameter<std::string>("logger_threshold", "error");
+   ROS2Logger::Instance().SetFeatureName(get_name());
+   ROS2Logger::Instance().SetLogLevel(get_parameter("logger_threshold").as_string());
 
-   if( !OutputAppInput )
-   {
-      AIS_LOG_FATAL( "No OutputAppInput interface defined" );
+   const double cycleRateHz = get_parameter("cycle_rate_hz").as_double();
+   if (!std::isfinite(cycleRateHz) || cycleRateHz < IDEAL_APP_CYCLE_RATE ||
+       std::fmod(cycleRateHz, IDEAL_APP_CYCLE_RATE) != 0.0) {
+      RCLCPP_FATAL(get_logger(), "cycle_rate_hz must be a positive multiple of 4 Hz");
       return false;
    }
+   AppCycleRateHz = static_cast<uint32_t>(cycleRateHz);
 
-   getTaskConfig().get( "cycleRate_hz", AppCycleRateHz);
-   if( AppCycleRateHz%IDEAL_APP_CYCLE_RATE != 0 )
-   {
-      AIS_LOG_FATAL( "AppCycleRate cannot provide 250ms output." );
+   outputChannelRosIn_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::OutputChannel>(
+         shared_from_this(), "output_channel");
+   if (!outputChannelRosIn_) {
+      RCLCPP_FATAL(get_logger(), "Failed to initialize output_channel ROS2 interface");
       return false;
    }
-   AIS_LOG_INFO( "APP_CYCLE_RATE_HZ: %d", AppCycleRateHz );
    return true;
 }
 
@@ -135,7 +134,7 @@ RETURN VALUE: Boolean
 *******************************************************************************/
 bool OutputApp::executive( )
 {
-   AIS_LOG_INFO( "Output::executive" );
+   RCLCPP_DEBUG(get_logger(), "Output executive cycle");
 
    ReadCommand();
 
@@ -144,19 +143,19 @@ bool OutputApp::executive( )
       if(true == Config[portNumber].NewCommandRcvd) //if we got new command: set Initial State
       {
          UpdateOutputPortSinkFile(portNumber, Config[portNumber].CmdInitState);
-         AIS_LOG_INFO("Output port%d set to Initial state: %d", portNumber, Config[portNumber].CmdInitState);
+         RCLCPP_INFO(get_logger(), "Output port%d set to Initial state: %d", portNumber, Config[portNumber].CmdInitState);
 
          //Set IsInfinite based on Duration: if Duration is 0 (Infinite) set to false. else set to true
          Config[portNumber].IsInfinite = (OutputChannel::DurationInfinite == Config[portNumber].Duration)? true: false;
          Config[portNumber].CommandActive = true;
          switch( Config[portNumber].CmdChangeDuration )//Set Period from ChangeDuration possible value: 1 (250 ms), 2 (500 ms), 4 (1 s)
          {
-            case ONE:
-            case TWO:
-            case FOUR:
+            case OutputChannel::ChangeDuration::ONE:
+            case OutputChannel::ChangeDuration::TWO:
+            case OutputChannel::ChangeDuration::FOUR:
                Config[portNumber].CycleCount = Config[portNumber].CmdChangeDuration * (AppCycleRateHz/IDEAL_APP_CYCLE_RATE);
                break;
-            case NO_FLASH:
+            case OutputChannel::ChangeDuration::NO_FLASH:
             default:
                Config[portNumber].CycleCount = OUTPUT_NO_FLASH; // 100(no flash)
                break;
@@ -182,7 +181,7 @@ bool OutputApp::executive( )
             OutputChannel::State portState = (Config[portNumber].PortCurrentState==OutputChannel::State::PORT_OFF)?
                   OutputChannel::State::PORT_ON:OutputChannel::State::PORT_OFF;
             UpdateOutputPortSinkFile( portNumber, portState );
-            AIS_LOG_INFO("Output port%d flash: set to: %d", portNumber, portState);
+            RCLCPP_INFO(get_logger(), "Output port%d flash: set to: %d", portNumber, portState);
             Config[portNumber].CycleCount = Config[portNumber].CmdChangeDuration * (AppCycleRateHz/IDEAL_APP_CYCLE_RATE);
          }
          Config[portNumber].CycleCount--;
@@ -190,7 +189,7 @@ bool OutputApp::executive( )
       else //duration expired: set to final state, clear command Active. reset Period counter.
       {
          UpdateOutputPortSinkFile(portNumber,Config[portNumber].CmdFinalState);
-         AIS_LOG_INFO("Output port%d set to Final state: %d", portNumber, Config[portNumber].CmdFinalState);
+         RCLCPP_INFO(get_logger(), "Output port%d set to Final state: %d", portNumber, Config[portNumber].CmdFinalState);
          Config[portNumber].CommandActive = false;
          Config[portNumber].CycleCount = 0;
       }
@@ -223,34 +222,46 @@ void OutputApp::PrintCurrentPortState()
       OutputPortLog[index] << ((Config[index].PortCurrentState == OutputChannel::State::PORT_OFF)? "_":"-");
 #endif
    }
-   AIS_LOG_DEBUG( outputString.str() );
+   RCLCPP_DEBUG(get_logger(), "%s", outputString.str().c_str());
 }
 
 /******************************************************************************
 FUNCTION NAME: ReadCommand
-DESCRIPTION:  Read latest command from Scs
+DESCRIPTION:  Drain the output command topic
 PARAMETER DESCRIPTION: No parameter
 RETURN VALUE: void
 *******************************************************************************/
 void OutputApp::ReadCommand()
 {
-   //Get all Commands for each output port from scs interfaces.
-   OutputChannel outputChannel;
-   while (OutputAppInput->get(outputChannel))
+   job_mgr_interfaces::msg::OutputChannel rosOutputChannel;
+   while (outputChannelRosIn_->get(rosOutputChannel))
    {
-      AIS_LOG_INFO( "Output App command received." );
-      for(auto cmd:outputChannel.GetOutputAppCmds())//iterate through command vector
+      RCLCPP_INFO(get_logger(), "Output App command received.");
+      OutputChannel outputChannel;
+      for (const auto& rosCommand : rosOutputChannel.commands)
       {
-         //Check Command if valid or not, only handle when it is valid.
-         if(ValidateCommandInfo(cmd))
+         if (rosCommand.total_duration < 0) {
+            RCLCPP_ERROR(get_logger(), "Output command duration is negative: %d", rosCommand.total_duration);
+            continue;
+         }
+         OutputChannel::OutputCmd command;
+         command.OutputPort = static_cast<OutputChannel::Port>(rosCommand.output_port);
+         command.InitialState = static_cast<OutputChannel::State>(rosCommand.initial_state);
+         command.StateChangeDuration = static_cast<OutputChannel::ChangeDuration>(rosCommand.state_change_duration);
+         command.TotalDuration = static_cast<uint32_t>(rosCommand.total_duration);
+         command.FinalState = static_cast<OutputChannel::State>(rosCommand.final_state);
+         outputChannel.AddOutputAppCmd(command);
+      }
+      for (const auto& cmd : outputChannel.GetOutputAppCmds())
+      {
+         if (ValidateCommandInfo(cmd))
          {
-            AIS_LOG_INFO( "Output App command received and verified. port: %d, Init State: %d, State Change Duration: %d, Total Duration: %d, FinalState: %d",
+            RCLCPP_INFO(get_logger(), "Output App command received and verified. port: %d, Init State: %d, State Change Duration: %d, Total Duration: %u, FinalState: %d",
                   cmd.OutputPort,
                   cmd.InitialState,
                   cmd.StateChangeDuration,
                   cmd.TotalDuration,
                   cmd.FinalState );
-            //Save commands and set New Command Received to true;
             Config[cmd.OutputPort].CmdInitState = cmd.InitialState;
             Config[cmd.OutputPort].CmdFinalState = cmd.FinalState;
             Config[cmd.OutputPort].CmdChangeDuration = cmd.StateChangeDuration;
@@ -304,11 +315,11 @@ bool OutputApp::ValidateCommandInfo(OutputChannel::OutputCmd cmd)
 
    if( true == returnVal)
    {
-      AIS_LOG_INFO( "Output App port%d command good.", cmd.OutputPort );
+      RCLCPP_INFO(get_logger(), "Output App port%d command good.", cmd.OutputPort);
    }
    else
    {
-      AIS_LOG_ERROR( validationErrors.str() );
+      RCLCPP_ERROR(get_logger(), "%s", validationErrors.str().c_str());
    }
    return returnVal;
 }
@@ -319,14 +330,26 @@ DESCRIPTION:
 PARAMETER DESCRIPTION:
 RETURN VALUE:void
 *******************************************************************************/
+void OutputApp::startExecutiveTimer()
+{
+   createExecutiveTimer(AppCycleRateHz);
+}
+
 void OutputApp::cleanup( )
 {
-   AIS_LOG_INFO( "Output::cleanup" );
+   RCLCPP_INFO(get_logger(), "Output cleanup");
+   delete outputChannelRosIn_;
+   outputChannelRosIn_ = nullptr;
 
 #ifdef TEST_MODE
    for(uint32_t index= 0 ; index < OutputChannel::Port::OUTPUT_SINK_COUNT; index++)
    {
-      AIS_LOG_DEBUG( OutputPortLog[index].str() );
+      RCLCPP_DEBUG(get_logger(), "%s", OutputPortLog[index].str().c_str());
    }
 #endif
+}
+
+int main(int argc, char** argv)
+{
+   return ros2_wrapper::Ros2TaskWrapper::run<OutputApp>(argc, argv);
 }

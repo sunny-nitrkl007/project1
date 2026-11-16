@@ -10,7 +10,6 @@ DESCRIPTION:
 #include <stdio.h>
 #include "ROS2Logger.hpp"
 #include "LpsSaJobMgrApp.h"
-#include <clock_tm_zone_proto.h>
 #include <chrono>
 
 #include <chrono/print.hpp>
@@ -108,7 +107,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
 
             if (removedPass) {
                 // restore truck with updated load
-                const LpsSaLoadRecordSubtotal& subtotal = tasks_.getCurrentTaskLoad().getCurrentSubtotal();
+                const jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = tasks_.getCurrentTaskLoad().getCurrentSubtotal();
                 LpsWeighBktWtAccuracy_t lastPassAccuracy;
                 float lastPassWeight = subtotal.lastPassWeightTonnes(lastPassAccuracy);
                 LpsPtRestoreTruck(subtotal.weightTonnes(), subtotal.passCount(), FALSE, lastPassWeight, lastPassAccuracy);
@@ -140,10 +139,10 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
             }
 
             { // Close out the current tasks load and sent it on to downstream consumers.
-                LpsSaLoadRecordChannel loadRecord;
+                jobmgr_data::LpsSaLoadRecordChannelStorage loadRecord;
 
                 { // Get load record
-                    LpsSaLoadRecordChannelStorage& loadRecordData = loadRecord;
+                    jobmgr_data::LpsSaLoadRecordChannelStorage& loadRecordData = loadRecord;
                     loadRecordData = tasks_.currentTaskLoadClose(serviceHourMeter_);
                 }
 
@@ -163,16 +162,16 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
 
                     // Set the reason for store.
                     if (LpsSaJobMgrWmOutput.loadUpdate.isAutoStore) {
-                        loadRecord.storeAction(LpsSaLoadRecordStoreAction::AUTO);
+                        loadRecord.storeAction(jobmgr_data::LpsSaLoadRecordStoreAction::AUTO);
                     }
                     else if (SEALegalForTradeInstalled_) {
                         // If nobody disabled LFT, then it is LFT
-                        if (loadRecord.storeAction() != LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE) {
-                            loadRecord.storeAction(LpsSaLoadRecordStoreAction::TICKET_LEGAL_FOR_TRADE);
+                        if (loadRecord.storeAction() != jobmgr_data::LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE) {
+                            loadRecord.storeAction(jobmgr_data::LpsSaLoadRecordStoreAction::TICKET_LEGAL_FOR_TRADE);
                         }
                     }
                     else {
-                        loadRecord.storeAction(LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE);
+                        loadRecord.storeAction(jobmgr_data::LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE);
                     }
 
                     // disable lists if SEA Level2 is not installed
@@ -231,8 +230,8 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
         }
 
         if (LpsJobMgrJobTrackerInfoTbl.splitModeNextPayloadCmd) {
-            LpsSaLoadRecordChannelStorage& load = tasks_.getCurrentTaskLoad();
-            LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
+            jobmgr_data::LpsSaLoadRecordChannelStorage& load = tasks_.getCurrentTaskLoad();
+            jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
 
             // set the zero and cal adjust for subtotal being closed out
             subtotal.setZeroWeight(LpsJobMgrJobTrackerInfoTbl.zeroWeight);
@@ -251,8 +250,8 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
         }
 
         if (LpsJobMgrJobTrackerInfoTbl.selectSubtotalCmd) {
-            LpsSaLoadRecordChannelStorage& load = tasks_.getCurrentTaskLoad();
-            LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
+            jobmgr_data::LpsSaLoadRecordChannelStorage& load = tasks_.getCurrentTaskLoad();
+            jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
 
             // set the zero and cal adjust for subtotal being closed out
             subtotal.setZeroWeight(LpsJobMgrJobTrackerInfoTbl.zeroWeight);
@@ -277,16 +276,16 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrPtUpdate(void)
 
     // Payload Operating Mode (D10748)
     if(!LpsSaJobMgrWmInput.cpm_is_calibrated) {
-        LpsJobMgrJobTrackerInfoTbl.OperationMode = LPS_SA_JOB_MGR_UNCALIBRATED; // Not calibrated
+        LpsJobMgrJobTrackerInfoTbl.OperationMode = jobmgr_data::LPS_SA_JOB_MGR_UNCALIBRATED; // Not calibrated
     }
     else if (LpsSaJobMgrWmOutput.standby_active) {
-        LpsJobMgrJobTrackerInfoTbl.OperationMode = LPS_SA_JOB_MGR_STANDBY_MODE;  // In Standby
+        LpsJobMgrJobTrackerInfoTbl.OperationMode = jobmgr_data::LPS_SA_JOB_MGR_STANDBY_MODE;  // In Standby
     }
     else if (LpsSaJobMgrWmOutput.tip_off_active) {
-        LpsJobMgrJobTrackerInfoTbl.OperationMode = LPS_SA_JOB_MGR_EXCESS_MODE;   // In tip off
+        LpsJobMgrJobTrackerInfoTbl.OperationMode = jobmgr_data::LPS_SA_JOB_MGR_EXCESS_MODE;   // In tip off
     }
     else {
-        LpsJobMgrJobTrackerInfoTbl.OperationMode = LPS_SA_JOB_MGR_WEIGH_MODE;   // Normal mode
+        LpsJobMgrJobTrackerInfoTbl.OperationMode = jobmgr_data::LPS_SA_JOB_MGR_WEIGH_MODE;   // Normal mode
     }
 
     LpsJobMgrJobTrackerInfoTbl.ReqPloadCtrlSysStat = GetActiveButtonStatus();
@@ -350,34 +349,34 @@ RETURN VALUE:void
 *******************************************************************************/
 void LpsSaJobMgrApp::LpsSaJobMgrHandleTipOffBtnStates()
 {
-    LpsJobMgrJobTrackerInfoTbl.TipOffState = LPS_SA_JOB_MGR_TIP_OFF_UNAVAILABLE;
-    LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
+    LpsJobMgrJobTrackerInfoTbl.TipOffState = jobmgr_data::LPS_SA_JOB_MGR_TIP_OFF_UNAVAILABLE;
+    LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
 
     // Tip Off manual
     if (LpsSaJobMgrWmInput.tip_off_trigger == TIP_OFF_TRIGGER_MANUAL)
     {
     	if (LpsSaJobMgrWmOutput.tip_off_active)
     	{
-    		LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_ACTIVE;
+    		LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_ACTIVE;
     	}
     	else if (LpsSaJobMgrWmOutput.display_bucket_weight_available)
     	{
-    		LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_AVAILABLE;
+    		LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_AVAILABLE;
     	}
     	else {
-    		LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
+    		LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
     	}
     }
     else {
-    	LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
+    	LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
     }
     // Tip Off Auto or Disabled or Tipoff Assist is Active
     if (LpsSaJobMgrWmOutput.tip_off_active && (!LpsJobMgrJobTrackerInfoTbl.TipoffAssistActive))
     {
-    	LpsJobMgrJobTrackerInfoTbl.TipOffState = (LpsSaJobMgrTipOffState_t)LpsSaJobMgrWmOutput.tip_off_mode;
+    	LpsJobMgrJobTrackerInfoTbl.TipOffState = (jobmgr_data::LpsSaJobMgrTipOffState_t)LpsSaJobMgrWmOutput.tip_off_mode;
     }
     else {
-    	LpsJobMgrJobTrackerInfoTbl.TipOffState = LPS_SA_JOB_MGR_TIP_OFF_UNAVAILABLE;
+    	LpsJobMgrJobTrackerInfoTbl.TipOffState = jobmgr_data::LPS_SA_JOB_MGR_TIP_OFF_UNAVAILABLE;
 
     }
 }
@@ -391,21 +390,21 @@ RETURN VALUE:void
 void LpsSaJobMgrApp::LpsSaJobMgrSendCmdToWeighApp()
 {
     if (LpsSaJobMgrWmOutput.unlatch_current_bucket_weight) {
-        LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command::RESET_BEST_BUCKET_WEIGHT);
+        LpsSaJobMgrScsSendCmd(cpm_common_interfaces::msg::WeighReqstChannelCommand::RESET_BEST_BUCKET_WEIGHT);
     }
 
     if (LpsSaJobMgrWmOutput.dump_detect_capture_cyl_ext_reference) {
-        LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command::CAPTURE_CYLINDER_EXTENSION_REFERENCE);
+        LpsSaJobMgrScsSendCmd(cpm_common_interfaces::msg::WeighReqstChannelCommand::CAPTURE_CYLINDER_EXTENSION_REFERENCE);
     }
 
     if (LpsSaJobMgrWmOutput.clear_reweigh_warning_status) {
-        LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command::CLEAR_REWEIGH_WARNING);
+        LpsSaJobMgrScsSendCmd(cpm_common_interfaces::msg::WeighReqstChannelCommand::CLEAR_REWEIGH_WARNING);
     }
 }
 
 /******************************************************************************
 FUNCTION NAME: LpsSaJobMgrApp::convertLoadRecordToRos
-DESCRIPTION: Converts LpsSaLoadRecordChannelStorage (AIS SCS Datum<>) to
+DESCRIPTION: Converts JobManager-local LpsSaLoadRecordChannelStorage to
     job_mgr_interfaces::msg::LpsSaLoadRecordChannel (ROS2) for publication.
     Field-by-field mapping verified against:
       prod/common/interfaces/LpsSaLoadRecordChannel/LpsSaLoadRecordChannel.h
@@ -415,11 +414,11 @@ DESCRIPTION: Converts LpsSaLoadRecordChannelStorage (AIS SCS Datum<>) to
     passes()) to avoid depending on private friendship -- no private member access.
 *******************************************************************************/
 /*static*/ job_mgr_interfaces::msg::LpsSaLoadRecordChannel
-LpsSaJobMgrApp::convertLoadRecordToRos(const LpsSaLoadRecordChannel& scs)
+LpsSaJobMgrApp::convertLoadRecordToRos(const jobmgr_data::LpsSaLoadRecordChannelStorage& scs)
 {
     job_mgr_interfaces::msg::LpsSaLoadRecordChannel ros;
 
-    ros.store_action = LpsSaLoadRecordStoreAction_Base_t(scs.storeAction());
+    ros.store_action = static_cast<uint8_t>(scs.storeAction());
 
     ros.ticket_number = scs.ticketNumber();
     ros.ticket_id     = scs.ticketId();
@@ -442,7 +441,7 @@ LpsSaJobMgrApp::convertLoadRecordToRos(const LpsSaLoadRecordChannel& scs)
     /* Convert subtotals -- index 1 is the "primary" subtotal (subtotal_),
        indices 2..N are the additional ones (subtotals_).
        Public API: subtotalCount() and getSubtotalByIndex(1-based). */
-    auto convertSubtotal = [](const LpsSaLoadRecordSubtotal& s)
+    auto convertSubtotal = [](const jobmgr_data::LpsSaLoadRecordSubtotal& s)
             -> job_mgr_interfaces::msg::LoadRecordSubtotal
     {
         job_mgr_interfaces::msg::LoadRecordSubtotal rs;
@@ -494,7 +493,7 @@ LpsSaJobMgrApp::convertLoadRecordToRos(const LpsSaLoadRecordChannel& scs)
 
     uint32_t count = scs.subtotalCount();
     for (uint16_t i = 1; i <= count; ++i) {
-        const LpsSaLoadRecordSubtotal& sub = scs.getSubtotalByIndex(i);
+        const jobmgr_data::LpsSaLoadRecordSubtotal& sub = scs.getSubtotalByIndex(i);
         if (i == 1) {
             ros.subtotal = convertSubtotal(sub);
         } else {
@@ -505,7 +504,7 @@ LpsSaJobMgrApp::convertLoadRecordToRos(const LpsSaLoadRecordChannel& scs)
     return ros;
 }
 
-job_mgr_interfaces::msg::LpsSaJobMgrTxChannel LpsSaJobMgrApp::convertJobMgrTxToRos(const LpsSaJobMgrTxChannel& scs)
+job_mgr_interfaces::msg::LpsSaJobMgrTxChannel LpsSaJobMgrApp::convertJobMgrTxToRos(const jobmgr_data::JobMgrTxData& scs)
 {
     job_mgr_interfaces::msg::LpsSaJobMgrTxChannel ros;
     ros.time_point_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(scs.timePoint.time_since_epoch()).count();

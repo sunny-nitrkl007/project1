@@ -13,7 +13,7 @@ DESCRIPTION:
 #include <mutex>
 
 #include <boost/filesystem.hpp>
-
+#include <boost/serialization/vector.hpp>
 
 // ---- ROS2/DDS wrapper layer
 #include "rclcpp/rclcpp.hpp"
@@ -44,50 +44,53 @@ DESCRIPTION:
 #include <weigh_app_interfaces/msg/data_link_data.hpp>
 #include <weigh_app_interfaces/msg/lps_sa_totals_printer_cnfg.hpp>
 
-#include <interfaces/LpsSaWeighReqstChannel/InterfaceTypes.h>
-#include <interfaces/DemoAppTxChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaWeighRespChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaWeighTxChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaWeighInitDebugChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaWeighDebugChannel/InterfaceTypes.h>
-
-#include <interfaces/LpsSaJobMgrTxChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaJobMgrReqstChannel/InterfaceTypes.h>
-#include <interfaces/AisJhm2TxChannel/InterfaceTypes.h>
-#include <interfaces/PwmInputChannels/InterfaceTypes.h>
-#include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
-#include <interfaces/ShmClock/InterfaceTypes.h>
-
-
-#include <interfaces/Machine/InterfaceTypes.h>
-#include <interfaces/LpsSaNvmCalDataChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaNvmCalOnTheFlyDataChannel/InterfaceTypes.h>
-
-
-#include <interfaces/CalMgrCmdReqst/InterfaceTypes.h>
-#include <interfaces/CalMgrCmdResp/InterfaceTypes.h>
+#include "WeighRequest.h"
+#include "ProtocolTypes.h"
+#include "DebugStaging.h"
+#include "PwmInputs.h"
 
 #include <autonomyConditions/conditions/PayLdOverLdLimitExceeded.h>
 
-#ifndef _Tpms2DataLinkChannel_h_
-
-#include <interfaces/DataLinkData/InterfaceTypes.h>
-#endif
-
-#include <interfaces/DataLinkData/DataLinkData.h>
-
-#include <interfaces/PartNumbers/InterfaceTypes.h>
-
-#include <ais/interfaces/SystemHardwareHealth/InterfaceTypes.h>
-#include <ais/interfaces/SystemHardwareHealthRequest/InterfaceTypes.h>
-
-#include <interfaces/ReadyToFlashStatus/InterfaceTypes.h>
-
-#include <interfaces/AisJhm2TxChannel/InterfaceTypes.h>
-#include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
-
-#include <mlComms/scsIo/ScsOutputs.h>
-#include <scsIOContainer/SCSOutData.h>
+using weigh_data::LpsSaWeighReqstChannel;
+using weigh_data::LpsSaWeighReqstChannelStorage;
+using weigh_data::LpsSaWeighTxChannel;
+using weigh_data::LpsSaWeighTxChannelStorage;
+using weigh_data::LpsSaLiftPosition_t;
+using weigh_data::LpsSaTiltPosition_t;
+using weigh_data::LpsSaPayload_t;
+using weigh_data::LpsSaLftSealStatus_t;
+using weigh_data::PloadSysZeroStat_t;
+using weigh_data::PloadSysCalWtEntryReqStat_t;
+using weigh_data::BktPayloadData_t;
+using weigh_data::ZEROED;
+using weigh_data::NOT_ZEROED;
+using weigh_data::CAL_ENTRY_REQUIRED;
+using weigh_data::CAL_ENTRY_NOT_REQUIRED;
+using weigh_data::BUCKET_PAYLOAD_NOT_AVAILABLE;
+using weigh_data::BUCKET_PAYLOAD_AVAILABLE;
+using weigh_data::BUCKET_PAYLOAD_STORED;
+using weigh_data::BUCKET_PAYLOAD_NOT_INSTALLED;
+using weigh_data::LpsSaJobMgrTipOffState_t;
+using weigh_data::LpsSaJobMgrStandbyState_t;
+using weigh_data::LPS_SA_JOB_MGR_TIP_OFF_PILE_ENABLE;
+using weigh_data::LPS_SA_JOB_MGR_TIP_OFF_TRUCK_ENABLE;
+using weigh_data::LPS_SA_JOB_MGR_TIP_OFF_UNAVAILABLE;
+using weigh_data::LPS_SA_JOB_MGR_STANDBY_ACTIVATED;
+using weigh_data::LPS_SA_JOB_MGR_STANDBY_DEACTIVATED;
+using weigh_data::PwmInputSwitchStatus;
+using weigh_data::PwmInputTimeout;
+using weigh_data::DataLinkParamInfo;
+using weigh_data::DataLinkParam;
+using weigh_data::AutonomyConditionDiagnosticsTxInterfaceStorage;
+using weigh_data::APP_READY_CODE_OK_TO_FLASH;
+using weigh_data::LPS_SA_CAL_SUCCESS;
+using weigh_data::LPS_SA_CAL_FAIL;
+using weigh_data::LPS_SA_CAL_UNKNOWN;
+namespace ACDInfoPopUp = weigh_data::ACDInfoPopUp;
+namespace ACDDiagPopUp = weigh_data::ACDDiagPopUp;
+namespace ACDEventPopUp = weigh_data::ACDEventPopUp;
+namespace ACDWeighStatus = weigh_data::ACDWeighStatus;
+namespace VarLengthDataLinkParamFactory = weigh_data::VarLengthDataLinkParamFactory;
 
 #include <catdllib_fid_def.h>
 
@@ -240,9 +243,9 @@ private:
 
     typedef struct
     {
-        vector<float> lift_cyl_ext_pct_axis;
-        vector<float> tilt_cyl_ext_pct_axis;
-        vector<float> tilt_comp_gain_data;
+        std::vector<float> lift_cyl_ext_pct_axis;
+        std::vector<float> tilt_cyl_ext_pct_axis;
+        std::vector<float> tilt_comp_gain_data;
     } CalibTblRuby_t;
 
     typedef struct
@@ -368,7 +371,7 @@ private:
     // This is passed to the weigh library for it's update.
     LpsUpdtTbl_t weighUpdtTbl;
 
-    LpsSaWeighDebugChannel DebugLpsSaXCPChannels;
+    weigh_data::DebugStaging DebugLpsSaXCPChannels;
 
     LpsSaInitTbl_t LpsSaInitTbl;
 
@@ -379,12 +382,12 @@ private:
     LPFILT2 TiltLinkageSensorDcLpFilt;
     LPFILT2 LiftLinkageSensorDcLpFilt;
 
-    LpsSaWeighReqstChannelStorage request_;
+    weigh_data::Request request_;
 
     // This is data needed by the app, but not the weigh library.
     LpsSaWeighInfoTbl_t LpsSaWeighInfoTbl;
 
-    PwmInputChannels inPwm_;
+    weigh_data::PwmInputs inPwm_;
 
     struct {
     	float defaultStartOfWeighRange = DEFAULT_WEIGH_RANGE_START;

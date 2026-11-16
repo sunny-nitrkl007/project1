@@ -9,7 +9,8 @@ DESCRIPTION:
 *******************************************************************************/
 #include <cmath>
 
-#include <chrono/tz.hpp>
+#include "TimeZone.h"
+#include <chrono/print.hpp>
 
 #include <boost/filesystem.hpp>
 
@@ -699,16 +700,15 @@ void LpsSaWeighApp::LpsSaWeighingScsRx( )
     if (nullptr != shmClockInput_) {
         cpm_common_interfaces::msg::ShmClockInput shmClockRos;
         while (shmClockInput_->get(shmClockRos)) {
-            ShmClock shmClock;
-            shmClock.set_SHM(shmClockRos.shm_sec);
-            shmClock.set_UTC_offset(shmClockRos.utc_offset_min);
-            shmClock.set_TZ(shmClockRos.tzone_info.data(), shmClockRos.tzone_info.size());
-            int32_t offset = shmClock.get_UTC_offset();
+            std::array<uint8_t, 20> rawTimeZone{};
+            std::copy_n(shmClockRos.tzone_info.begin(),
+                    std::min(shmClockRos.tzone_info.size(), rawTimeZone.size()), rawTimeZone.begin());
+            int32_t offset = shmClockRos.utc_offset_min;
             tzone_tx_comm_struct tzone;
-            if (tes_common_ais::get_tz_struct(tzone, shmClock)) {
+            if (weigh_data::decodeTimeZone(rawTimeZone, tzone)) {
                 if ((tzInfo_.offset != offset) || (tzInfo_.index != tzone.tzone_id)) {
-                    std::string tzStr = tes_common_ais::makeTZString(tzone);
-                    if (tes_common_ais::setTZString(tzStr)) {
+                    std::string tzStr = weigh_data::makeTZString(tzone);
+                    if (weigh_data::setTZString(tzStr)) {
                        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Set TZ environment variable to '%s'.", tzStr.c_str());
                         tes_common_ais::clearLocalTimeOffsetOverride();
                     }

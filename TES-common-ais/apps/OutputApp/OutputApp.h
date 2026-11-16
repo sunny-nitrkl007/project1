@@ -8,20 +8,26 @@
 /*******************************************************************************
  ** -- #Include's --
  *******************************************************************************/
-#include <ais/task/Task.h>
-#include <interfaces/OutputChannel/InterfaceTypes.h>
+#include <cstdint>
+#include <sstream>
+#include <string>
+#include <interfaces/OutputChannel/OutputChannel.h>
+#include <job_mgr_interfaces/msg/output_channel.hpp>
+#include <ros2wrapper/RosInputInterface.h>
+#include <ros2wrapper/Ros2TaskWrapper.h>
 /*******************************************************************************
  ** -- #defines --
  *******************************************************************************/
 
-class OutputApp: public task::Task, OutputChannelStorage
+class OutputApp: public ros2_wrapper::Ros2TaskWrapper
 {
 public:
    OutputApp( const std::string& taskName );
-   virtual ~OutputApp();
-   virtual bool initialize();
-   virtual bool executive();
-   virtual void cleanup();
+   ~OutputApp() override;
+   bool initialize() override;
+   bool executive() override;
+   void cleanup() override;
+   void startExecutiveTimer() override;
 protected:
 private:
    void UpdateOutputPortSinkFile( int portIndex, OutputChannel::State portState );
@@ -47,8 +53,7 @@ private:
    const uint8_t IDEAL_APP_CYCLE_RATE = 4;
 
    uint32_t AppCycleRateHz;
-   /* SCS interface*/
-   OutputChannelInput* OutputAppInput;
+   ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::OutputChannel>* outputChannelRosIn_;
    OutputConfig Config[OutputChannel::Port::OUTPUT_SINK_COUNT];
    std::stringstream OutputPortLog[OutputChannel::Port::OUTPUT_SINK_COUNT];
 };

@@ -102,7 +102,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrPtInit()
 }
 
 void LpsSaJobMgrApp::LpsSaJobMgrPtRestoreTruck() {
-    const LpsSaLoadRecordSubtotal& subtotal = tasks_.getCurrentTaskLoad().getCurrentSubtotal();
+    const jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = tasks_.getCurrentTaskLoad().getCurrentSubtotal();
     if (0 == subtotal.passCount()) { //no passes
         LpsPtRestoreTruck(0.f, 0, FALSE, 0.f, LPS_WEIGH_BUCKET_WEIGHT_ACCURACY_NONE);
     }

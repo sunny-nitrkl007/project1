@@ -32,7 +32,8 @@
 
 #include <release/legal_for_trade_identifiers.h>
 
-#include <interfaces/LpsSaWeighTxChannel/LpsSaWeighTxChannel.h>
+#include "ProtocolTypes.h"
+#include <boost_helpers/boost_serialization_chrono.hpp>
 
 #include "LpsSaWeighAppNvm.h"
 
@@ -129,7 +130,7 @@ public:
     }
 
     // Seal Status
-    LpsSaLftSealStatus_t status;
+    weigh_data::LpsSaLftSealStatus_t status;
 
     // Machine Configuration Code (Internal MSN)
     std::string machineConfigurationCode;
@@ -477,7 +478,7 @@ public:
 
     bool isSealed() const { return seal_.status.sealed; }
 
-    const LpsSaLftSealStatus_t& getSealStatus() const { return seal_.status; }
+    const weigh_data::LpsSaLftSealStatus_t& getSealStatus() const { return seal_.status; }
 
     const LpsSaWeighAppSeal& getSeal() const { return seal_; }
 

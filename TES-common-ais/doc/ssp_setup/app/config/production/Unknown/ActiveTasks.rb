@@ -17,8 +17,18 @@ SystemTasks.update ({
   "baseMachineInterface"               => Machines::MachineMap["ecm"],
   "BmiCdl"                             => Machines::MachineMap["ecm"],
   "FileTransferBridgeApp"              => Machines::MachineMap["ecm"],
-  # "OutputApp"                          => Machines::MachineMap["ecm"],
   # "Tpms2CycleSegApp"                   => Machines::MachineMap["ecm"],
   # "VP3FileCreationApp"                 => Machines::MachineMap["ecm"],
   "XcpServerTask"                      => Machines::MachineMap["ecm"],
+})
+
+AuxiliaryProcesses.update({
+  "OutputApp" => {
+      "machines" => [Machines::MachineMap["ecm"]],
+      "executableName" => ENV['CAT_DIR'] + "/bin/OutputApp",
+      "arguments" => ["--instanceName=OutputApp", "--ros-args", "-p", "cycle_rate_hz:=4.0", "-p", "logger_threshold:=error"],
+      "autoRestart" => true,
+      "timeBetweenRestarts_s" => 2,
+      "alwaysOn" => false,
+  },
 })

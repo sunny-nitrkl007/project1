@@ -15,6 +15,10 @@ import glob
 
 Import( 'testEnv' )
 myEnv = testEnv.Clone();
+myEnv.Replace(CXXFLAGS = [
+    flag for flag in myEnv['CXXFLAGS']
+    if flag != '-DAIS_SERIALIZATION_INCLUDE_BOOST_ARCHIVE'
+])
 
 # Please people, stop creating so many warnings!
 myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-function'])
@@ -87,7 +91,9 @@ sourceFiles = \
     Glob('*.cpp') + \
     Glob(myEnv[ 'SSP_DIR' ] + '/lps_pass_tracker/src/*.c')
 
-base_libs = [    'ais_serialization',
+base_libs = [    myEnv['BOOST_SERIALIZATION'],
+                 myEnv['BOOST_FILESYSTEM'],
+                 myEnv['BOOST_SYSTEM'],
                  'rclcpp',
                  'rcl',
                  'rcutils',

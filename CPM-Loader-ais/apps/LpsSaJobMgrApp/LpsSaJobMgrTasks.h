@@ -1,6 +1,8 @@
 #include <chrono>
 #include <array>
 #include <utility>
+#include <string>
+#include <boost/filesystem/path.hpp>
 
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/access.hpp>
@@ -9,7 +11,7 @@
 
 #include <boost/archive/archive_exception.hpp>
 
-#include <interfaces/LpsSaLoadRecordChannel/LpsSaLoadRecordChannel.h>
+#include "JobMgrLoadRecord.h"
 
 class LpsSaJobMgrTasks {
 public:
@@ -28,12 +30,12 @@ public:
         targetTypes_() {
 
         // Since loads_ was just default constructed, there should only be one subtotal per load record.
-        for (LpsSaLoadRecordChannelStorage& l : loads_) {
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loads_) {
             l.getCurrentSubtotal().truckTargetWeightTonnes = defaultTargetWeight;
         }
 
         // initialize targetTypes for all task by default to SINGLE
-        targetTypes_.fill(LpsSaLoadRecordTargetType::SINGLE);
+        targetTypes_.fill(jobmgr_data::LpsSaLoadRecordTargetType::SINGLE);
 
         // initialize the target type for the loads
         initTargetTypes();
@@ -90,25 +92,25 @@ public:
      * Gets a reference to the load information for the current task.
      * Protects against index out of bounds.
      */
-    LpsSaLoadRecordChannelStorage& getCurrentTaskLoad() {
+    jobmgr_data::LpsSaLoadRecordChannelStorage& getCurrentTaskLoad() {
         if (loadIndex_ < loads_.size()) {
             switch (targetTypes_[loadIndex_]) {
-            case LpsSaLoadRecordTargetType::SINGLE:
+            case jobmgr_data::LpsSaLoadRecordTargetType::SINGLE:
                 return loads_[loadIndex_];
                 break;
-            case LpsSaLoadRecordTargetType::SPLIT:
+            case jobmgr_data::LpsSaLoadRecordTargetType::SPLIT:
                 return loadsSplit_[loadIndex_];
                 break;
-            case LpsSaLoadRecordTargetType::BATCH:
+            case jobmgr_data::LpsSaLoadRecordTargetType::BATCH:
                 return loadsBatch_[loadIndex_];
                 break;
-            case LpsSaLoadRecordTargetType::MIX:
+            case jobmgr_data::LpsSaLoadRecordTargetType::MIX:
                 return loadsMix_[loadIndex_];
                 break;
-            case LpsSaLoadRecordTargetType::BLEND_LOADS:
+            case jobmgr_data::LpsSaLoadRecordTargetType::BLEND_LOADS:
                 return loadsBlendLoads_[loadIndex_];
                 break;
-            case LpsSaLoadRecordTargetType::BLEND_WEIGHT:
+            case jobmgr_data::LpsSaLoadRecordTargetType::BLEND_WEIGHT:
                 return loadsBlendWeight_[loadIndex_];
                 break;
             default:
@@ -119,23 +121,23 @@ public:
         return nullLoad_;
     }
 
-    const LpsSaLoadRecordChannelStorage& getCurrentTaskLoad() const {
+    const jobmgr_data::LpsSaLoadRecordChannelStorage& getCurrentTaskLoad() const {
         return getCurrentTaskLoad();
     }
 
-    void currentTaskLoadInit(const LpsSaLoadRecordChannelStorage& initLoad) {
-        LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
+    void currentTaskLoadInit(const jobmgr_data::LpsSaLoadRecordChannelStorage& initLoad) {
+        jobmgr_data::LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
         load = initLoad;
     }
 
     void currentTaskLoadAddPass(float weight, uint8_t accuracy, uint32_t shmTime) {
-        LpsSaLoadRecordSubtotal& subtotal = getCurrentTaskLoad().getCurrentSubtotal();
+        jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = getCurrentTaskLoad().getCurrentSubtotal();
         subtotal.addPass(weight, accuracy, shmTime);
     }
 
     void currentTaskLoadClearCurrentSubtotal() {
-        LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
-        LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
+        jobmgr_data::LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
+        jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
 
         subtotal.clearSubtotal();
 
@@ -145,8 +147,8 @@ public:
     }
 
     bool currentTaskLoadRemoveLastPass(uint32_t shmTime) {
-        LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
-        LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
+        jobmgr_data::LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
+        jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = load.getCurrentSubtotal();
 
         bool removedPass = subtotal.removeLastPass();
 
@@ -163,7 +165,7 @@ public:
     }
 
     bool currentTaskSetTargetWeight(float targetWeight) {
-        LpsSaLoadRecordSubtotal& subtotal = getCurrentTaskLoad().getCurrentSubtotal();
+        jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = getCurrentTaskLoad().getCurrentSubtotal();
         if (subtotal.truckTargetWeightTonnes != targetWeight) {
             subtotal.truckTargetWeightTonnes = targetWeight;
             return true;
@@ -172,38 +174,38 @@ public:
     }
 
     void currentTaskSetLFTDisable(bool disable) {
-        LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
+        jobmgr_data::LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
         if (disable) {
-            load.storeAction(LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE);
+            load.storeAction(jobmgr_data::LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE);
         }
         else {
-            load.storeAction(LpsSaLoadRecordStoreAction::AUTO);
+            load.storeAction(jobmgr_data::LpsSaLoadRecordStoreAction::AUTO);
         }
     }
 
     // resets the LFT disable state to enabled by default (AUTO is enabled)
     void allTasksResetLFTDisableState() {
-        for (LpsSaLoadRecordChannelStorage& l : loads_) {
-            l.storeAction(LpsSaLoadRecordStoreAction::AUTO);
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loads_) {
+            l.storeAction(jobmgr_data::LpsSaLoadRecordStoreAction::AUTO);
         }
     }
 
     bool currentTaskGetLFTDisable() {
-        LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
-        if (load.storeAction() == LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE) {
+        jobmgr_data::LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
+        if (load.storeAction() == jobmgr_data::LpsSaLoadRecordStoreAction::TICKET_NOT_FOR_TRADE) {
             return true;
         }
 
         return false;
     }
 
-    LpsSaLoadRecordChannelStorage currentTaskLoadClose(uint32_t shmTime) {
+    jobmgr_data::LpsSaLoadRecordChannelStorage currentTaskLoadClose(uint32_t shmTime) {
         std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
-        LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
+        jobmgr_data::LpsSaLoadRecordChannelStorage& load = getCurrentTaskLoad();
 
         // Grab a copy of the load to return
-        LpsSaLoadRecordChannelStorage returnLoad = load;
+        jobmgr_data::LpsSaLoadRecordChannelStorage returnLoad = load;
 
         // Clear out our load/subtotals
         load.clear();
@@ -262,40 +264,40 @@ private:
     std::string filePath_;
     float defaultTargetWeight_;
     uint8_t loadIndex_;
-    LpsSaLoadRecordChannelStorage nullLoad_;
-    std::array<LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loads_;
-    std::array<LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsSplit_;
-    std::array<LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsBatch_;
-    std::array<LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsMix_;
-    std::array<LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsBlendLoads_;
-    std::array<LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsBlendWeight_;
+    jobmgr_data::LpsSaLoadRecordChannelStorage nullLoad_;
+    std::array<jobmgr_data::LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loads_;
+    std::array<jobmgr_data::LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsSplit_;
+    std::array<jobmgr_data::LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsBatch_;
+    std::array<jobmgr_data::LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsMix_;
+    std::array<jobmgr_data::LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsBlendLoads_;
+    std::array<jobmgr_data::LpsSaLoadRecordChannelStorage, maxNumberOfTasks_> loadsBlendWeight_;
 
     std::array<uint8_t, maxNumberOfTasks_> targetTypes_;
 
     void initTargetTypes() {
         // initialize the targetType for the loads
-        for (LpsSaLoadRecordChannelStorage& l : loads_) {
-            l.setTargetType(LpsSaLoadRecordTargetType::SINGLE);
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loads_) {
+            l.setTargetType(jobmgr_data::LpsSaLoadRecordTargetType::SINGLE);
         }
 
-        for (LpsSaLoadRecordChannelStorage& l : loadsSplit_) {
-            l.setTargetType(LpsSaLoadRecordTargetType::SPLIT);
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loadsSplit_) {
+            l.setTargetType(jobmgr_data::LpsSaLoadRecordTargetType::SPLIT);
         }
 
-        for (LpsSaLoadRecordChannelStorage& l : loadsBatch_) {
-            l.setTargetType(LpsSaLoadRecordTargetType::BATCH);
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loadsBatch_) {
+            l.setTargetType(jobmgr_data::LpsSaLoadRecordTargetType::BATCH);
         }
 
-        for (LpsSaLoadRecordChannelStorage& l : loadsMix_) {
-            l.setTargetType(LpsSaLoadRecordTargetType::MIX);
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loadsMix_) {
+            l.setTargetType(jobmgr_data::LpsSaLoadRecordTargetType::MIX);
         }
 
-        for (LpsSaLoadRecordChannelStorage& l : loadsBlendLoads_) {
-            l.setTargetType(LpsSaLoadRecordTargetType::BLEND_LOADS);
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loadsBlendLoads_) {
+            l.setTargetType(jobmgr_data::LpsSaLoadRecordTargetType::BLEND_LOADS);
         }
 
-        for (LpsSaLoadRecordChannelStorage& l : loadsBlendWeight_) {
-            l.setTargetType(LpsSaLoadRecordTargetType::BLEND_WEIGHT);
+        for (jobmgr_data::LpsSaLoadRecordChannelStorage& l : loadsBlendWeight_) {
+            l.setTargetType(jobmgr_data::LpsSaLoadRecordTargetType::BLEND_WEIGHT);
         }
     }
 

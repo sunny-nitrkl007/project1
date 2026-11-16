@@ -1,10 +1,12 @@
 #ifndef LPSSALOADRECORDCHANNEL_H
 #define LPSSALOADRECORDCHANNEL_H
-
+ 
 #include <ais/serialization/Datum.h>
 #include <ais/serialization/csvable.h>
+#ifndef CPM_USE_ROS2_LOGGER
 #include <ais/log/Logger.h>
-
+#endif
+ 
 #include <cstdint>
 #include <chrono>
 #include <vector>
@@ -12,14 +14,27 @@
 #include <iomanip>
 #include <boost/serialization/vector.hpp>
 #include <boost_helpers/boost_serialization_chrono.hpp>
-
+ 
 #include <chrono/print.hpp>
-
+ 
 #include <LpsCommonWeight.h>
-
+ 
 #include "InterfaceCommon.h"
 #include "LpsSaLoadRecordSubtotal.h"
-
+ 
+// ROS2-only apps (no libais_log) define CPM_USE_ROS2_LOGGER to route logging to rclcpp.
+#ifdef CPM_USE_ROS2_LOGGER
+#include "ROS2Logger.hpp"
+#undef AIS_LOG_DEBUG
+#undef AIS_LOG_INFO
+#undef AIS_LOG_ERROR
+#undef AIS_LOG_ALERT
+#define AIS_LOG_DEBUG(...) RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(), __VA_ARGS__)
+#define AIS_LOG_INFO(...)  RCLCPP_INFO(ROS2Logger::Instance().GetLogger(), __VA_ARGS__)
+#define AIS_LOG_ERROR(...) RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), __VA_ARGS__)
+#define AIS_LOG_ALERT(...) RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), __VA_ARGS__)
+#endif
+ 
 #define MAXIMUM_NUMBER_OF_SUBTOTALS_PER_LOAD 99
 
 class LpsSaLoadRecordChannelStorage: public csvable

@@ -24,7 +24,6 @@ else
       "BmiJ1939" => { "executableName" => "bmiJ1939", },
       "CoachingTask" => { "executableName" => "CoachingTask", },
       "FileTransferBridgeApp" => { "executableName" => "FileTransferBridgeApp", },
-      "OutputApp" => { "executableName" => "OutputApp", },
       "PwmInput" => { "executableName" => "PwmInput", },
       "RemotePrinterApp" => { "executableName" => "RemotePrinterApp", },
       "SerialPrinterApp" => { "executableName" => "SerialPrinterApp", },

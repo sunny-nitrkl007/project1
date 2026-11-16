@@ -25,6 +25,7 @@ AuxiliaryProcesses.update({
                       Machines::MachineMap.default,
                     ],
       "executableName" => ENV['CAT_DIR'] + "/bin/OutputApp",
+      "arguments" => ["--instanceName=OutputApp", "--ros-args", "--params-file", ENV['CAT_DIR'] + "/config/OutputApp.yaml", "-p", "logger_threshold:=error"],
       "autoRestart" => true,
       "timeBetweenRestarts_s" => 2,
       "alwaysOn" => false,

@@ -12,10 +12,16 @@
 #include <cstring>
 #include <errno.h>
 #include <sys/socket.h>
-#include <chrono>
+#include <sys/ioctl.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <fcntl.h>
+#include <net/if.h>
+#include <linux/can.h>
+#include <linux/can/raw.h>
+#include <unistd.h>
 #include <oel_pack.h>
 #include "ROS2Logger.hpp"
-#include <CANBase/SocketCanUtil.h>
 #include <catdllib_fid_def.h>
 
 #include "LpsAdvCANProcess.h"
@@ -94,31 +100,48 @@ bool LpsAdvCANProcess::init( )
 	    socket_ = -1;
 	}
 
-	// Not using SocketCanUtil due to bug in error handling.
+	// Not using the shared helper because it also depends on the AIS CanPacket type.
 	socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 
 	if (socket_ >= 0) {
-	    if (!SocketCanUtil::setBlockingMode(socket_, false)) {
-	        success = false;
-	    }
-
-	    { // Apply filter
-	        std::vector<unsigned int> rxFilter = {0x734, 0x733};
-	        if (!SocketCanUtil::applyCanFilter(socket_, rxFilter)) {
-	            success = false;
-	        }
-	    }
-
-        if (!SocketCanUtil::setReceiveLocalMsgs(socket_, false)) {
+        int flags = fcntl(socket_, F_GETFL, 0);
+        if ((flags < 0) || (fcntl(socket_, F_SETFL, flags | O_NONBLOCK) != 0)) {
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(), "Failed to set CAN socket nonblocking: %s", strerror(errno));
             success = false;
         }
 
-        if (!SocketCanUtil::setReceiveOwnMsgs(socket_, false)) {
+        const struct can_filter rxFilter = {0x734, 0x7F8};
+        if (setsockopt(socket_, SOL_CAN_RAW, CAN_RAW_FILTER, &rxFilter, sizeof(rxFilter)) < 0) {
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(), "Failed to set CAN filter: %s", strerror(errno));
             success = false;
         }
 
-        if (!SocketCanUtil::bindInterface(socket_, "can2")) {
+        int receiveLocalMsgs = 0;
+        if (setsockopt(socket_, SOL_CAN_RAW, CAN_RAW_LOOPBACK, &receiveLocalMsgs, sizeof(receiveLocalMsgs)) < 0) {
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(), "Failed to disable CAN loopback: %s", strerror(errno));
             success = false;
+        }
+
+        int receiveOwnMsgs = 0;
+        if (setsockopt(socket_, SOL_CAN_RAW, CAN_RAW_RECV_OWN_MSGS, &receiveOwnMsgs, sizeof(receiveOwnMsgs)) < 0) {
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(), "Failed to disable own CAN messages: %s", strerror(errno));
+            success = false;
+        }
+
+        struct ifreq interfaceRequest{};
+        std::strncpy(interfaceRequest.ifr_name, "can2", sizeof(interfaceRequest.ifr_name) - 1);
+        if (ioctl(socket_, SIOCGIFINDEX, &interfaceRequest) < 0) {
+            RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(), "Failed to find CAN interface can2: %s", strerror(errno));
+            success = false;
+        }
+        else {
+            struct sockaddr_can address{};
+            address.can_family = AF_CAN;
+            address.can_ifindex = interfaceRequest.ifr_ifindex;
+            if (bind(socket_, reinterpret_cast<struct sockaddr*>(&address), sizeof(address)) < 0) {
+                RCLCPP_FATAL(ROS2Logger::Instance().GetLogger(), "Failed to bind CAN interface can2: %s", strerror(errno));
+                success = false;
+            }
         }
 	}
 	else {
@@ -144,28 +167,19 @@ RETURN VALUE: None -
 void LpsAdvCANProcess::sendTX(uint8_t data[8], uint8_t length, uint16_t mesg_id)
 {
     if (socket_ >= 0) {
-        CanPacket TxCANPacket;
-        TxCANPacket.msgId = mesg_id;
-        TxCANPacket.extendedId = false;
-        TxCANPacket.remoteFrame = false;
-        TxCANPacket.errorFrame = false;
-        TxCANPacket.length = length;
-        TxCANPacket.payload_[0] = data[0];
-        TxCANPacket.payload_[1] = data[1];
-        TxCANPacket.payload_[2] = data[2];
-        TxCANPacket.payload_[3] = data[3];
-        TxCANPacket.payload_[4] = data[4];
-        TxCANPacket.payload_[5] = data[5];
-        TxCANPacket.payload_[6] = data[6];
-        TxCANPacket.payload_[7] = data[7];
+        if (length > CAN_MAX_DLEN) {
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Invalid CAN payload length %u", length);
+            return;
+        }
 
-        // Convert and send the message
-        struct can_frame frame;
-        SocketCanUtil::convertToSocketFormat(frame, TxCANPacket);
+        struct can_frame frame{};
+        frame.can_id = mesg_id;
+        frame.can_dlc = length;
+        std::memcpy(frame.data, data, sizeof(frame.data));
 
         int bytesSent = write(socket_, &frame, sizeof(frame));
-        if (bytesSent < 0) {
-           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to write CAN message to socket, error %d (%s)", errno, strerror(errno));
+        if (bytesSent != static_cast<int>(sizeof(frame))) {
+           RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to write complete CAN message to socket, bytes=%d error %d (%s)", bytesSent, errno, strerror(errno));
         }
     }
     else {
@@ -306,9 +320,15 @@ bool LpsAdvCANProcess::getPacket(CanPacket& m, int timeout_ms)
 
         // This make the blocked 'read' system call to a non-block read timed out call
         // solving any read block issue when any of the CAN device lost communication.
-        select(socket_+1, &read_flags, nullptr, nullptr, &waitd);
+        int selected = select(socket_+1, &read_flags, nullptr, nullptr, &waitd);
+        if (selected < 0) {
+            if (errno != EINTR) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to wait for CAN message, error %d (%s)", errno, strerror(errno));
+            }
+            return false;
+        }
 
-        if (FD_ISSET(socket_, &read_flags)) {
+        if (selected > 0 && FD_ISSET(socket_, &read_flags)) {
             struct can_frame frame;
             memset(&frame, 0, sizeof(frame));
 
@@ -317,11 +337,19 @@ bool LpsAdvCANProcess::getPacket(CanPacket& m, int timeout_ms)
             if (nbytes <= 0) {
                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to read from CAN socket, error %d (%s)", errno, strerror(errno));
             }
-            else if (nbytes < 5) {
+            else if (nbytes != static_cast<int>(sizeof(frame))) {
                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Incomplete CAN frame nbytes=%d", nbytes);
             }
+            else if (frame.can_dlc > CAN_MAX_DLEN) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Invalid CAN payload length %u", frame.can_dlc);
+            }
             else {
-                SocketCanUtil::convertFromSocketFormat(m, frame);
+                m.extendedId = (frame.can_id & CAN_EFF_FLAG) != 0;
+                m.remoteFrame = (frame.can_id & CAN_RTR_FLAG) != 0;
+                m.errorFrame = (frame.can_id & CAN_ERR_FLAG) != 0;
+                m.msgId = m.extendedId ? (frame.can_id & CAN_EFF_MASK) : (frame.can_id & CAN_SFF_MASK);
+                m.length = frame.can_dlc;
+                std::memcpy(m.payload_, frame.data, frame.can_dlc);
                 success = true;
             }
         }
@@ -335,7 +363,7 @@ bool LpsAdvCANProcess::getPacket(CanPacket& m, int timeout_ms)
 /*
  * Unpack the provided CAN packet.
  */
-bool LpsAdvCANProcess::unpack734Data(const CanPacketStorage& packet)
+bool LpsAdvCANProcess::unpack734Data(const CanPacket& packet)
 {
     if (packet.length < 8) {
        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Wrong size for CAN734 %d", packet.length);
@@ -354,7 +382,7 @@ bool LpsAdvCANProcess::unpack734Data(const CanPacketStorage& packet)
 /*
  * Unpack the provided CAN packet.
  */
-bool LpsAdvCANProcess::unpack733Data(const CanPacketStorage& packet)
+bool LpsAdvCANProcess::unpack733Data(const CanPacket& packet)
 {
     if (packet.length < 6) {
        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Wrong size for CAN733 %d", packet.length);

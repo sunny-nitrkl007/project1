@@ -15,10 +15,7 @@ DESCRIPTION:
 #include <scl_dcli_svc_types.h>
 
 #include <chrono/print.hpp>
-#include <chrono/tz.hpp>
-#include <interfaces/DataLinkData/SecuritySystemCurrentKeyParam.h>
-#include <interfaces/DataLinkData/InterfaceTypes.h>
-#include <interfaces/EventDiagnosticData/EventDiagnosticData.h>
+#include "JobMgrTimeZone.h"
 #include <LoaderdiagnosticEventConfig/Loader_autonomy_event_config.h>
 
 #include <fileio/oflocker.hpp>
@@ -27,7 +24,7 @@ DESCRIPTION:
 ** -- #Define, Struct's, Typedef's, Enum's --
 *******************************************************************************/
 #define STG4 3                        //STG4 is index 3 in the array of STG_values.
-#define HORN_PORT_NUMBER   OutputChannel::Port::OUTPUT_SINK_3    //OUTPUT_APP_PORT_SINK3_PIN29_GPIO88
+#define HORN_PORT_NUMBER   jobmgr_data::output::OUTPUT_SINK_3    //OUTPUT_APP_PORT_SINK3_PIN29_GPIO88
 
 #define PAYLOAD_DETAIL_JSON_FILENAME (R"(/tmp/appdata/CPM/LpsSaJobMgrApp/PayloadDetails.json)")
 
@@ -70,7 +67,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         }
 
         if (storeRequest) {
-            if (LpsJobMgrJobTrackerInfoTbl.OperationMode == LPS_SA_JOB_MGR_STANDBY_MODE) {
+            if (LpsJobMgrJobTrackerInfoTbl.OperationMode == jobmgr_data::LPS_SA_JOB_MGR_STANDBY_MODE) {
                 // We are in standby, ignore store
                 storeRequest = false;
             }
@@ -140,7 +137,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         while (displayStateInputRos_->get(displayState)) {
             LpsJobMgrJobTrackerInfoTbl.inVerificationMode = displayState.state.in_verification_mode;
             if (LpsJobMgrJobTrackerInfoTbl.inVerificationMode &&
-                    (LpsJobMgrJobTrackerInfoTbl.OperationMode != LPS_SA_JOB_MGR_STANDBY_MODE)) {
+                    (LpsJobMgrJobTrackerInfoTbl.OperationMode != jobmgr_data::LPS_SA_JOB_MGR_STANDBY_MODE)) {
                 LpsSaJobMgrWmInput.standby_request_status = TRUE;
                 RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Enter standby when in verification mode.");
             }
@@ -262,7 +259,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::STORE): {
             bool storeRequest = true;
 
-            if (LpsJobMgrJobTrackerInfoTbl.OperationMode == LPS_SA_JOB_MGR_STANDBY_MODE) {
+            if (LpsJobMgrJobTrackerInfoTbl.OperationMode == jobmgr_data::LPS_SA_JOB_MGR_STANDBY_MODE) {
                 // We are in standby, ignore store
                 storeRequest = false;
             }
@@ -310,7 +307,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::STANDBY_ACTIVATE): {
             /* set the request flag */
             // ONLY DO THIS IF...
-            if (LpsJobMgrJobTrackerInfoTbl.OperationMode != LPS_SA_JOB_MGR_STANDBY_MODE) {
+            if (LpsJobMgrJobTrackerInfoTbl.OperationMode != jobmgr_data::LPS_SA_JOB_MGR_STANDBY_MODE) {
                 LpsSaJobMgrWmInput.standby_request_status = TRUE;
                 RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::STANDBY_ACTIVATE");
                 breakOut = true;
@@ -320,7 +317,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::STANDBY_DEACTIVATE): {
             /* set the request flag */
             // ONLY DO THIS IF...
-            if ((LpsJobMgrJobTrackerInfoTbl.OperationMode == LPS_SA_JOB_MGR_STANDBY_MODE) &&
+            if ((LpsJobMgrJobTrackerInfoTbl.OperationMode == jobmgr_data::LPS_SA_JOB_MGR_STANDBY_MODE) &&
                     (!LpsJobMgrJobTrackerInfoTbl.inVerificationMode)) {
                 LpsSaJobMgrWmInput.change_mode_weigh = TRUE;
                 RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::STANDBY_DEACTIVATE");
@@ -340,7 +337,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
         }
         case (cpm_common_interfaces::msg::JobMgrReqstChannelCommand::MANUAL_TIPOFF_ACTIVATE): {
             /* set the request flag */
-            LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_ACTIVE;
+            LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_ACTIVE;
             LpsSaJobMgrWmInput.change_mode_excess = TRUE;
             RCLCPP_WARN(ROS2Logger::Instance().GetLogger(),"Command::MANUAL_TIPOFF_ACTIVATE");
             breakOut = true;
@@ -350,7 +347,7 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsChkForReqst()
             /* only exit manual tipoff if Tip Assist is not Active */
             if (!LpsJobMgrJobTrackerInfoTbl.TipoffAssistActive) {
                 /* set the request flag */
-                LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_AVAILABLE;
+                LpsJobMgrJobTrackerInfoTbl.ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_AVAILABLE;
                 LpsSaJobMgrWmInput.change_mode_weigh = TRUE;
                 breakOut = true;
             }
@@ -734,16 +731,12 @@ void LpsSaJobMgrApp::LpsSaJobMgrScsSHMRead( )
     if (nullptr != ShmClockInputRos) {
         cpm_common_interfaces::msg::ShmClockInput shmClockRos;
         while (ShmClockInputRos->get(shmClockRos)) {
-            ShmClock shmClock;
-            shmClock.set_SHM(shmClockRos.shm_sec);
-            shmClock.set_UTC_offset(shmClockRos.utc_offset_min);
-            shmClock.set_TZ(shmClockRos.tzone_info.data(), shmClockRos.tzone_info.size());
-            int32_t offset = shmClock.get_UTC_offset();
+            int32_t offset = shmClockRos.utc_offset_min;
             tzone_tx_comm_struct tzone;
-            if (tes_common_ais::get_tz_struct(tzone, shmClock)) {
+            if (jobmgr_data::decodeTimeZone(shmClockRos.tzone_info.data(), shmClockRos.tzone_info.size(), tzone)) {
                 if ((tzInfo_.offset != offset) || (tzInfo_.index != tzone.tzone_id)) {
-                    std::string tzStr = tes_common_ais::makeTZString(tzone);
-                    if (tes_common_ais::setTZString(tzStr)) {
+                    std::string tzStr = jobmgr_data::makeTZString(tzone);
+                    if (jobmgr_data::setTZString(tzStr)) {
                        RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Set TZ environment variable to '%s'.", tzStr.c_str());
                         tes_common_ais::clearLocalTimeOffsetOverride();
                     }
@@ -928,25 +921,15 @@ RETURN VALUE:boolean
 *******************************************************************************/
 bool LpsSaJobMgrApp::LpsSaJobMgrHornOnStoreAction()
 {
-    OutputChannel outputChannel;
-    OutputChannel::OutputCmd command;
-    command.OutputPort = HORN_PORT_NUMBER;
-    command.InitialState = OutputChannel::State::PORT_ON;
-    command.StateChangeDuration = OutputChannel::ChangeDuration::NO_FLASH;
-    command.TotalDuration = 2;
-    command.FinalState = OutputChannel::State::PORT_OFF;
-    outputChannel.AddOutputAppCmd(command);
     if (nullptr != LpsSaOutputChannelRosOut_) {
         job_mgr_interfaces::msg::OutputChannel rosOutput;
-        for (const auto& command : outputChannel.GetOutputAppCmds()) {
-            job_mgr_interfaces::msg::OutputCmd rosCommand;
-            rosCommand.output_port = static_cast<uint8_t>(command.OutputPort);
-            rosCommand.initial_state = static_cast<uint8_t>(command.InitialState);
-            rosCommand.state_change_duration = static_cast<uint8_t>(command.StateChangeDuration);
-            rosCommand.total_duration = command.TotalDuration;
-            rosCommand.final_state = static_cast<uint8_t>(command.FinalState);
-            rosOutput.commands.push_back(rosCommand);
-        }
+        job_mgr_interfaces::msg::OutputCmd rosCommand;
+        rosCommand.output_port = HORN_PORT_NUMBER;
+        rosCommand.initial_state = jobmgr_data::output::PORT_ON;
+        rosCommand.state_change_duration = jobmgr_data::output::NO_FLASH;
+        rosCommand.total_duration = 2;
+        rosCommand.final_state = jobmgr_data::output::PORT_OFF;
+        rosOutput.commands.push_back(rosCommand);
         return LpsSaOutputChannelRosOut_->publish(rosOutput);
     }
     return false;
@@ -961,13 +944,13 @@ RETURN VALUE:boolean
 boolean LpsSaJobMgrApp::LpsSaJobMgrScsTx()
 {
     bool scsCmdRet=false;
-    LpsSaJobMgrTxChannel txOut;
+    jobmgr_data::JobMgrTxData txOut;
     /* frame SCS channel data to UI*/
     if (LpsSaJobMgrTxRosOut_) {
 
         { // Update current task load information
-            const LpsSaLoadRecordChannelStorage& loadRecord = tasks_.getCurrentTaskLoad();
-            const LpsSaLoadRecordSubtotal& subtotal = loadRecord.getCurrentSubtotal();
+            const jobmgr_data::LpsSaLoadRecordChannelStorage& loadRecord = tasks_.getCurrentTaskLoad();
+            const jobmgr_data::LpsSaLoadRecordSubtotal& subtotal = loadRecord.getCurrentSubtotal();
             txOut.taskNumber = tasks_.getCurrentTaskNumber();
             txOut.materialId = subtotal.materialId;
             txOut.materialName = subtotal.materialName;
@@ -1036,7 +1019,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrScsTx()
             txOut.subtotalCount = loadRecord.subtotalCount();
 
             txOut.targetType = (uint8_t)loadRecord.targetType();
-            if (loadRecord.targetType() == LpsSaLoadRecordTargetType::SINGLE) {
+            if (loadRecord.targetType() == jobmgr_data::LpsSaLoadRecordTargetType::SINGLE) {
                 txOut.splitModeEnabled = false;
             }
             else {
@@ -1057,24 +1040,24 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrScsTx()
 
         // Standby State
         if (LpsSaJobMgrWmOutput.standby_active) {
-            txOut.StandbyState = LPS_SA_JOB_MGR_STANDBY_ACTIVATED;
+            txOut.StandbyState = jobmgr_data::LPS_SA_JOB_MGR_STANDBY_ACTIVATED;
         }
         else {
-            txOut.StandbyState = LPS_SA_JOB_MGR_STANDBY_DEACTIVATED;
+            txOut.StandbyState = jobmgr_data::LPS_SA_JOB_MGR_STANDBY_DEACTIVATED;
         }
 
         // Clear or -1 Button is Showing?
         if (LpsSaJobMgrWmOutput.show_clear_not_minus_one) {
-            txOut.ClearMinusOneEnableStat = LPS_SA_JOB_MGR_CLEAR_BTN_ENABLED;
+            txOut.ClearMinusOneEnableStat = jobmgr_data::LPS_SA_JOB_MGR_CLEAR_BTN_ENABLED;
         }
         else {
-            txOut.ClearMinusOneEnableStat = LPS_SA_JOB_MGR_MINUS_ONE_BTN_ENABLED;
+            txOut.ClearMinusOneEnableStat = jobmgr_data::LPS_SA_JOB_MGR_MINUS_ONE_BTN_ENABLED;
         }
 
         txOut.DispBestBktWt = LpsJobMgrJobTrackerInfoTbl.DispBestBktWt;
 
-        txOut.TipOffTriggerType = (LpsSaTipOffTriggerType_t)config_.tipOffTriggerType;
-        txOut.TipOffStateCfg = (LpsSaJobMgrTipOffState_t)config_.tipOffMode;
+        txOut.TipOffTriggerType = (jobmgr_data::LpsSaTipOffTriggerType_t)config_.tipOffTriggerType;
+        txOut.TipOffStateCfg = (jobmgr_data::LpsSaJobMgrTipOffState_t)config_.tipOffMode;
 
         if (SEALegalForTradeInstalled_) {
             txOut.AutoStorePassCount = LPSSAJOBMGRCNFG_AUTO_STORE_PASS_COUNT_MAX;
@@ -1144,7 +1127,7 @@ boolean LpsSaJobMgrApp::LpsSaJobMgrScsTx()
             txOut.manualAddAvailable = false;
         }
 
-        txOut.HornStoreState = config_.hornStoreEnable ? SOUND_HORN : NOT_SOUND_HORN;
+        txOut.HornStoreState = config_.hornStoreEnable ? jobmgr_data::SOUND_HORN : jobmgr_data::NOT_SOUND_HORN;
 
         // LFT disabled state for current task
         txOut.lftDisabled = tasks_.currentTaskGetLFTDisable();
@@ -1168,14 +1151,14 @@ DESCRIPTION: It will send the cmd to weighing App through SCS channel by polling
 PARAMETER DESCRIPTION:                        
 RETURN VALUE:             
 *******************************************************************************/
-void LpsSaJobMgrApp::LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command command)
+void LpsSaJobMgrApp::LpsSaJobMgrScsSendCmd(cpm_common_interfaces::msg::WeighReqstChannelCommand::_value_type command)
 {
     cpm_common_interfaces::msg::LpsSaWeighReqstChannel request;
 
     switch (command) {
-    case (LpsSaWeighReqstChannel::Command::RESET_BEST_BUCKET_WEIGHT):
-    case (LpsSaWeighReqstChannel::Command::CAPTURE_CYLINDER_EXTENSION_REFERENCE):
-    case (LpsSaWeighReqstChannel::Command::CLEAR_REWEIGH_WARNING): {
+    case (cpm_common_interfaces::msg::WeighReqstChannelCommand::RESET_BEST_BUCKET_WEIGHT):
+    case (cpm_common_interfaces::msg::WeighReqstChannelCommand::CAPTURE_CYLINDER_EXTENSION_REFERENCE):
+    case (cpm_common_interfaces::msg::WeighReqstChannelCommand::CLEAR_REWEIGH_WARNING): {
         request.command.value = static_cast<uint8_t>(command);
         break;
     }
@@ -1198,34 +1181,34 @@ DESCRIPTION:
 PARAMETER DESCRIPTION:
 RETURN VALUE:
 *******************************************************************************/
-ReqPloadCtrlSysStat_t LpsSaJobMgrApp::GetActiveButtonStatus (void)
+jobmgr_data::ReqPloadCtrlSysStat_t LpsSaJobMgrApp::GetActiveButtonStatus (void)
 {
     if(TRUE == LpsSaJobMgrWmInput.clear_request_status)
     {
-        return ReqPloadCtrlSysStat_t::CLEAR;
+        return jobmgr_data::ReqPloadCtrlSysStat_t::CLEAR;
     }
     else if(TRUE == LpsSaJobMgrWmInput.reweigh_request_status)
     {
-        return ReqPloadCtrlSysStat_t::REWEIGH;
+        return jobmgr_data::ReqPloadCtrlSysStat_t::REWEIGH;
     }
     else if(TRUE == LpsSaJobMgrWmInput.zero_request_status)
     {
-        return ReqPloadCtrlSysStat_t::ZERO;
+        return jobmgr_data::ReqPloadCtrlSysStat_t::ZERO;
     }
     else if(TRUE == LpsSaJobMgrWmInput.store_request_status)
     {
-        return ReqPloadCtrlSysStat_t::STORE;
+        return jobmgr_data::ReqPloadCtrlSysStat_t::STORE;
     }
     else if(TRUE == LpsSaJobMgrWmInput.tipoff_toggle_request_status)
     {
-        return ReqPloadCtrlSysStat_t::TIPOFFTOGGLE;
+        return jobmgr_data::ReqPloadCtrlSysStat_t::TIPOFFTOGGLE;
     }
     else if(TRUE == LpsSaJobMgrWmInput.minus_one_request_status)
     {
-        return ReqPloadCtrlSysStat_t::MINUS_ONE;
+        return jobmgr_data::ReqPloadCtrlSysStat_t::MINUS_ONE;
     }
     else
     {
-        return ReqPloadCtrlSysStat_t::NONE;
+        return jobmgr_data::ReqPloadCtrlSysStat_t::NONE;
     }
 }

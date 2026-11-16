@@ -24,13 +24,32 @@ DESCRIPTION:
 #include <scl_prmsw.h>
 #include <lps_sea_defs.h>
 
-#include <interfaces/LpsSaWeighReqstChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaWeighRespChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaWeighTxChannel/InterfaceTypes.h>
-
 #include "LpsSaJobMgrApp.h"
+#include "JobMgrLegacyLoadRecord.h"
 
 namespace fs = boost::filesystem;
+
+namespace {
+bool checkSEAEnableStatus(const uint16_t& status) {
+    bool seaEnabled = false;
+
+    switch(status)
+    {
+    case SCL_PRMSW_FEAT_STATUS_INSTALLED_ENABLED:
+    case SCL_PRMSW_FEAT_STATUS_FREE_USE_INSTALLED:
+        seaEnabled = true;
+        break;
+    case SCL_PRMSW_FEAT_STATUS_UNINSTALLED:
+    case SCL_PRMSW_FEAT_STATUS_INSTALLED_DISABLED:
+    case SCL_PRMSW_FEAT_STATUS_NONE:
+    default:
+        seaEnabled = false;
+        break;
+    }
+
+    return seaEnabled;
+}
+}
 
 // This is the file that all of the tasks are stored in.
 // A "task" is basically an in process load record.
@@ -328,7 +347,7 @@ bool LpsSaJobMgrApp::initialize( )
     if (everythingOk) {
         try {
             if (!tasks_.load()) {
-                LpsSaLoadRecordChannel loadRecord;
+                jobmgr_data::LpsSaLoadRecordChannelStorage loadRecord;
                 if (loadOldLoadRecord(loadRecord)) {
                     // Initialize from existing load record.
                     tasks_.currentTaskLoadInit(loadRecord);
@@ -445,13 +464,13 @@ bool LpsSaJobMgrApp::executive( )
         while (autonomyConditionDiagnosticsTxInputRos_->get(txData)) {
             for (const auto & element : txData.sea_list) {
                 if (element.reason_code == LPS_SEA_REASON_CODE_149) {
-                    SEALevel1EssentialsInstalled_ = AutonomyConditionDiagnosticsTxInterfaceStorage::checkSEAEnableStatus(element.status);
+                    SEALevel1EssentialsInstalled_ = checkSEAEnableStatus(element.status);
                 }
                 else if (element.reason_code == LPS_SEA_REASON_CODE_245) {
-                    SEALevel2ProInstalled_ = AutonomyConditionDiagnosticsTxInterfaceStorage::checkSEAEnableStatus(element.status);
+                    SEALevel2ProInstalled_ = checkSEAEnableStatus(element.status);
                 }
                 else if (element.reason_code == LPS_SEA_LFT_REASON_CODE_312) {
-                    SEALegalForTradeInstalled_ = AutonomyConditionDiagnosticsTxInterfaceStorage::checkSEAEnableStatus(element.status);
+                    SEALegalForTradeInstalled_ = checkSEAEnableStatus(element.status);
                     if (!SEALegalForTradeInstalled_) {
                         // reset LFT to always enabled
                         tasks_.allTasksResetLFTDisableState();
@@ -551,7 +570,7 @@ void LpsSaJobMgrApp::cleanup( ) {
     }
 }
 
-bool LpsSaJobMgrApp::loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord) {
+bool LpsSaJobMgrApp::loadOldLoadRecord(jobmgr_data::LpsSaLoadRecordChannelStorage& loadRecord) {
     bool success = false;
 
     tes_common_ais::sha1_ifstream ifs{ true }; // two_copy
@@ -560,7 +579,9 @@ bool LpsSaJobMgrApp::loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord) {
         // Read the file in
         try {
             boost::archive::binary_iarchive ia(ifs);
-            ia >> loadRecord;
+            jobmgr_data::LegacyLoadRecordEnvelope<jobmgr_data::LpsSaLoadRecordChannelStorage> legacyRecord;
+            ia >> legacyRecord;
+            loadRecord = legacyRecord;
            RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"Loaded load record from storage.");
             success = true;
         }
@@ -592,7 +613,7 @@ bool LpsSaJobMgrApp::loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord) {
     }
 
     if (!success) {
-        loadRecord = LpsSaLoadRecordChannel();
+        loadRecord = jobmgr_data::LpsSaLoadRecordChannelStorage();
         loadRecord.getCurrentSubtotal().truckTargetWeightTonnes = defaultTargetWeight_;
     }
 

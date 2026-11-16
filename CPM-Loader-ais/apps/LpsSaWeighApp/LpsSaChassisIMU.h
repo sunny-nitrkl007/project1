@@ -9,7 +9,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-#include <interfaces/DataLinkData/DataLinkParam.h>
+#include "ProtocolTypes.h"
 #include "ROS2Logger.hpp"
 #include <imu/imu.hpp>
 
@@ -156,7 +156,7 @@ public:
     }
 
     void rxPGN61485(const uint8_t* rxBuf, uint8_t len, uint16_t dsi) {
-        if ((nullptr != rxBuf) && (DataLinkParam::DSI_CODE_OK() == dsi) && (len >= 7)) {
+        if ((nullptr != rxBuf) && (weigh_data::DataLinkParam::DSI_CODE_OK() == dsi) && (len >= 7)) {
             bool outOfRange = false;
 
             // Data Length:    2 bytes
@@ -241,7 +241,7 @@ public:
     }
 
     void rxPGN61482(const uint8_t* rxBuf, uint8_t len, uint16_t dsi) {
-        if ((nullptr != rxBuf) && (DataLinkParam::DSI_CODE_OK() == dsi) && (len >= 7)) {
+        if ((nullptr != rxBuf) && (weigh_data::DataLinkParam::DSI_CODE_OK() == dsi) && (len >= 7)) {
             bool outOfRange = false;
 
             // Data Length:    2 bytes
@@ -325,7 +325,7 @@ public:
     }
 
     void rxPIDF4FD(int16_t value, uint16_t dsi) {
-        if (DataLinkParam::DSI_CODE_OK() == dsi) {
+        if (weigh_data::DataLinkParam::DSI_CODE_OK() == dsi) {
             imu::IMU::Vector v;
             // Datalink value is 0.0036 km/hr/bit, which is mm/s
             // We want m/s
@@ -355,7 +355,7 @@ public:
          *     Calibration Status = Active
          * }
          */
-        if ((DataLinkParam::DSI_CODE_OK() == dsi) &&
+        if ((weigh_data::DataLinkParam::DSI_CODE_OK() == dsi) &&
                 (0x043A == value) /* Not Idle */) {
             inhibitBiasEstimation = true;
         }

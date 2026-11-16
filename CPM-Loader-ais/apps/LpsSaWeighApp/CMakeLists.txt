@@ -28,10 +28,6 @@ if(NOT SSP_DIR)
     message(FATAL_ERROR "Set SSP_DIR to the root of the SSP source tree")
 endif()
 
-if(NOT TES_COMMON_DIR)
-    message(FATAL_ERROR "Set TES_COMMON_DIR to the TES-common-ais source tree")
-endif()
-
 if(NOT TARGET_APP_VARIANT)
     message(FATAL_ERROR "Set TARGET_APP_VARIANT to the conan build script")
 endif()
@@ -346,25 +342,6 @@ target_link_directories(LpsSaWeighApp PRIVATE
 )
 
 target_link_libraries(LpsSaWeighApp PRIVATE
-
-    #
-    # AIS
-    #
-    #ais_task
-    ais_config
-    ais_log
-    ais_channel
-    #ais_task_core
-    ais_simpleComms
-    ais_time
-    ais_heartbeat
-    ais_executive
-    ais_sigcatch
-    ais_monitor
-    ais_configSection
-    ais_filesystem
-    ais_interfaces
-    ais_serialization
     
     hub_filesystem
     nvm_filesystem
@@ -378,21 +355,9 @@ target_link_libraries(LpsSaWeighApp PRIVATE
     oel_rtos
     oel_rtos_posix
 
-    socketCanBase
-    socketCanUtil
     -Wl,--end-group
     version
 
-    #######added
-
-    #
-    # Factory
-    #
-    AisPluginProcessor
-
-    #
-    # HUB
-    #
     hub_base
     hub_filesystem
     hub_timesync
@@ -495,7 +460,7 @@ target_link_options(LpsSaWeighApp PRIVATE
 
 target_compile_definitions(LpsSaWeighApp PRIVATE
     RAPIDJSON_HAS_STDSTRING=1
-    AIS_SERIALIZATION_INCLUDE_BOOST_ARCHIVE
+    CPM_USE_ROS2_LOGGER
 )
 
 #

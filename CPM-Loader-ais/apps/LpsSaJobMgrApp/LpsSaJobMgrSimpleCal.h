@@ -10,8 +10,8 @@
 #include <boost/serialization/version.hpp>
 #include <boost/filesystem.hpp>
 
-#include <interfaces/LpsSaJobMgrTxChannel/LpsSaJobMgrTxChannel.h>
-#include <interfaces/LpsSaLoadRecordChannel/LpsSaLoadRecordChannel.h>
+#include "JobMgrSimpleCalData.h"
+#include "JobMgrLoadRecord.h"
 
 
 /*
@@ -20,8 +20,8 @@
 struct LpsSaJobMgrSimpleCal {
 public:
     struct Entry {
-        SimpleCalData_t simpleCalData;
-        LpsSaLoadRecordChannelStorage loadRecord;
+        jobmgr_data::SimpleCalData_t simpleCalData;
+        jobmgr_data::LpsSaLoadRecordChannelStorage loadRecord;
 
         template <class Archive>
         void serialize(Archive& ar, unsigned int version) {
@@ -57,11 +57,11 @@ public:
         return queue_.size();
     }
 
-    void addEntry(const LpsSaLoadRecordChannelStorage& loadRecord);
+    void addEntry(const jobmgr_data::LpsSaLoadRecordChannelStorage& loadRecord);
     void eraseEntry(const std::string& timestamp);
 
-    void getSimpleCalData(std::deque<SimpleCalData_t>& simpleCalData) const;
-    void getSimpleCalData(std::vector<SimpleCalData_t>& simpleCalData) const;
+    void getSimpleCalData(std::deque<jobmgr_data::SimpleCalData_t>& simpleCalData) const;
+    void getSimpleCalData(std::vector<jobmgr_data::SimpleCalData_t>& simpleCalData) const;
 
     bool load();
     bool reset();

@@ -29,16 +29,8 @@ DESCRIPTION:
 #endif
 #include <LpsPrivate.h>
 
-#include <interfaces/LpsSaJobMgrDebugChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaJobMgrTxChannel/InterfaceTypes.h>
-#include <interfaces/OutputChannel/InterfaceTypes.h>
-#include <interfaces/LpsSaLoadRecordChannel/LpsSaLoadRecordChannel.h>
-#include <interfaces/LpsSaUI/DisplayStateInterfaceInputChannel.h>
-#include <interfaces/ShmClock/InterfaceTypes.h>
-#include <interfaces/DataLinkData/InterfaceTypes.h>
-#include <interfaces/AutonomyConditionDiagnostics/TxInterfaceInputChannel.h>
-#include <interfaces/EventDiagnosticData/InterfaceTypes.h>
-#include <interfaces/LpsSaWeighReqstChannel/LpsSaWeighAppInf.hpp>
+#include "JobMgrTxData.h"
+#include "JobMgrLoadRecord.h"
  
 /*Additional ROS2 interfaces*/
 #include <interfaces/LpsSaWeighReqstChannel/DDSWeighAppInf.hpp>
@@ -47,6 +39,7 @@ DESCRIPTION:
 #include "ros2wrapper/RosOutputInterface.h"
 #include "ros2wrapper/Ros2TaskWrapper.h"
 #include "cpm_common_interfaces/msg/lps_sa_weigh_reqst_channel.hpp"
+#include <cpm_common_interfaces/msg/weigh_reqst_channel_command.hpp>
 #include <cpm_common_interfaces/msg/shm_clock_input.hpp>
 #include <cpm_common_interfaces/msg/lps_sa_ui_display_state_interface.hpp>
 #include <cpm_common_interfaces/msg/lps_sa_weigh_resp_channel.hpp>
@@ -113,14 +106,14 @@ protected:
 private:
 
     struct LpsJobMgrJobTrackerInfoTbl_t {
-        LpsSaJobMgrManualTipOffState_t ManualTipOffState = LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
-        LpsSaJobMgrTipOffState_t TipOffState = LPS_SA_JOB_MGR_TIP_OFF_UNAVAILABLE;
-        LpsSaJobMgrOperationMode_t OperationMode = LPS_SA_JOB_MGR_WEIGH_MODE;
-        DispBestBktWt_t DispBestBktWt = { 0.f, false };
+        jobmgr_data::LpsSaJobMgrManualTipOffState_t ManualTipOffState = jobmgr_data::LPS_SA_JOB_MGR_MAN_TIP_OFF_UNAVAILABLE;
+        jobmgr_data::LpsSaJobMgrTipOffState_t TipOffState = jobmgr_data::LPS_SA_JOB_MGR_TIP_OFF_UNAVAILABLE;
+        jobmgr_data::LpsSaJobMgrOperationMode_t OperationMode = jobmgr_data::LPS_SA_JOB_MGR_WEIGH_MODE;
+        jobmgr_data::DispBestBktWt_t DispBestBktWt = { 0.f, false };
         LpsWeighBktDigStat_t DigStat = LPS_WEIGHT_BKT_DIG_STATE_UNKNOWN; /* Machine Dig Status */
         LpsWeighCalStatus_t CalStat = LPS_WEIGH_SYSTEM_CALIBRATED; /* Lps System Calibration Status */
         LpsWeighBktDumpStat_t DumpStat = LPS_WEIGHT_BKT_DUMP_STATE_UNKNOWN; /* Machine Dump Status */
-        ReqPloadCtrlSysStat_t ReqPloadCtrlSysStat = ReqPloadCtrlSysStat_t::NONE;
+        jobmgr_data::ReqPloadCtrlSysStat_t ReqPloadCtrlSysStat = jobmgr_data::ReqPloadCtrlSysStat_t::NONE;
         bool TipoffAssistActive = false;
         bool TipoffAssistPIDActive = false;
         uint_fast16_t TipoffAssistActiveEid = 0;
@@ -201,7 +194,7 @@ private:
 
     ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::EventDiagnosticData>* eddtInputRos_;
 
-    bool loadOldLoadRecord(LpsSaLoadRecordChannel& loadRecord);
+    bool loadOldLoadRecord(jobmgr_data::LpsSaLoadRecordChannelStorage& loadRecord);
 
     bool saveConfig(void);
 
@@ -219,7 +212,7 @@ private:
 
     boolean LpsSaJobMgrScsRx(void);/*get parameters from weighing app*/
     boolean LpsSaJobMgrScsTx(void);/*write param to UI*/
-    void LpsSaJobMgrScsSendCmd(LpsSaWeighReqstChannel::Command command); /* send command to weighing app */
+    void LpsSaJobMgrScsSendCmd(cpm_common_interfaces::msg::WeighReqstChannelCommand::_value_type command); /* send command to weighing app */
     void LpsSaJobMgrSendCmdToWeighApp(void);
     void LpsSaJobMgrHandleTipOffBtnStates(void);
     void AisJhmDataServerTxRead(void);
@@ -227,7 +220,7 @@ private:
     void LpsSaJobMgrScsDataLinkDataRead(void);
     void LpsSaJobMgrScsEddtRead();
     bool sendReqstResponse(const cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel& request, bool success);
-    ReqPloadCtrlSysStat_t GetActiveButtonStatus (void);
+    jobmgr_data::ReqPloadCtrlSysStat_t GetActiveButtonStatus (void);
     void LpsSaJobMgrScsChkHornAction(void);
     bool LpsSaJobMgrHornOnStoreAction(void);
 
@@ -235,8 +228,8 @@ private:
     void resetLpsPtInputFlags(void);
 
     /* Load record conversion: AIS SCS -> ROS2 msg, for publishing via loadRecordOutputChannel_ */
-    static job_mgr_interfaces::msg::LpsSaLoadRecordChannel convertLoadRecordToRos(const LpsSaLoadRecordChannel& scs);
-    static job_mgr_interfaces::msg::LpsSaJobMgrTxChannel convertJobMgrTxToRos(const LpsSaJobMgrTxChannel& scs);
+    static job_mgr_interfaces::msg::LpsSaLoadRecordChannel convertLoadRecordToRos(const jobmgr_data::LpsSaLoadRecordChannelStorage& scs);
+    static job_mgr_interfaces::msg::LpsSaJobMgrTxChannel convertJobMgrTxToRos(const jobmgr_data::JobMgrTxData& scs);
 
     LpsWeighBktWtAccuracy_t totalWeightAccuracy_;
 

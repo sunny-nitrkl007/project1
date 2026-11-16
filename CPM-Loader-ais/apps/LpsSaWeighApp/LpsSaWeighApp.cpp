@@ -16,8 +16,10 @@ DESCRIPTION:
 #include <iostream>
 #include <pthread.h>
 #include <sched.h>
+#include <time.h>
 #include <string>
 #include <vector>
+#include <unistd.h>
 
 #include <hal_boot_proto.h>
 #include <ecminfolib_public.h>
@@ -27,7 +29,7 @@ DESCRIPTION:
 #include <boost/property_tree/xml_parser.hpp>
 
 #include <filesystem/extensions/file.h>
-#include <fileio/directory.hpp>
+#include <filesystem/extensions/nvm.h>
 #include <print.hpp>
 
 #ifndef  _LPS_SA_WEIGHAPP_H_
@@ -65,6 +67,25 @@ bool CalNVMReinitFlag = false;
 // live in Ros2TaskWrapper::run() (base class), shared across apps.
 LpsSaWeighApp *temp_thisTask = nullptr;
 static float extractValFromString(const std::string& str);
+
+static std::string weighHostName() {
+    char name[256] = {};
+    if (gethostname(name, sizeof(name)) != 0) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to read host name.");
+        return {};
+    }
+    name[sizeof(name) - 1] = '\0';
+    return name;
+}
+
+static std::chrono::microseconds weighMonotonicNow() {
+    timespec now{};
+    if (clock_gettime(CLOCK_MONOTONIC_RAW, &now) != 0) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to read monotonic clock.");
+        return {};
+    }
+    return std::chrono::seconds(now.tv_sec) + std::chrono::microseconds(now.tv_nsec / 1000);
+}
 
 /******************************************************************************
 FUNCTION NAME:LpsSaWeighApp
@@ -201,8 +222,6 @@ void LpsSaWeighApp::cleanupRosInterfaces()
     shmClockInput_ = nullptr;
 }
 
-}
-
 /******************************************************************************
 FUNCTION NAME:Initialize
 DESCRIPTION:
@@ -264,13 +283,13 @@ bool LpsSaWeighApp::initialize( )
         declare_parameter<std::string>("temp_root", tempRoot_.string());
         tempRoot_ = get_parameter("temp_root").as_string();
 
-        tes_common_ais::directory::create(tempRoot_);
+        ros2_nvm::filesystem::nvm_dir::create(tempRoot_);
 
         storageRoot_ = DEFAULT_STORAGE_ROOT;
         declare_parameter<std::string>("storage_root", storageRoot_.string());
         storageRoot_ = get_parameter("storage_root").as_string();
 
-        if (!tes_common_ais::directory::create(storageRoot_)) {
+        if (!ros2_nvm::filesystem::nvm_dir::create(storageRoot_)) {
             // If we can't create the storage root, we can't run.
             return false;
         }
@@ -814,7 +833,7 @@ void LpsSaWeighApp::flashEnablerUpdate() {
 
     weigh_app_interfaces::msg::ReadyToFlashStatus readyToFlashStatus;
     readyToFlashStatus.ready_code = APP_READY_CODE_OK_TO_FLASH;
-    readyToFlashStatus.host_name = getHostName();
+    readyToFlashStatus.host_name = weighHostName();
     readyToFlashStatus.task_name = get_name();
 
     // if lft is installed and sealed and flash is disabled, then disable flash
@@ -1342,8 +1361,8 @@ public:
         return static_cast<DataLinkParamInfo::DlpParamIdentifierType_t>(param_.identifier_type);
     }
 
-    VarLengthDataLinkParamPool::VarLengthParamType GetVarLengthParamType() const {
-        return static_cast<VarLengthDataLinkParamPool::VarLengthParamType>(param_.var_length_param_type);
+    VarLengthDataLinkParamFactory::VarLengthParamType GetVarLengthParamType() const {
+        return static_cast<VarLengthDataLinkParamFactory::VarLengthParamType>(param_.var_length_param_type);
     }
 
     template <typename T>
@@ -1912,7 +1931,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     switch (dlParam.GetParamId()) {
                     // Angular Rate Information (ARI)
                     case (61482): {
-                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                        if (VarLengthDataLinkParamFactory::PGN == dlParam.GetVarLengthParamType()) {
                             uint16_t dsi = dlParam.GetLastValueDsi();
                             uint8_t len = dlParam.GetVarParamBlockLength();
                             const uint8_t* data = dlParam.GetVarParamBlock();
@@ -1925,7 +1944,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     // IMU - ECU Identification Information
                     case (64965): {
-                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                        if (VarLengthDataLinkParamFactory::PGN == dlParam.GetVarLengthParamType()) {
                             uint16_t dsi = dlParam.GetLastValueDsi();
                             uint8_t len = dlParam.GetVarParamBlockLength();
 
@@ -1974,7 +1993,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     // IMU - Software Identification
                     case (65242): {
-                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                        if (VarLengthDataLinkParamFactory::PGN == dlParam.GetVarLengthParamType()) {
                             uint16_t dsi = dlParam.GetLastValueDsi();
                             uint8_t len = dlParam.GetVarParamBlockLength();
 
@@ -1999,7 +2018,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
 
                     // Acceleration Sensor (ACCS)
                     case (61485): {
-                        if (VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) {
+                        if (VarLengthDataLinkParamFactory::PGN == dlParam.GetVarLengthParamType()) {
                             uint16_t dsi = dlParam.GetLastValueDsi();
                             uint8_t len = dlParam.GetVarParamBlockLength();
 
@@ -2043,7 +2062,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     }
                     // PGN 61451  ELECTRONIC STEERING CONTROL (ESC1)
                     case (61451): {
-                        if ((VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) &&
+                        if ((VarLengthDataLinkParamFactory::PGN == dlParam.GetVarLengthParamType()) &&
                                 (0 == dlParam.GetVarLengthParamDsi()) &&
                                 dlParam.GetVarParamBlockLength() >= 8) {
                             const uint8_t* data = dlParam.GetVarParamBlock();
@@ -2066,7 +2085,7 @@ void LpsSaWeighApp::LpsSaBmiRead( )
                     }
                     // EEC1
                     case (61444): {
-                        if ((VarLengthDataLinkParamPool::PGN == dlParam.GetVarLengthParamType()) &&
+                        if ((VarLengthDataLinkParamFactory::PGN == dlParam.GetVarLengthParamType()) &&
                                 (0 == dlParam.GetVarLengthParamDsi()) &&
                                 dlParam.GetVarParamBlockLength() >= 5) {
                             const uint8_t* data = dlParam.GetVarParamBlock();
@@ -2109,10 +2128,10 @@ void LpsSaWeighApp::LpsSaBmiRead( )
     // measure cycle rate and print out rate every 100 cycles
     static int cn = 0;
     cn++;
-    static TimeStamp ts;
-    TimeStamp last = ts;
-    ts= localhostNow();
-    double cr = (ts - last).toDouble();
+    static std::chrono::microseconds ts{};
+    auto last = ts;
+    ts= weighMonotonicNow();
+    double cr = std::chrono::duration<double>(ts - last).count();
 
     if ( cn % 5 == 1)
     {
