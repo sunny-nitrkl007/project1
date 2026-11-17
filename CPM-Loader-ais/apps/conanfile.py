@@ -115,8 +115,8 @@ class CPMConan(ConanFile):
     def _resolve_repo_root(self):
         repo_root = path.abspath(path.join(self.source_folder, "..", ".."))
 
-        if not path.isdir(path.join(repo_root, "Ros2_Interfaces", "src")):
-            raise Exception("Resolved repo root '{}' has no Ros2_Interfaces/src.".format(repo_root))
+        if not path.isdir(path.join(repo_root, "CPM-Loader-ais")):
+            raise Exception("Resolved repo root '{}' has no CPM-Loader-ais.".format(repo_root))
 
         return repo_root
 
@@ -160,7 +160,10 @@ class CPMConan(ConanFile):
     def _build_ros2_interfaces(self):
         repo_root = self._resolve_repo_root()
         ros2_models_dir = path.join(repo_root, "ros2_models")
-        interfaces_root = path.join(repo_root, "Ros2_Interfaces", "src")
+        interfaces_root = path.abspath(path.join(repo_root, "..", "Ros2_Interfaces", "src"))
+
+        if not path.isdir(interfaces_root):
+            raise Exception("Resolved interfaces root '{}' does not exist.".format(interfaces_root))
 
         interface_packages = self._discover_ros2_interface_packages(interfaces_root)
         self.output.info("ROS2 interface build order: {}".format(interface_packages))
