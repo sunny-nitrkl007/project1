@@ -114,3 +114,7 @@ ais/ais-sdk-aarch64-a/
 
 # Legacy tree, not part of the ROS2 migration baseline
 /ssp-CPM_Loader-ais/
+
+# Build-output trees, not source
+/ros2_model/
+/ros2_ws/
