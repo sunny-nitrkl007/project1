@@ -1,3 +1,6 @@
+import os
+import xml.etree.ElementTree as ET
+
 from conan import ConanFile
 
 from conan.tools.cmake import (
@@ -99,6 +102,8 @@ class CPMConan(ConanFile):
 
     def build(self):
 
+        self._build_ros2_interfaces()
+
         cmake = CMake(self)
 
         cmake.configure()
@@ -106,6 +111,77 @@ class CPMConan(ConanFile):
         cmake.build()
 
         cmake.install()
+
+    def _resolve_repo_root(self):
+        repo_root = path.abspath(path.join(self.source_folder, "..", ".."))
+
+        if not path.isdir(path.join(repo_root, "Ros2_Interfaces", "src")):
+            raise Exception("Resolved repo root '{}' has no Ros2_Interfaces/src.".format(repo_root))
+
+        return repo_root
+
+    def _discover_ros2_interface_packages(self, interfaces_root):
+        pkg_names = sorted(
+            name for name in os.listdir(interfaces_root)
+            if path.isfile(path.join(interfaces_root, name, "package.xml"))
+        )
+        if not pkg_names:
+            raise Exception("No package.xml found under '{}'.".format(interfaces_root))
+
+        depends = {}
+        for name in pkg_names:
+            root_el = ET.parse(path.join(interfaces_root, name, "package.xml")).getroot()
+            local_deps = set()
+            for tag in ("depend", "build_depend", "exec_depend"):
+                for el in root_el.findall(tag):
+                    dep_name = (el.text or "").strip()
+                    if dep_name in pkg_names and dep_name != name:
+                        local_deps.add(dep_name)
+            depends[name] = local_deps
+
+        ordered = []
+        remaining = dict(depends)
+        while remaining:
+            ready = sorted(n for n, deps in remaining.items() if not deps)
+            if not ready:
+                raise Exception(
+                    "Circular dependency among ROS2 interface packages: {}".format(
+                        sorted(remaining.keys())
+                    )
+                )
+            for n in ready:
+                ordered.append(n)
+                del remaining[n]
+            for deps in remaining.values():
+                deps.difference_update(ready)
+
+        return ordered
+
+    def _build_ros2_interfaces(self):
+        repo_root = self._resolve_repo_root()
+        ros2_models_dir = path.join(repo_root, "ros2_models")
+        interfaces_root = path.join(repo_root, "Ros2_Interfaces", "src")
+
+        interface_packages = self._discover_ros2_interface_packages(interfaces_root)
+        self.output.info("ROS2 interface build order: {}".format(interface_packages))
+
+        original_build_folder = self.folders.build
+
+        for pkg in interface_packages:
+            self.folders.build = path.join(original_build_folder, "ros2_interfaces", pkg)
+
+            cmake = CMake(self)
+            cmake.configure(
+                build_script_folder=path.join(interfaces_root, pkg),
+                variables={
+                    "CMAKE_INSTALL_PREFIX": ros2_models_dir,
+                    "CMAKE_PREFIX_PATH": ros2_models_dir,
+                },
+            )
+            cmake.build()
+            cmake.install()
+
+        self.folders.build = original_build_folder
 
     # def package_info(self):
     #     self.runenv_info.prepend_path(

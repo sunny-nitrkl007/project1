@@ -117,4 +117,5 @@ ais/ais-sdk-aarch64-a/
 
 # Build-output trees, not source
 /ros2_model/
+/ros2_models/
 /ros2_ws/

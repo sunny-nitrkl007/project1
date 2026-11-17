@@ -34,7 +34,18 @@ myEnv.Append(CPPPATH = [
 ])
 
 #Addon------------------------------
-BASE_PATH = os.path.abspath(os.path.join(Dir('#').abspath, '..'))
+def _find_cpm_workspace_root(start_dir):
+    current = os.path.abspath(start_dir)
+    while True:
+        if os.path.isdir(os.path.join(current, 'CPM-Loader-ais')) and \
+           os.path.isdir(os.path.join(current, 'ros2_jazzy_sdk')):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            raise Exception("Could not find the ssp-CPM_Loader-ais root walking up from '%s'." % start_dir)
+        current = parent
+
+BASE_PATH = _find_cpm_workspace_root(Dir('.').abspath)
 
 
 ros2_libs = []
