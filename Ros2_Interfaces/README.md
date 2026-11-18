@@ -1,11 +1,10 @@
 # Porting a legacy AIS interface channel to a ROS2 `.msg`
 
-This is the end-to-end process for taking a legacy AIS interface channel
+This is the process for taking a legacy AIS interface channel
 (`prod/common/interfaces/<ChannelName>/...`) and turning it into a ROS2
-message, for whoever is porting the next app after JobMgr/WeighApp/OutputApp.
-It covers: finding what an app actually uses, deciding which package a type
-belongs in, writing the `.msg` file, registering it in the build, and wiring
-the C++ app code to use it.
+`.msg` file, for porting any app's interfaces. It covers: finding what an
+app actually uses, deciding which package a type belongs in, and writing
+the `.msg` file.
 
 ## Step 1 — Find what the app you're porting actually uses
 
@@ -155,8 +154,7 @@ new package if you're porting a genuinely new app).
 ## Step 5 — Register the new `.msg` file(s) in the build
 
 Two files per package, both already exist for the three current packages —
-you're just adding lines, not creating new structure (unless this is a
-brand new app's package, see Step 7).
+you're just adding lines, not creating new structure.
 
 **`<package>/CMakeLists.txt`** — add the new `.msg` path to the
 `rosidl_generate_interfaces()` list:
@@ -175,53 +173,11 @@ first time from this package), add a `<depend>` tag:
 ```xml
 <depend>cpm_common_interfaces</depend>
 ```
-This isn't optional bookkeeping — the Conan build (`apps/conanfile.py`,
-`_discover_ros2_interface_packages()`) reads exactly this tag to work out
-build order automatically. If you reference another package's type without
-declaring the `<depend>`, the build may try to compile your package before
-the one it needs, and fail with a confusing `find_package()` error rather
-than a clear one. Get this right and you don't need to touch any build
-script by hand — the ordering is fully automatic from here.
-
-## Step 6 — Build it
-
-```sh
-./conan_build.sh
-```
-This regenerates all three (or more) interface packages fresh, in
-dependency order, installing headers/typesupport libs flat into
-`ros2_models/`, then builds the apps against that output. Nothing to do
-manually beyond Steps 4–5 above — no colcon invocation, no manifest to
-update by hand.
-
-## Step 7 — Wire the C++ app code to use the new message
-
-Replace the legacy pattern:
-```cpp
-// old
-MyChannelInput = dynamic_cast<MyChannelInput*>(InterfaceDb::fetch("MyChannelInput"));
-```
-with the ROS2 one, matching JobMgr/WeighApp/OutputApp's established
-pattern — construct it in `initialize()`, after the node itself exists:
-```cpp
-// new
-myChannelRosIn_ = new ros2_wrapper::RosInputInterface<job_mgr_interfaces::msg::MyChannel>(
-      shared_from_this(), "my_channel_topic_name");
-```
-(`RosOutputInterface<...>` for the publish direction.) `shared_from_this()`
-only works here because `Ros2TaskWrapper::run()` has already constructed
-the app via `std::make_shared<AppT>()` before `initialize()` runs — don't
-call it from the constructor.
-
-## Step 8 (new app only) — creating a brand new interfaces package
-
-If you're porting an app that doesn't fit into the three existing packages
-at all, give it its own, following `weigh_app_interfaces` as the template:
-`package.xml` (declare `<depend>` on anything it reuses from
-`cpm_common_interfaces`), `CMakeLists.txt` (`rosidl_generate_interfaces()`),
-`msg/`. Nothing else needs to change — the Conan build discovers new
-packages under `Ros2_Interfaces/src/` automatically (see
-`_discover_ros2_interface_packages()`), no hardcoded package list to edit.
+This isn't optional bookkeeping — the build tooling reads this tag to work
+out build order automatically. If you reference another package's type
+without declaring the `<depend>`, the build may try to compile your package
+before the one it needs, and fail with a confusing error rather than a
+clear one.
 
 ## Common mistakes to check for
 
@@ -232,10 +188,3 @@ packages under `Ros2_Interfaces/src/` automatically (see
 - **Forgetting `<depend>` in `package.xml`** when referencing another
   package's type — breaks automatic build ordering, not just a cosmetic
   omission.
-- **Not validating field ranges on the C++ side.** A `.msg` field like
-  `uint8 output_port` has no compile-time guarantee it matches the valid
-  range of whatever enum/array index it ends up driving in the app code —
-  bounds-check it explicitly wherever it's consumed, the same way
-  `total_duration` is checked in `OutputApp::ReadCommand()`. This has
-  already been flagged as a real gap in one existing port, worth not
-  repeating.
