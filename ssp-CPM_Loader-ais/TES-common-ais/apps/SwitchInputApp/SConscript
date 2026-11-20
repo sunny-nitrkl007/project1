@@ -1,0 +1,180 @@
+###############################################################################
+## @file      SConscript
+## @brief     SConscript for SwitchInputApp
+###############################################################################
+
+import os
+import glob
+from SCons.Script import Dir
+
+Import('testEnv')
+myEnv = testEnv.Clone()
+
+# Please people, stop creating so many warnings!
+myEnv.Append(CCFLAGS=['-Werror', '-Wno-unused-function'])
+
+print("SCONSCRIPT DIR =", Dir('.').abspath)
+print("TOP DIR =", Dir('#').abspath)
+
+SCONSCRIPT_DIR = Dir('.').abspath
+
+BASE_PATH = os.path.abspath(
+    os.path.join(SCONSCRIPT_DIR, "../../../../")
+)
+
+print("BASE_PATH =", BASE_PATH)
+
+#
+# Discover ROS2 model libraries
+#
+ros2_libs = []
+
+ros2_lib_dir = os.path.join(
+    BASE_PATH,
+    'ros2_models',
+    'lib'
+)
+
+for so in glob.glob(
+        os.path.join(
+            ros2_lib_dir,
+            '*',
+            'lib*.so')):
+    ros2_libs.append(
+        os.path.basename(so)[3:-3]
+    )
+
+print("ROS2_LIBS =", ros2_libs)
+
+#
+# ROS2 include paths
+#
+cate_ros2_include = glob.glob(
+    os.path.join(
+        BASE_PATH,
+        'dependencies',
+        'cate_ros2*',
+        'include'
+    )
+)
+
+if cate_ros2_include:
+    myEnv.Append(CPPPATH=[cate_ros2_include[0]])
+
+for d in glob.glob(
+        os.path.join(
+            BASE_PATH,
+            'dependencies',
+            'cate_ros2*',
+            'include',
+            '*')):
+    if os.path.isdir(d):
+        myEnv.Append(CPPPATH=[d])
+
+#
+# ros2wrapper
+#
+wrapper_dir = os.path.join(
+    BASE_PATH,
+    'CPM-Loader-ais',
+    'prod',
+    'common',
+    'ros2wrapper'
+)
+
+if os.path.isdir(wrapper_dir):
+    myEnv.Append(CPPPATH=[wrapper_dir])
+
+#
+# Additional include directories
+#
+myEnv.Append(CPPPATH=[
+    os.path.join(BASE_PATH, 'ros2_models', 'include'),
+    os.path.join(BASE_PATH, 'CPM-Loader-ais', 'prod', 'common')
+])
+
+#
+# Library paths
+#
+cate_ros2_lib = glob.glob(
+    os.path.join(
+        BASE_PATH,
+        'dependencies',
+        'cate_ros2*',
+        'lib'
+    )
+)
+
+ROS_LIB_PATHS = []
+
+if cate_ros2_lib:
+    ROS_LIB_PATHS.append(cate_ros2_lib[0])
+
+ROS_LIB_PATHS.extend([
+    os.path.join(BASE_PATH, 'ros2_models', 'lib', 'cpm_common_interfaces'),
+    os.path.join(BASE_PATH, 'ros2_models', 'lib', 'job_mgr_interfaces'),
+    os.path.join(BASE_PATH, 'ros2_models', 'lib', 'weigh_app_interfaces'),
+    os.path.join(BASE_PATH, 'dependencies', 'libyaml_0.2.5', 'lib'),
+])
+
+myEnv.Append(LIBPATH=ROS_LIB_PATHS)
+
+myEnv.Append(
+    LINKFLAGS=[
+        flag
+        for p in ROS_LIB_PATHS
+        for flag in (
+            '-Wl,-rpath,' + p,
+            '-Wl,-rpath-link,' + p
+        )
+    ]
+)
+
+print("LIBPATH =", ROS_LIB_PATHS)
+
+#
+# Sources
+#
+sourceFiles = [
+    'SwitchInputApp.cpp'
+]
+
+#
+# Base libraries
+#
+base_libs = [
+    'rclcpp',
+    'rcl_yaml_param_parser',
+    'yaml'
+]
+
+#
+# Build application
+#
+SwitchInputApp = myEnv.Program(
+    target='SwitchInputApp',
+    source=sourceFiles,
+    LIBS=base_libs + ros2_libs
+)
+
+#
+# Install binary
+#
+myEnv.InstallBinary(SwitchInputApp)
+
+#
+# Install config
+#
+myEnv.InstallConfig(
+    os.path.join(
+        BASE_PATH,
+        'CPM-Loader-ais',
+        'ros2_config'
+    ),
+    'SwitchInputApp.yaml'
+)
+
+#
+# Alias
+#
+myEnv.Alias("SwitchInputApp","#bin/SwitchInputApp")

@@ -1,0 +1,9 @@
+/**:
+  ros__parameters:
+    cycle_rate_hz: 50.0
+    debounce_count: 5
+    open_debounce_count: 10
+    closed_debounce_count: 1
+    heartbeat_period_sec: 1.0
+    logger_threshold: "error"
+    autonomy_ecm: false

@@ -1,0 +1,26 @@
+check process LpsJobMgr with pidfile /run/lps_job_mgr.pid
+    start program = "/opt/CPM/scripts/monit_start.sh" with timeout 20 seconds
+    stop program  = "/opt/CPM/scripts/monit_stop.sh" with timeout 20 seconds
+
+    if does not exist then restart
+    if 5 restarts within 10 cycles then unmonitor
+
+    group lps
+
+check process LpsWeigh with pidfile /run/lps_weigh.pid
+    start program = "/opt/CPM/scripts/monit_start.sh" with timeout 20 seconds
+    stop program  = "/opt/CPM/scripts/monit_stop.sh" with timeout 20 seconds
+
+    if does not exist then restart
+    if 5 restarts within 10 cycles then unmonitor
+
+    group lps    
+
+check process OutputApp with pidfile /run/output_app.pid
+    start program = "/opt/CPM/scripts/monit_start.sh"
+    stop program = "/opt/CPM/scripts/monit_stop.sh"
+
+    if does not exist then restart
+    if 5 restarts within 10 cycles then unmonitor
+
+    group lps      
