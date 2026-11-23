@@ -82,26 +82,8 @@ RETURN VALUE:  Boolean
 *******************************************************************************/
 bool SwitchInput::initialize()
 {
-    const auto threshold = declare_parameter<std::string>("logger_threshold", "error");
-    ROS2Logger::Instance().SetFeatureName(get_name());
-    ROS2Logger::Instance().SetLogLevel(threshold);
-    const std::string levels[] = {"emerg", "fatal", "alert", "crit", "error",
-                                  "warn", "notice", "info", "debug"};
-    bool validThreshold = false;
-    for (unsigned int i = 0; i < 9; ++i) {
-        if (threshold == levels[i]) {
-            loggerPriority_ = (1u << (i + 1)) - 1;
-            validThreshold = true;
-        }
-    }
-    if (!validThreshold) {
-        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Invalid logger_threshold");
-        return false;
-    }
-    // ROS2Logger supports five levels; preserve the intermediate AIS threshold mask.
-    if (threshold == "emerg") ROS2Logger::Instance().SetLogLevel("fatal");
-    if (threshold == "alert" || threshold == "crit") ROS2Logger::Instance().SetLogLevel("error");
-    if (threshold == "notice") ROS2Logger::Instance().SetLogLevel("warn");
+    declare_parameter<std::string>("logger_threshold", "error");
+    ROS2Logger::Instance().SetLogLevel(get_parameter("logger_threshold").as_string());
 
     cycleRateHz_ = declare_parameter<double>("cycle_rate_hz", 50.0);
     heartbeatPeriodSec_ = declare_parameter<double>("heartbeat_period_sec", 1.0);

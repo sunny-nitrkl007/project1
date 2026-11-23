@@ -1,7 +1,14 @@
 #!/bin/sh
 
+export AMENT_PREFIX_PATH=/opt/CPM
 APP_DIR=/opt/CPM
 CONFIG_DIR=${APP_DIR}/config
+
+CONFIG_DIR=${APP_DIR}/config
+VERITY_DIRECTORY=${APP_DIR%/}
+VERITY_DIRECTORY=${VERITY_DIRECTORY##*/}
+DAEMON=${START_STOP_DAEMON:-/sbin/start-stop-daemon}
+PIDFILE=${VP3_PIDFILE:-/run/lps_vp3.pid}
 
 # Debug
 {
@@ -50,6 +57,7 @@ fi
 [ -f "${CONFIG_DIR}/${ROBOT_YAML}" ] || exit 1
 [ -f "${CONFIG_DIR}/OutputApp.yaml" ] || exit 1
 [ -f "${CONFIG_DIR}/SerialPrinterApp.yaml" ] || exit 1
+[ -f "${CONFIG_DIR}/VP3FileCreationApp.yaml" ] || exit 1
 
 # Start JobMgr
 /sbin/start-stop-daemon \
@@ -88,8 +96,7 @@ fi
     -- \
     --instanceName=OutputApp \
     --ros-args \
-    --params-file "${CONFIG_DIR}/OutputApp.yaml" \
-    -p logger_threshold:=error
+    --params-file "${CONFIG_DIR}/OutputApp.yaml"
 
 # Start SerialPrinterApp
 /sbin/start-stop-daemon \
@@ -102,3 +109,18 @@ fi
     --instance SerialPrinterApp \
     --ros-args \
     --params-file "${CONFIG_DIR}/SerialPrinterApp.yaml"
+
+# Start VP3FileCreationApp
+/sbin/start-stop-daemon \
+    --start \
+    --background \
+    --make-pidfile \
+    --pidfile /run/lps_vp3.pid \
+    --exec "${APP_DIR}/bin/VP3FileCreationApp" \
+    -- \
+    --instanceName=VP3FileCreationApp \
+    --ros-args \
+    --params-file "${CONFIG_DIR}/VP3FileCreationApp.yaml" \
+    --param "storageRoot:=/opt/appdata/${VERITY_DIRECTORY}/VP3FileCreationApp/nvm/" \
+    --param "tempRoot:=/tmp/appdata/${VERITY_DIRECTORY}/VP3FileCreationApp" \
+    --param "VP3TxPath:=/opt/appdata/${VERITY_DIRECTORY}/FileTransferBridgeApp/TxFiles/"

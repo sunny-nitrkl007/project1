@@ -48,7 +48,7 @@ public:
     // spin until a shutdown signal , cleanup()
     // with communication still alive, then rclcpp::shutdown() as the last
     // step. Each app's main() becomes a one-line call to this.
-    template<typename AppT>
+    template<typename AppT, bool UseReceivePump = false>
     static int run(int argc, char** argv)
     {
         std::string const rosLogDir = "/tmp/appdata/CPM/log";
@@ -56,7 +56,7 @@ public:
         setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
         setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
         setenv("ROS_AUTOMATIC_DISCOVERY_RANGE", "LOCALHOST", 0);
-        
+
         std::vector<char*> rosArgv;
         std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
         int rosArgc = static_cast<int>(rosArgv.size());
@@ -75,7 +75,25 @@ public:
         bool initialized = app->beforeInitialize() && app->initialize();
         if (initialized) {
             app->startExecutiveTimer();
-            executor->spin();
+
+            if constexpr (UseReceivePump)
+            {
+                app->setReceivePump(
+                    [executor]()
+                    {
+                        executor->spin_some();
+                    });
+
+                while (rclcpp::ok())
+                {
+                    executor->spin_some();
+                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                }
+            }
+            else
+            {
+                executor->spin();
+            }
         }
         else {
             RCLCPP_ERROR(app->get_logger(), "Failed to initialize %s", nodeName.c_str());

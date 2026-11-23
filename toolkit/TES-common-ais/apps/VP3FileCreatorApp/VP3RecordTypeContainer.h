@@ -1,7 +1,7 @@
 #ifndef VP3RECORDTYPECONTAINER_H
 #define VP3RECORDTYPECONTAINER_H
 
-#include <interfaces/VP3Record/VP3Record.h>
+#include "VP3RuntimeRecord.h"
 
 class VP3RecordTypeContainer
 {
@@ -20,7 +20,7 @@ public:
         numberOfRecords_(1),
         rBlockData_(rBlockData) {}
 
-    VP3RecordTypeContainer(const VP3RecordStorage& vp3Record) :
+    VP3RecordTypeContainer(const VP3Record& vp3Record) :
         VP3RecordTypeContainer(vp3Record.getRecordType(),
                 vp3Record.getUIDList(),
                 vp3Record.getSizeOfRecord(),

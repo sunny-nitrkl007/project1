@@ -7,6 +7,7 @@ DESCRIPTION: See ScsToRos2Bridge.h for the design rationale.
 #include "ScsToRos2Bridge.h"
 #include "ROS2Logger.hpp"
 #include <bitset>
+#include <thread>
 
 #include <interfaces/LpsSaWeighReqstChannel/InterfaceTypes.h>
 #include <interfaces/LpsSaWeighRespChannel/InterfaceTypes.h>
@@ -207,7 +208,7 @@ AbstractTaskCore* task::getTaskImplementation(void)
 
     if (!rclcpp::ok())
     {
-        rclcpp::init(0, nullptr);
+        rclcpp::init(0, nullptr, rclcpp::InitOptions(), rclcpp::SignalHandlerOptions::None);
     }
     ROS2Logger::Instance().SetFeatureName("ScsToRos2Bridge");
     static ScsToRos2Bridge thisTask("ScsToRos2Bridge");
@@ -302,6 +303,14 @@ bool ScsToRos2Bridge::initialize()
 {
     bool everythingOk = true;
     getLogger().log_info("ScsToRos2Bridge::initialize");
+
+    getTaskConfig().get("VP3BridgeDrainTimeoutMs", vp3Drain_.timeoutMs);
+    getTaskConfig().get("VP3AppName", vp3Drain_.appName);
+    if (!vp3Drain_.valid()) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),
+                "VP3AppName must be nonempty and VP3BridgeDrainTimeoutMs must be at least 1950000");
+        return false;
+    }
 
     rosNode_ = std::make_shared<rclcpp::Node>("job_mgr_scs_ros2_bridge_node");
     executor_.add_node(rosNode_);
@@ -412,6 +421,48 @@ bool ScsToRos2Bridge::initialize()
         everythingOk = false;
     }
 
+    if (!task::InterfaceDb::bind("VP3RecordInput", vp3RecordScsIn_) ||
+            !task::InterfaceDb::bind("CreateFileRequestInput", createFileRequestScsIn_) ||
+            !task::InterfaceDb::bind("AppRegInput", appRegScsIn_) ||
+            !task::InterfaceDb::bind("AppRegOutput", appRegScsOut_) ||
+            !task::InterfaceDb::bind("FileTransferBridgeRequestOutput", fileTransferScsOut_)) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "One or more VP3 SCS interfaces are not configured.");
+        everythingOk = false;
+    }
+
+    if (!task::InterfaceDb::bind("SerialPrinterRequestInput", serialPrinterRequestScsIn_)) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "SerialPrinterRequestInput Interface not configured.");
+        everythingOk = false;
+    }
+
+    vp3RecordRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::VP3Record>>(
+            rosNode_, "vp3_record", 100);
+    createFileRequestRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::CreateFileRequest>>(
+            rosNode_, "create_file_request", 10);
+    appRegRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::AppReg>>(
+            rosNode_, "vp3_app_reg_rx", 20);
+    appRegRosIn_ = rosNode_->create_subscription<cpm_common_interfaces::msg::AppReg>(
+            "vp3_app_reg_tx", 20, [this](cpm_common_interfaces::msg::AppReg::SharedPtr msg) {
+                if (vp3_bridge::validAppReg(*msg) && vp3Drain_.acceptsTx(msg->app_name, msg->dest_app_name)) {
+                    vp3_bridge::enqueue(appRegQueue_, *msg);
+                } else {
+                    RCLCPP_WARN(ROS2Logger::Instance().GetLogger(), "Rejected invalid or non-VP3 outbound AppReg");
+                }
+            });
+    fileTransferRosIn_ = rosNode_->create_subscription<cpm_common_interfaces::msg::FileTransferBridgeRequest>(
+            "file_transfer_bridge_request", 20,
+            [this](cpm_common_interfaces::msg::FileTransferBridgeRequest::SharedPtr msg) {
+                vp3_bridge::enqueue(fileTransferQueue_, *msg);
+            });
+
+    serialPrinterRequestRosOut_ = rosNode_->create_publisher<cpm_common_interfaces::msg::SerialPrinterRequest>(
+            "serial_printer_request", rclcpp::QoS(rclcpp::KeepLast(2)).reliable().durability_volatile());
+
+    if (!serialPrinterRequestRosOut_) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to initialize SerialPrinterRequest ROS2 publisher.");
+        everythingOk = false;
+    }
+
     /* ROS2 side -- topic names matching what LpsSaJobMgrApp subscribes/publishes */
     jobMgrReqstRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>>(
             rosNode_, "lps_sa_job_mgr_reqst_channel");
@@ -514,7 +565,76 @@ bool ScsToRos2Bridge::initialize()
     // Print the Node and topic details for debugging purpose. 
     printGraphInfo();    
 
+    initialized_ = everythingOk;
     return everythingOk;
+}
+
+void ScsToRos2Bridge::forwardVP3()
+{
+    if (vp3RecordScsIn_ && vp3RecordRosOut_) {
+        VP3Record record;
+        while (vp3RecordScsIn_->get(record)) {
+            if (!vp3RecordRosOut_->publish(vp3_bridge::recordToRos<cpm_common_interfaces::msg::VP3Record>(record))) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to forward VP3Record SCS->ROS2");
+            }
+        }
+    }
+    if (createFileRequestScsIn_ && createFileRequestRosOut_) {
+        CreateFileRequest request;
+        while (createFileRequestScsIn_->get(request)) {
+            cpm_common_interfaces::msg::CreateFileRequest ros;
+            ros.file_number = request.fileNumber;
+            ros.requester = request.Requester;
+            ros.command = static_cast<int32_t>(request.Command);
+            if (!createFileRequestRosOut_->publish(ros)) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to forward CreateFileRequest SCS->ROS2");
+            }
+        }
+    }
+    if (appRegScsIn_ && appRegRosOut_) {
+        AppReg registration;
+        while (appRegScsIn_->get(registration)) {
+            if (!vp3Drain_.acceptsRx(registration.GetDestAppName())) {
+                continue;
+            }
+            cpm_common_interfaces::msg::AppReg ros;
+            ros.msg_type = static_cast<uint8_t>(registration.GetMsgType());
+            ros.app_name = registration.GetAppName();
+            ros.app_state = static_cast<uint8_t>(registration.GetAppState());
+            ros.dest_app_name = registration.GetDestAppName();
+            ros.reg_status = static_cast<uint8_t>(registration.GetRegStatus());
+            if (!vp3_bridge::validAppReg(ros)) {
+                RCLCPP_WARN(ROS2Logger::Instance().GetLogger(), "Rejected invalid inbound AppReg enums");
+            } else if (!appRegRosOut_->publish(ros)) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to forward AppReg SCS->ROS2");
+            }
+        }
+    }
+    while (!fileTransferQueue_.empty() && fileTransferScsOut_) {
+        FileTransferBridgeRequest scs;
+        if (!vp3_bridge::transferToScs(fileTransferQueue_.front(), scs)) {
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Rejected FileTransferBridgeRequest FID overflow");
+            fileTransferQueue_.pop_front();
+        } else if (fileTransferScsOut_->publish(scs)) {
+            fileTransferQueue_.pop_front();
+        } else {
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to forward FileTransferBridgeRequest ROS2->SCS");
+            break;
+        }
+    }
+    while (!appRegQueue_.empty() && appRegScsOut_) {
+        const auto& ros = appRegQueue_.front();
+        if (ros.msg_type == ros.REQ && ros.app_state == ros.STATE_INACTIVE && !fileTransferQueue_.empty()) {
+            break;
+        }
+        AppReg scs(vp3_bridge::appRegToScs<AppRegStorage>(ros));
+        if (!appRegScsOut_->publish(scs)) {
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to forward AppReg ROS2->SCS");
+            break;
+        }
+        vp3Drain_.observe(ros.msg_type, ros.app_state);
+        appRegQueue_.pop_front();
+    }
 }
 
 /******************************************************************************
@@ -525,6 +645,7 @@ DESCRIPTION: Drains each side and forwards to the other, one direction per
 bool ScsToRos2Bridge::executive()
 {
     executor_.spin_some();
+    forwardVP3();
 
     /* Forward 1: LpsSaJobMgrReqstChannel, AIS SCS -> ROS2 */
     if (nullptr != jobMgrReqstScsIn_) {
@@ -847,6 +968,18 @@ bool ScsToRos2Bridge::executive()
         }
     }
 
+    if (nullptr != serialPrinterRequestScsIn_ && nullptr != serialPrinterRequestRosOut_) {
+        SerialPrinterRequestInterface request;
+        while (serialPrinterRequestScsIn_->get(request)) {
+            try {
+                serialPrinterRequestRosOut_->publish(convertSerialPrinterRequestToRos(request));
+            }
+            catch (const std::exception&) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to forward SerialPrinterRequest SCS->ROS2");
+            }
+        }
+    }
+
     return true;
 }
 
@@ -855,7 +988,37 @@ FUNCTION NAME:ScsToRos2Bridge::cleanup
 *******************************************************************************/
 void ScsToRos2Bridge::cleanup()
 {
+    if (cleanedUp_) {
+        return;
+    }
+    cleanedUp_ = true;
     RCLCPP_INFO(ROS2Logger::Instance().GetLogger(),"ScsToRos2Bridge::cleanup");
+    if (initialized_ && rclcpp::ok()) {
+        const auto start = std::chrono::steady_clock::now();
+        do {
+            executive();
+            if (!vp3Drain_.waiting(std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - start))) {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(120));
+        } while (rclcpp::ok());
+        if (!vp3Drain_.inactive) {
+            RCLCPP_WARN(ROS2Logger::Instance().GetLogger(), "VP3 drain ended without creator INACTIVE; timeout or ROS context loss");
+        }
+    }
+    vp3RecordRosOut_.reset();
+    createFileRequestRosOut_.reset();
+    appRegRosOut_.reset();
+    appRegRosIn_.reset();
+    fileTransferRosIn_.reset();
+    appRegQueue_.clear();
+    fileTransferQueue_.clear();
+    vp3RecordScsIn_ = nullptr;
+    createFileRequestScsIn_ = nullptr;
+    appRegScsIn_ = nullptr;
+    appRegScsOut_ = nullptr;
+    fileTransferScsOut_ = nullptr;
     jobMgrReqstRosOut_.reset();
     jobMgrRespRosIn_.reset();
     aisJhm2TxRosOut_.reset();
@@ -887,6 +1050,7 @@ void ScsToRos2Bridge::cleanup()
     calMgrCmdRespRosIn_.reset();
     tipoffTestPointsRosIn_.reset();
     printerCnfgRosOut_.reset();
+    serialPrinterRequestRosOut_.reset();
     jobMgrReqstScsIn_ = nullptr;
     jobMgrRespScsOut_ = nullptr;
     aisJhm2TxScsIn_ = nullptr;
@@ -914,11 +1078,15 @@ void ScsToRos2Bridge::cleanup()
     partNumbersScsIn_ = nullptr;
     tipoffTestPointsScsOut_ = nullptr;
     printerCnfgScsIn_ = nullptr;
+    serialPrinterRequestScsIn_ = nullptr;
     systemHardwareHealthScsIn_ = nullptr;
     systemHardwareHealthRequestScsIn_ = nullptr;
     readyToFlashScsOut_ = nullptr;
     if (rclcpp::ok()) {
         rclcpp::shutdown();
+    }
+    if (rosNode_) {
+        executor_.remove_node(rosNode_);
     }
     rosNode_.reset();
 }
@@ -1883,6 +2051,19 @@ weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg ScsToRos2Bridge::convertPrinte
     ros.udp_transfer_ip                        = c.udpTransferIp;
     ros.udp_transfer_port                      = c.udpTransferPort;
     ros.udp_transfer_enabled                   = c.udpTransferEnabled;
+    return ros;
+}
+
+/*******************************************************************************
+FUNCTION NAME: ScsToRos2Bridge::convertSerialPrinterRequestToRos
+DESCRIPTION: SerialPrinterRequestInterface (AIS SCS) -> cpm_common_interfaces::msg::SerialPrinterRequest (ROS2, SerialPrinterApp subscriber)
+*******************************************************************************/
+cpm_common_interfaces::msg::SerialPrinterRequest ScsToRos2Bridge::convertSerialPrinterRequestToRos(const SerialPrinterRequestInterface& scs)
+{
+    cpm_common_interfaces::msg::SerialPrinterRequest ros;
+    ros.command = static_cast<uint8_t>(scs.command);
+    ros.file_path = scs.arg1;
+    ros.number_of_copies = scs.arg2;
     return ros;
 }
 

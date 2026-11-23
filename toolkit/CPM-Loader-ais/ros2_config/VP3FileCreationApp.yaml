@@ -1,0 +1,10 @@
+VP3FileCreationApp:
+  ros__parameters:
+    cycleRateHz: 1.0
+    requireStatusRecord: true
+    recordDataSizeTxTrigger: 10240
+    recordCountTxTrigger: 1000
+    maxVP3StorageSize: 8388608
+    maxVP3StorageFiles: 2500
+    VP3KeyoffTimeout: 1920000
+    logger_threshold: "error"

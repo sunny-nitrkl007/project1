@@ -1,3 +1,4 @@
 /**:
   ros__parameters:
     cycle_rate_hz: 4.0
+    logger_threshold: "error"

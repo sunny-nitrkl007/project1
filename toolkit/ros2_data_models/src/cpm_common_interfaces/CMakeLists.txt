@@ -39,6 +39,10 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LpsSaUIDisplayState.msg"
   "msg/LpsSaUIDisplayStateInterface.msg"
   "msg/ProcessHealth.msg"
+  "msg/VP3Record.msg"
+  "msg/CreateFileRequest.msg"
+  "msg/AppReg.msg"
+  "msg/FileTransferBridgeRequest.msg"
   "msg/SerialPrinterRequest.msg"
 )
 

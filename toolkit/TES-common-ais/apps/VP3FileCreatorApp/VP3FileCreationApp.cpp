@@ -9,14 +9,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <ecminfolib_private.h>
-
+#include <cmath>
+#include <iomanip>
 #include <chrono/convert.hpp>
-#include <chrono/print.hpp>
-#include <chrono/tz.hpp>
-#include <fileio/iflocker.hpp>
-#include <fileio/oflocker.hpp>
-#include <fileio/sha1_fstream.hpp>
+#include "VP3RuntimeSupport.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
@@ -24,16 +20,17 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/archive_exception.hpp>
 
-#include <ais/log/AisLogger.h>
-#include <fileio/nvm.hpp>
-namespace nvm = tes_common_ais::nvm;
+#include <climits>
+#include <algorithm>
 
 /* For debugging
 #include <ais/time/TimeStamp.h>
 #include <ais/time/ConvertTime.h>
 */
 
-#include <interfaces/FileTransferBridgeRequest/InterfaceTypes.h>
+#include <atomic>
+#include <thread>
+#include <csignal>
 
 #include "VP3FileCreationApp.h"
 
@@ -70,10 +67,9 @@ static std::string shmClockUTCString = "";
 static std::string shmClockLocalString = "";
 */
 
-task::AbstractTaskCore* task::getTaskImplementation(void)
+int main(int argc, char** argv)
 {
-    static VP3FileCreationApp thisTask("VP3FileCreationApp");
-    return dynamic_cast<Task *>(&thisTask);
+    return ros2_wrapper::Ros2TaskWrapper::run<VP3FileCreationApp,true>(argc, argv);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,11 +84,9 @@ task::AbstractTaskCore* task::getTaskImplementation(void)
 // Argument [I/O]  : None
 ////////////////////////////////////////////////////////////////////////////
 VP3FileCreationApp::VP3FileCreationApp(const std::string& taskName) :
-    task::Task(taskName),
+    ros2_wrapper::Ros2TaskWrapper(taskName),
     tempRoot_(DEFAULT_TEMP_ROOT),
     storageRoot_(DEFAULT_STORAGE_ROOT),
-    VP3_Rec_input_(nullptr),
-    createFileRequestInput_(nullptr),
     myRecordTypeContainers(),
     latestStatusRecord(),
     totalReceivedRecordSize_(0),
@@ -107,14 +101,10 @@ VP3FileCreationApp::VP3FileCreationApp(const std::string& taskName) :
     vp3StoragePath_(fs::path(DEFAULT_STORAGE_ROOT) / VP3_SUBDIR),
     vp3TxPath_(),
     AppRegistered(false),
-    AppRegList(taskName),
-    AppRegInput_(nullptr),
     AppRegOutput_(nullptr),
     FileTransferBridgeRequestOutput_(nullptr),
     vp3FilesDestinationApp("FileTransferBridgeApp"),
     LastDownloadTimestamp_(),
-    ShmClockInput_(nullptr),
-    PartNumbersInput_(nullptr),
     productId_(),
     ecmPartNum_(),
     swGroupPartNum_(),
@@ -141,111 +131,54 @@ VP3FileCreationApp::~VP3FileCreationApp( )
 ////////////////////////////////////////////////////////////////////////////
 bool VP3FileCreationApp::initialize( )
 {
-    if (!task::InterfaceDb::bind("VP3RecordInput", VP3_Rec_input_)) {
-        AIS_LOG_FATAL("VP3RecordInput interface not defined");
-        return false;
+
+    declare_parameter<std::string>("logger_threshold", "error");
+    ROS2Logger::Instance().SetLogLevel(get_parameter("logger_threshold").as_string());
+    
+    auto unsignedParameter = [this](const std::string& name, std::int64_t fallback, std::uint64_t maximum) {
+        const auto value = declare_parameter<std::int64_t>(name, fallback);
+        if (value < 0 || static_cast<std::uint64_t>(value) > maximum)
+            throw std::invalid_argument("Out of range parameter: " + name);
+        return value;
+    };
+    recordDataSizeTxTrigger_ = unsignedParameter("recordDataSizeTxTrigger", DEFAULT_RECORD_DATA_SIZE_TX_TRIGGER, UINT_MAX);
+    recordCountTxTrigger_ = unsignedParameter("recordCountTxTrigger", DEFAULT_RECORD_COUNT_TX_TRIGGER, UINT_MAX);
+    maxVP3StorageSize_ = unsignedParameter("maxVP3StorageSize", DEFAULT_MAX_VP3_STORAGE_SIZE, LONG_MAX);
+    maxVP3StorageFiles_ = unsignedParameter("maxVP3StorageFiles", DEFAULT_MAX_VP3_STORAGE_FILES, UINT16_MAX);
+    keyoffTimeoutMs_ = unsignedParameter("VP3KeyoffTimeout", 0, UINT32_MAX);
+    requireStatusRecord_ = declare_parameter<bool>("requireStatusRecord", true);
+    storageRoot_ = declare_parameter<std::string>("storageRoot", DEFAULT_STORAGE_ROOT);
+    tempRoot_ = declare_parameter<std::string>("tempRoot", DEFAULT_TEMP_ROOT);
+    vp3TxPath_ = declare_parameter<std::string>("VP3TxPath", "");
+    cycleRateHz_ = declare_parameter<double>("cycleRateHz", 1.0);
+    if (!std::isfinite(cycleRateHz_) || cycleRateHz_ <= 0 ||
+        1e9 / cycleRateHz_ < 1 || 1e9 / cycleRateHz_ > INT64_MAX)
+        throw std::invalid_argument("Invalid cycleRateHz");
+    for (const auto& path : {storageRoot_, tempRoot_, vp3TxPath_}) {
+        if (path.empty() || path.string().find('\0') != std::string::npos)
+            throw std::invalid_argument("Empty or invalid filesystem path");
     }
-
-    if (!task::InterfaceDb::bind("CreateFileRequestInput", createFileRequestInput_)) {
-        AIS_LOG_FATAL("CreateFileRequestInput interface not defined");
-        return false;
-    }
-
-    if (!task::InterfaceDb::bind("AppRegOutput", AppRegOutput_)) {
-        AIS_LOG_FATAL("AppRegOutput interface not defined");
-        return false;
-    }
-
-    if (!task::InterfaceDb::bind("AppRegInput", AppRegInput_)) {
-        AIS_LOG_FATAL("AppRegInput interface not defined");
-        return false;
-    }
-
-    if (!task::InterfaceDb::bind("FileTransferBridgeRequestOutput", FileTransferBridgeRequestOutput_)) {
-        AIS_LOG_FATAL("FileTransferBridgeRequestOutput interface not defined");
-        return false;
-    }
-
-    if (!task::InterfaceDb::bind("PartNumbersInput", PartNumbersInput_)) {
-        AIS_LOG_FATAL("PartNumbersInput interface not defined");
-        return false;
-    }
-
-    if (!task::InterfaceDb::bind("ShmClockInput", ShmClockInput_)) {
-        AIS_LOG_FATAL("ShmClockInput interface not defined");
-        return false;
-    }
-
-    { // Get the configs and print it out.
-        ConfigSection& configs = getTaskConfig();
-
-        if (!configs.get("recordDataSizeTxTrigger", recordDataSizeTxTrigger_)) {
-            recordDataSizeTxTrigger_ = DEFAULT_RECORD_DATA_SIZE_TX_TRIGGER;
-        }
-
-        if (!configs.get("recordCountTxTrigger", recordCountTxTrigger_)) {
-            recordCountTxTrigger_ = DEFAULT_RECORD_COUNT_TX_TRIGGER;
-        }
-
-        if (!configs.get("maxVP3StorageSize", maxVP3StorageSize_)) {
-            maxVP3StorageSize_ = DEFAULT_MAX_VP3_STORAGE_SIZE;
-        }
-
-        if (!configs.get("maxVP3StorageFiles", maxVP3StorageFiles_)) {
-            maxVP3StorageFiles_ = DEFAULT_MAX_VP3_STORAGE_FILES;
-        }
-
-        // Are status records required?
-        if (!configs.get("requireStatusRecord", requireStatusRecord_)) {
-            requireStatusRecord_ = true;
-        }
-
-        std::string storageRoot;
-        if (configs.get("storageRoot", storageRoot)) {
-            storageRoot_ = storageRoot;
-        }
-        else {
-            storageRoot_ = DEFAULT_STORAGE_ROOT;
-        }
-
-        std::string tempRoot;
-        if (configs.get("tempRoot", tempRoot)) {
-            tempRoot_ = tempRoot;
-        }
-        else {
-            tempRoot_ = DEFAULT_TEMP_ROOT;
-        }
-
-        std::string vp3TxPath;
-        if (configs.get("VP3TxPath", vp3TxPath)) {
-            vp3TxPath_ = vp3TxPath;
-        }
-        else {
-            AIS_LOG_FATAL("'VP3TxPath' configuration not found.");
-            return false;
-        }
-
-        // Initialize the subdirectories for VP3 file creation and storage.
-        vp3TempPath_ = tempRoot_ / VP3_SUBDIR;
-        vp3StoragePath_ = storageRoot_ / VP3_SUBDIR;
-
-        AIS_LOG_INFO("Storage Root: %s", storageRoot_.c_str());
-        AIS_LOG_INFO("Temp Root: %s", tempRoot_.c_str());
-        AIS_LOG_INFO("VP3 Tx Path: %s", vp3TxPath_.c_str());
-        AIS_LOG_INFO("VP3 Temp Path: %s", vp3TempPath_.c_str());
-        AIS_LOG_INFO("VP3 Storage Path: %s", vp3StoragePath_.c_str());
-
-        { // Get key off timeout
-            unsigned int keyoffTime;
-            if (!configs.get("VP3KeyoffTimeout", keyoffTime)) {
-                keyoffTime = 0;
-            }
-
-            AIS_LOG_INFO("Key off Timeout: %u" , keyoffTime);
-
-            AppRegList.SetKeyOffTimeOutMSec(keyoffTime);
-        }
-    }
+    const auto scheduler = declare_parameter<std::string>("scheduler", "SCHED_OTHER");
+    const auto priority = declare_parameter<std::int64_t>("priority", 0);
+    int policy = SCHED_OTHER;
+    if (scheduler == "SCHED_RR") policy = SCHED_RR;
+    else if (scheduler == "SCHED_FIFO") policy = SCHED_FIFO;
+    else if (scheduler != "SCHED_OTHER") throw std::invalid_argument("Invalid scheduler");
+    if (priority < sched_get_priority_min(policy) || priority > sched_get_priority_max(policy))
+        throw std::invalid_argument("Invalid scheduling priority");
+    if (!applyRealtimeScheduling(policy, static_cast<int>(priority))) return false;
+    vp3TempPath_ = tempRoot_ / VP3_SUBDIR;
+    vp3StoragePath_ = storageRoot_ / VP3_SUBDIR;
+    using RosRecord = cpm_common_interfaces::msg::VP3Record;
+    subscribeQueue<RosRecord>("vp3_record", 100, recordQueue_, [](const RosRecord& message) {
+        return VP3Record(vp3::RecordValue::fromMessage(message));
+    });
+    subscribeQueue<CreateFileRequest>("create_file_request", 10, requestQueue_, [](const CreateFileRequest& message) { return message; });
+    subscribeQueue<AppReg>("vp3_app_reg_rx", 20, registrationQueue_, [](const AppReg& message) { return message; });
+    subscribeQueue<PartNumbers>("part_numbers", 10, partQueue_, [](const PartNumbers& message) { return message; });
+    subscribeQueue<ShmClock>("shm_clock_input", 10, clockQueue_, [](const ShmClock& message) { return message; });
+    AppRegOutput_ = create_publisher<AppReg>("vp3_app_reg_tx", rclcpp::QoS(20).reliable().durability_volatile());
+    FileTransferBridgeRequestOutput_ = create_publisher<FileTransferBridgeRequest>("file_transfer_bridge_request", rclcpp::QoS(20).reliable().durability_volatile());
 
     totalReceivedRecordSize_ = 0;
     totalReceivedRecordCount_ = 0;
@@ -256,7 +189,7 @@ bool VP3FileCreationApp::initialize( )
         fs::create_directories(tempRoot_);
 
         if (!LastDownloadTimestamp_.load(makeStoragePath(LASTDOWNLOADTIMESTAMP_FILENAME_BIN))) {
-            AIS_LOG_INFO("Inside reset if");
+            RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Inside reset if");
             resetLastDownloadTimestamp_ = true;
             LastDownloadTimestamp_.reset();
         }
@@ -267,31 +200,34 @@ bool VP3FileCreationApp::initialize( )
             ecmPartNum_.clear();
         }
         
-        if (!nvm::read(storageRoot_, STATUS_RECORD_FILENAME_BIN, latestStatusRecord)) {
+        if (!vp3::readStorage(makeStoragePath(STATUS_RECORD_FILENAME_BIN), [this](auto& archive) { archive >> statusArchive_; })) {
             /*
              * Make a default status record that has the earliest time possible
              * and default values for all other fields.  This will act as the status
              * record until a real status record comes in.
              */
-            latestStatusRecord = VP3RecordBuilder::makeStatusRecord(0, 0, 0, "", "", 0.f, "");
+            latestStatusRecord = VP3RecordBuilder::makeDefaultStatusRecord();
+        } else {
+            latestStatusRecord = VP3Record(vp3::RecordValue::fromArchive(statusArchive_));
         }
 
-        AIS_LOG_INFO("At init LastDownloadTimestamp_.LastDownloadTimestamp.UTC : %d", LastDownloadTimestamp_.LastDownloadTimestamp.UTC);
-        AIS_LOG_INFO("At init LastDownloadTimestamp_.LastDownloadTimestamp.Offset : %d", LastDownloadTimestamp_.LastDownloadTimestamp.Offset);
-        AIS_LOG_INFO("At init LastDownloadTimestamp_.LastDownloadTimestamp.SMH : %d", LastDownloadTimestamp_.LastDownloadTimestamp.SMH);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "At init LastDownloadTimestamp_.LastDownloadTimestamp.UTC : %d", LastDownloadTimestamp_.LastDownloadTimestamp.UTC);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "At init LastDownloadTimestamp_.LastDownloadTimestamp.Offset : %d", LastDownloadTimestamp_.LastDownloadTimestamp.Offset);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "At init LastDownloadTimestamp_.LastDownloadTimestamp.SMH : %d", LastDownloadTimestamp_.LastDownloadTimestamp.SMH);
 
         // Create the directories for VP3 file creation and storage.
         fs::create_directories(vp3TempPath_);
         fs::create_directories(vp3StoragePath_);
     }
     catch (const fs::filesystem_error& e) {
-        AIS_LOG_ERROR(e.what());
+        RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
     }
 
     // Clean up vp3 file storage if it is taking up too much space.
     makeSpaceForNewVp3File(0);
 
-    AIS_LOG_INFO("VP3FileCreationApp::initialize: %i, %i", recordDataSizeTxTrigger_, recordCountTxTrigger_);
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "VP3FileCreationApp::initialize: %i, %i", recordDataSizeTxTrigger_, recordCountTxTrigger_);
+    initialized_ = true;
     return true;
 }
 
@@ -309,14 +245,14 @@ bool VP3FileCreationApp::initialize( )
 ////////////////////////////////////////////////////////////////////////////
 bool VP3FileCreationApp::executive( )
 {
-    AIS_LOG_INFO("executive");
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "executive");
 
     UpdateRegistrations();
 
     getACDscsObject();
-    AIS_LOG_INFO("swGroupPartNum_ %s", swGroupPartNum_.c_str());
-    AIS_LOG_INFO("modelNum_ %s", modelNum_.c_str());
-    AIS_LOG_INFO("ecmPartNum_ %s", ecmPartNum_.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "swGroupPartNum_ %s", swGroupPartNum_.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "modelNum_ %s", modelNum_.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "ecmPartNum_ %s", ecmPartNum_.c_str());
 
     {
         bool createFileFlag = false;
@@ -336,21 +272,19 @@ bool VP3FileCreationApp::executive( )
             createFileRequester = "RecordCount";
         }
 
-        if (nullptr != createFileRequestInput_) {
-            // Consume all records looking for Mine
-            CreateFileRequest request;
-            while (createFileRequestInput_->get(request)) {
-                if (request.fileNumber == VP3_FILE_NUM) {
-                    createFileFlag = true;
-                    createFileRequester = request.Requester;
-                }
+        while (!requestQueue_.empty()) {
+            const auto request = std::move(requestQueue_.front());
+            requestQueue_.pop_front();
+            if (request.file_number == VP3_FILE_NUM) {
+                createFileFlag = true;
+                createFileRequester = request.requester;
             }
         }
 
         // Check whether we need to create the file based on SCS Command or size/record count trigger
         if (createFileFlag) {
             if (myRecordTypeContainers.empty()) {
-                AIS_LOG_NOTICE("No file created because of no records, requester = %s.", createFileRequester.c_str());
+                RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "No file created because of no records, requester = %s.", createFileRequester.c_str());
             }
             else {
                 createFile(createFileRequester);
@@ -367,9 +301,9 @@ bool VP3FileCreationApp::executive( )
 
         resetLastDownloadTimestamp_ = false;
 
-        AIS_LOG_INFO("Reset LastDownloadTimestamp_.LastDownloadTimestamp.UTC : %d", LastDownloadTimestamp_.LastDownloadTimestamp.UTC);
-        AIS_LOG_INFO("Reset LastDownloadTimestamp_.LastDownloadTimestamp.Offset : %d", LastDownloadTimestamp_.LastDownloadTimestamp.Offset);
-        AIS_LOG_INFO("Reset LastDownloadTimestamp_.LastDownloadTimestamp.SMH : %d", LastDownloadTimestamp_.LastDownloadTimestamp.SMH);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Reset LastDownloadTimestamp_.LastDownloadTimestamp.UTC : %d", LastDownloadTimestamp_.LastDownloadTimestamp.UTC);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Reset LastDownloadTimestamp_.LastDownloadTimestamp.Offset : %d", LastDownloadTimestamp_.LastDownloadTimestamp.Offset);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Reset LastDownloadTimestamp_.LastDownloadTimestamp.SMH : %d", LastDownloadTimestamp_.LastDownloadTimestamp.SMH);
     }
 
     /*
@@ -379,7 +313,7 @@ bool VP3FileCreationApp::executive( )
         TimeStamp cNow = commonNow();
         std::string commonNowStr = convertGPSToGMTString(cNow, "%m/%d/%Y %H:%M:%S");
 
-        AIS_LOG_WARN("SYS | %s | SHM | %s | SHML | %s | CMN | %s", nowStr.c_str(), shmClockUTCString.c_str(), shmClockLocalString.c_str(), commonNowStr.c_str());
+        RCLCPP_WARN(rclcpp::get_logger("VP3FileCreationApp"), "SYS | %s | SHM | %s | SHML | %s | CMN | %s", nowStr.c_str(), shmClockUTCString.c_str(), shmClockLocalString.c_str(), commonNowStr.c_str());
     }
     */
 
@@ -398,16 +332,33 @@ bool VP3FileCreationApp::executive( )
 //
 // Argument [I/O]  : None
 ////////////////////////////////////////////////////////////////////////////
+void VP3FileCreationApp::startExecutiveTimer()
+{
+    createExecutiveTimer(cycleRateHz_);
+}
+
+void VP3FileCreationApp::pumpFor(std::chrono::milliseconds duration)
+{
+    const auto end = std::chrono::steady_clock::now() + duration;
+    do {
+        if (receivePump_) receivePump_();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    } while (std::chrono::steady_clock::now() < end && rclcpp::ok());
+}
+
 void VP3FileCreationApp::cleanup()
 {
-    AIS_LOG_INFO("VP3FileCreationApp::cleanup");
+    if (!initialized_ || cleaned_) return;
+    cleaned_ = true;
+    if (executiveTimer_) executiveTimer_->cancel();
+    const auto start = std::chrono::steady_clock::now();
+    if (receivePump_) receivePump_();
+    UpdateRegistrations();
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "VP3FileCreationApp::cleanup");
 
     // Keep accumulating VP3 records as long as we are registered with apps producing them (or until a key-off timeout)
-    while (!AppRegList.IsAppRegListEmpty() && !AppRegList.IsKeyOffTimeOut()) {
-
-        usleep(VP3_CLEANUP_SLEEP_TIME); // sleep 100 msec + 20 msec in IsKeyOffTimeOut for each loop. total of 120ms
-
-        AIS_LOG_NOTICE("Waiting %d : %d", AppRegList.GetTimeDiffMSec(), AppRegList.GetKeyOffTimeOutMSec());
+    while (!activeProducers_.empty() && std::chrono::steady_clock::now() - start < std::chrono::milliseconds(keyoffTimeoutMs_)) {
+        pumpFor(std::chrono::milliseconds(120));
 
         // Process any new incoming records
         processIncomingRecords();
@@ -416,35 +367,32 @@ void VP3FileCreationApp::cleanup()
         UpdateRegistrations();
     }
 
-    nvm::store(storageRoot_, STATUS_RECORD_FILENAME_BIN, latestStatusRecord);
-
     // Process any remaining incoming records
     processIncomingRecords();
 
+    latestStatusRecord.updateArchive(statusArchive_);
+    vp3::writeStorage(makeStoragePath(STATUS_RECORD_FILENAME_BIN), [this](auto& archive) { archive << statusArchive_; });
+
     // Generate the last file and send it out
     if (myRecordTypeContainers.empty()) {
-        AIS_LOG_NOTICE("No cleanup file created because of no records.");
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "No cleanup file created because of no records.");
     }
     else {
         createFile("KeyOff");
     }
 
     // Log which apps are still trying to keep us alive.
-    const auto& activeAppNames = AppRegList.GetActiveAppNames();
+    const auto& activeAppNames = activeProducers_;
     for (const auto& name : activeAppNames) {
-        AIS_LOG_NOTICE("ListActiveAppNames::%s", name.c_str());
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "ListActiveAppNames::%s", name.c_str());
     }
 
    
     // Add sleep so that we give some time for FTB to transfer the last file before unregistering  
-    usleep(VP3_CLEANUP_SLEEP_TIME); // sleep 100 msec + 20 msec in IsKeyOffTimeOut for each loop. total of 120ms
-        
-    if ((nullptr != AppRegOutput_) && AppRegistered) {
-        // Build a registration severance request from this app
-        AppReg newRequest;
-        newRequest.SetAppRegAttr(AppRegList.GetAppName(), AppRegStorage::APP_REG_STATE_INACTIVE, vp3FilesDestinationApp);
-        AppRegOutput_->publish(newRequest);
-        AIS_LOG_NOTICE("Vp3FileCreatorApp: Unregistration with %s", vp3FilesDestinationApp.c_str());
+    pumpFor(std::chrono::milliseconds(100));
+    if (AppRegOutput_ && AppRegistered) {
+        publishRegistration(AppReg::STATE_INACTIVE);
+        pumpFor(std::chrono::milliseconds(100));
     }
 }
 
@@ -524,22 +472,33 @@ void VP3FileCreationApp::createFile(const std::string& requester)
     FileTransferBridgeRequest fileTransferRequest;
     FILE* vp3File = nullptr;
 
-    AIS_LOG_NOTICE("Create File Requester: %s", requester.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Create File Requester: %s", requester.c_str());
 
-    if (!PartNumbers::IsProductIdValid(productId_)) {
-        AIS_LOG_ERROR("Failed to create file, product id '%s' is not valid.", productId_.c_str());
+    const auto alphaNumeric = [](char c) { return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'); };
+    const bool validProduct = productId_.size() >= 8 &&
+        std::all_of(productId_.begin(), productId_.begin() + 3, alphaNumeric) &&
+        std::all_of(productId_.begin() + 3, productId_.begin() + 8, [](char c) { return c >= '0' && c <= '9'; });
+    if (!validProduct) {
+        RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Failed to create file, product id '%s' is not valid.", productId_.c_str());
         return;
     }
 
     Add_VP3_header_block();
 
-    std::string vp3FileName = fileTransferRequest.GenerateFileNamev2(VP3_FILE_NUM, productId_, "VP3").Name;
+    const auto clock = std::time(nullptr);
+    std::tm utc{};
+    if (!gmtime_r(&clock, &utc)) throw std::runtime_error("Cannot convert filename time");
+    std::ostringstream filename;
+    filename << VP3_FILE_NUM << '_' << productId_ << std::put_time(&utc, "%y%m%d%H%M%S") << "_DQ1.VP3";
+    const std::string vp3FileName = filename.str();
+    fileTransferRequest.name = vp3FileName;
+    fileTransferRequest.telematics_file_number = VP3_FILE_NUM;
 
     fs::path tempFilePath = vp3TempPath_ / vp3FileName;
     fs::path storageFilePath = vp3StoragePath_ / vp3FileName;
     fs::path txFilePath = vp3TxPath_ / vp3FileName;
 
-    AIS_LOG_NOTICE("VP3 Tx File Path: %s", txFilePath.c_str());
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "VP3 Tx File Path: %s", txFilePath.c_str());
 
     vp3File = fopen(tempFilePath.c_str(), "wb+");
 
@@ -555,12 +514,12 @@ void VP3FileCreationApp::createFile(const std::string& requester)
 
             fwrite(P2, sizeof(P2[0]), sizeof(P2)/sizeof(P2[0]), vp3File);
             if (ferror(vp3File)) {
-                AIS_LOG_ERROR("Error Writing P2 Block to VP3 file");
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Error Writing P2 Block to VP3 file");
             }
 
             fwrite(container.getUID64().data(), container.getUID64().length(), 1, vp3File);
             if (ferror(vp3File)) {
-                AIS_LOG_ERROR("Error Writing UIDs to VP3 file");
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Error Writing UIDs to VP3 file");
             }
 
             uint_to_byteArr(container.getNumberOfUIDs()-1, &R2[4]);
@@ -569,24 +528,24 @@ void VP3FileCreationApp::createFile(const std::string& requester)
 
             fwrite(R2, sizeof(R2[0]), sizeof(R2)/sizeof(R2[0]), vp3File);
             if (ferror(vp3File)) {
-                AIS_LOG_ERROR("Error Writing R2 Block to VP3 file");
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Error Writing R2 Block to VP3 file");
             }
 
             fwrite(container.getRBlockData().data(), container.getRBlockData().length(), 1, vp3File);
             if (ferror(vp3File)) {
-                AIS_LOG_ERROR("Error Writing record data to VP3 file");
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Error Writing record data to VP3 file");
             }
 
             sizeOfVp3File += (14 + container.getUID64().length() + container.getRBlockData().length()); //calculating size of the file
         }
 
         if (fclose(vp3File)) {
-            AIS_LOG_ERROR("Error closing VP3 file");
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Error closing VP3 file");
         }
 
         auto tpEnd = std::chrono::system_clock::now();
 
-        AIS_LOG_INFO("Duration (sec): %lf", std::chrono::duration_cast<std::chrono::milliseconds>(tpEnd - tpStart).count());
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Duration (sec): %f", std::chrono::duration<double>(tpEnd - tpStart).count());
 
         bool copiedToStorage = false;
 
@@ -598,12 +557,12 @@ void VP3FileCreationApp::createFile(const std::string& requester)
                 copiedToStorage = true;
             }
             catch (const fs::filesystem_error& e) {
-                AIS_LOG_ERROR(e.what());
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
             }
         }
         else {
             // Cannot make space!
-            AIS_LOG_ERROR("Cannot make space for new VP3 file in storage directoy.");
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Cannot make space for new VP3 file in storage directoy.");
         }
 
         // Copy file to tx directory and publish the file transfer request
@@ -617,20 +576,15 @@ void VP3FileCreationApp::createFile(const std::string& requester)
                 fs::copy_file(tempFilePath, txFilePath, fs::copy_option::fail_if_exists);
             }
 
-            fileTransferRequest.fileAttr.DirPath = txFilePath.parent_path().string() + "/";
-            fileTransferRequest.fileAttr.SizeInBytes = sizeOfVp3File;
-
-            if (nullptr != FileTransferBridgeRequestOutput_) {
-                if (FileTransferBridgeRequestOutput_->publish(fileTransferRequest)) {
-                    AIS_LOG_NOTICE("Published new VP3 file to file transfer bridge app.  Size is %d", sizeOfVp3File);
-                }
-                else {
-                    AIS_LOG_ERROR("Failed to publish VP3 file to file transfer bridge app.");
-                }
+            fileTransferRequest.dir_path = txFilePath.parent_path().string() + "/";
+            fileTransferRequest.size_in_bytes = sizeOfVp3File;
+            if (FileTransferBridgeRequestOutput_) {
+                FileTransferBridgeRequestOutput_->publish(fileTransferRequest);
+                RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Published new VP3 file to file transfer bridge app. Size is %d", sizeOfVp3File);
             }
         }
         catch (const fs::filesystem_error& e) {
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
         }
 
         // Remove the Temp file
@@ -638,11 +592,11 @@ void VP3FileCreationApp::createFile(const std::string& requester)
             fs::remove(tempFilePath);
         }
         catch (const fs::filesystem_error& e) {
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
         }
     }
     else {
-        AIS_LOG_ERROR("Could not fopen VP3 file");
+        RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not fopen VP3 file");
     }
 
     // remove everything
@@ -656,60 +610,53 @@ void VP3FileCreationApp::createFile(const std::string& requester)
  * Receive new vp3 records and save them for the next vp3 file.
  */
 void VP3FileCreationApp::processIncomingRecords() {
-    if (nullptr != VP3_Rec_input_) {
-        VP3Record record;
-        while (VP3_Rec_input_->get(record)) {
-            saveVp3Record(record);
-        }
+    while (!recordQueue_.empty()) {
+        const auto record = std::move(recordQueue_.front());
+        recordQueue_.pop_front();
+        saveVp3Record(record);
     }
+}
+
+void VP3FileCreationApp::publishRegistration(std::uint8_t state)
+{
+    AppReg request;
+    request.app_name = get_name();
+    request.app_state = state;
+    request.dest_app_name = vp3FilesDestinationApp;
+    AppRegOutput_->publish(request);
 }
 
 void VP3FileCreationApp::UpdateRegistrations(void)
 {
-    AIS_LOG_INFO( "AppRegTest::UpdateRegistrations" );
-
-    // Service all incoming requests and responses
-    if (nullptr != AppRegInput_) {
-        AppReg incomingReqResp;
-        while (AppRegInput_->get(incomingReqResp)) {
-            // Service only requests and responses addressed to this app
-            if (incomingReqResp.IsMsgAddressedToMe(AppRegList.GetAppName())) {
-                const bool isRequest = (incomingReqResp.GetMsgType() == AppRegStorage::APP_REG_REQ);
-                AIS_LOG_INFO("Received register/unregister (%d) request or response (%d) from app '%s'",
-                   static_cast<int>(incomingReqResp.GetAppState()),
-                   static_cast<int>(incomingReqResp.GetMsgType()),
-                   incomingReqResp.GetAppName().c_str());
-
-                // If this was a request then send a response
-                if (isRequest) {
-                    AppRegList.UpdateAppRegState(&incomingReqResp);
-                    AppRegOutput_->publish(incomingReqResp);
-                }
-                else if (vp3FilesDestinationApp == incomingReqResp.GetAppName() &&
-                         (incomingReqResp.GetRegStatus() == AppRegStorage::APP_REG_APP_NAME_REGISTERED ||
-                          incomingReqResp.GetRegStatus() == AppRegStorage::APP_REG_APP_NAME_ALREADY_REGISTERED)) {
-                    AppRegistered = true;
-                }
+    while (!registrationQueue_.empty()) {
+        auto message = std::move(registrationQueue_.front());
+        registrationQueue_.pop_front();
+        if (message.msg_type > AppReg::RESP || message.app_state > AppReg::STATE_INACTIVE || message.reg_status > AppReg::UNKNOWN) {
+            RCLCPP_WARN(get_logger(), "Unsupported AppReg enum value");
+            continue;
+        }
+        if (message.dest_app_name != get_name()) continue;
+        if (message.msg_type == AppReg::REQ) {
+            if (message.app_name.empty()) {
+                message.reg_status = AppReg::NAME_EMPTY;
+                AppRegOutput_->publish(message);
+                continue;
             }
+            if (message.app_state == AppReg::STATE_ACTIVE) {
+                message.reg_status = activeProducers_.insert(message.app_name).second ? AppReg::REGISTERED : AppReg::ALREADY_REGISTERED;
+            } else {
+                activeProducers_.erase(message.app_name);
+                message.reg_status = AppReg::UNREGISTERED;
+            }
+            std::swap(message.app_name, message.dest_app_name);
+            message.msg_type = AppReg::RESP;
+            AppRegOutput_->publish(message);
+        } else if (message.app_name == vp3FilesDestinationApp &&
+                   (message.reg_status == AppReg::REGISTERED || message.reg_status == AppReg::ALREADY_REGISTERED)) {
+            AppRegistered = true;
         }
     }
-
-    // Who is registered?
-    const auto& activeAppNames = AppRegList.GetActiveAppNames();
-    for (const auto& name : activeAppNames) {
-        AIS_LOG_DEBUG("ListActiveAppNames::%s",name.c_str());
-    }
-
-    // Send out registration requests
-    if (nullptr != AppRegOutput_) {
-        if (!AppRegistered) {
-            // Build a registration request from this app
-            AppReg newRequest;
-            newRequest.SetAppRegAttr(AppRegList.GetAppName(), AppRegStorage::APP_REG_STATE_ACTIVE, vp3FilesDestinationApp);
-            AIS_LOG_INFO("Attempting to register with app '%s'", vp3FilesDestinationApp.c_str());
-            AppRegOutput_->publish(newRequest);
-        }
-    }
+    if (!AppRegistered && AppRegOutput_) publishRegistration(AppReg::STATE_ACTIVE);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -835,9 +782,9 @@ void VP3FileCreationApp::Add_VP3_header_block()
 
     // Save LastDownloadTimestamp
     LastDownloadTimestamp_.save(makeStoragePath(LASTDOWNLOADTIMESTAMP_FILENAME_BIN));
-    AIS_LOG_INFO( "After save LastDownloadTimestamp_.LastDownloadTimestamp.UTC : %d",LastDownloadTimestamp_.LastDownloadTimestamp.UTC );
-    AIS_LOG_INFO( "After save LastDownloadTimestamp_.LastDownloadTimestamp.Offset : %d",LastDownloadTimestamp_.LastDownloadTimestamp.Offset );
-    AIS_LOG_INFO( "After save LastDownloadTimestamp_.LastDownloadTimestamp.SMH : %d",LastDownloadTimestamp_.LastDownloadTimestamp.SMH );
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"),  "After save LastDownloadTimestamp_.LastDownloadTimestamp.UTC : %d",LastDownloadTimestamp_.LastDownloadTimestamp.UTC );
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"),  "After save LastDownloadTimestamp_.LastDownloadTimestamp.Offset : %d",LastDownloadTimestamp_.LastDownloadTimestamp.Offset );
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"),  "After save LastDownloadTimestamp_.LastDownloadTimestamp.SMH : %d",LastDownloadTimestamp_.LastDownloadTimestamp.SMH );
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -853,36 +800,37 @@ void VP3FileCreationApp::Add_VP3_header_block()
 ////////////////////////////////////////////////////////////////////////////
 void VP3FileCreationApp::getACDscsObject()
 {
-    PartNumbers partNumbers;
-    while (PartNumbersInput_->get(partNumbers)) {
+    while (!partQueue_.empty()) {
+        const auto partNumbers = std::move(partQueue_.front());
+        partQueue_.pop_front();
         bool updateFile = false;
 
-        if (partNumbers.IsProductIdNumSet()) {
-            std::string productId(partNumbers.GetProductIdNum());
+        if (partNumbers.product_id_num_set) {
+            std::string productId(partNumbers.product_id_num);
             if (productId_ != productId) {
                 productId_ = std::move(productId);
                 // product id is not stored in the file
             }
         }
 
-        if (partNumbers.IsECMPartNumSet()) { 
-            std::string ecmPartNum(partNumbers.GetECMPartNum());
+        if (partNumbers.ecm_part_num_set) { 
+            std::string ecmPartNum(partNumbers.ecm_part_num);
             if (ecmPartNum_ != ecmPartNum) {
                 ecmPartNum_ = std::move(ecmPartNum);
                 updateFile = true;
             }
         }
 
-        if (partNumbers.IsSwGroupPartNumSet()) {
-            std::string swGroupPartNum(partNumbers.GetSwGroupPartNum());
+        if (partNumbers.sw_group_part_num_set) {
+            std::string swGroupPartNum(partNumbers.sw_group_part_num);
             if (swGroupPartNum_ != swGroupPartNum) {
                 swGroupPartNum_ = std::move(swGroupPartNum);
                 updateFile = true;
             }
         }
 
-        if (partNumbers.IsModelNumSet()) {
-            std::string modelNum(partNumbers.GetModelNum());
+        if (partNumbers.model_num_set) {
+            std::string modelNum(partNumbers.model_num);
             if (modelNum_ != modelNum) {
                 modelNum_ = std::move(modelNum);
                 updateFile = true;
@@ -894,26 +842,21 @@ void VP3FileCreationApp::getACDscsObject()
         }
     }
 
-    ShmClock shmClock;
-    while (ShmClockInput_->get(shmClock)) {
-        int32_t offset = shmClock.get_UTC_offset();
-        tzone_tx_comm_struct tzone;
-
-        if (tes_common_ais::get_tz_struct(tzone, shmClock) && ((tzInfo_.offset != offset) || (tzInfo_.index != tzone.tzone_id))) {
-            std::string tzStr = tes_common_ais::makeTZString(tzone);
-            if (tes_common_ais::setTZString(tzStr)) {
-                AIS_LOG_INFO("Set TZ environment variable to '%s'.", tzStr.c_str());
-                tes_common_ais::clearLocalTimeOffsetOverride();
-            }
-            else {
-                AIS_LOG_ERROR("Could not set TZ environment variable to '%s'.", tzStr.c_str());
-                tes_common_ais::setLocalTimeOffsetOverride(std::chrono::minutes(offset));
-            }
+    while (!clockQueue_.empty()) {
+        const auto shmClock = std::move(clockQueue_.front());
+        clockQueue_.pop_front();
+        const auto offset = shmClock.utc_offset_min;
+        const auto index = shmClock.tzone_info[19];
+        if (offset < INT16_MIN || offset > INT16_MAX) {
+            RCLCPP_WARN(get_logger(), "Clock UTC offset is not representable in VP3 header");
+        } else if (tzInfo_.offset != offset || tzInfo_.index != index) {
+            const auto tz = vp3::timezoneString(shmClock.tzone_info);
+            if (setenv("TZ", tz.c_str(), 1) == 0) tzset();
+            else RCLCPP_ERROR(get_logger(), "Could not set TZ environment variable");
             tzInfo_.offset = offset;
-            tzInfo_.index = tzone.tzone_id;
+            tzInfo_.index = index;
         }
-
-        shmSeconds_ = shmClock.get_SHM();
+        shmSeconds_ = shmClock.shm_sec;
 
             /*
             { // For debugging
@@ -944,35 +887,35 @@ bool LastDownloadTimestampStorage::load(const fs::path& filePath) {
         try {
             boost::archive::binary_iarchive ia(ifs);
             ia >> *this;
-            AIS_LOG_INFO("Loaded Last Download Timestamp from storage.");
+            RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Loaded Last Download Timestamp from storage.");
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not deserialize Last Download Timestamp from storage.");
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not deserialize Last Download Timestamp from storage.");
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
             reset();
         }
         catch (const std::exception& e) {
-            AIS_LOG_ERROR("Could not deserialize Last Download Timestamp from storage.");
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not deserialize Last Download Timestamp from storage.");
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
         }
         catch (...) {
-            AIS_LOG_ERROR("Could not deserialize Last Download Timestamp from storage, unexpected error.");
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not deserialize Last Download Timestamp from storage, unexpected error.");
         }
 
         ifs.close();
 
         if (ifs.is_corrupt()) {
             if (ifs.fix_it()) {
-                AIS_LOG_WARN("Last Download Timestamp file was corrupt... fixed it.");
+                RCLCPP_WARN(rclcpp::get_logger("VP3FileCreationApp"), "Last Download Timestamp file was corrupt... fixed it.");
             }
             else {
-                AIS_LOG_ERROR("Last Download Timestamp file was corrupt... could not fix it.");
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Last Download Timestamp file was corrupt... could not fix it.");
             }
         }
     }
     else {
-        AIS_LOG_ERROR("Last Download Timestamp could not be opened from storage.");
+        RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Last Download Timestamp could not be opened from storage.");
     }
 
     return success;
@@ -998,18 +941,18 @@ bool LastDownloadTimestampStorage::save(const fs::path& filePath) {
         try {
             boost::archive::binary_oarchive oa(ofs);
             oa << *this;
-            AIS_LOG_INFO("Saved Last Download Timestamp to storage.");
+            RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Saved Last Download Timestamp to storage.");
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not serialize Last Download Timestamp to storage.");
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not serialize Last Download Timestamp to storage.");
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
         }
 
         ofs.close();
     }
     else {
-        AIS_LOG_ERROR("Last Download Timestamp could not be opened from storage.");
+        RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Last Download Timestamp could not be opened from storage.");
     }
 
     return success;
@@ -1063,29 +1006,29 @@ bool VP3FileCreationApp::ReadPartNumsFromNVM()
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not deserialize %s from storage.", PARTNUM_FILENAME_BIN);
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not deserialize %s from storage.", PARTNUM_FILENAME_BIN);
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
         }
         catch (const std::exception& e) {
-            AIS_LOG_ERROR("Could not deserialize %s from storage.", PARTNUM_FILENAME_BIN);
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not deserialize %s from storage.", PARTNUM_FILENAME_BIN);
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
         }
         catch (...) {
-            AIS_LOG_ERROR("Could not deserialize %s from storage, unexpected error.", PARTNUM_FILENAME_BIN);
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not deserialize %s from storage, unexpected error.", PARTNUM_FILENAME_BIN);
         }
 
         ifs.close();
         if (ifs.is_corrupt()) {
             if (ifs.fix_it()) {
-                AIS_LOG_WARN("%s was corrupt... fixed it.", PARTNUM_FILENAME_BIN);
+                RCLCPP_WARN(rclcpp::get_logger("VP3FileCreationApp"), "%s was corrupt... fixed it.", PARTNUM_FILENAME_BIN);
             }
             else {
-                AIS_LOG_ERROR("%s was corrupt... could not fix it.", PARTNUM_FILENAME_BIN);
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s was corrupt... could not fix it.", PARTNUM_FILENAME_BIN);
             }
         }
     }
     else {
-        AIS_LOG_ERROR("%s could not be opened from storage.", PARTNUM_FILENAME_BIN);
+        RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s could not be opened from storage.", PARTNUM_FILENAME_BIN);
     }
 
     return success;
@@ -1113,17 +1056,17 @@ bool VP3FileCreationApp::WritePartNumsToNVM()
         try {
             boost::archive::binary_oarchive oa(ofs);
             oa << swGroupPartNum_ << modelNum_ << ecmPartNum_;
-            AIS_LOG_NOTICE("Saving %s to storage.", PARTNUM_FILENAME_BIN);
+            RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Saving %s to storage.", PARTNUM_FILENAME_BIN);
             success = true;
         }
         catch (const boost::archive::archive_exception& e) {
-            AIS_LOG_ERROR("Could not serialize %s to storage.", PARTNUM_FILENAME_BIN);
-            AIS_LOG_ERROR(e.what());
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "Could not serialize %s to storage.", PARTNUM_FILENAME_BIN);
+            RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
         }
         ofs.close();
     }
     else {
-        AIS_LOG_ERROR("%s could not be saved to storage.", PARTNUM_FILENAME_BIN);
+        RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s could not be saved to storage.", PARTNUM_FILENAME_BIN);
     }
     return success;
 }
@@ -1159,25 +1102,25 @@ bool VP3FileCreationApp::makeSpaceForNewVp3File(long int newVp3FileSize)
                         totalSize += fstat.st_size;
                     }
                     else {
-                        AIS_LOG_WARN("Cannot get file size of %s", de.path().c_str());
+                        RCLCPP_WARN(rclcpp::get_logger("VP3FileCreationApp"), "Cannot get file size of %s", de.path().c_str());
                     }
                 }
                 else {
-                    AIS_LOG_NOTICE("%s is not a regular file", de.path().c_str());
+                    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "%s is not a regular file", de.path().c_str());
                 }
             }
             catch (const fs::filesystem_error& e) {
-                AIS_LOG_ERROR(e.what());
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
             }
         }
     }
 
     auto numFiles = fileMap.size();
     auto maxFiles = maxVP3StorageFiles_;
-    AIS_LOG_NOTICE("Found %d files, maximum is %d", numFiles, maxVP3StorageFiles_);
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Found %zu files, maximum is %d", numFiles, maxVP3StorageFiles_);
 
     auto maxSize = maxVP3StorageSize_;
-    AIS_LOG_NOTICE("Found %d bytes worth of data in storage directory, maximum is %d", totalSize, maxSize);
+    RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Found %ld bytes worth of data in storage directory, maximum is %ld", totalSize, maxSize);
 
     { // Remove files until we have enough space.
         FileMap::const_iterator it = fileMap.cbegin();
@@ -1193,10 +1136,10 @@ bool VP3FileCreationApp::makeSpaceForNewVp3File(long int newVp3FileSize)
                 fs::remove(vp3StoragePath_ / it->second.first);
                 totalSize -= it->second.second;
                 --numFiles;
-                AIS_LOG_NOTICE("Deleted file %s, %d files, %d bytes remaining", it->second.first.c_str(), numFiles, totalSize);
+                RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Deleted file %s, %zu files, %ld bytes remaining", it->second.first.c_str(), numFiles, totalSize);
             }
             catch (const fs::filesystem_error& e) {
-                AIS_LOG_ERROR(e.what());
+                RCLCPP_ERROR(rclcpp::get_logger("VP3FileCreationApp"), "%s", e.what());
             }
 
             ++it;
@@ -1208,10 +1151,10 @@ bool VP3FileCreationApp::makeSpaceForNewVp3File(long int newVp3FileSize)
 
     { // Log the time it took
         double elapsedCpuTime = 1000.0 * (endCpuTime - startCpuTime) / CLOCKS_PER_SEC;
-        AIS_LOG_NOTICE("Took %f milliseconds of CPU time to make space for new vp3 files.", elapsedCpuTime);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Took %f milliseconds of CPU time to make space for new vp3 files.", elapsedCpuTime);
 
         double elapsedTime = std::chrono::duration<double, std::milli>(endTime - startTime).count();
-        AIS_LOG_NOTICE("Took %f milliseconds of wall clock time to make space to new vp3 files.", elapsedTime);
+        RCLCPP_INFO(rclcpp::get_logger("VP3FileCreationApp"), "Took %f milliseconds of wall clock time to make space to new vp3 files.", elapsedTime);
     }
 
     bool haveSpace = ((numFiles + newVp3FileCount) <= maxFiles) && ((totalSize + newVp3FileSize) <= maxSize);

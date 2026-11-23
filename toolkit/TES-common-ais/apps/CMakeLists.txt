@@ -123,6 +123,8 @@ set(TARGET_APP_VARIANT "${ECM_VARIANT}")
 add_subdirectory(OutputApp)
 add_subdirectory(SerialPrinterApp)
 
+add_subdirectory(VP3FileCreatorApp)
+
 ###################################################
 #Deploy
 ###################################################
@@ -135,6 +137,7 @@ add_custom_target(copy_runtime_libs ALL
 add_dependencies(copy_runtime_libs
    OutputApp
    SerialPrinterApp
+   VP3FileCreationApp
 )
 #################################################
 

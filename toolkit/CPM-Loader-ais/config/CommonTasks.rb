@@ -53,16 +53,6 @@ AuxiliaryProcesses.update({
       "alwaysOn" => false,
   },
 
-  "SerialPrinterApp" => {
-      "machines" => [
-                      Machines::MachineMap.default,
-                    ],
-      "executableName" => ENV['CAT_DIR'] + "/bin/SerialPrinterApp",
-      "autoRestart" => true,
-      "timeBetweenRestarts_s" => 2,
-      "alwaysOn" => false,
-  },
-
   "AISJhm2DataServer" => {
       "machines" => [
                       Machines::MachineMap.default,
@@ -78,16 +68,6 @@ AuxiliaryProcesses.update({
                       Machines::MachineMap.default,
                     ],
       "executableName" => ENV['CAT_DIR'] + "/bin/autonomyConditionDiagnostics",
-      "autoRestart" => true,
-      "timeBetweenRestarts_s" => 2,
-      "alwaysOn" => false,
-  },
-
-  "VP3FileCreationApp" => {
-      "machines" => [
-                      Machines::MachineMap.default,
-                    ],
-      "executableName" => ENV['CAT_DIR'] + "/bin/VP3FileCreationApp",
       "autoRestart" => true,
       "timeBetweenRestarts_s" => 2,
       "alwaysOn" => false,

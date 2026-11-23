@@ -13,7 +13,10 @@ DESCRIPTION:
 #ifndef SCSTOROS2BRIDGE_H
 #define SCSTOROS2BRIDGE_H
 
+#include <chrono>
+#include <deque>
 #include <memory>
+#include "VP3BridgeSupport.h"
 #include <string>
 
 #include <ais/task/Task.h>
@@ -41,9 +44,19 @@ DESCRIPTION:
 #include <interfaces/ReadyToFlashStatus/InterfaceTypes.h>
 #include <interfaces/TipoffModelTestPoints/InterfaceTypes.h>
 #include <interfaces/LpsSaTotals/PrinterCnfgInterfaceInputChannel.h>
+#include <interfaces/SerialPrinter/RequestInterfaceInputChannel.h>
 #include <ais/interfaces/SystemHardwareHealth/InterfaceTypes.h>
 #include <ais/interfaces/SystemHardwareHealthRequest/InterfaceTypes.h>
 #include <interfaces/PartNumbers/InterfaceTypes.h>
+#include <interfaces/VP3Record/InterfaceTypes.h>
+#include <interfaces/CreateFileRequest/InterfaceTypes.h>
+#include <interfaces/AppReg/InterfaceTypes.h>
+#include <interfaces/FileTransferBridgeRequest/InterfaceTypes.h>
+#include <cpm_common_interfaces/msg/vp3_record.hpp>
+#include <cpm_common_interfaces/msg/create_file_request.hpp>
+#include <cpm_common_interfaces/msg/app_reg.hpp>
+#include <cpm_common_interfaces/msg/file_transfer_bridge_request.hpp>
+#include <cpm_common_interfaces/msg/serial_printer_request.hpp>
 
 /* ROS2/DDS wrapper + generated message headers */
 #include "rclcpp/rclcpp.hpp"
@@ -172,6 +185,26 @@ private:
     std::unique_ptr<ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>>                  calMgrCmdRespRosIn_;   /* ROS2 -> AIS SCS (ACD consumer) */
     std::unique_ptr<ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::TipoffModelTestPoints>>          tipoffTestPointsRosIn_;  /* ROS2 -> AIS SCS (aisXcpServer consumer) */
     std::unique_ptr<ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg>>        printerCnfgRosOut_;      /* AIS SCS -> ROS2 (WeighApp subscriber) */
+    VP3RecordInput* vp3RecordScsIn_ = nullptr;
+    CreateFileRequestInput* createFileRequestScsIn_ = nullptr;
+    AppRegInput* appRegScsIn_ = nullptr;
+    AppRegOutput* appRegScsOut_ = nullptr;
+    FileTransferBridgeRequestOutput* fileTransferScsOut_ = nullptr;
+    SerialPrinterRequestInterfaceInputChannel* serialPrinterRequestScsIn_ = nullptr;
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::VP3Record>> vp3RecordRosOut_;
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::CreateFileRequest>> createFileRequestRosOut_;
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::AppReg>> appRegRosOut_;
+    rclcpp::Subscription<cpm_common_interfaces::msg::AppReg>::SharedPtr appRegRosIn_;
+    rclcpp::Subscription<cpm_common_interfaces::msg::FileTransferBridgeRequest>::SharedPtr fileTransferRosIn_;
+    std::deque<cpm_common_interfaces::msg::AppReg> appRegQueue_;
+    std::deque<cpm_common_interfaces::msg::FileTransferBridgeRequest> fileTransferQueue_;
+    vp3_bridge::DrainState vp3Drain_;
+    bool initialized_ = false;
+    bool cleanedUp_ = false;
+    void forwardVP3();
+    // Raw publisher, not RosOutputInterface: that wrapper hardcodes best_effort,
+    // but SerialPrinterApp's subscriber requires reliable -- incompatible QoS silently drops all messages.
+    rclcpp::Publisher<cpm_common_interfaces::msg::SerialPrinterRequest>::SharedPtr serialPrinterRequestRosOut_;
     void printGraphInfo();
     /* Conversion helpers -- pure, no side effects, no I/O. Static private
        methods rather than free functions so they stay scoped to this class
@@ -206,6 +239,7 @@ private:
     static CalMgrCmdResp convertCalMgrCmdRespToScs(const weigh_app_interfaces::msg::CalMgrCmdResp& ros);
     static TipoffModelTestPoints convertTipoffTestPointsToScs(const weigh_app_interfaces::msg::TipoffModelTestPoints& ros);
     static weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg convertPrinterCnfgToRos(const LpsSaTotalsPrinterCnfgInterface& scs);
+    static cpm_common_interfaces::msg::SerialPrinterRequest convertSerialPrinterRequestToRos(const SerialPrinterRequestInterface& scs);
 };
 
 #endif

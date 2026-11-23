@@ -23,3 +23,9 @@
     --stop \
     --pidfile /run/serial_printer.pid \
     --retry=TERM/30/KILL/5
+
+# Stop VP3FileCreationApp
+/sbin/start-stop-daemon \
+    --stop \
+    --pidfile /run/lps_vp3.pid \
+    --retry=TERM/30/KILL/5  

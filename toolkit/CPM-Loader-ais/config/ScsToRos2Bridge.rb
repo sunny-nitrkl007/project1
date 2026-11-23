@@ -43,6 +43,12 @@ Interfaces.update({
   "CalMgrCmdRespOutput" => InterfaceDefs_CpmCommon::CalMgrCmdRespOutput,
   "TipoffModelTestPointsOutput" => InterfaceDefs_Loaders::TipoffModelTestPointsOutput,
   "PrinterCnfgInput" => InterfaceDefs_Loaders::LpsSaTotalsPrinterCnfgInputChannel,
+  "SerialPrinterRequestInput" => InterfaceDefs_CpmCommon::SerialPrinterRequestInputChannel,
+  "VP3RecordInput" => InterfaceDefs_CpmCommon::VP3RecordInput,
+  "CreateFileRequestInput" => InterfaceDefs_CpmCommon::CreateFileRequestInput,
+  "AppRegInput" => InterfaceDefs_CpmCommon::AppRegInput,
+  "AppRegOutput" => InterfaceDefs_CpmCommon::AppRegOutput,
+  "FileTransferBridgeRequestOutput" => InterfaceDefs_CpmCommon::FileTransferBridgeRequestOutput,
 })
 
 Parameters = CommonTaskParams::Parameters.dup;
@@ -50,6 +56,8 @@ Parameters.update({
   "loggerThreshold" => "error",  ##  All options listed in descending severity order
                                  ##  - emerg, fatal, alert, crit, error, warn, notice, info, debug
 
+  "VP3BridgeDrainTimeoutMs" => 1950000,
+  "VP3AppName" => "VP3FileCreationApp",
   "cycleRate_hz" => 20.0, # fast enough that operator-facing command/ack latency through this bridge is not user-visible
 })
 
