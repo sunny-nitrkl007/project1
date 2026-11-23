@@ -39,6 +39,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LpsSaUIDisplayState.msg"
   "msg/LpsSaUIDisplayStateInterface.msg"
   "msg/ProcessHealth.msg"
+  "msg/SerialPrinterRequest.msg"
 )
 
 ament_export_dependencies(rosidl_default_runtime)

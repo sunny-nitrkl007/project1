@@ -1,0 +1,12 @@
+SerialPrinterApp:
+  ros__parameters:
+    scheduler: "SCHED_RR"
+    scheduler_priority: 1
+    cycle_rate_hz: 2.0
+    logger_threshold: "error"
+    device_path: "/dev/ttyS2"
+    baud_rate: 9600
+    stop_bits: 1
+    data_bits: 8
+    parity_bit: "none"
+    seconds_between_docs: 2.0

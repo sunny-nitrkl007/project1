@@ -12,12 +12,9 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include <ais/task/Task.h>
-#include <ais/log/AisLogger.h>
+#include "ROS2Logger.hpp"
 
 #include <fileio/iflocker.hpp>
-
-#include <interfaces/SerialPrinter/RequestInterface.hpp>
 
 #include "SerialPrinterApp.h"
 
@@ -46,19 +43,89 @@ static constexpr auto TEST_STRING = R"(  @@@@@@@         @@@    @@@@@@@@@@@@
  @@@@@@@ .:::::::::::::::::::. @@
   @@@@@ ::::::::::::::::::::::: @)";
 
-/*
- * main() will call this function in order to get the task instance.
- */
-task::AbstractTaskCore* task::getTaskImplementation(void) {
-    static SerialPrinterApp thisTask("SerialPrinterApp");
-    return dynamic_cast<Task*>(&thisTask);
+int main(int argc, char** argv) {
+    std::vector<char*> rosArguments{argv[0]};
+    std::string instance = "SerialPrinterApp";
+    for (int index = 1; index < argc; ++index) {
+        const std::string argument(argv[index]);
+        if (argument == "--instance" || argument == "--instanceName") {
+            if (++index >= argc) {
+                std::cerr << "Missing instance name\n";
+                return 1;
+            }
+            instance = argv[index];
+        }
+        else if (argument.rfind("--instance=", 0) == 0) {
+            instance = argument.substr(11);
+        }
+        else if (argument.rfind("--instanceName=", 0) == 0) {
+            instance = argument.substr(15);
+        }
+        else {
+            rosArguments.push_back(argv[index]);
+        }
+    }
+    sigset_t signals;
+    sigemptyset(&signals);
+    sigaddset(&signals, SIGINT);
+    sigaddset(&signals, SIGTERM);
+    sigaddset(&signals, SIGQUIT);
+    if (pthread_sigmask(SIG_BLOCK, &signals, nullptr) != 0) {
+        std::cerr << "Cannot block shutdown signals\n";
+        return 1;
+    }
+    rclcpp::init(static_cast<int>(rosArguments.size()), rosArguments.data(),
+            rclcpp::InitOptions(), rclcpp::SignalHandlerOptions::None);
+    std::atomic<bool> stopping{false};
+    std::atomic<bool> signalThreadDone{false};
+    std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor;
+    std::thread signalThread;
+    std::shared_ptr<SerialPrinterApp> app;
+    int result = 1;
+    try {
+        ROS2Logger::Instance().SetFeatureName(instance);
+        app = std::make_shared<SerialPrinterApp>(instance);
+        executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+        executor->add_node(app);
+        signalThread = std::thread([&]() {
+            unsigned int caught = 0;
+            const timespec timeout{0, 100000000};
+            while (!signalThreadDone) {
+                const int signal = sigtimedwait(&signals, nullptr, &timeout);
+                if (signal == SIGINT || signal == SIGTERM || signal == SIGQUIT) {
+                    if (++caught >= 3) {
+                        std::_Exit(1);
+                    }
+                    stopping = true;
+                    executor->cancel();
+                }
+            }
+        });
+        if (app->initialize() && !stopping) {
+            app->startExecutiveTimer();
+            executor->spin();
+            result = 0;
+        }
+    }
+    catch (const std::exception& error) {
+        RCLCPP_ERROR(rclcpp::get_logger("SerialPrinterApp"), "%s", error.what());
+    }
+    if (app) {
+        app->cleanup();
+    }
+    signalThreadDone = true;
+    if (signalThread.joinable()) {
+        signalThread.join();
+    }
+    rclcpp::shutdown();
+    return result;
 }
 
 /*
  * Constructor
  */
 SerialPrinterApp::SerialPrinterApp(const std::string& taskName) :
-    task::Task(taskName),
+    ros2_wrapper::Ros2TaskWrapper(taskName),
     port_(""),
     baudRate_(SerialPrinterBaudRate::BPS_9600),
     parityBit_(SerialPrinterParityBit::NONE),
@@ -78,17 +145,32 @@ SerialPrinterApp::SerialPrinterApp(const std::string& taskName) :
  * Destructor
  */
 SerialPrinterApp::~SerialPrinterApp() {
+    cleanup();
 }
 
 /*
- * AIS Task Initializer
+ * ROS2 Initializer
  */
 bool SerialPrinterApp::initialize() {
     bool everythingOk = true;
-    AIS_LOG_INFO("SerialPrinterApp::initialize");
+    RCLCPP_INFO(get_logger(), "SerialPrinterApp::initialize");
 
     { // Get the configs and print it out.
-        ConfigSection& configs = getTaskConfig();
+        ROS2Logger::Instance().SetLogLevel(declare_parameter<std::string>("logger_threshold", "error"));
+        cycleRateHz_ = declare_parameter<double>("cycle_rate_hz", 2.0);
+        if (!std::isfinite(cycleRateHz_) || cycleRateHz_ <= 0.0 || cycleRateHz_ > 1000.0) {
+            RCLCPP_ERROR(get_logger(), "Invalid cycle_rate_hz");
+            return false;
+        }
+        const auto scheduler = declare_parameter<std::string>("scheduler", "SCHED_OTHER");
+        const auto priority = declare_parameter<int>("scheduler_priority", 0);
+        if (scheduler != "SCHED_OTHER" && scheduler != "SCHED_RR" && scheduler != "SCHED_FIFO") {
+            RCLCPP_ERROR(get_logger(), "Invalid scheduler");
+            return false;
+        }
+        if (!applyRealtimeScheduling(scheduler, priority)) {
+            return false;
+        }
         uint32_t bitsPerCharacter = 1; // Start with 1 for the start bit
         float bitsPerSecond;
 
@@ -99,28 +181,28 @@ bool SerialPrinterApp::initialize() {
 
         { // Get Port
             std::string devicePath;
-            if (configs.get("devicePath", devicePath)) {
+            if (readConfig("device_path", devicePath, std::string{})) {
                 if (devicePath.empty()) {
                     port_ = "";
                     printToStdOut_ = true;
-                    AIS_LOG_INFO("Printing to std out");
+                    RCLCPP_INFO(get_logger(), "Printing to std out");
                 }
                 else {
                     port_ = devicePath;
                     printToStdOut_ = false;
-                    AIS_LOG_INFO("Serial port device path '%s'", devicePath.c_str());
+                    RCLCPP_INFO(get_logger(), "Serial port device path '%s'", devicePath.c_str());
                 }
             }
             else {
                 port_ = "";
                 printToStdOut_ = true;
-                AIS_LOG_WARN("Serial port device path not given");
+                RCLCPP_WARN(get_logger(), "Serial port device path not given");
             }
         }
 
         { // Get Baud Rate
-            uint32_t baudRate;
-            if (configs.get("baudRate", baudRate)) {
+            uint32_t baudRate = 9600;
+            if (readConfig("baud_rate", baudRate, uint32_t{9600})) {
                 if (baudRate <= 300) {
                     bitsPerSecond = 300.0f;
                     baudRate_ = SerialPrinterBaudRate::BPS_300;
@@ -167,12 +249,12 @@ bool SerialPrinterApp::initialize() {
                 baudRate_ = SerialPrinterBaudRate::BPS_9600;
             }
 
-            AIS_LOG_INFO("Serial port baud rate set to %u", baudRate);
+            RCLCPP_INFO(get_logger(), "Serial port baud rate set to %u", baudRate);
         }
 
         { // Get Number of Stop Bits
             uint32_t stopBits;
-            if (configs.get("stopBits", stopBits)) {
+            if (readConfig("stop_bits", stopBits, uint32_t{1})) {
                 if (stopBits > 1) {
                     stopBits = 2;
                 }
@@ -188,12 +270,12 @@ bool SerialPrinterApp::initialize() {
 
             stopBits_ = stopBits;
 
-            AIS_LOG_INFO("Serial port stop bits set to %u", stopBits);
+            RCLCPP_INFO(get_logger(), "Serial port stop bits set to %u", stopBits);
         }
 
         { // Get Number of Data Bits
             uint32_t dataBits;
-            if (configs.get("dataBits", dataBits)) {
+            if (readConfig("data_bits", dataBits, uint32_t{8})) {
                 if (dataBits > 7) {
                     dataBits = 8;
                 }
@@ -209,12 +291,12 @@ bool SerialPrinterApp::initialize() {
 
             dataBits_ = dataBits;
 
-            AIS_LOG_INFO("Serial port data bits set to %u", dataBits);
+            RCLCPP_INFO(get_logger(), "Serial port data bits set to %u", dataBits);
         }
 
         { // Get Parity Bit Setting
             std::string parityBit;
-            if (configs.get("parityBit", parityBit)) {
+            if (readConfig("parity_bit", parityBit, std::string{"none"})) {
                 if ("none" == parityBit) {
                     parityBit_ = SerialPrinterParityBit::NONE;
                 }
@@ -236,7 +318,7 @@ bool SerialPrinterApp::initialize() {
                 parityBit_ = SerialPrinterParityBit::NONE;
             }
 
-            AIS_LOG_INFO("Serial port parity bit set to '%s'", parityBit.c_str());
+            RCLCPP_INFO(get_logger(), "Serial port parity bit set to '%s'", parityBit.c_str());
         }
 
         { // Get seconds between documents
@@ -246,7 +328,7 @@ bool SerialPrinterApp::initialize() {
              * the paper up when the document is complete.
              */
             float secondsBetweenDocs;
-            if (configs.get("secondsBetweenDocs", secondsBetweenDocs)) {
+            if (readConfig("seconds_between_docs", secondsBetweenDocs, 1.0f)) {
                 // Clip it to reasonable values
                 secondsBetweenDocs = std::max(secondsBetweenDocs, 0.0f);
                 secondsBetweenDocs = std::min(secondsBetweenDocs, 10.0f);
@@ -257,7 +339,7 @@ bool SerialPrinterApp::initialize() {
 
             secondsBetweenDocs_ = secondsBetweenDocs;
 
-            AIS_LOG_INFO("Seconds between printed documents is %f", secondsBetweenDocs);
+            RCLCPP_INFO(get_logger(), "Seconds between printed documents is %f", secondsBetweenDocs);
         }
 
         /*
@@ -272,73 +354,72 @@ bool SerialPrinterApp::initialize() {
         fileDescriptor_ = open(port_.c_str(), O_RDWR | O_NOCTTY);
         if (fileDescriptor_ < 0) {
             int err = errno;
-            AIS_LOG_ERROR("Cannot open port '%s' - errno=%d", port_.c_str(), err);
+            RCLCPP_ERROR(get_logger(), "Cannot open port '%s' - errno=%d", port_.c_str(), err);
             everythingOk = false;
         }
         else {
             // Configure the options
-            struct termios options;
+            struct termios options{};
 
-            // Get the current options for this port
-            tcgetattr(fileDescriptor_, &options);
+            // Never apply settings derived from a failed attribute read.
+            if (tcgetattr(fileDescriptor_, &options) != 0) {
+                RCLCPP_ERROR(get_logger(), "Cannot read serial attributes: errno=%d", errno);
+                return false;
+            }
 
             // Set baud rate
+            speed_t selectedSpeed = B9600;
             switch (baudRate_) {
             case (SerialPrinterBaudRate::BPS_300): {
-                cfsetispeed(&options, B300);
-                cfsetospeed(&options, B300);
+                selectedSpeed = B300;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_600): {
-                cfsetispeed(&options, B600);
-                cfsetospeed(&options, B600);
+                selectedSpeed = B600;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_1200): {
-                cfsetispeed(&options, B1200);
-                cfsetospeed(&options, B1200);
+                selectedSpeed = B1200;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_2400): {
-                cfsetispeed(&options, B2400);
-                cfsetospeed(&options, B2400);
+                selectedSpeed = B2400;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_4800): {
-                cfsetispeed(&options, B4800);
-                cfsetospeed(&options, B4800);
+                selectedSpeed = B4800;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_9600): {
-                cfsetispeed(&options, B9600);
-                cfsetospeed(&options, B9600);
+                selectedSpeed = B9600;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_19200): {
-                cfsetispeed(&options, B19200);
-                cfsetospeed(&options, B19200);
+                selectedSpeed = B19200;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_38400): {
-                cfsetispeed(&options, B38400);
-                cfsetospeed(&options, B38400);
+                selectedSpeed = B38400;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_57600): {
-                cfsetispeed(&options, B57600);
-                cfsetospeed(&options, B57600);
+                selectedSpeed = B57600;
                 break;
             }
             case (SerialPrinterBaudRate::BPS_115200): {
-                cfsetispeed(&options, B115200);
-                cfsetospeed(&options, B115200);
+                selectedSpeed = B115200;
                 break;
             }
             default: {
-                cfsetispeed(&options, B9600);
-                cfsetospeed(&options, B9600);
+                selectedSpeed = B9600;
                 break;
             }
+            }
+
+            if (cfsetispeed(&options, selectedSpeed) != 0 ||
+                    cfsetospeed(&options, selectedSpeed) != 0) {
+                RCLCPP_ERROR(get_logger(), "Cannot set serial speed: errno=%d", errno);
+                return false;
             }
 
             // Set parity bits
@@ -415,22 +496,33 @@ bool SerialPrinterApp::initialize() {
             options.c_iflag &= ~(BRKINT);
 
             // Discard all pending I/O
-            tcflush(fileDescriptor_, TCIOFLUSH);
+            if (tcflush(fileDescriptor_, TCIOFLUSH) != 0) {
+                RCLCPP_ERROR(get_logger(), "Cannot flush serial port: errno=%d", errno);
+                return false;
+            }
 
             // Apply the new settings
-            tcsetattr(fileDescriptor_, TCSANOW, &options);
+            if (tcsetattr(fileDescriptor_, TCSANOW, &options) != 0) {
+                RCLCPP_ERROR(get_logger(), "Cannot configure serial port: errno=%d", errno);
+                return false;
+            }
         }
     }
     else {
         fileDescriptor_ = -1;
     }
 
-    // Initialize input and output channels
-    requestInputChannel_ = dynamic_cast<SerialPrinterRequestInterfaceInputChannel*>(task::InterfaceDb::fetch("RequestInput"));
-    if (nullptr == requestInputChannel_) {
-        AIS_LOG_ERROR("No request input channel defined.");
-        everythingOk = false;
+    if (!everythingOk) {
+        return false;
     }
+    requestInputChannel_ = create_subscription<Request>(
+            "serial_printer_request", rclcpp::QoS(rclcpp::KeepLast(2)).reliable().durability_volatile(),
+            [this](const Request::SharedPtr request) {
+                if (requests_.size() == 2) {
+                    requests_.pop_front();
+                }
+                requests_.push_back(*request);
+            });
 
     printStream_.str("");
     printStream_.clear();
@@ -451,7 +543,7 @@ bool SerialPrinterApp::printWorker(uint8_t numberOfCopies) {
         totallyDone = true;
     }
 
-    AIS_LOG_NOTICE("Start Printing.");
+    RCLCPP_WARN(get_logger(), "Start Printing.");
 
     /*
      * The outer while loop keeps running the inner while loop until printing is
@@ -508,7 +600,7 @@ bool SerialPrinterApp::printWorker(uint8_t numberOfCopies) {
                     // We failed, bail, but give at least enough time to start a new fresh document.
                     waitTime += secondsBetweenDocs_;
                     totallyDone = true;
-                    AIS_LOG_ERROR("Line not printed, write error.");
+                    RCLCPP_ERROR(get_logger(), "Line not printed, write error.");
                     break; // out of inner while loop
                 }
                 else if (static_cast<std::size_t>(sizeWritten) >= sizeToWrite) {
@@ -544,7 +636,7 @@ bool SerialPrinterApp::printWorker(uint8_t numberOfCopies) {
                             printStream_.seekg(0);
                         }
 
-                        AIS_LOG_NOTICE("Last line printed.");
+                        RCLCPP_WARN(get_logger(), "Last line printed.");
                         break; // out of inner while loop
                     }
                     else {
@@ -559,13 +651,13 @@ bool SerialPrinterApp::printWorker(uint8_t numberOfCopies) {
                     currentLine = currentLine.substr(sizeWritten);
                     waitTime += static_cast<float>(sizeWritten) * secondsPerCharacter_;
 
-                    AIS_LOG_INFO("Part of the line printed.");
+                    RCLCPP_INFO(get_logger(), "Part of the line printed.");
                     break; // out of inner while loop
                 }
                 else /* 0 == sizeWritten */ {
                     // None of the line was written.
                     // Keep current line and try again.
-                    AIS_LOG_WARN("Line not printed, zero characters written.");
+                    RCLCPP_WARN(get_logger(), "Line not printed, zero characters written.");
                     break; // out of inner while loop
                 }
             }
@@ -586,50 +678,54 @@ bool SerialPrinterApp::printWorker(uint8_t numberOfCopies) {
     return true;
 }
 
+void SerialPrinterApp::startExecutiveTimer() {
+    createExecutiveTimer(cycleRateHz_);
+}
+
 /*
- * AIS Task Executive
+ * Periodic executive
  */
 bool SerialPrinterApp::executive() {
-    AIS_LOG_DEBUG("SerialPrinterApp::executive");
+    RCLCPP_DEBUG(get_logger(), "SerialPrinterApp::executive");
 
     // Handle one request at a time
-    SerialPrinterRequestInterface request;
-
-    if (requestInputChannel_->get(request)) {
+    if (!requests_.empty()) {
+        const auto request = requests_.front();
+        requests_.pop_front();
         switch (request.command) {
-            case (SerialPrinterRequestInterfaceCommand::PRINT): {
+            case (Request::PRINT): {
                 if (isPrinting()) {
-                    AIS_LOG_WARN("Cannot process a print request when printing is in process.");
+                    RCLCPP_WARN(get_logger(), "Cannot process a print request when printing is in process.");
                 }
                 else {
-                    tes_common_ais::IFlocker ifl(request.filePath());
+                    tes_common_ais::IFlocker ifl(request.file_path);
                     if (ifl) {
                         std::ifstream& ifs = ifl.ifstream();
 
                         std::ostringstream oss;
                         oss << ifs.rdbuf();
 
-                        print(oss.str(), request.numberOfCopies());
+                        print(oss.str(), std::min<uint8_t>(request.number_of_copies, 3));
 
                         ifl.close();
                     }
                     else {
-                        AIS_LOG_ERROR("Cannot open and lock print request file for reading.");
+                        RCLCPP_ERROR(get_logger(), "Cannot open and lock print request file for reading.");
                     }
                 }
                 break;
             }
-            case (SerialPrinterRequestInterfaceCommand::TEST): {
+            case (Request::TEST): {
                 if (isPrinting()) {
-                    AIS_LOG_WARN("Cannot process a print request when printing is in process.");
+                    RCLCPP_WARN(get_logger(), "Cannot process a print request when printing is in process.");
                 }
                 else {
-                    print(TEST_STRING, request.numberOfCopies());
+                    print(TEST_STRING, std::min<uint8_t>(request.number_of_copies, 3));
                 }
                 break;
             }
             default: {
-                AIS_LOG_WARN("Unsupported command.");
+                RCLCPP_WARN(get_logger(), "Unsupported command.");
                 break;
             }
         }
@@ -644,16 +740,16 @@ bool SerialPrinterApp::executive() {
  */
 bool SerialPrinterApp::isPrinting() {
     if (!printStatus_.valid()) {
-        AIS_LOG_NOTICE("not yet printed.");
+        RCLCPP_WARN(get_logger(), "not yet printed.");
         return false;
     }
     else if (printStatus_.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-        AIS_LOG_NOTICE("done printing.");
+        RCLCPP_WARN(get_logger(), "done printing.");
         printStatus_.get();
         return false;
     }
     else {
-        AIS_LOG_NOTICE("is printing now.");
+        RCLCPP_WARN(get_logger(), "is printing now.");
         return true;
     }
 }
@@ -664,7 +760,7 @@ bool SerialPrinterApp::isPrinting() {
  */
 bool SerialPrinterApp::print(const std::string& str, uint8_t numberOfCopies) {
 
-    AIS_LOG_NOTICE("Printing %d copies.", numberOfCopies);
+    RCLCPP_WARN(get_logger(), "Printing %d copies.", numberOfCopies);
 
     if (str.empty() || (numberOfCopies == 0)) {
         // Print nothing?  OK
@@ -690,29 +786,40 @@ bool SerialPrinterApp::print(const std::string& str, uint8_t numberOfCopies) {
  * Stop the printing
  */
 void SerialPrinterApp::stopPrinting() {
-    if (fileDescriptor_) {
+    {
         stopPrinting_ = true;
         if(printStatus_.valid()) {
             printStatus_.wait();
+            try {
+                printStatus_.get();
+            }
+            catch (const std::exception& error) {
+                RCLCPP_ERROR(get_logger(), "Print worker failed: %s", error.what());
+            }
         }
 
         // Flush the output (discard data written but not transmitted)
-        tcflush(fileDescriptor_, TCOFLUSH);
+        if (fileDescriptor_ >= 0) {
+            tcflush(fileDescriptor_, TCOFLUSH);
+        }
     }
 }
 
 /*
- * AIS Task Cleanup
+ * ROS2 Cleanup
  */
 void SerialPrinterApp::cleanup() {
-    AIS_LOG_INFO("SerialPrinterApp::cleanup");
+    RCLCPP_INFO(get_logger(), "SerialPrinterApp::cleanup");
 
-    if (isPrinting()) {
+    executiveTimer_.reset();
+    requestInputChannel_.reset();
+    requests_.clear();
+    if (printStatus_.valid()) {
         stopPrinting();
     }
 
     if (fileDescriptor_ >= 0) {
         close(fileDescriptor_);
-        fileDescriptor_ = 0;
+        fileDescriptor_ = -1;
     }
 }

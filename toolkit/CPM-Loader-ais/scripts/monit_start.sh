@@ -49,6 +49,7 @@ fi
 [ -f "${CONFIG_DIR}/LpsSaWeighApp.yaml" ] || exit 1
 [ -f "${CONFIG_DIR}/${ROBOT_YAML}" ] || exit 1
 [ -f "${CONFIG_DIR}/OutputApp.yaml" ] || exit 1
+[ -f "${CONFIG_DIR}/SerialPrinterApp.yaml" ] || exit 1
 
 # Start JobMgr
 /sbin/start-stop-daemon \
@@ -89,3 +90,15 @@ fi
     --ros-args \
     --params-file "${CONFIG_DIR}/OutputApp.yaml" \
     -p logger_threshold:=error
+
+# Start SerialPrinterApp
+/sbin/start-stop-daemon \
+    --start \
+    --background \
+    --make-pidfile \
+    --pidfile /run/serial_printer.pid \
+    --exec "${APP_DIR}/bin/SerialPrinterApp" \
+    -- \
+    --instance SerialPrinterApp \
+    --ros-args \
+    --params-file "${CONFIG_DIR}/SerialPrinterApp.yaml"

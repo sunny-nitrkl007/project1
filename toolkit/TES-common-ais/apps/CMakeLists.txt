@@ -121,6 +121,7 @@ set(TARGET_APP_VARIANT "${ECM_VARIANT}")
 ##############################################################################
 
 add_subdirectory(OutputApp)
+add_subdirectory(SerialPrinterApp)
 
 ###################################################
 #Deploy
@@ -133,6 +134,7 @@ add_custom_target(copy_runtime_libs ALL
 
 add_dependencies(copy_runtime_libs
    OutputApp
+   SerialPrinterApp
 )
 #################################################
 

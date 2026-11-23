@@ -16,4 +16,10 @@
 /sbin/start-stop-daemon \
     --stop \
     --pidfile /run/output_app.pid \
-    --retry=TERM/30/KILL/5    
+    --retry=TERM/30/KILL/5
+
+# Stop SerialPrinterApp
+/sbin/start-stop-daemon \
+    --stop \
+    --pidfile /run/serial_printer.pid \
+    --retry=TERM/30/KILL/5

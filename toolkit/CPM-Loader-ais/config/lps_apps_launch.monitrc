@@ -23,4 +23,13 @@ check process OutputApp with pidfile /run/output_app.pid
     if does not exist then restart
     if 5 restarts within 10 cycles then unmonitor
 
-    group lps      
+    group lps
+
+check process SerialPrinterApp with pidfile /run/serial_printer.pid
+    start program = "/opt/CPM/scripts/monit_start.sh"
+    stop program = "/opt/CPM/scripts/monit_stop.sh"
+
+    if does not exist then restart
+    if 5 restarts within 10 cycles then unmonitor
+
+    group lps
