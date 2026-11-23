@@ -4,6 +4,9 @@
 #include <sstream>
 #include <future>
 #include <algorithm>
+#include <atomic>
+#include <csignal>
+#include <exception>
 #include <thread>
 #include <chrono>
 
@@ -44,8 +47,7 @@ static constexpr auto TEST_STRING = R"(  @@@@@@@         @@@    @@@@@@@@@@@@
   @@@@@ ::::::::::::::::::::::: @)";
 
 int main(int argc, char** argv) {
-    return ros2_wrapper::Ros2TaskWrapper::run<SerialPrinterApp>(argc, argv,
-            ros2_wrapper::LifecyclePolicy::OrderlyShutdown, "SerialPrinterApp");
+    return ros2_wrapper::Ros2TaskWrapper::run<SerialPrinterApp>(argc, argv, "SerialPrinterApp");
 }
 
 /*
@@ -607,6 +609,65 @@ bool SerialPrinterApp::printWorker(uint8_t numberOfCopies) {
 
 void SerialPrinterApp::startExecutiveTimer() {
     createExecutiveTimer(cycleRateHz_);
+}
+
+/*
+ * Signals blocked, a dedicated sigtimedwait() thread (3-strikes force-exit),
+ * and a bounded spin_some() loop -- SerialPrinterApp's orderly-shutdown shape.
+ */
+int SerialPrinterApp::runLifecycle(std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor) {
+    sigset_t signalSet;
+    sigemptyset(&signalSet);
+    sigaddset(&signalSet, SIGINT);
+    sigaddset(&signalSet, SIGTERM);
+    sigaddset(&signalSet, SIGQUIT);
+    sigset_t previousSignalMask;
+    if (pthread_sigmask(SIG_BLOCK, &signalSet, &previousSignalMask) != 0) {
+        return 1;
+    }
+    struct SignalMaskRestorer {
+        sigset_t& previousMask;
+        ~SignalMaskRestorer() { pthread_sigmask(SIG_SETMASK, &previousMask, nullptr); }
+    } signalMaskRestorer{previousSignalMask};
+
+    std::atomic<bool> stopping{false};
+    std::atomic<bool> signalThreadDone{false};
+    std::thread signalThread([&]() {
+        unsigned int signalsCaught = 0;
+        const timespec timeout{0, 100000000};
+        while (!signalThreadDone.load()) {
+            const int signalNumber = sigtimedwait(&signalSet, nullptr, &timeout);
+            if (signalNumber == SIGINT || signalNumber == SIGTERM || signalNumber == SIGQUIT) {
+                if (++signalsCaught >= 3) {
+                    std::_Exit(1);
+                }
+                stopping.store(true);
+            }
+        }
+    });
+
+    startExecutiveTimer();
+    int result = 0;
+    try {
+        while (!stopping.load() && rclcpp::ok()) {
+            executor->spin_some(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+    catch (const std::exception& error) {
+        RCLCPP_ERROR(get_logger(), "%s", error.what());
+        result = 1;
+    }
+    catch (...) {
+        RCLCPP_ERROR(get_logger(), "Unknown lifecycle exception");
+        result = 1;
+    }
+
+    signalThreadDone.store(true);
+    if (signalThread.joinable()) {
+        signalThread.join();
+    }
+    return result;
 }
 
 /*

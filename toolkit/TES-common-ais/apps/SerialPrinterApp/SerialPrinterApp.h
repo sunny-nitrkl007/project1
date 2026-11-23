@@ -44,6 +44,7 @@ public:
     virtual bool executive();
     virtual void cleanup();
     void startExecutiveTimer() override;
+    int runLifecycle(std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor) override;
 
 protected:
     bool isPrinting();

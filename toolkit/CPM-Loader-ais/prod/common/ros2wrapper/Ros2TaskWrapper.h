@@ -13,8 +13,6 @@
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
-#include <exception>
-#include <iostream>
 #include <pthread.h>
 #include <sched.h>
 #include <string>
@@ -27,12 +25,6 @@
 namespace ros2_wrapper
 {
 
-enum class LifecyclePolicy
-{
-    Legacy,
-    OrderlyShutdown
-};
-
 class Ros2TaskWrapper : public rclcpp::Node
 {
 public:
@@ -44,7 +36,7 @@ public:
     virtual bool executive() = 0;
     virtual void cleanup() = 0;
 
-    
+
     virtual void startExecutiveTimer() = 0;
 
     // Optional hook for anything that must run before initialize() -- e.g.
@@ -55,9 +47,11 @@ public:
     // to drive: signals registered up front, beforeInitialize()+initialize(),
     // spin until a shutdown signal , cleanup()
     // with communication still alive, then rclcpp::shutdown() as the last
-    // step. Each app's main() becomes a one-line call to this.
-    template<typename AppT, bool UseReceivePump = false>
-    static int run(int argc, char** argv)
+    // step. Each app's main() becomes a one-line call to this. the lifecycle shape itself lives in
+    // runLifecycle() below, which an app overrides only if it needs
+    // something other than the default plain-spin loop.
+    template<typename AppT>
+    static int run(int argc, char** argv, const std::string& defaultIdentity = std::string())
     {
         std::string const rosLogDir = "/tmp/appdata/CPM/log";
         std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
@@ -66,7 +60,7 @@ public:
         setenv("ROS_AUTOMATIC_DISCOVERY_RANGE", "LOCALHOST", 0);
 
         std::vector<char*> rosArgv;
-        std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv);
+        std::string nodeName = parseLegacyInstanceName(argc, argv, rosArgv, defaultIdentity);
         int rosArgc = static_cast<int>(rosArgv.size());
 
         ROS2Logger::Instance().SetFeatureName(nodeName);
@@ -78,30 +72,10 @@ public:
         auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
         executor->add_node(app);
 
-        registerSignalHandling(executor);
-
         bool initialized = app->beforeInitialize() && app->initialize();
+        int loopResult = 0;
         if (initialized) {
-            app->startExecutiveTimer();
-
-            if constexpr (UseReceivePump)
-            {
-                app->setReceivePump(
-                    [executor]()
-                    {
-                        executor->spin_some();
-                    });
-
-                while (rclcpp::ok())
-                {
-                    executor->spin_some();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                }
-            }
-            else
-            {
-                executor->spin();
-            }
+            loopResult = app->runLifecycle(executor);
         }
         else {
             RCLCPP_ERROR(app->get_logger(), "Failed to initialize %s", nodeName.c_str());
@@ -112,124 +86,19 @@ public:
             rclcpp::shutdown();
         }
 
-        return initialized ? 0 : 1;
+        return (initialized && loopResult == 0) ? 0 : 1;
     }
 
-    template<typename AppT>
-    static int run(int argc, char** argv, LifecyclePolicy policy,
-            const std::string& defaultIdentity = std::string())
+    // Default lifecycle: registerSignalHandling() + executor->spin(), exactly
+    // what JobMgr/WeighApp/OutputApp/SwitchInputApp already get. Override in
+    // a derived app class for a different signal/loop shape. Return non-zero
+    // to mark the run as failed.
+    virtual int runLifecycle(std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor)
     {
-        if (policy != LifecyclePolicy::OrderlyShutdown) {
-            return run<AppT>(argc, argv);
-        }
-
-        std::string const rosLogDir = "/tmp/appdata/CPM/log";
-        std::string const logFormat = "{date_time_with_ms} | {severity} | {file_name}:{line_number} | {message}";
-        setenv("ROS_LOG_DIR", rosLogDir.c_str(), 1);
-        setenv("RCUTILS_CONSOLE_OUTPUT_FORMAT", logFormat.c_str(), 1);
-        setenv("ROS_AUTOMATIC_DISCOVERY_RANGE", "LOCALHOST", 0);
-
-        sigset_t signalSet;
-        sigemptyset(&signalSet);
-        sigaddset(&signalSet, SIGINT);
-        sigaddset(&signalSet, SIGTERM);
-        sigaddset(&signalSet, SIGQUIT);
-        sigset_t previousSignalMask;
-        if (pthread_sigmask(SIG_BLOCK, &signalSet, &previousSignalMask) != 0) {
-            return 1;
-        }
-        struct SignalMaskRestorer {
-            sigset_t& previousMask;
-            ~SignalMaskRestorer() { pthread_sigmask(SIG_SETMASK, &previousMask, nullptr); }
-        } signalMaskRestorer{previousSignalMask};
-
-        std::vector<char*> rosArgv;
-        bool argumentsValid = true;
-        std::string const nodeName = parseLegacyInstanceName(argc, argv, rosArgv,
-                defaultIdentity, true, &argumentsValid);
-        if (!argumentsValid) {
-            std::cerr << "Missing instance name\n";
-            return 1;
-        }
-        int const rosArgc = static_cast<int>(rosArgv.size());
-        ROS2Logger::Instance().SetFeatureName(nodeName);
-
-        bool contextInitialized = false;
-        std::atomic<bool> stopping{false};
-        std::atomic<bool> signalThreadDone{false};
-        std::shared_ptr<AppT> app;
-        std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor;
-        std::thread signalThread;
-        int result = 1;
-
-        try {
-            rclcpp::init(rosArgc, rosArgv.data(), rclcpp::InitOptions(),
-                    rclcpp::SignalHandlerOptions::None);
-            contextInitialized = true;
-            app = std::make_shared<AppT>(nodeName);
-            executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-            executor->add_node(app);
-            signalThread = std::thread([&]() {
-                unsigned int signalsCaught = 0;
-                const timespec timeout{0, 100000000};
-                while (!signalThreadDone.load()) {
-                    const int signalNumber = sigtimedwait(&signalSet, nullptr, &timeout);
-                    if (signalNumber == SIGINT || signalNumber == SIGTERM || signalNumber == SIGQUIT) {
-                        if (++signalsCaught >= 3) {
-                            std::_Exit(1);
-                        }
-                        stopping.store(true);
-                    }
-                }
-            });
-
-            const bool initialized = !stopping.load() && app->beforeInitialize() &&
-                    !stopping.load() && app->initialize();
-            if (initialized && !stopping.load()) {
-                app->startExecutiveTimer();
-                while (!stopping.load() && rclcpp::ok()) {
-                    executor->spin_some(std::chrono::milliseconds(100));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                }
-                result = 0;
-            }
-            else if (!stopping.load()) {
-                RCLCPP_ERROR(app->get_logger(), "Failed to initialize %s", nodeName.c_str());
-            }
-        }
-        catch (const std::exception& error) {
-            RCLCPP_ERROR(rclcpp::get_logger("Ros2TaskWrapper"), "%s", error.what());
-        }
-        catch (...) {
-            RCLCPP_ERROR(rclcpp::get_logger("Ros2TaskWrapper"), "Unknown lifecycle exception");
-        }
-
-        if (app) {
-            try {
-                app->cleanup();
-            }
-            catch (const std::exception& error) {
-                RCLCPP_ERROR(rclcpp::get_logger("Ros2TaskWrapper"), "Cleanup failed: %s", error.what());
-                result = 1;
-            }
-            catch (...) {
-                RCLCPP_ERROR(rclcpp::get_logger("Ros2TaskWrapper"), "Cleanup failed");
-                result = 1;
-            }
-        }
-        if (contextInitialized && rclcpp::ok()) {
-            try {
-                rclcpp::shutdown();
-            }
-            catch (...) {
-                result = 1;
-            }
-        }
-        signalThreadDone.store(true);
-        if (signalThread.joinable()) {
-            signalThread.join();
-        }
-        return result;
+        registerSignalHandling(executor);
+        startExecutiveTimer();
+        executor->spin();
+        return 0;
     }
 
 protected:
@@ -288,45 +157,9 @@ protected:
 
     rclcpp::TimerBase::SharedPtr executiveTimer_;
 
-private:
-    
-    static std::string parseLegacyInstanceName(int argc, char** argv, std::vector<char*>& rosArgv,
-            const std::string& defaultIdentity = std::string(), bool validateInstance = false,
-            bool* argumentsValid = nullptr)
-    {
-        std::string nodeName = defaultIdentity.empty() ? (argc > 0 ? argv[0] : "ros2_task") : defaultIdentity;
-        rosArgv.push_back(argv[0]);
-
-        for (int idx = 1; idx < argc; ++idx) {
-            const std::string arg(argv[idx]);
-
-            if ((arg == "--instance") || (arg == "--instanceName")) {
-                if ((idx + 1) < argc) {
-                    nodeName = argv[++idx];
-                }
-                else if (validateInstance && argumentsValid) {
-                    *argumentsValid = false;
-                }
-                continue;
-            }
-
-            const std::string instancePrefix = "--instance=";
-            const std::string instanceNamePrefix = "--instanceName=";
-            if (0 == arg.find(instancePrefix)) {
-                nodeName = arg.substr(instancePrefix.size());
-                continue;
-            }
-            if (0 == arg.find(instanceNamePrefix)) {
-                nodeName = arg.substr(instanceNamePrefix.size());
-                continue;
-            }
-
-            rosArgv.push_back(argv[idx]);
-        }
-
-        return nodeName;
-    }
-
+    // Exposed protected (not private) so a derived app's overridden
+    // runLifecycle() can reuse the same signal-thread helper.
+    //
     // Reproduces ais_task/ais/task/sigcatch.cpp exactly: block the exit
     // signals on every thread, hand them to one dedicated thread via
     // sigwait(). 1st/2nd signal interrupts the executor; 3rd forces an
@@ -362,6 +195,45 @@ private:
             }
         });
         signalThread.detach();
+    }
+
+private:
+
+    static std::string parseLegacyInstanceName(int argc, char** argv, std::vector<char*>& rosArgv,
+            const std::string& defaultIdentity = std::string(), bool validateInstance = false,
+            bool* argumentsValid = nullptr)
+    {
+        std::string nodeName = defaultIdentity.empty() ? (argc > 0 ? argv[0] : "ros2_task") : defaultIdentity;
+        rosArgv.push_back(argv[0]);
+
+        for (int idx = 1; idx < argc; ++idx) {
+            const std::string arg(argv[idx]);
+
+            if ((arg == "--instance") || (arg == "--instanceName")) {
+                if ((idx + 1) < argc) {
+                    nodeName = argv[++idx];
+                }
+                else if (validateInstance && argumentsValid) {
+                    *argumentsValid = false;
+                }
+                continue;
+            }
+
+            const std::string instancePrefix = "--instance=";
+            const std::string instanceNamePrefix = "--instanceName=";
+            if (0 == arg.find(instancePrefix)) {
+                nodeName = arg.substr(instancePrefix.size());
+                continue;
+            }
+            if (0 == arg.find(instanceNamePrefix)) {
+                nodeName = arg.substr(instanceNamePrefix.size());
+                continue;
+            }
+
+            rosArgv.push_back(argv[idx]);
+        }
+
+        return nodeName;
     }
 };
 

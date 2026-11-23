@@ -69,7 +69,7 @@ static std::string shmClockLocalString = "";
 
 int main(int argc, char** argv)
 {
-    return ros2_wrapper::Ros2TaskWrapper::run<VP3FileCreationApp,true>(argc, argv);
+    return ros2_wrapper::Ros2TaskWrapper::run<VP3FileCreationApp>(argc, argv);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -335,6 +335,21 @@ bool VP3FileCreationApp::executive( )
 void VP3FileCreationApp::startExecutiveTimer()
 {
     createExecutiveTimer(cycleRateHz_);
+}
+
+// A spin_some() poll loop driving the receive pump that cleanup()/pumpFor()
+// also call into, so queued ROS2 messages keep getting processed while VP3
+// drains on shutdown.
+int VP3FileCreationApp::runLifecycle(std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor)
+{
+    startExecutiveTimer();
+    setReceivePump([executor]() { executor->spin_some(); });
+
+    while (rclcpp::ok()) {
+        executor->spin_some();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    return 0;
 }
 
 void VP3FileCreationApp::pumpFor(std::chrono::milliseconds duration)

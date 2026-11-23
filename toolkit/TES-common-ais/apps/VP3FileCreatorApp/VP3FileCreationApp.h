@@ -40,6 +40,7 @@ public:
     virtual bool executive( );
     virtual void cleanup( );
     void startExecutiveTimer() override;
+    int runLifecycle(std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor) override;
     void setReceivePump(std::function<void()> pump) { receivePump_ = std::move(pump); }
 
 protected:
