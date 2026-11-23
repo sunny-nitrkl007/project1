@@ -44,81 +44,8 @@ static constexpr auto TEST_STRING = R"(  @@@@@@@         @@@    @@@@@@@@@@@@
   @@@@@ ::::::::::::::::::::::: @)";
 
 int main(int argc, char** argv) {
-    std::vector<char*> rosArguments{argv[0]};
-    std::string instance = "SerialPrinterApp";
-    for (int index = 1; index < argc; ++index) {
-        const std::string argument(argv[index]);
-        if (argument == "--instance" || argument == "--instanceName") {
-            if (++index >= argc) {
-                std::cerr << "Missing instance name\n";
-                return 1;
-            }
-            instance = argv[index];
-        }
-        else if (argument.rfind("--instance=", 0) == 0) {
-            instance = argument.substr(11);
-        }
-        else if (argument.rfind("--instanceName=", 0) == 0) {
-            instance = argument.substr(15);
-        }
-        else {
-            rosArguments.push_back(argv[index]);
-        }
-    }
-    sigset_t signals;
-    sigemptyset(&signals);
-    sigaddset(&signals, SIGINT);
-    sigaddset(&signals, SIGTERM);
-    sigaddset(&signals, SIGQUIT);
-    if (pthread_sigmask(SIG_BLOCK, &signals, nullptr) != 0) {
-        std::cerr << "Cannot block shutdown signals\n";
-        return 1;
-    }
-    rclcpp::init(static_cast<int>(rosArguments.size()), rosArguments.data(),
-            rclcpp::InitOptions(), rclcpp::SignalHandlerOptions::None);
-    std::atomic<bool> stopping{false};
-    std::atomic<bool> signalThreadDone{false};
-    std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor;
-    std::thread signalThread;
-    std::shared_ptr<SerialPrinterApp> app;
-    int result = 1;
-    try {
-        ROS2Logger::Instance().SetFeatureName(instance);
-        app = std::make_shared<SerialPrinterApp>(instance);
-        executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-        executor->add_node(app);
-        signalThread = std::thread([&]() {
-            unsigned int caught = 0;
-            const timespec timeout{0, 100000000};
-            while (!signalThreadDone) {
-                const int signal = sigtimedwait(&signals, nullptr, &timeout);
-                if (signal == SIGINT || signal == SIGTERM || signal == SIGQUIT) {
-                    if (++caught >= 3) {
-                        std::_Exit(1);
-                    }
-                    stopping = true;
-                    executor->cancel();
-                }
-            }
-        });
-        if (app->initialize() && !stopping) {
-            app->startExecutiveTimer();
-            executor->spin();
-            result = 0;
-        }
-    }
-    catch (const std::exception& error) {
-        RCLCPP_ERROR(rclcpp::get_logger("SerialPrinterApp"), "%s", error.what());
-    }
-    if (app) {
-        app->cleanup();
-    }
-    signalThreadDone = true;
-    if (signalThread.joinable()) {
-        signalThread.join();
-    }
-    rclcpp::shutdown();
-    return result;
+    return ros2_wrapper::Ros2TaskWrapper::run<SerialPrinterApp>(argc, argv,
+            ros2_wrapper::LifecyclePolicy::OrderlyShutdown, "SerialPrinterApp");
 }
 
 /*
