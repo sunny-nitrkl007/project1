@@ -10,19 +10,46 @@
 ## @attention All rights reserved
 ## @attention Carnegie Mellon Proprietary
 ###############################################################################
+import os
+import glob
+
 Import( 'testEnv' )
 myEnv = testEnv.Clone();
+myEnv.Replace(LIBS = [])
+myEnv.Replace(CXXFLAGS = [
+    flag for flag in myEnv['CXXFLAGS']
+    if flag != '-DAIS_SERIALIZATION_INCLUDE_BOOST_ARCHIVE'
+])
+myEnv.Append(CXXFLAGS = ['-std=c++17'])
 
 # Please people, stop creating so many warnings!
 myEnv.Append(CCFLAGS = ['-Werror'])
 
-# This is to get 'boost/cgi/...'
-myEnv.Append(CPPPATH = ['#../TES-common-ais/prod/common/jhm2']);
+BASE_PATH = os.path.abspath(os.path.join(Dir('#').abspath, '..'))
+ROS2_SDK_DIR = myEnv.get('ROS2_SDK_DIR', BASE_PATH + '/ros2_jazzy_sdk')
+ROS2_MODELS_DIR = myEnv.get('ROS2_MODELS_DIR', BASE_PATH + '/ros2_models')
 
-cgiLibs = [
-    myEnv['BOOST_SYSTEM'],
-    myEnv['BOOST_FILESYSTEM']
-]
+myEnv.Append(CPPPATH = [
+    BASE_PATH + '/CPM-Loader-ais/prod/common/ros2wrapper',
+    ROS2_MODELS_DIR + '/include',
+] + [d for d in glob.glob(ROS2_SDK_DIR + '/include/*') if os.path.isdir(d)]
+  + [d for d in glob.glob(ROS2_MODELS_DIR + '/include/*') if os.path.isdir(d)])
+
+ros2_libs = [File(so) for so in glob.glob(ROS2_SDK_DIR + '/lib/lib*.so')
+             if 'generator_py' not in so and 'lttng' not in so]
+ROS_LIB_PATHS = [ROS2_SDK_DIR + '/lib', ROS2_SDK_DIR + '/lib/aarch64-linux-gnu']
+for package in ['cpm_common_interfaces', 'weigh_app_interfaces', 'demo_app_interfaces']:
+    lib_dir = ROS2_MODELS_DIR + '/lib/' + package
+    package_libs = [File(so) for so in glob.glob(lib_dir + '/lib*.so')
+                    if 'generator_py' not in so]
+    if not package_libs:
+        raise RuntimeError('Missing generated ' + package + ' libraries in ' + lib_dir)
+    ros2_libs.extend(package_libs)
+    ROS_LIB_PATHS.append(lib_dir)
+
+myEnv.Append(LIBPATH = ROS_LIB_PATHS)
+myEnv.Append(LINKFLAGS = [flag for p in ROS_LIB_PATHS
+                         for flag in ('-Wl,-rpath,' + p, '-Wl,-rpath-link,' + p)])
 
 Repository(myEnv[ 'SSP_DIR' ])
 
@@ -50,11 +77,7 @@ sourceFiles = \
 DemoApp = myEnv.Program( 
         target = 'DemoApp',
         source = sourceFiles,
-        LIBS = [ 'ais_task',
-                 'ais_config',
-                 'ais_log',
-                 'sl_cal'
-         ]
+        LIBS = ['sl_cal', 'pthread', 'm'] + ros2_libs
     )
 
 myEnv.InstallBinary( DemoApp )
