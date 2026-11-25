@@ -74,12 +74,31 @@ ExternalProject_Add(
         -Dfastcdr_DIR=${fastcdr_DIR}
 )
 
+ExternalProject_Add(
+    demo_app_interfaces
+    SOURCE_DIR
+        ${CMAKE_CURRENT_SOURCE_DIR}/demo_app_interfaces
+
+    BINARY_DIR
+        ${CMAKE_BINARY_DIR}/build_demo_app_interfaces
+
+    DEPENDS
+        weigh_app_interfaces
+
+    CMAKE_ARGS
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+        -DCMAKE_PREFIX_PATH=${INSTALL_DIR};${CMAKE_PREFIX_PATH}
+        -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON
+        -Dfastcdr_DIR=${fastcdr_DIR}
+)
+
 #
 # Convert ROS2 install tree to legacy CPM layout
 #
 add_custom_target(
     ros2_models_layout ALL
-    DEPENDS weigh_app_interfaces
+    DEPENDS demo_app_interfaces
 
     COMMAND
         ${CMAKE_COMMAND}

@@ -36,7 +36,7 @@ testEnv.buildit( 'LpsSaListMgrApp', ['suse'] )
 testEnv.buildit( 'LpsSaTotalsApp', ['suse'] )
 testEnv.buildit( 'WorkOrderAssist', ['suse'] )
 testEnv.buildit( 'WidgetApp', ['suse'] )
-testEnv.buildit( 'DemoApp', ['suse'] )
+# testEnv.buildit( 'DemoApp', ['suse'] )
 #testEnv.buildit( 'AprilTagReader', ['suse'] )
 
 if (testEnv[ 'PLATFORM' ] != 'x86_64-linux-gnu'):

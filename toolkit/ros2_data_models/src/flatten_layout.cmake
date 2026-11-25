@@ -6,6 +6,7 @@ message(STATUS "Flattening ROS2 install layout...")
 file(MAKE_DIRECTORY "${INSTALL_DIR}/lib/cpm_common_interfaces")
 file(MAKE_DIRECTORY "${INSTALL_DIR}/lib/job_mgr_interfaces")
 file(MAKE_DIRECTORY "${INSTALL_DIR}/lib/weigh_app_interfaces")
+file(MAKE_DIRECTORY "${INSTALL_DIR}/lib/demo_app_interfaces")
 
 #
 # Flatten include structure
@@ -34,6 +35,14 @@ if(EXISTS "${INSTALL_DIR}/include/weigh_app_interfaces/weigh_app_interfaces")
     )
 endif()
 
+if(EXISTS "${INSTALL_DIR}/include/demo_app_interfaces/demo_app_interfaces")
+    file(COPY
+        "${INSTALL_DIR}/include/demo_app_interfaces/demo_app_interfaces/msg"
+        DESTINATION
+        "${INSTALL_DIR}/include/demo_app_interfaces"
+    )
+endif()
+
 #
 # Remove duplicate nested folders
 #
@@ -47,6 +56,10 @@ file(REMOVE_RECURSE
 
 file(REMOVE_RECURSE
     "${INSTALL_DIR}/include/weigh_app_interfaces/weigh_app_interfaces"
+)
+
+file(REMOVE_RECURSE
+    "${INSTALL_DIR}/include/demo_app_interfaces/demo_app_interfaces"
 )
 
 #
@@ -83,6 +96,17 @@ foreach(lib ${WEIGH_LIBS})
     file(RENAME
          "${lib}"
          "${INSTALL_DIR}/lib/weigh_app_interfaces/${name}")
+endforeach()
+
+file(GLOB DEMO_APP_LIBS
+    "${INSTALL_DIR}/lib/libdemo_app_interfaces*"
+)
+
+foreach(lib ${DEMO_APP_LIBS})
+    get_filename_component(name "${lib}" NAME)
+    file(RENAME
+         "${lib}"
+         "${INSTALL_DIR}/lib/demo_app_interfaces/${name}")
 endforeach()
 
 message(STATUS "CPM layout conversion complete")

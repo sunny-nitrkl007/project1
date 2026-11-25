@@ -13,31 +13,19 @@ extern "C" {
 #endif
 
 
-using namespace task;
-constexpr uint32_t HYD_OIL_TEMP = 0x0045;
-constexpr uint32_t P_M_FEATURE_ENABLE_STATUS = 0xD10EE7;
-constexpr uint32_t SEA_LEVEL_2 = 0xD11884;
+#include <algorithm>
+#include <utility>
+#include <cstring>
+#include <random>
+#include <stdexcept>
+#include <unistd.h>
 extern demo_sim_a6n2_catParameters_si_RAM_t demo_sim_a6n2_catParameters_si_RAM;
-/******************************************************************************
-FUNCTION NAME:getTaskImplementation
-DESCRIPTION:
-PARAMETER DESCRIPTION:
-RETURN VALUE:
-*******************************************************************************/
-AbstractTaskCore* task::getTaskImplementation(void )
-{
-    static DemoApp thisTask("DemoApp");
-    return &thisTask;
-}
+
+
 
 
 DemoApp::DemoApp( const std::string& taskName ):
-    Task( taskName ),
-    dlData_(),
-    dataLinkDataOutput_(nullptr),
-    DemoAppScsTxIn(nullptr),
-    DemoAppScsTxout(nullptr),
-    DemoAppScsReqstIn(nullptr),
+    Ros2TaskWrapper(taskName),
     liftposition_(10.f),
     liftposition_rate_(15.f), // Maximum Raise Speed
     tiltposition_(100.f),
@@ -59,33 +47,64 @@ RETURN VALUE:
 *******************************************************************************/
 bool DemoApp::initialize( )
 {
-    bool somethingWrong = true;
-    if(!task::InterfaceDb::bind("DataLinkDataOutput", dataLinkDataOutput_)) {
-        AIS_LOG_ERROR("No DataLinkDataOutput channel defined.");
-        somethingWrong = false;
+    const double rate = declare_parameter<double>("cycle_rate_hz", 50.0);
+    if (rate != 50.0) {
+        RCLCPP_ERROR(get_logger(), "Generated Demo model requires 50 Hz");
+        return false;
     }
-    DemoAppScsTxout  = dynamic_cast<DemoAppTxChannelOutput*>( InterfaceDb::fetch("DemoAppTxChannelOutput"));
-    DemoAppScsTxIn = dynamic_cast<DemoAppTxChannelInput*>( InterfaceDb::fetch("DemoAppTxChannelInput"));
-    DemoAppScsReqstIn = dynamic_cast<DemoAppReqstChannelInput*>( InterfaceDb::fetch("DemoAppReqstChannelInput"));
-    if ( !DemoAppScsTxIn ) {
-        AIS_LOG_ERROR("Interface DemoAppScsTxIn not configured");
-        somethingWrong = false;
+    loggerThreshold_ = declare_parameter<std::string>("logger_threshold", "error");
+    ROS2Logger::Instance().SetLogLevel(loggerThreshold_);
+    const std::string scheduler = declare_parameter<std::string>("scheduler", "SCHED_OTHER");
+    const int64_t configuredPriority = declare_parameter<int64_t>("scheduler_priority", 0);
+    if (configuredPriority < 0 || configuredPriority > 99) {
+        RCLCPP_ERROR(get_logger(), "Scheduler priority must be between 0 and 99");
+        return false;
     }
-    if ( !DemoAppScsReqstIn ) {
-        AIS_LOG_ERROR("SCS interface for Demo app not configured");
-        somethingWrong = false;
+    const int priority = static_cast<int>(configuredPriority);
+    int policy;
+    if (scheduler == "SCHED_OTHER" && priority == 0) {
+        policy = SCHED_OTHER;
+    } else if ((scheduler == "SCHED_RR" || scheduler == "SCHED_FIFO") &&
+               priority >= 1 && priority <= 99) {
+        policy = scheduler == "SCHED_RR" ? SCHED_RR : SCHED_FIFO;
+    } else {
+        RCLCPP_ERROR(get_logger(), "Invalid scheduler/priority %s/%d", scheduler.c_str(), priority);
+        return false;
     }
-    if ( !DemoAppScsTxout ) {
-        AIS_LOG_ERROR("Demo App Scs Tx out not configured");
-        somethingWrong = false;
+    sched_param param{};
+    param.sched_priority = priority;
+    const int error = pthread_setschedparam(pthread_self(), policy, &param);
+    if (error != 0) {
+        RCLCPP_ERROR(get_logger(), "Cannot apply scheduling: %s", std::strerror(error));
+        return false;
     }
-
-    InitDataLinkData();
+    char hostname[256]{};
+    if (gethostname(hostname, sizeof(hostname) - 1) != 0) {
+        throw std::runtime_error("Cannot obtain DemoApp hostname");
+    }
+    host_ = hostname;
+    std::random_device random;
+    sessionId_ = host_ + ":" + std::to_string(getpid()) + ":" +
+        std::to_string(Clock::now().time_since_epoch().count()) + ":" + std::to_string(random());
+    const auto commandsQos = rclcpp::QoS(rclcpp::KeepLast(20)).reliable().durability_volatile();
+    requestSubscription_ = create_subscription<RequestBatch>("demo_app_requests", commandsQos,
+        [this](RequestBatch::ConstSharedPtr batch) {
+            requests_.push_back(*batch);
+            if (requests_.size() == 21) {
+                RCLCPP_WARN(get_logger(), "Demo request backlog exceeds legacy depth 20; no batches coalesced");
+            }
+        });
+    cyclePublisher_ = create_publisher<Cycle>("demo_app_cycle",
+        rclcpp::QoS(rclcpp::KeepLast(30)).reliable().durability_volatile());
+    healthPublisher_ = create_publisher<Health>("demo_app_health",
+        rclcpp::QoS(rclcpp::KeepLast(10)).reliable().durability_volatile());
     demo_sim_a6n2_work.demo_sim_a6n2_M.demo_sim_a6n2_catParameters_si_RAM_p = &demo_sim_a6n2_catParameters_si_RAM;
 
     demo_sim_a6n2_po_init();
 
-    return somethingWrong;
+    initialized_ = true;
+    lastHealthTime_ = Clock::now();
+    return true;
 }
 
 /******************************************************************************
@@ -96,137 +115,51 @@ RETURN VALUE:
 *******************************************************************************/
 bool DemoApp::executive( )
 {
-    PublishDataLinkData();
-    ReadDemoAppScsIn();
-    ReadPWM_API();
-
+    if (!initialized_) {
+        return false;
+    }
+    const auto begin = Clock::now();
+    if (sequence_ != 0) {
+        const double elapsed = std::chrono::duration<double>(begin - lastCycleStart_).count();
+        cycleRate_ = elapsed > 0.0 ? 1.0 / elapsed : 0.0;
+    }
+    lastCycleStart_ = begin;
+    Cycle cycle;
+    cycle.session_id = sessionId_;
+    cycle.sequence = ++sequence_;
+    CaptureDataLinkData(cycle);
+    ReadDemoAppRosIn();
+    ReadPWM_API(cycle.tx);
+    cyclePublisher_->publish(cycle);
+    const double duration = std::chrono::duration<double>(Clock::now() - begin).count();
+    longestCycle_ = std::max(longestCycle_, duration);
+    longestRecentCycle_ = std::max(longestRecentCycle_, duration);
+    if (duration > 0.02) {
+        ++lateCycleCount_;
+    }
     return true;
 }
 
 /******************************************************************************
-FUNCTION NAME:InitDataLinkData
-DESCRIPTION: Add PID's that we want to simulate over Data link
+FUNCTION NAME:CaptureDataLinkData
+DESCRIPTION: Capture raw demo values for bridge-owned legacy reconstruction
 PARAMETER DESCRIPTION:
 RETURN VALUE:none
 *******************************************************************************/
-void DemoApp::InitDataLinkData()
+
+void DemoApp::CaptureDataLinkData(Cycle& cycle)
 {
-    //Add all pid's that you want to simulate here.
-    //Hydraulic oil temp: (45)
-    hydtempparam.SetDataLinkType(DataLinkParamInfo::DATA_LINK_PARAM_CDL);
-    hydtempparam.SetParamIdentifierType(DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID);
-    hydtempparam.SetParameterType(CDL2_I16_DSI);
-    hydtempparam.SetParamId(HYD_OIL_TEMP);
-    hydtempparam.SetSid(0x2E);
-    hydtempparam.SetScaling(1.0);
-    hydtempparam.SetOffset(0);
-    dlData_.AddDataLinkParam(hydtempparam);
-
-    //Production Measurement Feature Enabled Status: (D10EE7)
-    prodparam.SetDataLinkType(DataLinkParamInfo::DATA_LINK_PARAM_CDL);
-    prodparam.SetParamIdentifierType(DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID);
-    prodparam.SetParameterType(CDL2_U8_DSI);
-    prodparam.SetParamId(P_M_FEATURE_ENABLE_STATUS);
-    prodparam.SetSid(0x2E);
-    prodparam.SetScaling(1.0);
-    prodparam.SetOffset(0);
-    dlData_.AddDataLinkParam(prodparam);
-
-    //SEA production measurement level 2 feature installation status: (D11884)
-    seainstallparam.SetDataLinkType(DataLinkParamInfo::DATA_LINK_PARAM_CDL);
-    seainstallparam.SetParamIdentifierType(DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID);
-    seainstallparam.SetParameterType(CDL2_U8_DSI);
-    seainstallparam.SetParamId(SEA_LEVEL_2);
-    seainstallparam.SetSid(0x2E);
-    seainstallparam.SetScaling(1.0);
-    seainstallparam.SetOffset(0);
-    dlData_.AddDataLinkParam(seainstallparam);
-
-    // Engine Speed
-    engineSpeedParam.SetDataLinkType(DataLinkParamInfo::DATA_LINK_PARAM_CDL);
-    engineSpeedParam.SetParamIdentifierType(DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PUBLIC_PGN);
-    engineSpeedParam.SetParameterType(CDL2_VAR_NO_DSI);
-    engineSpeedParam.SetVarLengthParamType(VarLengthDataLinkParamFactory::PGN);
-    engineSpeedParam.SetParamId(61444);
-    engineSpeedParam.SetSid(0x00);
-    engineSpeedParam.SetScaling(1);
-    engineSpeedParam.SetOffset(0);
-    dlData_.AddDataLinkParam(engineSpeedParam);
-
-    // Service Mode
-    serviceModeParam.SetDataLinkType(DataLinkParamInfo::DATA_LINK_PARAM_CDL);
-    serviceModeParam.SetParamIdentifierType(DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID);
-    serviceModeParam.SetParameterType(CDL2_U16_DSI);
-    serviceModeParam.SetParamId(0xD1000E);
-    serviceModeParam.SetSid(0x28);
-    serviceModeParam.SetScaling(1);
-    serviceModeParam.SetOffset(0);
-    dlData_.AddDataLinkParam(serviceModeParam);
-
-    // Total Fuel Used High Resolution
-    totalFuelUsedHrParam.SetDataLinkType(DataLinkParamInfo::DATA_LINK_PARAM_CDL);
-    totalFuelUsedHrParam.SetParamIdentifierType(DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID);
-    totalFuelUsedHrParam.SetParameterType(CDL2_U32_DSI);
-    totalFuelUsedHrParam.SetParamId(0xFE5D);
-    totalFuelUsedHrParam.SetSid(0x00);
-    totalFuelUsedHrParam.SetScaling(0.001);
-    totalFuelUsedHrParam.SetOffset(0);
-    dlData_.AddDataLinkParam(totalFuelUsedHrParam);
-
-    // Total Fuel Used Low Resolution
-//    totalFuelUsedLrParam.SetParamIdentifierType(DataLinkParamInfo::DATA_LINK_PARAM_IDENTIFIER_PID);
-//    totalFuelUsedLrParam.SetParameterType(CDL2_U32_DSI);
-//    totalFuelUsedLrParam.SetParamId(0xC8);
-//    totalFuelUsedLrParam.SetSid(0x00);
-//    totalFuelUsedLrParam.SetScaling(0.125);
-//    totalFuelUsedLrParam.SetOffset(0);
-//    dlData_.AddDataLinkParam(totalFuelUsedLrParam);
-}
-
-/******************************************************************************
-FUNCTION NAME:PublishDataLinkData
-DESCRIPTION:Update values and publish data link data
-PARAMETER DESCRIPTION:
-RETURN VALUE:None
-*******************************************************************************/
-void DemoApp::PublishDataLinkData()
-{
-    //Set Hydraulic oil temp
-    hydtempparam.SetLastValue(hyd_temp_value, 0);
-    dlData_.UpdateDataLinkParam(hydtempparam);
-
-    //Set SEA install status
-    seainstallparam.SetLastValue(sea_level_2, 0);
-    dlData_.UpdateDataLinkParam(seainstallparam);
-
-    //Set Production measurement feature enable status:
-    prodparam.SetLastValue(production_measurement, 0);
-    dlData_.UpdateDataLinkParam(prodparam);
-
-    { // Set engine speed
-        // Set engine speed to 2000 RPM -> 0.125 RPM/bit -> 16000 bits -> 0x3E80
-        uint8_t dataBuffer[] = { 0x00, 0x00, 0x00, 0x80, 0x3E, 0x00, 0x00, 0x00 };
-        engineSpeedParam.SetVarLengthParamValue(dataBuffer, sizeof(dataBuffer)/sizeof(dataBuffer[0]), DataLinkParam::DSI_CODE_OK());
-        dlData_.UpdateDataLinkParam(engineSpeedParam);
-    }
-
-    // Set Service Mode Status
-    serviceModeParam.SetLastValue(0x000C, DataLinkParam::DSI_CODE_OK());
-    dlData_.UpdateDataLinkParam(serviceModeParam);
-
-    //Set Total Fuel Used High Resolution
+    cycle.hydraulic_oil_temperature = hyd_temp_value;
+    cycle.sea_level_installation = sea_level_2;
+    cycle.production_measurement = production_measurement;
+    cycle.engine_speed_pgn = {{0x00, 0x00, 0x00, 0x80, 0x3E, 0x00, 0x00, 0x00}};
+    cycle.service_mode = 0x000C;
     updateTotalFuel();
-    totalFuelUsedHrParam.SetLastValue(total_fuel_used_, DataLinkParam::DSI_CODE_OK());
-    dlData_.UpdateDataLinkParam(totalFuelUsedHrParam);
-
-    dataLinkDataOutput_->publish(dlData_); // Publish data link data
-    dlData_.HandleDataLinkDataMap();
-    dlData_.ClearDlpDiagInfo();
+    cycle.total_fuel_used = total_fuel_used_;
 }
 
-void DemoApp::ReadPWM_API()
+void DemoApp::ReadPWM_API(weigh_app_interfaces::msg::DemoAppTxChannel& txout1)
 {
-    DemoAppTxChannel pwm_in;
     pos_lift_desired = liftposition_;
     pos_lift_rate = liftposition_rate_;
     pos_tilt_desired = tiltposition_;
@@ -236,57 +169,56 @@ void DemoApp::ReadPWM_API()
     demo_sim_a6n2_po_0();
 
     {
-        DemoAppTxChannel txout1;
         txout1.pres_lift_he_demo = angle_lift_het;   // Lift He Pressure (angle_lift_het = Lift He Pressure)
         txout1.pres_lift_re_demo = pres_lift_re;     // Lift Re pressure
         txout1.angle_lift_demo = angle_lift;
-        txout1.angle_AFE_demo = angle_AFE;
-        txout1.angle_ABC_demo = angle_ABC_supplement;
+        txout1.angle_afe_demo = angle_AFE;
+        txout1.angle_abc_demo = angle_ABC_supplement;
         txout1.liftposition = liftposition_;
         txout1.liftposition_rate = liftposition_rate_;
         txout1.tiltposition = tiltposition_;
         txout1.tiltposition_rate = tiltposition_rate_;
         txout1.payload = payload_;
         txout1.payload_rate = payload_rate_;
-        DemoAppScsTxout->publish(txout1);
     }
 }
 
 
-void DemoApp::ReadDemoAppScsIn()
+void DemoApp::ReadDemoAppRosIn()
 {
-    DemoAppReqstChannel request;
-    DemoAppTxChannel demoIn;
-    while (DemoAppScsReqstIn->get(request)) {
+    using DemoAppReqstCommand = demo_app_interfaces::msg::DemoAppRequest;
+    while (!requests_.empty()) {
+        const RequestBatch request = std::move(requests_.front());
+        requests_.pop_front();
         for (const auto& r : request.requests) {
             switch (r.command) {
             case (DemoAppReqstCommand::WRITE_LIFT_POSITION): {
-                liftposition_ = r.liftposition();
+                liftposition_ = r.arg;
                 break;
             }
             case (DemoAppReqstCommand::WRITE_LIFT_POSITION_RATE): {
-                liftposition_rate_ = r.liftposition_rate();
+                liftposition_rate_ = r.arg;
                 break;
             }
             case (DemoAppReqstCommand::WRITE_TILT_POSITION): {
-                tiltposition_ = r.tiltposition();
+                tiltposition_ = r.arg;
                 break;
             }
             case (DemoAppReqstCommand::WRITE_TILT_POSITION_RATE): {
-                tiltposition_rate_ = r.tiltposition_rate();
+                tiltposition_rate_ = r.arg;
                 break;
             }
             case (DemoAppReqstCommand::WRITE_PAYLOAD): {
-                payload_ = r.payload();
+                payload_ = r.arg;
                 break;
             }
             case (DemoAppReqstCommand::WRITE_PAYLOAD_RATE): {
-                payload_rate_ = r.payload_rate();
+                payload_rate_ = r.arg;
                 break;
             }
             case (DemoAppReqstCommand::DIG): {
                 payload_rate_ = 20.f;
-                payload_ = r.weight1();
+                payload_ = r.arg;
                 tiltposition_ = 100.f;
                 tiltposition_rate_ = 30.f; // Maximum Rack Speed
                 liftposition_ = 10.f;
@@ -310,7 +242,7 @@ void DemoApp::ReadDemoAppScsIn()
             }
             case (DemoAppReqstCommand::PDUMP): {
                 payload_rate_ = 20.f;
-                payload_ = r.weight1();
+                payload_ = r.arg;
                 tiltposition_ = 65.f;
                 tiltposition_rate_ = 35.f; // Maximum Dump Speed
                 break;
@@ -331,13 +263,67 @@ void DemoApp::ReadDemoAppScsIn()
     }
 }
 
-/******************************************************************************
-FUNCTION NAME:Demo App cleanup
-DESCRIPTION:
-PARAMETER DESCRIPTION:
-RETURN VALUE: None
-*******************************************************************************/
+void DemoApp::startExecutiveTimer()
+{
+    if (!initialized_) {
+        throw std::logic_error("DemoApp timer started before initialization");
+    }
+    createExecutiveTimer(50.0);
+    healthTimer_ = create_wall_timer(std::chrono::seconds(1), [this]() { PublishHealth(); });
+    state_ = Health::EXECUTIVE_RUNNING;
+    PublishHealth();
+}
+
+void DemoApp::PublishHealth()
+{
+    if (!healthPublisher_) {
+        return;
+    }
+    const auto now = Clock::now();
+    const double elapsed = std::chrono::duration<double>(now - lastHealthTime_).count();
+    Health health;
+    health.session_id = sessionId_;
+    health.report_sequence = ++healthSequence_;
+    health.source = get_name();
+    health.host = host_;
+    health.process_id = static_cast<int32_t>(getpid());
+    health.state = state_;
+    health.logger_threshold = loggerThreshold_;
+    health.intended_cycle_rate_hz = 50.0;
+    health.cycle_rate_hz = sequence_ > lastHealthCycleCount_ ? cycleRate_ : 0.0;
+    health.recent_executive_cycle_rate_hz = elapsed > 0.0 ?
+        static_cast<double>(sequence_ - lastHealthCycleCount_) / elapsed : 0.0;
+    health.longest_executive_cycle_sec = longestCycle_;
+    health.longest_recent_executive_cycle_sec = longestRecentCycle_;
+    health.total_executive_cycle_count = sequence_;
+    health.total_executive_late_cycle_count = lateCycleCount_;
+    // Inter-cycle non-executive time also includes subscription/health callbacks.
+    // Leave the idle metric zero until the executor can measure actual idle time.
+    health.executor_idle_time_sec = 0.0;
+    healthPublisher_->publish(health);
+    lastHealthTime_ = now;
+    lastHealthCycleCount_ = sequence_;
+    longestRecentCycle_ = 0.0;
+}
+
 void  DemoApp::cleanup( )
 {
-    AIS_LOG_INFO("DemoApp::cleanup");
+    state_ = Health::SHUTTING_DOWN;
+    if (executiveTimer_) {
+        executiveTimer_->cancel();
+    }
+    if (healthTimer_) {
+        healthTimer_->cancel();
+    }
+    if (healthPublisher_ && rclcpp::ok()) {
+        PublishHealth();
+    }
+    initialized_ = false;
+    requests_.clear();
+    requestSubscription_.reset();
+    executiveTimer_.reset();
+    healthTimer_.reset();
+    cyclePublisher_.reset();
+    healthPublisher_.reset();
+    RCLCPP_INFO(get_logger(), "DemoApp::cleanup");
 }

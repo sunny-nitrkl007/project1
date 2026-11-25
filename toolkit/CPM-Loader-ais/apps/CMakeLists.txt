@@ -122,6 +122,7 @@ set(TARGET_APP_VARIANT "${ECM_VARIANT}")
 
 add_subdirectory(LpsSaWeighApp)
 add_subdirectory(LpsSaJobMgrApp)
+add_subdirectory(DemoApp)
 #add_subdirectory(ScsToRos2Bridge)
 
 
@@ -137,6 +138,7 @@ add_custom_target(copy_runtime_libs ALL
 add_dependencies(copy_runtime_libs
    LpsSaJobMgrApp
    LpsSaWeighApp
+   DemoApp
  #  ScsToRos2Bridge
 )
 #################################################
