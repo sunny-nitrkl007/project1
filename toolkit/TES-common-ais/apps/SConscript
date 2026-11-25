@@ -26,7 +26,7 @@ if appEnv[ 'PLATFORM' ] in ['A6N1', 'A6N2']:
 
 # appEnv.buildit( 'VP3FileCreatorApp', ['suse'] )
 appEnv.buildit( 'SwitchInputApp', ['suse'] )
-# appEnv.buildit( 'SerialPrinterApp', ['suse'] )
+appEnv.buildit( 'SerialPrinterApp', ['suse'] )
 appEnv.buildit( 'xcp_server', ['suse'] )
 
 # Target only apps
