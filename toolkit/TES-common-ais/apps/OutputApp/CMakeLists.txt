@@ -175,7 +175,7 @@ endif()
 
 set_target_properties(OutputApp PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY
-        "${TES_COMMON_DIR}/build-A7H4-adv/apps/OutputApp"
+        "${SSP_DIR}/eta-ais/build-A7H4-adv/bin"
 )
 
 message(STATUS "Build configuration completed successfully!")
