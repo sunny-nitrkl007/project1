@@ -290,10 +290,10 @@ bool SerialPrinterApp::initialize() {
             // Configure the options
             struct termios options{};
 
-            // Never apply settings derived from a failed attribute read.
+            // Matches pre-ROS2 behavior: proceed even if the attribute read
+            // fails rather than aborting the whole app over it.
             if (tcgetattr(fileDescriptor_, &options) != 0) {
                 RCLCPP_ERROR(get_logger(), "Cannot read serial attributes: errno=%d", errno);
-                return false;
             }
 
             // Set baud rate
@@ -348,7 +348,6 @@ bool SerialPrinterApp::initialize() {
             if (cfsetispeed(&options, selectedSpeed) != 0 ||
                     cfsetospeed(&options, selectedSpeed) != 0) {
                 RCLCPP_ERROR(get_logger(), "Cannot set serial speed: errno=%d", errno);
-                return false;
             }
 
             // Set parity bits
@@ -427,13 +426,11 @@ bool SerialPrinterApp::initialize() {
             // Discard all pending I/O
             if (tcflush(fileDescriptor_, TCIOFLUSH) != 0) {
                 RCLCPP_ERROR(get_logger(), "Cannot flush serial port: errno=%d", errno);
-                return false;
             }
 
             // Apply the new settings
             if (tcsetattr(fileDescriptor_, TCSANOW, &options) != 0) {
                 RCLCPP_ERROR(get_logger(), "Cannot configure serial port: errno=%d", errno);
-                return false;
             }
         }
     }
