@@ -36,7 +36,7 @@ public:
     virtual bool executive() = 0;
     virtual void cleanup() = 0;
 
-
+    
     virtual void startExecutiveTimer() = 0;
 
     // Optional hook for anything that must run before initialize() -- e.g.
@@ -91,8 +91,7 @@ public:
 
     // Default lifecycle: registerSignalHandling() + executor->spin(), exactly
     // what JobMgr/WeighApp/OutputApp/SwitchInputApp already get. Override in
-    // a derived app class for a different signal/loop shape. Return non-zero
-    // to mark the run as failed.
+    // a derived app class for a different signal/loop shape.
     virtual int runLifecycle(std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor)
     {
         registerSignalHandling(executor);

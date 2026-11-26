@@ -148,24 +148,23 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang"
 
 endif()
 
-
-set_target_properties(SerialPrinterApp PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY
-        "${SSP_DIR}/eta-ais/build-A7H4-adv/bin"
-)
-
 #
 # Copy cate_ros2 runtime libraries
 #
 add_custom_command(
     TARGET SerialPrinterApp POST_BUILD
-
+ 
     COMMAND ${CMAKE_COMMAND} -E make_directory
             "${SSP_DIR}/eta-ais/build-A7H4-adv/lib"
-
+ 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${SSP_DIR}/dependencies/cate_ros2_1.0.1/lib"
             "${SSP_DIR}/eta-ais/build-A7H4-adv/lib"
+)
+
+set_target_properties(SerialPrinterApp PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY
+        "${SSP_DIR}/eta-ais/build-A7H4-adv/bin"
 )
 
 message(STATUS "Build configuration completed successfully!")

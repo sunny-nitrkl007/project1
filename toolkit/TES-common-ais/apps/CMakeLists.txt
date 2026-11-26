@@ -122,7 +122,6 @@ set(TARGET_APP_VARIANT "${ECM_VARIANT}")
 
 add_subdirectory(OutputApp)
 add_subdirectory(SerialPrinterApp)
-
 add_subdirectory(VP3FileCreatorApp)
 
 ###################################################

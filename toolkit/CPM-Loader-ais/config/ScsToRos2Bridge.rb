@@ -49,6 +49,12 @@ Interfaces.update({
   "AppRegInput" => InterfaceDefs_CpmCommon::AppRegInput,
   "AppRegOutput" => InterfaceDefs_CpmCommon::AppRegOutput,
   "FileTransferBridgeRequestOutput" => InterfaceDefs_CpmCommon::FileTransferBridgeRequestOutput,
+  # AIS producers -> ROS2 for aisXcpServer (former XcpServerTask SCS inputs).
+  "PwmInputChannelsInput" => InterfaceDefs_CpmCommon::PwmInputChannelsInput,
+  "WorkOrderAssistTxInput" => InterfaceDefs_Loaders::WorkOrderAssistTxInputChannel,
+  "CycleSegTxChannelInput" => InterfaceDefs_Loaders::CycleSegTxChannelInput,
+  "WidgetsDebugDataInput" => InterfaceDefs_Loaders::WidgetsDebugDataInput,
+  "BEMSimStateInput" => InterfaceDefs_Loaders::LpsSaUIBEMSimStateInputChannel,
 })
 
 Parameters = CommonTaskParams::Parameters.dup;

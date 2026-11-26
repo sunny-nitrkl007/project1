@@ -29,6 +29,7 @@ processes=(VP3FileCreationApp
 	   LpsSaWeighApp
 	   machSerialNumTask
 	   OutputApp
+	   aisXcpServer
 	   SerialPrinterApp
 	   WorkOrderAssist	   	
   	   autonomyLogger

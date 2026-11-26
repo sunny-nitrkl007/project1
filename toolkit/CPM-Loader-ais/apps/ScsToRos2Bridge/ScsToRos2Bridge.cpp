@@ -250,6 +250,11 @@ ScsToRos2Bridge::ScsToRos2Bridge(const std::string& taskName):
     systemHardwareHealthScsIn_(nullptr),
     systemHardwareHealthRequestScsIn_(nullptr),
     readyToFlashScsOut_(nullptr),
+    pwmInputChannelsScsIn_(nullptr),
+    workOrderAssistTxScsIn_(nullptr),
+    cycleSegTxScsIn_(nullptr),
+    widgetsDebugDataScsIn_(nullptr),
+    bemSimStateScsIn_(nullptr),
     rosNode_(nullptr),
     executor_(),
     jobMgrReqstRosOut_(),
@@ -282,7 +287,12 @@ ScsToRos2Bridge::ScsToRos2Bridge(const std::string& taskName):
     calMgrCmdReqstRosOut_(),
     calMgrCmdRespRosIn_(),
     tipoffTestPointsRosIn_(),
-    printerCnfgRosOut_()
+    printerCnfgRosOut_(),
+    pwmInputChannelsRosOut_(),
+    workOrderAssistTxRosOut_(),
+    cycleSegTxRosOut_(),
+    widgetsDebugDataRosOut_(),
+    bemSimStateRosOut_()
 {
 }
 
@@ -454,7 +464,18 @@ bool ScsToRos2Bridge::initialize()
             [this](cpm_common_interfaces::msg::FileTransferBridgeRequest::SharedPtr msg) {
                 vp3_bridge::enqueue(fileTransferQueue_, *msg);
             });
+	if (!task::InterfaceDb::bind("PwmInputChannelsInput", pwmInputChannelsScsIn_)) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"PwmInputChannelsInput Interface not configured.");
+        everythingOk = false;
+    }
 
+    if (!task::InterfaceDb::bind("WorkOrderAssistTxInput", workOrderAssistTxScsIn_) ||
+            !task::InterfaceDb::bind("CycleSegTxChannelInput", cycleSegTxScsIn_) ||
+            !task::InterfaceDb::bind("WidgetsDebugDataInput", widgetsDebugDataScsIn_) ||
+            !task::InterfaceDb::bind("BEMSimStateInput", bemSimStateScsIn_)) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"One or more aisXcpServer SCS interfaces are not configured.");
+        everythingOk = false;
+    }
     serialPrinterRequestRosOut_ = rosNode_->create_publisher<cpm_common_interfaces::msg::SerialPrinterRequest>(
             "serial_printer_request", rclcpp::QoS(rclcpp::KeepLast(2)).reliable().durability_volatile());
 
@@ -462,7 +483,6 @@ bool ScsToRos2Bridge::initialize()
         RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Failed to initialize SerialPrinterRequest ROS2 publisher.");
         everythingOk = false;
     }
-
     /* ROS2 side -- topic names matching what LpsSaJobMgrApp subscribes/publishes */
     jobMgrReqstRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaJobMgrReqstChannel>>(
             rosNode_, "lps_sa_job_mgr_reqst_channel");
@@ -526,6 +546,16 @@ bool ScsToRos2Bridge::initialize()
             rosNode_, "tipoff_model_test_points");
     printerCnfgRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg>>(
             rosNode_, "lps_sa_totals_printer_cnfg");
+    pwmInputChannelsRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::PwmInputChannels>>(
+            rosNode_, "pwm_input_channels");
+    workOrderAssistTxRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::WorkOrderAssistTxChannel>>(
+            rosNode_, "work_order_assist_tx_channel");
+    cycleSegTxRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::CycleSegTxChannel>>(
+            rosNode_, "cycle_seg_tx_channel");
+    widgetsDebugDataRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::WidgetsDebugData>>(
+            rosNode_, "widgets_debug_data");
+    bemSimStateRosOut_ = std::make_unique<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaUIBemSimStateInterface>>(
+            rosNode_, "lps_sa_ui_bem_sim_state_interface");
 
     if (!jobMgrReqstRosOut_ || !jobMgrRespRosIn_ || !aisJhm2TxRosOut_ || !switchInputRosIn_ || !processHealthRosIn_ || !loadRecordRosIn_ ||
             !weighReqstRosOut_ || !weighRespRosIn_ || !weighTxRosIn_) {
@@ -559,6 +589,16 @@ bool ScsToRos2Bridge::initialize()
     if (!demoAppTxRosOut_ || !partNumbersRosOut_ || !systemHardwareHealthRosOut_ ||
             !systemHardwareHealthRequestRosIn_ || !readyToFlashRosIn_) {
         RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize one or more weigh-app migration ROS2 interfaces.");
+        everythingOk = false;
+    }
+
+    if (!pwmInputChannelsRosOut_) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize PwmInputChannels ROS2 wrapper interface.");
+        everythingOk = false;
+    }
+
+    if (!workOrderAssistTxRosOut_ || !cycleSegTxRosOut_ || !widgetsDebugDataRosOut_ || !bemSimStateRosOut_) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to initialize one or more aisXcpServer ROS2 wrapper interfaces.");
         everythingOk = false;
     }
 
@@ -853,7 +893,7 @@ bool ScsToRos2Bridge::executive()
         }
     }
 
-    /* LpsSaWeighDebugChannel: ROS2 -> AIS SCS (aisXcpServer consumer) */
+    /* LpsSaWeighDebugChannel: ROS2 -> AIS SCS (no SCS reader since aisXcpServer moved to ROS2; kept by default) */
     if (nullptr != weighDebugRosIn_ && nullptr != weighDebugScsOut_) {
         weigh_app_interfaces::msg::LpsSaWeighDebugChannel debugRos;
         while (weighDebugRosIn_->get(debugRos)) {
@@ -863,7 +903,7 @@ bool ScsToRos2Bridge::executive()
         }
     }
 
-    /* LpsSaNvmCalDataChannel: ROS2 -> AIS SCS (aisXcpServer consumer) */
+    /* LpsSaNvmCalDataChannel: ROS2 -> AIS SCS (no SCS reader since aisXcpServer moved to ROS2; kept by default) */
     if (nullptr != nvmCalDataRosIn_ && nullptr != nvmCalDataScsOut_) {
         weigh_app_interfaces::msg::LpsSaNvmCalDataChannel nvmCalRos;
         while (nvmCalDataRosIn_->get(nvmCalRos)) {
@@ -873,7 +913,7 @@ bool ScsToRos2Bridge::executive()
         }
     }
 
-    /* LpsSaNvmCalOnTheFlyDataChannel: ROS2 -> AIS SCS (aisXcpServer consumer) */
+    /* LpsSaNvmCalOnTheFlyDataChannel: ROS2 -> AIS SCS (no SCS reader since aisXcpServer moved to ROS2; kept by default) */
     if (nullptr != nvmCalOnTheFlyDataRosIn_ && nullptr != nvmCalOnTheFlyDataScsOut_) {
         weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel nvmCalOtfRos;
         while (nvmCalOnTheFlyDataRosIn_->get(nvmCalOtfRos)) {
@@ -948,12 +988,62 @@ bool ScsToRos2Bridge::executive()
         }
     }
     
-    /* TipoffModelTestPoints: ROS2 (WeighApp publisher) -> AIS SCS (aisXcpServer consumer) */
+    /* TipoffModelTestPoints: ROS2 (WeighApp publisher) -> AIS SCS (no SCS reader since aisXcpServer moved to ROS2; kept by default) */
     if (nullptr != tipoffTestPointsRosIn_ && nullptr != tipoffTestPointsScsOut_) {
         weigh_app_interfaces::msg::TipoffModelTestPoints tipoffRos;
         while (tipoffTestPointsRosIn_->get(tipoffRos)) {
             if (!tipoffTestPointsScsOut_->publish(convertTipoffTestPointsToScs(tipoffRos))) {
                 RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward TipoffModelTestPoints ROS2->SCS");
+            }
+        }
+    }
+
+    /* PwmInputChannels: AIS SCS (PwmInput publisher) -> ROS2 (aisXcpServer subscriber) */
+    if (nullptr != pwmInputChannelsScsIn_ && nullptr != pwmInputChannelsRosOut_) {
+        PwmInputChannels pwmScs;
+        while (pwmInputChannelsScsIn_->get(pwmScs)) {
+            if (!pwmInputChannelsRosOut_->publish(convertPwmInputChannelsToRos(pwmScs))) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward PwmInputChannels SCS->ROS2");
+            }
+        }
+    }
+
+    /* WorkOrderAssistTx: AIS SCS (WorkOrderAssist publisher) -> ROS2 (aisXcpServer subscriber) */
+    if (nullptr != workOrderAssistTxScsIn_ && nullptr != workOrderAssistTxRosOut_) {
+        WorkOrderAssistTxInterface woaScs;
+        while (workOrderAssistTxScsIn_->get(woaScs)) {
+            if (!workOrderAssistTxRosOut_->publish(convertWorkOrderAssistTxToRos(woaScs))) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward WorkOrderAssistTx SCS->ROS2");
+            }
+        }
+    }
+
+    /* CycleSegTx: AIS SCS (CycleSeg publisher) -> ROS2 (aisXcpServer subscriber) */
+    if (nullptr != cycleSegTxScsIn_ && nullptr != cycleSegTxRosOut_) {
+        CycleSegTxInterface cycleSegScs;
+        while (cycleSegTxScsIn_->get(cycleSegScs)) {
+            if (!cycleSegTxRosOut_->publish(convertCycleSegTxToRos(cycleSegScs))) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward CycleSegTx SCS->ROS2");
+            }
+        }
+    }
+
+    /* WidgetsDebugData: AIS SCS (WidgetApp publisher) -> ROS2 (aisXcpServer subscriber) */
+    if (nullptr != widgetsDebugDataScsIn_ && nullptr != widgetsDebugDataRosOut_) {
+        WidgetsDebugData widgetsScs;
+        while (widgetsDebugDataScsIn_->get(widgetsScs)) {
+            if (!widgetsDebugDataRosOut_->publish(convertWidgetsDebugDataToRos(widgetsScs))) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward WidgetsDebugData SCS->ROS2");
+            }
+        }
+    }
+
+    /* BEMSimState: AIS SCS (AisJhm2DataServer publisher) -> ROS2 (aisXcpServer subscriber) */
+    if (nullptr != bemSimStateScsIn_ && nullptr != bemSimStateRosOut_) {
+        LpsSaUIBEMSimStateInterface bemScs;
+        while (bemSimStateScsIn_->get(bemScs)) {
+            if (!bemSimStateRosOut_->publish(convertBemSimStateToRos(bemScs))) {
+                RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(),"Failed to forward BEMSimState SCS->ROS2");
             }
         }
     }
@@ -1698,6 +1788,14 @@ ScsToRos2Bridge::convertSystemHardwareHealthToRos(const SystemHardwareHealth& sc
     ros.source_system = scs.sourceSystem;
     ros.total_system_memory_kb = scs.totalSystemMemory_kb;
     ros.available_system_memory_kb = scs.availableSystemMemory_kb;
+    ros.list_of_remaining_disk_space.reserve(scs.listOfRemainingDiskSpace.size());
+    for (const auto& diskSpace : scs.listOfRemainingDiskSpace) {
+        weigh_app_interfaces::msg::DiskSpaceRemain rosDiskSpace;
+        rosDiskSpace.filesystem = diskSpace.filesystem;
+        rosDiskSpace.avail_kb = diskSpace.avail_kb;
+        rosDiskSpace.percent_use = diskSpace.percentUse;
+        ros.list_of_remaining_disk_space.push_back(rosDiskSpace);
+    }
     ros.system_up_time_sec = scs.systemUpTime_sec;
     ros.load_avg1min = scs.loadAvg1min;
     ros.load_avg5min = scs.loadAvg5min;
@@ -1715,6 +1813,195 @@ ScsToRos2Bridge::convertSystemHardwareHealthToRos(const SystemHardwareHealth& sc
     ros.system_cpu_irq_percent = scs.systemCpuIrq_percent;
     ros.ecm_os_version = scs.ecmOsVersion;
     ros.battery_voltage = scs.battery_voltage;
+    return ros;
+}
+
+/******************************************************************************
+FUNCTION NAME: ScsToRos2Bridge::convertPwmInputChannelsToRos
+DESCRIPTION: PwmInputChannels (AIS SCS) -> weigh_app_interfaces::msg::PwmInputChannels (ROS2)
+    Field-for-field mapping of PwmData, verified against:
+      TES-common-ais/prod/common/interfaces/PwmInputChannels/PwmInputChannels.h
+      ros2_model/src/weigh_app_interfaces/msg/PwmInputChannels.msg
+    timestamp is not transported: PwmInputChannelsStorage::serialize() never sent it over SCS.
+*******************************************************************************/
+weigh_app_interfaces::msg::PwmInputChannels
+ScsToRos2Bridge::convertPwmInputChannelsToRos(const PwmInputChannels& scs)
+{
+    weigh_app_interfaces::msg::PwmInputChannels ros;
+    ros.period.reserve(MAX_CH);
+    ros.width.reserve(MAX_CH);
+    ros.switch_status.reserve(MAX_CH);
+    ros.timeout.reserve(MAX_CH);
+    for (int i = 0; i < MAX_CH; ++i) {
+        ros.period.push_back(scs.PwmData.Period[i]);
+        ros.width.push_back(scs.PwmData.Width[i]);
+        ros.switch_status.push_back(static_cast<uint8_t>(scs.PwmData.SwitchStatus[i]));
+        ros.timeout.push_back(static_cast<uint8_t>(scs.PwmData.Timeout[i]));
+    }
+    ros.actual_time_us = static_cast<int64_t>(scs.PwmData.ActualTimeUs);
+    ros.exec_time = static_cast<int32_t>(scs.PwmData.ExecTime);
+    ros.diff_time = static_cast<int32_t>(scs.PwmData.DiffTime);
+    ros.exp = static_cast<uint32_t>(scs.PwmData.Exp);
+    return ros;
+}
+
+/******************************************************************************
+FUNCTION NAME: ScsToRos2Bridge::convertWorkOrderAssistTxToRos
+DESCRIPTION: WorkOrderAssistTxInterface (AIS SCS) -> cpm_common_interfaces::msg::WorkOrderAssistTxChannel (ROS2)
+    Field-for-field mapping of every serialized field, verified against:
+      prod/common/interfaces/WorkOrderAssist/TxInterface.hpp
+      ros2_model/src/cpm_common_interfaces/msg/WorkOrderAssistTxChannel.msg
+*******************************************************************************/
+cpm_common_interfaces::msg::WorkOrderAssistTxChannel
+ScsToRos2Bridge::convertWorkOrderAssistTxToRos(const WorkOrderAssistTxInterface& scs)
+{
+    cpm_common_interfaces::msg::WorkOrderAssistTxChannel ros;
+    ros.activity_detected = scs.activityDetected;
+    ros.active_site_id = scs.activeSiteId;
+    ros.active_job_id = scs.activeJobId;
+    ros.number_of_jobs = scs.numberOfJobs;
+    ros.hub_service_comms_active = scs.hubServiceCommsActive;
+    ros.hub_service_tx_error_count = scs.hubServiceTxErrorCount;
+    ros.hub_service_tx_success_count = scs.hubServiceTxSuccessCount;
+    ros.hub_service_rx_count = scs.hubServiceRxCount;
+    ros.comms_warning_active = scs.commsWarningActive;
+    return ros;
+}
+
+/******************************************************************************
+FUNCTION NAME: ScsToRos2Bridge::convertCycleSegTxToRos
+DESCRIPTION: CycleSegTxInterface (AIS SCS) -> cpm_common_interfaces::msg::CycleSegTxChannel (ROS2)
+    Field-for-field mapping of every serialized field, verified against:
+      prod/common/interfaces/CycleSeg/TxInterface.hpp
+      ros2_model/src/cpm_common_interfaces/msg/CycleSeg{TxChannel,Inputs,Outputs}.msg
+*******************************************************************************/
+cpm_common_interfaces::msg::CycleSegTxChannel
+ScsToRos2Bridge::convertCycleSegTxToRos(const CycleSegTxInterface& scs)
+{
+    cpm_common_interfaces::msg::CycleSegTxChannel ros;
+    ros.active_segment_id = scs.activeSegmentId;
+    ros.dig_state = scs.digState;
+    ros.segment_last_completed_id = scs.segmentLastCompletedId;
+    ros.segment_seconds_since_last_end = scs.segmentSecondsSinceLastEnd;
+    ros.segment_sequence_number = scs.segmentSequenceNumber;
+
+    const CycleSegInputs_t& in = scs.cycleSegIn;
+    ros.cycle_seg_in.ground_spd_kph = in.ground_spd_kph;
+    ros.cycle_seg_in.payload_ratio = in.payload_ratio;
+    ros.cycle_seg_in.payload_ratio_status = in.payload_ratio_status;
+    ros.cycle_seg_in.payload_ratio_raw = in.payload_ratio_raw;
+    ros.cycle_seg_in.payload_ratio_raw_status = in.payload_ratio_raw_status;
+    ros.cycle_seg_in.lift_valve_cmd = in.lift_valve_cmd;
+    ros.cycle_seg_in.tilt_valve_cmd = in.tilt_valve_cmd;
+    ros.cycle_seg_in.bucket_angle = in.bucket_angle;
+    ros.cycle_seg_in.lift_angle = in.lift_angle;
+    ros.cycle_seg_in.desired_gear = in.desired_gear;
+    ros.cycle_seg_in.engine_spd_rpm = in.engine_spd_rpm;
+    ros.cycle_seg_in.tilt_lever_cmd = in.tilt_lever_cmd;
+    ros.cycle_seg_in.tilt_cyl_pos = in.tilt_cyl_pos;
+    ros.cycle_seg_in.machine_idle_status = in.machine_idle_status;
+    ros.cycle_seg_in.keyswitch_state = in.keyswitch_state;
+    ros.cycle_seg_in.real_time = in.real_time;
+    ros.cycle_seg_in.real_time_status = in.realTime_status;
+    ros.cycle_seg_in.timezone_offset = in.timezone_offset;
+    ros.cycle_seg_in.total_fuel_high_res = in.total_fuel_high_res;
+    ros.cycle_seg_in.total_fuel_low_res = in.total_fuel_low_res;
+    ros.cycle_seg_in.fuel_rate = in.fuel_rate;
+    ros.cycle_seg_in.ard_fuel_rate = in.ARD_fuel_rate;
+    ros.cycle_seg_in.gps_latitude = in.GPS_latitude;
+    ros.cycle_seg_in.gps_longitude = in.GPS_longitude;
+    ros.cycle_seg_in.gps_status = in.GPS_status;
+    ros.cycle_seg_in.service_hour_meter = in.service_hour_meter;
+    ros.cycle_seg_in.payload_weight = in.payload_weight;
+    ros.cycle_seg_in.payload_weight_status = in.payload_weight_status;
+    ros.cycle_seg_in.payload_calc_method = in.payload_calc_method;
+    ros.cycle_seg_in.ext_force_normalized = in.extForceNormalized;
+    ros.cycle_seg_in.impl_operation_status = in.impl_operation_status;
+    ros.cycle_seg_in.engine_load_factor = in.Engine_Load_Factor;
+
+    const CycleSegOutputs_t& out = scs.cycleSegOut;
+    ros.cycle_seg_out.commit_segment_record = out.commit_segment_record;
+    ros.cycle_seg_out.segment_record_id = out.segment_record_id;
+    ros.cycle_seg_out.segment_rec_start_sim_time = out.segment_rec_start_simTime;
+    ros.cycle_seg_out.segment_rec_duration = out.segment_rec_duration;
+    ros.cycle_seg_out.segment_rec_distance = out.segment_rec_distance;
+    ros.cycle_seg_out.segment_rec_start_real_time = out.segment_rec_start_real_time;
+    ros.cycle_seg_out.segment_rec_fuel_used = out.segment_rec_fuel_used;
+    ros.cycle_seg_out.segment_rec_latitude = out.segment_rec_latitude;
+    ros.cycle_seg_out.segment_rec_longitude = out.segment_rec_longitude;
+    ros.cycle_seg_out.segment_rec_idle_time = out.segment_rec_idle_time;
+    ros.cycle_seg_out.segment_rec_hour_meter = out.segment_rec_hour_meter;
+    ros.cycle_seg_out.segment_rec_payload = out.segment_rec_payload;
+    ros.cycle_seg_out.segment_rec_payload_calc_method = out.segment_rec_payload_calc_method;
+    ros.cycle_seg_out.commit_rec_gps = out.commit_rec_gps;
+    ros.cycle_seg_out.segment_dig_state = out.segment_dig_state;
+    ros.cycle_seg_out.segment_last_completed_id = out.segment_last_completed_id;
+    ros.cycle_seg_out.segment_time_since_last_end = out.segment_time_since_last_end;
+    ros.cycle_seg_out.segment_sequence_number = out.segment_sequence_number;
+    ros.cycle_seg_out.keyswitch_override_flag = out.keyswitch_override_flag;
+    ros.cycle_seg_out.segment_active_segment_id = out.segment_active_segment_id;
+    return ros;
+}
+
+/******************************************************************************
+FUNCTION NAME: ScsToRos2Bridge::convertWidgetsDebugDataToRos
+DESCRIPTION: WidgetsDebugData (AIS SCS) -> cpm_common_interfaces::msg::WidgetsDebugData (ROS2)
+    Every serialized field, read through the public getters, verified against:
+      prod/common/interfaces/WidgetsDebugData/WidgetsDebugData.h
+      ros2_model/src/cpm_common_interfaces/msg/WidgetsDebugData.msg (+ WidgetsTireRev*.msg)
+*******************************************************************************/
+cpm_common_interfaces::msg::WidgetsDebugData
+ScsToRos2Bridge::convertWidgetsDebugDataToRos(const WidgetsDebugData& scs)
+{
+    cpm_common_interfaces::msg::WidgetsDebugData ros;
+    ros.distance.forward_mm = scs.getDistance().ForwardMm;
+    ros.distance.reverse_mm = scs.getDistance().ReverseMm;
+    ros.distance.status = scs.getDistance().Status;
+    ros.rotation.forward = scs.getRotation().Forward;
+    ros.rotation.reverse = scs.getRotation().Reverse;
+    ros.rotation.status = scs.getRotation().Status;
+    ros.dig_time_current = scs.getDigTimeCurrent();
+    ros.traveling_loaded_revs = scs.getTravelingLoadedRevs();
+    ros.dig_state = static_cast<uint8_t>(scs.getDigState());
+    ros.ground_speed_info_speed = scs.getGroundSpeedInfo().speed;
+    ros.ground_speed_info_data_status = scs.getGroundSpeedInfo().data_status;
+    ros.gear_info_gear = scs.getGearInfo().gear;
+    ros.gear_info_gear_status = scs.getGearInfo().gear_status;
+    return ros;
+}
+
+/******************************************************************************
+FUNCTION NAME: ScsToRos2Bridge::convertBemSimStateToRos
+DESCRIPTION: LpsSaUIBEMSimStateInterface (AIS SCS) -> cpm_common_interfaces::msg::LpsSaUIBemSimStateInterface (ROS2)
+    Every field of the messages (BEMSimCnfgStorage serializes 8 of its fields; newMachine is
+    public but not serialized over SCS, it is transported here and ignored by aisXcpServer), verified against:
+      prod/common/interfaces/LpsSaUI/BEMSimStateInterface.hpp
+      prod/infrastructure/aisJhm/aisJhm2/AisJhm2RequestProcessor/BEMSim/BEMSimCnfgStorage.h
+      ros2_model/src/cpm_common_interfaces/msg/{LpsSaUIBemSimStateInterface,BemSimCnfg}.msg
+    chrono: chargeModeStartTime (system_clock) -> int64 nanoseconds since epoch.
+*******************************************************************************/
+cpm_common_interfaces::msg::LpsSaUIBemSimStateInterface
+ScsToRos2Bridge::convertBemSimStateToRos(const LpsSaUIBEMSimStateInterface& scs)
+{
+    cpm_common_interfaces::msg::LpsSaUIBemSimStateInterface ros;
+    ros.cnfg.charge_mode = scs.cnfg.chargeMode;
+    ros.cnfg.start_charge = scs.cnfg.startCharge;
+    ros.cnfg.charge_mode_start_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            scs.cnfg.chargeModeStartTime.time_since_epoch()).count();
+    ros.cnfg.start_fuel_used = scs.cnfg.startFuelUsed;
+    ros.cnfg.last_discharge_rate = scs.cnfg.lastDischargeRate;
+    ros.cnfg.bem_sim_enabled = scs.cnfg.bemSimEnabled;
+    ros.cnfg.charger_capacity = scs.cnfg.chargerCapacity;
+    ros.cnfg.engine_derate_enabled = scs.cnfg.engineDerateEnabled;
+    ros.cnfg.new_machine = scs.cnfg.newMachine;
+    ros.charge_level = scs.chargeLevel;
+    ros.discharge_rate = scs.dischargeRate;
+    ros.total_fuel_used = scs.totalFuelUsed;
+    ros.derate_engine_cmd = scs.derateEngineCmd;
+    ros.derate_engine_rpm = scs.derateEngineRPM;
+    ros.charge_rate = scs.chargeRate;
+    ros.time_to_charged = scs.timeToCharged;
+    ros.time_to_discharged = scs.timeToDischarged;
     return ros;
 }
 
@@ -1929,7 +2216,7 @@ CalMgrCmdResp ScsToRos2Bridge::convertCalMgrCmdRespToScs(
 
 /******************************************************************************
 FUNCTION NAME: ScsToRos2Bridge::convertTipoffTestPointsToScs
-DESCRIPTION: weigh_app_interfaces::msg::TipoffModelTestPoints (ROS2, from WeighApp) -> TipoffModelTestPoints (AIS SCS, for aisXcpServer)
+DESCRIPTION: weigh_app_interfaces::msg::TipoffModelTestPoints (ROS2, from WeighApp) -> TipoffModelTestPoints (AIS SCS; no SCS reader since aisXcpServer moved to ROS2)
 *******************************************************************************/
 TipoffModelTestPoints ScsToRos2Bridge::convertTipoffTestPointsToScs(
         const weigh_app_interfaces::msg::TipoffModelTestPoints& ros)

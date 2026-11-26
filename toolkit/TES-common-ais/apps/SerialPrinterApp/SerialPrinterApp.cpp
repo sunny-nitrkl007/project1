@@ -290,8 +290,7 @@ bool SerialPrinterApp::initialize() {
             // Configure the options
             struct termios options{};
 
-            // Matches pre-ROS2 behavior: proceed even if the attribute read
-            // fails rather than aborting the whole app over it.
+            // Never apply settings derived from a failed attribute read.
             if (tcgetattr(fileDescriptor_, &options) != 0) {
                 RCLCPP_ERROR(get_logger(), "Cannot read serial attributes: errno=%d", errno);
             }
@@ -647,8 +646,8 @@ int SerialPrinterApp::runLifecycle(std::shared_ptr<rclcpp::executors::SingleThre
     int result = 0;
     try {
         while (!stopping.load() && rclcpp::ok()) {
-            executor->spin_some(std::chrono::milliseconds(100));
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            executor->spin_some();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
     catch (const std::exception& error) {

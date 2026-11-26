@@ -52,12 +52,27 @@ fi
     echo "ROBOT_YAML=${ROBOT_YAML}"
 } >> /tmp/lps_start.log 2>&1
 
+[ -f "${CONFIG_DIR}/XcpServerTask.yaml" ] || exit 1
 [ -f "${CONFIG_DIR}/LpsSaJobMgrApp.yaml" ] || exit 1
 [ -f "${CONFIG_DIR}/LpsSaWeighApp.yaml" ] || exit 1
 [ -f "${CONFIG_DIR}/${ROBOT_YAML}" ] || exit 1
 [ -f "${CONFIG_DIR}/OutputApp.yaml" ] || exit 1
 [ -f "${CONFIG_DIR}/SerialPrinterApp.yaml" ] || exit 1
 [ -f "${CONFIG_DIR}/VP3FileCreationApp.yaml" ] || exit 1
+
+# Start XcpServerTask (aisXcpServer) first, as in AIS. The NVM calibration snapshot
+# (lps_sa_nvm_cal_data_channel) is transient_local, so a later start still receives it.
+# No Robot YAML: the app reads no machine-specific keys.
+/sbin/start-stop-daemon \
+    --start \
+    --background \
+    --make-pidfile \
+    --pidfile /run/xcp_server_task.pid \
+    --exec "${APP_DIR}/bin/aisXcpServer" \
+    -- \
+    --instance XcpServerTask \
+    --ros-args \
+    --params-file "${CONFIG_DIR}/XcpServerTask.yaml"
 
 # Start JobMgr
 /sbin/start-stop-daemon \
@@ -94,9 +109,24 @@ fi
     --pidfile /run/output_app.pid \
     --exec "${APP_DIR}/bin/OutputApp" \
     -- \
-    --instanceName=OutputApp \
+    --instance OutputApp \
     --ros-args \
-    --params-file "${CONFIG_DIR}/OutputApp.yaml"
+    --params-file "${CONFIG_DIR}/OutputApp.yaml" 
+
+# Start VP3FileCreationApp
+/sbin/start-stop-daemon \
+    --start \
+    --background \
+    --make-pidfile \
+    --pidfile /run/lps_vp3.pid \
+    --exec "${APP_DIR}/bin/VP3FileCreationApp" \
+    -- \
+    --instance VP3FileCreationApp \
+    --ros-args \
+    --params-file "${CONFIG_DIR}/VP3FileCreationApp.yaml" \
+    --param "storageRoot:=/opt/appdata/${VERITY_DIRECTORY}/VP3FileCreationApp/nvm/" \
+    --param "tempRoot:=/tmp/appdata/${VERITY_DIRECTORY}/VP3FileCreationApp" \
+    --param "VP3TxPath:=/opt/appdata/${VERITY_DIRECTORY}/FileTransferBridgeApp/TxFiles/"
 
 # Start SerialPrinterApp
 /sbin/start-stop-daemon \
@@ -109,18 +139,3 @@ fi
     --instance SerialPrinterApp \
     --ros-args \
     --params-file "${CONFIG_DIR}/SerialPrinterApp.yaml"
-
-# Start VP3FileCreationApp
-/sbin/start-stop-daemon \
-    --start \
-    --background \
-    --make-pidfile \
-    --pidfile /run/lps_vp3.pid \
-    --exec "${APP_DIR}/bin/VP3FileCreationApp" \
-    -- \
-    --instanceName=VP3FileCreationApp \
-    --ros-args \
-    --params-file "${CONFIG_DIR}/VP3FileCreationApp.yaml" \
-    --param "storageRoot:=/opt/appdata/${VERITY_DIRECTORY}/VP3FileCreationApp/nvm/" \
-    --param "tempRoot:=/tmp/appdata/${VERITY_DIRECTORY}/VP3FileCreationApp" \
-    --param "VP3TxPath:=/opt/appdata/${VERITY_DIRECTORY}/FileTransferBridgeApp/TxFiles/"

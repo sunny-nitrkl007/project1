@@ -347,7 +347,7 @@ int VP3FileCreationApp::runLifecycle(std::shared_ptr<rclcpp::executors::SingleTh
 
     while (rclcpp::ok()) {
         executor->spin_some();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     return 0;
 }

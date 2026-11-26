@@ -56,7 +56,20 @@ DESCRIPTION:
 #include <cpm_common_interfaces/msg/create_file_request.hpp>
 #include <cpm_common_interfaces/msg/app_reg.hpp>
 #include <cpm_common_interfaces/msg/file_transfer_bridge_request.hpp>
+#include <interfaces/PwmInputChannels/InterfaceTypes.h>
+#include <interfaces/WorkOrderAssist/TxInterfaceInputChannel.h>
+#include <interfaces/CycleSeg/TxInterfaceInputChannel.h>
+#include <interfaces/WidgetsDebugData/InterfaceTypes.h>
+#include <interfaces/LpsSaUI/BEMSimStateInterfaceInputChannel.h>
 #include <cpm_common_interfaces/msg/serial_printer_request.hpp>
+#ifdef UNAVAILABLE
+#undef UNAVAILABLE
+#endif
+
+#ifdef AVAILABLE
+#undef AVAILABLE
+#endif
+
 
 /* ROS2/DDS wrapper + generated message headers */
 #include "rclcpp/rclcpp.hpp"
@@ -97,6 +110,11 @@ DESCRIPTION:
 #include <weigh_app_interfaces/msg/cal_mgr_cmd_resp.hpp>
 #include <weigh_app_interfaces/msg/tipoff_model_test_points.hpp>
 #include <weigh_app_interfaces/msg/lps_sa_totals_printer_cnfg.hpp>
+#include <weigh_app_interfaces/msg/pwm_input_channels.hpp>
+#include <cpm_common_interfaces/msg/work_order_assist_tx_channel.hpp>
+#include <cpm_common_interfaces/msg/cycle_seg_tx_channel.hpp>
+#include <cpm_common_interfaces/msg/widgets_debug_data.hpp>
+#include <cpm_common_interfaces/msg/lps_sa_ui_bem_sim_state_interface.hpp>
 #include <interfaces/CalMgrCmdResp/InterfaceTypes.h>
 
 class ScsToRos2Bridge: public task::Task
@@ -117,7 +135,7 @@ private:
     ** repo for a standalone process binding these interface names.
     **--------------------------------------------------------------------*/
     LpsSaJobMgrReqstChannelInput*  jobMgrReqstScsIn_;   /* subscribe: requests from WorkOrderAssist / hornOnStoreTest / AisJhm2RequestProcessor / LpsSaWeighApp */
-    LpsSaJobMgrRespChannelOutput*  jobMgrRespScsOut_;   /* publish: forwards JobMgr's ack to AutonomyConditionDiagnostics / aisXcpServer / AisJhm2RequestProcessor */
+    LpsSaJobMgrRespChannelOutput*  jobMgrRespScsOut_;   /* publish: forwards JobMgr's ack to AutonomyConditionDiagnostics / AisJhm2RequestProcessor */
     AisJhm2TxChannelInput*         aisJhm2TxScsIn_;     /* subscribe: JHM2 dispatch data from AisJhm2RequestProcessor */
     SwitchInputScsOutput*          switchInputScsOut_;   /* publish: SwitchInputApp's ROS2 states to legacy ACD / aisXcpServer */
     ProcessHealthOutput* processHealthScsOut_;
@@ -141,11 +159,16 @@ private:
     CalMgrCmdRespOutput*                  calMgrCmdRespScsOut_;       /* write resp from ROS2 WeighApp -> AIS SCS ACD consumer */
     DemoAppTxChannelInput* demoAppTxScsIn_;
     PartNumbersInput* partNumbersScsIn_;
-    TipoffModelTestPointsOutput*          tipoffTestPointsScsOut_;    /* write tipoff diagnostics from ROS2 WeighApp -> AIS SCS aisXcpServer */
+    TipoffModelTestPointsOutput*          tipoffTestPointsScsOut_;    /* write tipoff diagnostics from ROS2 WeighApp -> AIS SCS (no SCS reader since aisXcpServer moved to ROS2; kept by default) */
     LpsSaTotalsPrinterCnfgInterfaceInputChannel* printerCnfgScsIn_;  /* read printer cfg from AIS SCS LpsSaTotalsApp -> forward to ROS2 WeighApp */
     SystemHardwareHealthInput* systemHardwareHealthScsIn_;
     SystemHardwareHealthRequestOutput* systemHardwareHealthRequestScsIn_;
     ReadyToFlashStatusOutput* readyToFlashScsOut_;
+    PwmInputChannelsInput* pwmInputChannelsScsIn_;  /* read PWM inputs from AIS SCS PwmInput -> forward to ROS2 aisXcpServer */
+    WorkOrderAssistTxInterfaceInputChannel* workOrderAssistTxScsIn_;   /* AIS SCS WorkOrderAssist -> ROS2 aisXcpServer */
+    CycleSegTxInterfaceInputChannel* cycleSegTxScsIn_;                 /* AIS SCS CycleSeg -> ROS2 aisXcpServer */
+    WidgetsDebugDataInput* widgetsDebugDataScsIn_;                     /* AIS SCS WidgetApp -> ROS2 aisXcpServer */
+    LpsSaUIBEMSimStateInterfaceInputChannel* bemSimStateScsIn_;        /* AIS SCS AisJhm2DataServer -> ROS2 aisXcpServer */
 
     /*----------------------------------------------------------------------
     ** ROS2 side. One shared node + executor for this process, mirroring
@@ -183,7 +206,7 @@ private:
     std::unique_ptr<ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::LpsSaNvmCalOnTheFlyDataChannel>> nvmCalOnTheFlyDataRosIn_;
     std::unique_ptr<ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::CalMgrCmdReqst>>                calMgrCmdReqstRosOut_; /* AIS SCS -> ROS2 (WeighApp subscriber) */
     std::unique_ptr<ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::CalMgrCmdResp>>                  calMgrCmdRespRosIn_;   /* ROS2 -> AIS SCS (ACD consumer) */
-    std::unique_ptr<ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::TipoffModelTestPoints>>          tipoffTestPointsRosIn_;  /* ROS2 -> AIS SCS (aisXcpServer consumer) */
+    std::unique_ptr<ros2_wrapper::RosInputInterface<weigh_app_interfaces::msg::TipoffModelTestPoints>>          tipoffTestPointsRosIn_;  /* ROS2 -> AIS SCS (no SCS reader since aisXcpServer moved to ROS2; kept by default) */
     std::unique_ptr<ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg>>        printerCnfgRosOut_;      /* AIS SCS -> ROS2 (WeighApp subscriber) */
     VP3RecordInput* vp3RecordScsIn_ = nullptr;
     CreateFileRequestInput* createFileRequestScsIn_ = nullptr;
@@ -202,9 +225,12 @@ private:
     bool initialized_ = false;
     bool cleanedUp_ = false;
     void forwardVP3();
-    // Raw publisher, not RosOutputInterface: that wrapper hardcodes best_effort,
-    // but SerialPrinterApp's subscriber requires reliable -- incompatible QoS silently drops all messages.
-    rclcpp::Publisher<cpm_common_interfaces::msg::SerialPrinterRequest>::SharedPtr serialPrinterRequestRosOut_;
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<weigh_app_interfaces::msg::PwmInputChannels>>              pwmInputChannelsRosOut_; /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::WorkOrderAssistTxChannel>>    workOrderAssistTxRosOut_;  /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::CycleSegTxChannel>>           cycleSegTxRosOut_;         /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::WidgetsDebugData>>            widgetsDebugDataRosOut_;   /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
+    std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaUIBemSimStateInterface>> bemSimStateRosOut_;        /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
+    rclcpp::Publisher<cpm_common_interfaces::msg::SerialPrinterRequest>::SharedPtr serialPrinterRequestRosOut_;    
     void printGraphInfo();
     /* Conversion helpers -- pure, no side effects, no I/O. Static private
        methods rather than free functions so they stay scoped to this class
@@ -239,6 +265,11 @@ private:
     static CalMgrCmdResp convertCalMgrCmdRespToScs(const weigh_app_interfaces::msg::CalMgrCmdResp& ros);
     static TipoffModelTestPoints convertTipoffTestPointsToScs(const weigh_app_interfaces::msg::TipoffModelTestPoints& ros);
     static weigh_app_interfaces::msg::LpsSaTotalsPrinterCnfg convertPrinterCnfgToRos(const LpsSaTotalsPrinterCnfgInterface& scs);
+    static weigh_app_interfaces::msg::PwmInputChannels convertPwmInputChannelsToRos(const PwmInputChannels& scs);
+    static cpm_common_interfaces::msg::WorkOrderAssistTxChannel convertWorkOrderAssistTxToRos(const WorkOrderAssistTxInterface& scs);
+    static cpm_common_interfaces::msg::CycleSegTxChannel convertCycleSegTxToRos(const CycleSegTxInterface& scs);
+    static cpm_common_interfaces::msg::WidgetsDebugData convertWidgetsDebugDataToRos(const WidgetsDebugData& scs);
+    static cpm_common_interfaces::msg::LpsSaUIBemSimStateInterface convertBemSimStateToRos(const LpsSaUIBEMSimStateInterface& scs);
     static cpm_common_interfaces::msg::SerialPrinterRequest convertSerialPrinterRequestToRos(const SerialPrinterRequestInterface& scs);
 };
 

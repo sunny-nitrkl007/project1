@@ -1,0 +1,38 @@
+XcpServerTask:
+  ros__parameters:
+    # Matches commonTaskParams.rb on non-AUTO ECMs (A6N1/A6N2/A7H4/OCS): "scheduler" => SCHED_OTHER.
+    # SCHED_OTHER has no priority (commonTaskParams.rb leaves "schedulerPriority" unset), so 0.
+    scheduler: "SCHED_OTHER"
+    scheduler_priority: 0
+
+    # Parameters section (former config/XcpServerTask.rb): "cycleRate_hz" => 100
+    # Must stay 100 Hz: both XCP servers declare one 10 ms DAQ event (xcpServerDb.cpp).
+    cycle_rate_hz: 100.0
+
+    # Logging threshold - one of: debug, info, warn, error, fatal
+    # (former config/XcpServerTask.rb: "loggerThreshold" => "error")
+    logger_threshold: "error"
+
+    # ScsRxTimeouts section (former config/XcpServerTask.rb), seconds; 0 disables the timeout.
+    # MachineInput has no publisher, so it has no entry.
+    scs_rx_timeouts.autonomy_condition_diagnostics_tx_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.system_hardware_health_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_weigh_reqst_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_weigh_resp_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_weigh_tx_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_weigh_debug_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_nvm_cal_data_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_nvm_cal_on_the_fly_data_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_weigh_init_debug_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_job_mgr_tx_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.pwm_input_channels_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_job_mgr_reqst_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_job_mgr_resp_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.lps_sa_job_mgr_debug_channel_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.switch_input_scs_input_rx_timeout_sec: 5.0
+    scs_rx_timeouts.work_order_assist_tx_input_rx_timeout_sec: 10.0
+    scs_rx_timeouts.display_state_input_rx_timeout_sec: 10.0
+    scs_rx_timeouts.cycle_seg_tx_channel_input_rx_timeout_sec: 10.0
+    scs_rx_timeouts.widgets_debug_data_input_rx_timeout_sec: 10.0
+    scs_rx_timeouts.tipoff_model_test_points_input_rx_timeout_sec: 10.0
+    scs_rx_timeouts.bem_sim_state_input_rx_timeout_sec: 10.0

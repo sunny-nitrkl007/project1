@@ -31,7 +31,22 @@ public:
     RosInputInterface(const rclcpp::Node::SharedPtr& node, const std::string& topicName, size_t qosDepth = 1)
         : topicName_(topicName)
     {
-        auto qos = rclcpp::QoS(rclcpp::KeepLast(1)).best_effort().durability_volatile();
+        auto qos = rclcpp::QoS(rclcpp::KeepLast(qosDepth)).best_effort().durability_volatile();
+        subscription_ = node->create_subscription<T>(
+            topicName,
+            qos,
+            [this](const typename T::SharedPtr msg)
+            {
+                std::lock_guard<std::mutex> lock(queueMutex_);
+                queue_.push(*msg);
+            });
+    }
+
+    // Same, with a full QoS profile, e.g. rclcpp::QoS(1).transient_local() to receive the
+    // last sample of a transient_local publisher that published before this subscriber existed.
+    RosInputInterface(const rclcpp::Node::SharedPtr& node, const std::string& topicName, const rclcpp::QoS& qos)
+        : topicName_(topicName)
+    {
         subscription_ = node->create_subscription<T>(
             topicName,
             qos,

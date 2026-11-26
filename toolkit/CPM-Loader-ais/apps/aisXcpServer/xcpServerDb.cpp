@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <ais/log/Logger.h>
+#include "ROS2Logger.hpp"
 
 #include "xcp_server/XCP.h"
 #include "xcp_server/XCPServer.h"
@@ -57,41 +57,41 @@ bool xcpServerDbInit(xcp_server::ParameterDb& db)
 {
     bool everything_ok = true;
 
-    AIS_LOG_INFO("XCPServer::init");
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(), "XCPServer::init");
 
     pXCP1_ = XCPServer_new();
     if (nullptr != pXCP1_) {
     	if (XCPServer_init(pXCP1_, &XCP1UDPConfig)) {
-    		AIS_LOG_DEBUG("XCP1 Initialization successful.");
+    		RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(), "XCP1 Initialization successful.");
 
     		// Register the database with the server.
     		db.registerWithServer(pXCP1_);
 
-    		AIS_LOG_DEBUG("XCP1 Database registered.");
+    		RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(), "XCP1 Database registered.");
     	} else {
-    		AIS_LOG_FATAL("XCP1 XCPServer initialization failed.");
+    		RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "XCP1 XCPServer initialization failed.");
             everything_ok = false;
         }
     } else {
-        AIS_LOG_FATAL("XCP1 XCPServer creation failed.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "XCP1 XCPServer creation failed.");
         everything_ok = false;
     }
 
     pXCP2_ = XCPServer_new();
     if (nullptr != pXCP2_) {
         if (XCPServer_init(pXCP2_, &XCP2UDPConfig)) {
-            AIS_LOG_DEBUG("XCP2 Initialization successful.");
+            RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(), "XCP2 Initialization successful.");
 
             // Register the database with the server.
             db.registerWithServer(pXCP2_);
 
-            AIS_LOG_DEBUG("XCP2 Database registered.");
+            RCLCPP_DEBUG(ROS2Logger::Instance().GetLogger(), "XCP2 Database registered.");
         } else {
-            AIS_LOG_FATAL("XCP2 XCPServer initialization failed.");
+            RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "XCP2 XCPServer initialization failed.");
             everything_ok = false;
         }
     } else {
-        AIS_LOG_FATAL("XCP2 XCPServer creation failed.");
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "XCP2 XCPServer creation failed.");
         everything_ok = false;
     }
 
@@ -102,7 +102,7 @@ bool xcpServerDbInit(xcp_server::ParameterDb& db)
 
 bool xcpServerDbUpdate()
 {
-	AIS_LOG_INFO("XCPExampleServerTask::update");
+	RCLCPP_INFO(ROS2Logger::Instance().GetLogger(), "XCPExampleServerTask::update");
 
     // Update the XCP server
     XCPServer_main(pXCP1_);
@@ -116,7 +116,7 @@ bool xcpServerDbUpdate()
 
 void xcpServerDbCleanup()
 {
-    AIS_LOG_INFO("XCPExampleServerTask::cleanup");
+    RCLCPP_INFO(ROS2Logger::Instance().GetLogger(), "XCPExampleServerTask::cleanup");
 
     // Cleanup the XCP server.
     if (nullptr != pXCP1_) {

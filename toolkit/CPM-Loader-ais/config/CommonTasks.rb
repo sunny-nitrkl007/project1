@@ -10,16 +10,6 @@ SystemTasks.update({
 })
 
 AuxiliaryProcesses.update({
-  "aisXcpServer" => {
-      "machines" => [ 
-                      Machines::MachineMap.default,
-                    ],
-      "executableName" => ENV['CAT_DIR'] + "/bin/aisXcpServer",
-      "autoRestart" => true,
-      "timeBetweenRestarts_s" => 2,
-      "alwaysOn" => false,
-  },
-  
   # Restores the AIS-SCS leg of LpsSaJobMgrReqstChannel/LpsSaJobMgrRespChannel/
   # AisJhm2TxChannel, which LpsSaJobMgrApp made ROS2-only during its ROS2 port.
   # See porting_artefacts/plan.md and apps/ScsToRos2Bridge/README.md.

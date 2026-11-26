@@ -102,10 +102,11 @@ RETURN VALUE:  Boolean
 *******************************************************************************/
 bool OutputApp::initialize( )
 {
-   declare_parameter<double>("cycle_rate_hz", 4.0);
    declare_parameter<std::string>("logger_threshold", "error");
-   ROS2Logger::Instance().SetLogLevel(get_parameter("logger_threshold").as_string());
+   std::string const loggerThreshold = get_parameter("logger_threshold").as_string();
+   ROS2Logger::Instance().SetLogLevel(loggerThreshold);
 
+   declare_parameter<double>("cycle_rate_hz", 4.0);
    const double cycleRateHz = get_parameter("cycle_rate_hz").as_double();
    if (!std::isfinite(cycleRateHz) || cycleRateHz < IDEAL_APP_CYCLE_RATE ||
        std::fmod(cycleRateHz, IDEAL_APP_CYCLE_RATE) != 0.0) {

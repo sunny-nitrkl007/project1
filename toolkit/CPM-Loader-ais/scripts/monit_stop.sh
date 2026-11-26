@@ -16,16 +16,22 @@
 /sbin/start-stop-daemon \
     --stop \
     --pidfile /run/output_app.pid \
+    --retry=TERM/30/KILL/5    
+
+# Stop VP3FileCreationApp
+/sbin/start-stop-daemon \
+    --stop \
+    --pidfile /run/lps_vp3.pid \
+    --retry=TERM/30/KILL/5
+
+# Stop XcpServerTask (aisXcpServer)
+/sbin/start-stop-daemon \
+    --stop \
+    --pidfile /run/xcp_server_task.pid \
     --retry=TERM/30/KILL/5
 
 # Stop SerialPrinterApp
 /sbin/start-stop-daemon \
     --stop \
     --pidfile /run/serial_printer.pid \
-    --retry=TERM/30/KILL/5
-
-# Stop VP3FileCreationApp
-/sbin/start-stop-daemon \
-    --stop \
-    --pidfile /run/lps_vp3.pid \
-    --retry=TERM/30/KILL/5  
+    --retry=TERM/30/KILL/5     

@@ -47,7 +47,7 @@ if (testEnv[ 'PLATFORM' ] != 'x86_64-linux-gnu'):
     testEnv.buildit( 'AppLogCapture', ['suse'] )
 
 #XCP
-testEnv.buildit( 'aisXcpServer', ['suse'] )
+#testEnv.buildit( 'aisXcpServer', ['suse'] )
 
 
 #Comment this out if you do not need Datalink Monitor App

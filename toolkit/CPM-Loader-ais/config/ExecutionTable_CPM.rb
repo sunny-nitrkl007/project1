@@ -31,7 +31,7 @@ else
     "TireRevTestApp" => { "executableName" => "TireRevTestApp", },
     "WidgetApp" => { "executableName" => "WidgetApp", },
     "WorkOrderAssist" => { "executableName" => "WorkOrderAssist", },
-    "XcpServerTask" => { "executableName" => "aisXcpServer", },
+    # XcpServerTask (aisXcpServer) is a ROS2 node launched by scripts/monit_start.sh.
     #"Acd2Task" => { "executableName" => "acd2Task", },
 
   })

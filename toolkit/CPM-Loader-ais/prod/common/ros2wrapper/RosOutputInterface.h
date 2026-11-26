@@ -33,6 +33,13 @@ public:
         publisher_ = node->create_publisher<T>(topicName, qos);
     }
  
+    // Same, with a full QoS profile, e.g. rclcpp::QoS(1).transient_local() for one-shot
+    // data that a subscriber starting later must still receive.
+    RosOutputInterface(const rclcpp::Node::SharedPtr& node, const std::string& topicName, const rclcpp::QoS& qos)
+        : topicName_(topicName)
+    {
+        publisher_ = node->create_publisher<T>(topicName, qos);
+    }
     // Matches interfaces::baseTypes::OutputInterface<T>::publish(const T&) --
     // same call syntax as the real SCS object it replaces.
     bool publish(const T& data)

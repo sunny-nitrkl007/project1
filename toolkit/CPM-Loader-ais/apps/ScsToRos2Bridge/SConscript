@@ -14,7 +14,14 @@ from SCons.Script import Dir
 Import( 'testEnv' )
 myEnv = testEnv.Clone();
 
-myEnv.Append(CCFLAGS = ['-Werror', '-Wno-unused-function'])
+myEnv.Append(
+    CCFLAGS=[
+        '-Werror',
+        '-Wno-attributes',
+        '-Wno-error=attributes',
+        '-Wno-unused-function'
+    ]
+)
 
 # Add the root of this repository to the search path
 myEnv.Append(CPPPATH = ['#'])
@@ -35,6 +42,11 @@ myEnv.Append(CPPPATH = [
     '#/sss/include',
     '#/TES-common-ais/prod/common/chrono',
     '#/eta-ais/prod/platformCommon/content/tgt_gcc_5.1.0_a6n2/lib_a4/hmpl/include',
+    # WidgetsDebugData (aisXcpServer leg): WidgetsDebugData.h -> tire_rev.h, dig_timer.h -> pcs_public.h
+    '#/widgets/tire_rev_wl00/include',
+    '#/widgets/dig_timer_wl00/include',
+    '#/mach_prod_pcs-interface/include',
+    '#/mach_prod_prodcore/include',
 ])
 
 #Addon------------------------------

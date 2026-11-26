@@ -43,6 +43,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CreateFileRequest.msg"
   "msg/AppReg.msg"
   "msg/FileTransferBridgeRequest.msg"
+  "msg/WorkOrderAssistTxChannel.msg"
+  "msg/CycleSegInputs.msg"
+  "msg/CycleSegOutputs.msg"
+  "msg/CycleSegTxChannel.msg"
+  "msg/BemSimCnfg.msg"
+  "msg/LpsSaUIBemSimStateInterface.msg"
+  "msg/WidgetsTireRevDistances.msg"
+  "msg/WidgetsTireRevRotations.msg"
+  "msg/WidgetsDebugData.msg"
   "msg/SerialPrinterRequest.msg"
 )
 

@@ -28,8 +28,7 @@
 #ifndef XCPSERVERTASK_H_
 #define XCPSERVERTASK_H_
 
-#include <ais/task/Task.h>
-//#include <ais/interfaces/Example/InterfaceTypes.h> // for ExampleInput
+#include "ros2wrapper/Ros2TaskWrapper.h"
 
 #include "XcpScsInputsDb.h"
 #include "TipoffAssistLogging.hpp"
@@ -38,30 +37,45 @@
  *
  */
 
-class XcpServerTask: public task::Task {
+class XcpServerTask: public ros2_wrapper::Ros2TaskWrapper {
 public:
-    // task::Task construction requires a task name
+    // Ros2TaskWrapper construction requires a task name
     XcpServerTask( const std::string& taskName );
 
     // ALWAYS virtual destructors for polymorphic classes
     virtual ~XcpServerTask( );
 
-    // principal task::Task interface: all derivatives must implement these
+    // principal Ros2TaskWrapper interface: all derivatives must implement these
 
-    // called once, at startup, after comms are connected
+    // called once, at startup, after the node is created
     virtual bool initialize( );
 
-    // called periodically, according to the task config file
+    // called periodically, at cycle_rate_hz
     virtual bool executive( );
 
-    // called on the first Ctrl-C for pre-exit cleanup
+    // called on shutdown for pre-exit cleanup
     virtual void cleanup( );
+
+    // creates the executive timer (cycle_rate_hz)
+    virtual void startExecutiveTimer( );
 
     XcpScsInputs m_xcpScsInputs;
     TipoffAssistLogging toaLogging;
 
 private:
 
+    template<typename Msg>
+    bool createRosInput(const rclcpp::Node::SharedPtr& rosNode, ros2_wrapper::RosInputInterface<Msg>*& input,
+                        const std::string& topic, size_t qosDepth);
+
+    template<typename Msg>
+    bool createRosInput(const rclcpp::Node::SharedPtr& rosNode, ros2_wrapper::RosInputInterface<Msg>*& input,
+                        const std::string& topic, const rclcpp::QoS& qos);
+
+    void cleanupRosInterfaces( );
+
+    /* ROS2 inputs injected into m_xcpScsInputs (owned here, deleted in cleanupRosInterfaces()) */
+    XcpScsInputs::RosInputs rosInputs_;
 };
 
 #endif

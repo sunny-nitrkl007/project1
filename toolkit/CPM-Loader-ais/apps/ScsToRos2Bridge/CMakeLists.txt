@@ -234,6 +234,12 @@ target_include_directories(ScsToRos2Bridge PRIVATE
 
     "${SSP_DIR}/sss/include"
 
+    # WidgetsDebugData (aisXcpServer leg): WidgetsDebugData.h -> tire_rev.h, dig_timer.h -> pcs_public.h
+    "${SSP_DIR}/widgets/tire_rev_wl00/include"
+    "${SSP_DIR}/widgets/dig_timer_wl00/include"
+    "${SSP_DIR}/mach_prod_pcs-interface/include"
+    "${SSP_DIR}/mach_prod_prodcore/include"
+
     "${TES_COMMON_DIR}/prod/common"
     "${TES_COMMON_DIR}/prod/common/chrono"
 
@@ -400,6 +406,10 @@ target_link_options(ScsToRos2Bridge PRIVATE
 target_compile_definitions(ScsToRos2Bridge PRIVATE
     RAPIDJSON_HAS_STDSTRING=1
     AIS_SERIALIZATION_INCLUDE_BOOST_ARCHIVE
+)
+
+target_compile_options(ScsToRos2Bridge PRIVATE
+    -Wno-error=attributes
 )
 
 #

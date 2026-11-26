@@ -9,12 +9,27 @@
 #define TIPOFFASSISTLOGGING_H_
 
 #include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <ctime>
+#include <fstream>
+#include <iomanip>
+#include <string>
+#include <vector>
 
 #include <boost/filesystem.hpp>
 
-#include <chrono/print.hpp>
+#include "ROS2Logger.hpp"
 
-#include "../../../../tipoff_assist/toa_wl00_x86_64-b/include/toa_wl00_types.h"
+// Values of the tip-off-assist library enums used in update() (tipoff_assist/toa_wl00_x86_64-b/include/
+// toa_wl00_types.h). Copied instead of included: that header pulls std_t.h from eta-ais.
+enum {
+    TipAssistSecPfwStatus_t_VALID_MEASURING = 1,
+    TipAssistSecPfwStatus_t_VALID_NOT_MEASURING = 4
+};
+enum {
+    TipAssistUnsecPfwStatus_t_VALID = 1
+};
 
 /*
 IMPORTANT! Increment this version number whenever making changes to the TOA logger code.
@@ -238,11 +253,28 @@ protected:
             ofs.close();
         }
         else {
-            AIS_LOG_ERROR("Cannot create %s file for logging.", filePath_);
+            RCLCPP_ERROR_STREAM(ROS2Logger::Instance().GetLogger(), "Cannot create " << filePath_ << " file for logging.");
             return false;
         }
 
         return true;
+    }
+
+    // Same output as the former tes_common_ais::putTime(time_point, format): UTC calendar time via
+    // gmtime_r, formatted with strftime (buffer grown until the text fits).
+    static std::string putTimeUtc(const std::chrono::system_clock::time_point& tpUtc, const char* format) {
+        std::time_t tt = std::chrono::system_clock::to_time_t(tpUtc);
+        std::tm tm;
+        if (nullptr == gmtime_r(&tt, &tm)) {
+            return "";
+        }
+        std::vector<std::string::value_type> v(25);
+        std::size_t n = std::strftime(v.data(), v.size(), format, &tm);
+        while (0 == n) {
+            v.resize(v.size() * 2);
+            n = std::strftime(v.data(), v.size(), format, &tm);
+        }
+        return std::string(v.data(), n);
     }
 
     void logAppendResult(
@@ -265,7 +297,7 @@ protected:
         std::ofstream ofs(filePath_, std::ios::out | std::ios::app);
         if (ofs) {
             // Log the start time
-            ofs << tes_common_ais::putTime(startRealTime, tes_common_ais::date_time_formats::ISO_DATE_TIME_LOCAL) << ",";
+            ofs << putTimeUtc(startRealTime, "%FT%T") << ",";
 
             // Truck Start Weight
             ofs << std::fixed << std::setprecision(3) << truckStartWeight << ",";
