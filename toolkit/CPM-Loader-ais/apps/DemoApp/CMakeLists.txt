@@ -173,6 +173,20 @@ set_target_properties(DemoApp PROPERTIES
 )
 
 #
+# Copy runtime libraries
+#
+add_custom_command(
+    TARGET DemoApp POST_BUILD
+
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            "${CMAKE_BINARY_DIR}/build_${PLATFORM}/lib"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${SSP_DIR}/eta-ais/build-A7H4-adv/lib"
+            "${CMAKE_BINARY_DIR}/build_${PLATFORM}/lib"
+)
+
+#
 # Web assets
 #
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/index.html" DESTINATION "${DEMO_WEB_INSTALL_DIR}/DemoApp")
