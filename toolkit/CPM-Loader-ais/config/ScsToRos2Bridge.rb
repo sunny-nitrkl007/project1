@@ -57,6 +57,19 @@ Interfaces.update({
   "BEMSimStateInput" => InterfaceDefs_Loaders::LpsSaUIBEMSimStateInputChannel,
 })
 
+activeTasksPath = File.join(getCatConfigDir(), "ActiveTasks.rb")
+demoBridgeEnabled = File.open(activeTasksPath) do |file|
+  file.readline.start_with?("# CPM_DEMO_SCENARIO:")
+end
+if demoBridgeEnabled
+  Interfaces.update({
+    "DemoAppReqstChannelInput" => InterfaceDefs_Loaders::DemoAppReqstChannelInput,
+    "DemoAppTxChannelOutput" => InterfaceDefs_Loaders::DemoAppTxChannelOutput,
+    "DataLinkDataOutput" => InterfaceDefs_CpmCommon::DataLinkDataOutput,
+    "DemoProcessHealthOutput" => InterfaceDefs::ProcessHealthOutput,
+  })
+end
+
 Parameters = CommonTaskParams::Parameters.dup;
 Parameters.update({
   "loggerThreshold" => "error",  ##  All options listed in descending severity order
@@ -64,6 +77,7 @@ Parameters.update({
 
   "VP3BridgeDrainTimeoutMs" => 1950000,
   "VP3AppName" => "VP3FileCreationApp",
+  "demoBridgeEnabled" => demoBridgeEnabled,
   "cycleRate_hz" => 20.0, # fast enough that operator-facing command/ack latency through this bridge is not user-visible
 })
 

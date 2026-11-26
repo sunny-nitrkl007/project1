@@ -17,6 +17,8 @@ DESCRIPTION:
 #include <deque>
 #include <memory>
 #include "VP3BridgeSupport.h"
+#include "DemoCycleAdapter.h"
+#include "DemoHealthAdapter.h"
 #include <string>
 
 #include <ais/task/Task.h>
@@ -230,7 +232,9 @@ private:
     std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::CycleSegTxChannel>>           cycleSegTxRosOut_;         /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
     std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::WidgetsDebugData>>            widgetsDebugDataRosOut_;   /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
     std::unique_ptr<ros2_wrapper::RosOutputInterface<cpm_common_interfaces::msg::LpsSaUIBemSimStateInterface>> bemSimStateRosOut_;        /* AIS SCS -> ROS2 (aisXcpServer subscriber) */
-    rclcpp::Publisher<cpm_common_interfaces::msg::SerialPrinterRequest>::SharedPtr serialPrinterRequestRosOut_;    
+    rclcpp::Publisher<cpm_common_interfaces::msg::SerialPrinterRequest>::SharedPtr serialPrinterRequestRosOut_;
+    std::unique_ptr<DemoCycleAdapter> demoAdapter_;
+    std::unique_ptr<DemoHealthAdapter> demoHealthAdapter_;
     void printGraphInfo();
     /* Conversion helpers -- pure, no side effects, no I/O. Static private
        methods rather than free functions so they stay scoped to this class

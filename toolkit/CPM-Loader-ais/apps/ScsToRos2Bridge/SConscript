@@ -62,6 +62,9 @@ ros2_lib_dir = BASE_PATH + '/ros2_models/lib'
 for so in glob.glob(os.path.join(ros2_lib_dir, '*', 'lib*.so')):
     ros2_libs.append(os.path.basename(so)[3:-3])
 
+if not glob.glob(os.path.join(ros2_lib_dir, 'demo_app_interfaces', 'lib*.so')):
+    raise RuntimeError('Missing generated demo_app_interfaces libraries in ' + ros2_lib_dir)
+
 print(ros2_libs)
 
 for d in glob.glob(BASE_PATH + '/dependencies/cate_ros2*/include/*'):
@@ -88,6 +91,7 @@ ROS_LIB_PATHS.extend([
     BASE_PATH + '/ros2_models/lib/cpm_common_interfaces',
     BASE_PATH + '/ros2_models/lib/job_mgr_interfaces',
     BASE_PATH + '/ros2_models/lib/weigh_app_interfaces',
+    BASE_PATH + '/ros2_models/lib/demo_app_interfaces',
     BASE_PATH + '/dependencies/libyaml_0.2.5/lib',
 ])
 

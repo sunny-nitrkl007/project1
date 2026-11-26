@@ -602,8 +602,18 @@ bool ScsToRos2Bridge::initialize()
         everythingOk = false;
     }
 
-    // Print the Node and topic details for debugging purpose. 
-    printGraphInfo();    
+    bool demoEnabled = false;
+    getTaskConfig().get("demoBridgeEnabled", demoEnabled);
+    if (demoEnabled && everythingOk) {
+        demoAdapter_ = std::make_unique<DemoCycleAdapter>();
+        demoHealthAdapter_ = std::make_unique<DemoHealthAdapter>();
+        if (!demoAdapter_->initialize(rosNode_) || !demoHealthAdapter_->initialize(rosNode_)) {
+            everythingOk = false;
+        }
+    }
+
+    // Print the Node and topic details for debugging purpose.
+    printGraphInfo();
 
     initialized_ = everythingOk;
     return everythingOk;
@@ -686,6 +696,12 @@ bool ScsToRos2Bridge::executive()
 {
     executor_.spin_some();
     forwardVP3();
+    if (demoHealthAdapter_ && !demoHealthAdapter_->executive()) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Demo health unavailable; other bridge routes continue");
+    }
+    if (demoAdapter_ && !demoAdapter_->executive()) {
+        RCLCPP_ERROR(ROS2Logger::Instance().GetLogger(), "Demo cycle/request adapter unavailable; other bridge routes continue");
+    }
 
     /* Forward 1: LpsSaJobMgrReqstChannel, AIS SCS -> ROS2 */
     if (nullptr != jobMgrReqstScsIn_) {
@@ -1097,6 +1113,11 @@ void ScsToRos2Bridge::cleanup()
             RCLCPP_WARN(ROS2Logger::Instance().GetLogger(), "VP3 drain ended without creator INACTIVE; timeout or ROS context loss");
         }
     }
+    if (demoHealthAdapter_) {
+        demoHealthAdapter_->cleanup();
+        demoHealthAdapter_.reset();
+    }
+    demoAdapter_.reset();
     vp3RecordRosOut_.reset();
     createFileRequestRosOut_.reset();
     appRegRosOut_.reset();

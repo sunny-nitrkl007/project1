@@ -92,7 +92,16 @@ file(GLOB WEIGH_APP_INTERFACE_LIBS
 list(FILTER WEIGH_APP_INTERFACE_LIBS
      EXCLUDE REGEX ".*generator_py.*")
 
+file(GLOB DEMO_APP_INTERFACE_LIBS
+    "${SSP_DIR}/ros2_models/lib/demo_app_interfaces/lib*.so"
+)
 
+list(FILTER DEMO_APP_INTERFACE_LIBS
+     EXCLUDE REGEX ".*generator_py.*")
+
+if(NOT DEMO_APP_INTERFACE_LIBS)
+    message(FATAL_ERROR "Missing generated demo_app_interfaces libraries in ${SSP_DIR}/ros2_models/lib/demo_app_interfaces")
+endif()
 
 #
 # LPS Pass Tracker
@@ -285,6 +294,7 @@ target_link_directories(ScsToRos2Bridge PRIVATE
     "${SSP_DIR}/ros2_models/lib/cpm_common_interfaces"
     "${SSP_DIR}/ros2_models/lib/job_mgr_interfaces"
     "${SSP_DIR}/ros2_models/lib/weigh_app_interfaces"
+    "${SSP_DIR}/ros2_models/lib/demo_app_interfaces"
 
     "${SSP_DIR}/eta-ais/build-A7H4-adv/ext/sdk/ais-sdk-aarch64-a/amd64/host/usr/aarch64-linux-gnu/sysroot/usr/lib"
 
@@ -382,6 +392,7 @@ target_link_libraries(ScsToRos2Bridge PRIVATE
     ${CPM_COMMON_INTERFACE_LIBS}
     ${JOB_MGR_INTERFACE_LIBS}
     ${WEIGH_APP_INTERFACE_LIBS}
+    ${DEMO_APP_INTERFACE_LIBS}
 
     ${CPM_LIBS}
 
