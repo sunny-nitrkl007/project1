@@ -17,7 +17,9 @@ echo "Stopping any old processes..."
 
 ###  List of all processes we want to stop (not including scs - we kill that separately)
 ###  Active processes are only listed by the first 15 characters of the process name.
-processes=(VP3FileCreationApp
+processes=(DemoApp
+           ScsToRos2Bridge
+           VP3FileCreationApp
 	   LpsSaTotalsApp
 	   aisJhm2DataServer
 	   bmiJ1939
