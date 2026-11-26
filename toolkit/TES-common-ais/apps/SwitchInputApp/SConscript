@@ -114,6 +114,7 @@ ROS_LIB_PATHS.extend([
     os.path.join(BASE_PATH, 'ros2_models', 'lib', 'cpm_common_interfaces'),
     os.path.join(BASE_PATH, 'ros2_models', 'lib', 'job_mgr_interfaces'),
     os.path.join(BASE_PATH, 'ros2_models', 'lib', 'weigh_app_interfaces'),
+    os.path.join(BASE_PATH, 'ros2_models', 'lib', 'demo_app_interfaces'),
     os.path.join(BASE_PATH, 'dependencies', 'libyaml_0.2.5', 'lib'),
 ])
 

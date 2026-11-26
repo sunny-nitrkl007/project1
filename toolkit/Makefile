@@ -492,6 +492,7 @@ project_all:
     cp -r ${PWD}/ros2_models/lib/cpm_common_interfaces/* ${AIS_BUILD_DIR}/lib/; \
     cp -r ${PWD}/ros2_models/lib/job_mgr_interfaces/* ${AIS_BUILD_DIR}/lib/; \
     cp -r ${PWD}/ros2_models/lib/weigh_app_interfaces/* ${AIS_BUILD_DIR}/lib/; \
+    cp -r ${PWD}/ros2_models/lib/demo_app_interfaces/* ${AIS_BUILD_DIR}/lib/; \
 	cp -r ${PWD}/ros2_models/share/* ${AIS_BUILD_DIR}/share/; \
 	cp -r ${PWD}/TES-common-ais/build-A7H4-adv/lib/* ${AIS_BUILD_DIR}/lib/; \
 	cp -r ${PWD}/dependencies/boost_1.83.0/lib/* ${AIS_BUILD_DIR}/lib/; \
